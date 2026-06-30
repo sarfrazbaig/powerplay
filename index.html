@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Powerplay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --table:#0c8f86;--felt:#0a7b73;--panel:#fffdf6;--ink:#13313f;--muted:#6a8587;
+    --gold:#f5c84b;--gold-d:#bb8f1c;--bat:#1f9b53;--bat-l:#34c06a;--bowl:#1f78c7;--bowl-l:#3aa5ee;
+    --all:#8a55e6;--all-l:#b985ff;--red:#e8455a;--cream:#fff8e6;
+    --shadow:0 10px 24px rgba(6,40,42,.22);--shadow-sm:0 5px 12px rgba(6,40,42,.16);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;color:var(--ink);
+    font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;
+    background:
+      linear-gradient(rgba(255,255,255,.10) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.10) 1px,transparent 1px),
+      radial-gradient(900px 500px at 50% -8%,rgba(255,240,170,.22),transparent 60%),
+      linear-gradient(180deg,var(--table),var(--felt));
+    background-size:34px 34px,34px 34px,auto,auto;background-attachment:fixed}
+  button{font:inherit;cursor:pointer;border:0}
+  #app{max-width:1540px;margin:0 auto;padding:10px 14px 14px}
+  .screen{display:none}.screen.active{display:block}
+  #match.screen.active{min-height:calc(100dvh - 24px);display:grid;grid-template-columns:1fr;grid-template-rows:auto auto minmax(430px,1fr) auto auto;grid-template-areas:
+    "top"
+    "board"
+    "arena"
+    "squadbar"
+    "squad";gap:10px;align-items:start}
+
+  /* buttons */
+  .btn{background:linear-gradient(180deg,#ffd75e,var(--gold));color:#241b00;border-radius:999px;padding:12px 22px;
+    font-weight:900;box-shadow:0 5px 0 var(--gold-d),0 10px 20px rgba(34,24,0,.14);letter-spacing:.01em;transition:transform .08s,box-shadow .08s}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--gold-d)}
+  .btn.secondary{background:#fff;color:var(--ink);box-shadow:0 4px 0 rgba(10,90,86,.4);border:1px solid rgba(18,49,63,.14)}
+  .btn.secondary:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(10,90,86,.4)}
+  .btn.ghost{background:rgba(255,255,255,.14);color:#eafffb;box-shadow:none;border:1.5px solid rgba(255,255,255,.4)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:0 5px 0 var(--gold-d)}
+  .btn.sm{padding:8px 13px;font-size:13px;border-radius:9px;box-shadow:0 4px 0 var(--gold-d)}
+  .btn.secondary.sm{box-shadow:0 3px 0 rgba(10,90,86,.4)}
+
+  /* title */
+  .title{min-height:calc(100dvh - 46px);place-items:center;text-align:center}
+  .screen.active.title{display:grid}
+  .title-inner{transform:translateY(-4%)}
+  .logo{font-weight:900;font-size:clamp(56px,12vw,120px);line-height:.84;color:#fff;text-shadow:0 5px 0 rgba(8,70,66,.4)}
+  .logo span{color:#ffe98a}
+  .tag{max-width:560px;margin:18px auto 24px;color:#eafffb;font-size:17px;line-height:1.5;text-shadow:0 1px 0 rgba(0,0,0,.18)}
+  .title .btn{font-size:20px;padding:15px 34px}
+  .pill-row{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .stat-pill{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#eafffb;
+    border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700}
+  .stat-pill b{color:#fff;font-weight:900}
+
+  /* header */
+  .top{grid-area:top;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:-2px}
+  .match-title{font-size:24px;font-weight:900;color:#fff;text-shadow:0 3px 0 rgba(8,70,66,.4);line-height:1}
+  .sub{font-size:13px;color:#dbfff8;margin-top:3px}
+  .stepper{display:flex;gap:6px;align-items:center;margin-top:7px}
+  .step{width:26px;height:6px;border-radius:99px;background:rgba(255,255,255,.28)}
+  .step.done{background:#ffe98a}.step.now{background:#fff}
+
+  /* scoreboard */
+  .board{grid-area:board;display:grid;grid-template-columns:1fr 126px 1fr;gap:10px;align-items:stretch;margin-bottom:0}
+  .side{position:relative;overflow:hidden;background:
+    radial-gradient(circle at 10% 0,rgba(255,255,255,.18),transparent 32%),
+    linear-gradient(180deg,rgba(13,55,61,.96),rgba(7,38,43,.96));border-radius:14px;padding:9px 14px;
+    box-shadow:0 7px 0 rgba(3,45,43,.5),var(--shadow-sm);border:1px solid rgba(255,255,255,.18);color:#eafffb}
+  .side:before{content:"";position:absolute;inset:0 auto 0 0;width:7px;background:var(--bat)}
+  .side.rival:before{left:auto;right:0;background:var(--red)}
+  .side.you{border-top:0}
+  .side.rival{border-top:0;text-align:right}
+  .side .who{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:rgba(234,255,251,.76)}
+  .side .sc{font-size:36px;font-weight:900;line-height:.92;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.22)}
+  .side .sc small{font-size:17px;color:rgba(234,255,251,.62)}
+  .side .mini{font-size:11px;color:rgba(234,255,251,.72);margin-top:3px;font-weight:800}
+  .wkts{display:inline-flex;gap:4px;margin-top:5px}
+  .side.rival .wkts{flex-direction:row-reverse}
+  .stump{width:7px;height:16px;border-radius:2px;background:var(--bat-l);box-shadow:0 0 8px rgba(52,192,106,.38)}
+  .side.rival .stump{background:#f3899a}
+  .stump.out{background:#d9e3e1}
+  .target{align-self:center;text-align:center;background:radial-gradient(circle at 50% 0,#fff7ca,#f6d75b 62%,#c69222);
+    border-radius:50%;padding:11px 10px 10px;box-shadow:0 5px 0 #946915,0 10px 18px rgba(34,24,0,.22);
+    border:3px solid rgba(255,255,255,.68);min-width:112px;min-height:112px;display:grid;place-items:center}
+  .target .lbl{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#6d4c0c}
+  .target .big{font-size:27px;font-weight:900;line-height:1.02;color:#241b00}
+  .target .big b{color:var(--red)}
+  .target .big span{display:block;margin-top:1px}
+  .target .note{font-size:10px;color:#74540c;margin-top:1px;font-weight:800}
+
+  /* arena */
+  .arena{grid-area:arena;position:relative;display:flex;flex-direction:column;overflow:hidden;align-self:stretch;min-height:0;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),
+      linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
+      radial-gradient(ellipse at 50% 42%,rgba(255,236,166,.30) 0 18%,transparent 19%),
+      radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.18) 0 47%,transparent 48%),
+      linear-gradient(135deg,#0f8e76,#086d61);
+    background-size:30px 30px,30px 30px,auto,auto,auto;
+    border-radius:18px;padding:12px 16px 10px;box-shadow:var(--shadow);border:2px solid rgba(255,255,255,.22)}
+  .arena:before{content:"";position:absolute;inset:14px 18px 122px;border:2px solid rgba(255,255,255,.32);border-radius:20px;pointer-events:none}
+  .arena:after{content:"";position:absolute;left:50%;top:24px;bottom:132px;width:3px;transform:translateX(-50%);
+    background:linear-gradient(transparent,rgba(255,255,255,.5),transparent);opacity:.55;pointer-events:none}
+  .duel{position:relative;z-index:1;display:grid;grid-template-columns:minmax(240px,1fr) 96px minmax(240px,1fr);gap:14px;align-items:center;min-height:270px;flex:1}
+  .rival-pile{position:absolute;right:20px;top:14px;z-index:4;display:flex;align-items:center;gap:8px;color:var(--muted);
+    font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;pointer-events:none}
+  .pile-stack{position:relative;width:48px;height:66px}
+  .pile-card{position:absolute;inset:0;border-radius:8px;border:2px solid #f6e09a;background:
+    radial-gradient(circle at 25% 18%,rgba(255,255,255,.34),transparent 28%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,.12) 0 6px,transparent 6px 12px),
+    linear-gradient(145deg,#d63d52,#7a2fb5 56%,#1f78c7);
+    box-shadow:0 5px 10px rgba(6,40,42,.22)}
+  .pile-card:nth-child(1){transform:translate(-7px,5px) rotate(-6deg);opacity:.42}
+  .pile-card:nth-child(2){transform:translate(-3px,2px) rotate(-2deg);opacity:.62}
+  .pile-card:nth-child(3){transform:rotate(3deg)}
+  .rival-pile.deal .pile-card:nth-child(3){animation:pileDeal .34s ease}
+  .pile-meta{display:grid;gap:1px;text-align:right}
+  .pile-meta b{font-size:15px;line-height:1;color:var(--red)}
+  .vs{display:grid;place-items:center;font-weight:900;color:#eafffb;font-size:14px;text-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .placeholder{display:grid;place-items:center;text-align:center;color:rgba(234,255,251,.82);border:2px dashed rgba(255,255,255,.34);
+    border-radius:16px;background:rgba(4,74,65,.34);padding:14px;font-size:48px;font-weight:900;min-height:250px}
+  .placeholder span{display:block;margin-top:8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(234,255,251,.72)}
+  .log{min-height:0;margin:2px 2px 4px;font-size:13px;font-weight:800;line-height:1.2;text-align:center;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .log b{color:#ffe98a}
+  .log .good{color:var(--bowl)}
+  .actions{position:absolute;left:50%;bottom:176px;z-index:5;display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;transform:translateX(-50%)}
+  .actions .btn{min-width:96px;padding:12px 19px;text-transform:uppercase;letter-spacing:.06em}
+  .actions .btn.secondary{width:42px;height:42px;padding:0;border-radius:50%;font-size:0;position:relative}
+  .actions .btn.secondary:before{content:"x";font-size:22px;font-weight:900;color:var(--ink)}
+  .explain{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:10px;margin-top:8px}
+  .ladder,.feed{background:rgba(255,253,246,.94);border:1px solid rgba(18,49,63,.1);border-radius:12px;padding:8px 10px;box-shadow:0 7px 16px rgba(4,42,39,.14)}
+  .ladder h3,.feed h3{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+  .curve-box{padding:4px 2px 0}
+  .curve-svg{width:100%;height:78px;display:block}
+  .curve-area{fill:rgba(31,120,199,.14);stroke:var(--bowl);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .curve-dot{fill:#fff;stroke:var(--bowl);stroke-width:2}
+  .curve-dot.danger{stroke:var(--red)}.curve-dot.good{stroke:var(--bat)}
+  .curve-dot.hit{fill:var(--gold);stroke:#13313f;stroke-width:3;animation:curveHit .5s ease both}
+  .curve-marker{fill:var(--gold);stroke:#13313f;stroke-width:3;filter:drop-shadow(0 4px 5px rgba(6,40,42,.28))}
+  .curve-flash{fill:var(--gold);stroke:#13313f;stroke-width:3;opacity:0;filter:drop-shadow(0 4px 5px rgba(6,40,42,.28));
+    animation:curveFlash .24s steps(1,end) both}
+  .curve-flash.slow{animation-duration:.34s}
+  .curve-marker.rolling{opacity:0;animation:curveLand .38s ease both;animation-delay:2.85s}
+  .curve-axis{stroke:rgba(18,49,63,.18);stroke-width:2}
+  .curve-tick{stroke:rgba(18,49,63,.16);stroke-width:1.5}
+  .curve-svg-label{font-size:13px;font-weight:900;text-anchor:middle;dominant-baseline:middle;fill:#13313f}
+  .curve-svg-label.danger{fill:var(--red)}.curve-svg-label.good{fill:var(--bat)}
+  .curve-scale{display:flex;justify-content:space-between;margin-top:2px;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  @keyframes curveHit{0%{r:4;opacity:.4}55%{r:9;opacity:1}100%{r:6}}
+  @keyframes curveFlash{0%,100%{opacity:0}18%,82%{opacity:1}}
+  @keyframes curveLand{0%{opacity:0;transform:scale(.7)}65%{opacity:1;transform:scale(1.28)}100%{opacity:1;transform:scale(1)}}
+  .feed-list{display:grid;gap:6px;max-height:96px;overflow:auto}
+  .feed-item{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+  .feed-item .tag{font-weight:900;color:#13313f;min-width:54px}
+  .feed-item .tag.w{color:var(--red)}.feed-item .tag.b{color:var(--bowl)}
+  .over-strip{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:38px}
+  .ball-chip{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#f3f8f8;
+    border:2px solid #dbe8e8;color:#90a3a5;font-size:12px;font-weight:900;box-shadow:inset 0 -2px 0 rgba(19,49,63,.08)}
+  .ball-chip.filled{background:#fff;color:var(--ink);border-color:#bfd5d6}
+  .ball-chip.boundary{background:#e8f8ee;color:var(--bat);border-color:#7bd79d}
+  .ball-chip.wicket{background:#fdecef;color:var(--red);border-color:#f095a5}
+  .ball-chip.current{animation:ballPop .36s ease both}
+  @keyframes ballPop{0%{transform:scale(.72);opacity:.35}65%{transform:scale(1.14)}100%{transform:scale(1);opacity:1}}
+
+  /* hand */
+  .hand-bar{grid-area:squadbar;display:flex;justify-content:space-between;align-items:center;margin:0 2px;color:#eafffb;font-size:12px;text-shadow:0 1px 0 rgba(0,0,0,.18);min-height:16px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+  .hand-bar .r{display:flex;gap:10px;align-items:center}
+  .hand{grid-area:squad;display:flex;gap:6px;align-items:stretch;justify-content:center;overflow-x:visible;overflow-y:visible;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.11),transparent 16%,transparent 84%,rgba(255,255,255,.11)),
+      linear-gradient(180deg,rgba(255,253,246,.96),rgba(232,249,240,.92));border:1px solid rgba(255,255,255,.45);box-shadow:0 7px 0 rgba(4,68,64,.52),var(--shadow);
+    border-radius:16px;padding:7px 8px 9px;scrollbar-width:thin}
+  .role-lane{position:relative;min-width:max-content;background:rgba(255,255,255,.08);border:1.5px solid rgba(19,49,63,.10);
+    border-radius:14px;padding:18px 5px 5px;display:flex;flex-direction:column;gap:4px;box-shadow:none}
+  .role-lane.bat{border-color:rgba(31,155,83,.34)}
+  .role-lane.bowl{border-color:rgba(31,120,199,.34)}
+  .role-lane.all{border-color:rgba(138,85,230,.34)}
+  .role-lane.coach{border-color:rgba(245,200,75,.55);min-width:88px}
+  .lane-head{position:absolute;left:12px;top:-9px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    background:rgba(13,55,61,.95);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:2px 9px;font-size:10px;font-weight:900;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+  .lane-head span{display:none}
+  .lane-head b{color:#eafffb}
+  .lane-cards{display:flex;gap:5px;align-items:flex-end;min-height:122px;overflow:visible;padding:0 0 2px}
+  .lane-cards .card{flex:0 0 clamp(68px,5.8vw,88px)}
+  .coach-slot{min-height:122px;border:1.5px dashed rgba(19,49,63,.22);border-radius:12px;background:rgba(255,255,255,.28);
+    display:grid;place-items:center;text-align:center;color:var(--muted);font-size:24px;font-weight:900;line-height:1;padding:8px}
+
+  /* CARD */
+  .card{position:relative;background:var(--panel);border-radius:14px;border:1px solid rgba(18,49,63,.12);
+    box-shadow:var(--shadow-sm);padding:11px;display:flex;flex-direction:column;gap:9px;cursor:pointer;text-align:left;
+    transition:transform .13s,box-shadow .13s,border-color .13s;animation:deal .22s both}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:rgba(245,200,75,.6)}
+  .card.selected{transform:translateY(-7px);border-color:var(--gold);box-shadow:0 0 0 3px var(--gold),0 16px 28px rgba(6,40,42,.32)}
+  .card.used{filter:grayscale(.55);opacity:.45;pointer-events:none}
+  .card:disabled{cursor:default}
+  .cardtop{display:flex;gap:10px;align-items:center}
+  .crest{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:900;
+    flex:none;position:relative;box-shadow:inset 0 0 0 2px rgba(255,255,255,.28)}
+  .role-bat .crest{background:linear-gradient(135deg,var(--bat-l),var(--bat))}
+  .role-bowl .crest{background:linear-gradient(135deg,var(--bowl-l),var(--bowl))}
+  .role-all .crest{background:linear-gradient(135deg,var(--all-l),var(--all))}
+  .crest .initials{font-size:16px;letter-spacing:.5px}
+  .crest .mark{position:absolute;right:-7px;bottom:-7px;width:21px;height:21px;border-radius:50%;background:#fff;
+    display:grid;place-items:center;box-shadow:0 2px 5px rgba(0,0,0,.22)}
+  .crest .mark svg{width:13px;height:13px}
+  .role-bat .mark{color:var(--bat)}.role-bowl .mark{color:var(--bowl)}.role-all .mark{color:var(--all)}
+  .idblock{flex:1;min-width:0}
+  .pname{font-weight:900;font-size:15px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .prole{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+  .role-bat .prole{color:var(--bat)}.role-bowl .prole{color:var(--bowl)}.role-all .prole{color:var(--all)}
+  .jersey{font-weight:900;color:rgba(19,49,63,.22);font-size:17px;align-self:flex-start}
+  .stats2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{border-radius:10px;padding:7px 4px;text-align:center;background:#eef5f8;border:1.5px solid #dde9ef;position:relative}
+  .stat span{display:block;font-size:10px;font-weight:800;color:#7b8f93;letter-spacing:.05em}
+  .stat b{font-size:24px;font-weight:900;line-height:1}
+  .stat.bat b{color:var(--bat)}.stat.bowl b{color:var(--bowl)}
+  .stat.emph{background:var(--cream);border-color:var(--gold);box-shadow:0 0 0 2px rgba(245,200,75,.45)}
+  .traitline{font-size:11px;font-weight:700;color:#b9740a;min-height:15px;line-height:1.2}
+  .traitline.none{color:#a4b4b6;font-weight:600}
+  .selbadge{display:none;position:absolute;top:-9px;right:-9px;width:26px;height:26px;border-radius:50%;
+    background:var(--gold);color:#241b00;font-weight:900;place-items:center;border:2px solid #fff;box-shadow:0 3px 8px rgba(0,0,0,.28);font-size:14px}
+  .card.selected .selbadge{display:grid}
+  @keyframes deal{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+  .pop{animation:pop .34s ease}
+  @keyframes pop{0%{transform:scale(.92);opacity:.4}55%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+  /* duel card */
+  .dcard{position:relative;background:var(--panel);border-radius:14px;border:1px solid rgba(18,49,63,.12);
+    box-shadow:var(--shadow-sm);padding:12px;display:flex;flex-direction:column;gap:9px}
+  .dcard .lbl{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .bigstat{margin-top:auto;border-radius:12px;padding:10px;text-align:center;background:var(--cream);border:2px solid var(--gold)}
+  .bigstat span{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--muted)}
+  .bigstat b{font-size:38px;font-weight:900;line-height:1}
+  .bigstat.bat b{color:var(--bat)}.bigstat.bowl b{color:var(--bowl)}
+
+  /* squad drawer */
+  .drawer{display:none;margin-top:12px;background:rgba(255,253,246,.96);border-radius:14px;padding:14px;box-shadow:var(--shadow);border:1px solid rgba(18,49,63,.08)}
+  .drawer.show{display:block}
+  .drawer h3{margin:0 0 10px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+  .grid6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+
+  /* shop */
+  .shop-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+  .coins-tag{background:linear-gradient(180deg,#fff,#fff5cf);border:1px solid rgba(18,49,63,.12);border-radius:12px;
+    padding:8px 16px;font-weight:900;font-size:20px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:8px}
+  .coin{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe27a,#e0a91e);box-shadow:inset -2px -2px 0 rgba(0,0,0,.12)}
+  .shop-section{background:rgba(255,253,246,.96);border-radius:16px;padding:16px;box-shadow:var(--shadow);border:1px solid rgba(18,49,63,.08);margin-bottom:14px}
+  .shop-section h2{margin:0 0 4px;font-size:18px;font-weight:900;color:#13313f}
+  .shop-section .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .offers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .offer{position:relative;background:var(--panel);border-radius:14px;border:1px solid rgba(18,49,63,.12);box-shadow:var(--shadow-sm);
+    padding:12px;display:flex;flex-direction:column;gap:10px}
+  .offer.bought{opacity:.5}
+  .offer .price{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:900}
+  .offer.util{text-align:center;align-items:center;justify-content:flex-start}
+  .offer .ic-lg{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;color:#fff;margin:2px auto 0}
+  .offer .ic-lg svg{width:28px;height:28px}
+  .offer h4{margin:2px 0 0;font-size:15px;font-weight:900}
+  .offer p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.35}
+  .squad-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .pickhint{font-size:13px;font-weight:800;color:var(--bat);background:#e8f8ee;border:1px solid #b9e6c9;border-radius:9px;padding:8px 12px}
+  .pickhint.release{color:var(--red);background:#fdecef;border-color:#f4c2cb}
+  .card.pickable{outline:2px dashed rgba(245,200,75,.8);outline-offset:2px}
+  .shop-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
+
+  /* over */
+  #over .logo{font-size:clamp(44px,9vw,84px)}
+
+  @media(max-width:880px){
+    #match.screen.active{display:block}
+    .board{grid-template-columns:1fr}.target{order:-1}
+    .duel{grid-template-columns:1fr;gap:10px}.vs{min-height:18px}
+    .explain{grid-template-columns:1fr}
+    .hand{grid-template-columns:1fr}
+    .grid6{grid-template-columns:repeat(2,1fr)}
+    .offers{grid-template-columns:1fr}
+  }
+
+  /* --- SVG trump-card overrides --- */
+  .card{background:transparent;border:0;padding:0;display:block;border-radius:16px;box-shadow:none;gap:0}
+  .card:hover{transform:translateY(-5px);box-shadow:none;border-color:transparent}
+  .card.selected{transform:translateY(-8px);border:0;box-shadow:0 0 0 4px var(--gold),0 16px 30px rgba(6,40,42,.45)}
+  .card.used{filter:grayscale(.7);opacity:.45}
+  .card.pickable{box-shadow:0 0 0 3px rgba(245,200,75,.85)}
+  .tc{display:block;width:100%;height:auto;border-radius:16px}
+  .duel{align-items:center}
+  .dslot{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center}
+  .dslot .tc{max-width:214px}
+  .dlabel{font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:center}
+  .placeholder{min-height:300px;align-self:stretch}
+  .dslot.clash-left .tc{animation:clashLeft 2.65s cubic-bezier(.17,.76,.22,1) both}
+  .dslot.clash-right .tc{animation:clashRight 2.65s cubic-bezier(.17,.76,.22,1) both}
+  .impact-zone{position:relative;display:grid;place-items:center;min-height:270px;font-weight:900;color:var(--muted)}
+  .impact-bat{position:absolute;width:84px;height:12px;border-radius:999px;background:linear-gradient(90deg,#7a4a16,#e0b653);
+    transform:rotate(-28deg);box-shadow:0 3px 0 rgba(80,42,8,.28);animation:batSwing 2.65s ease both}
+  .impact-ball{position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #c0303f;
+    box-shadow:0 0 0 5px rgba(245,200,75,.3);animation:ballStrike 2.65s ease both}
+  .outcome-burst{position:absolute;z-index:3;min-width:148px;height:148px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 35% 28%,#fff8bd,var(--gold));border:4px solid #fff;color:#241b00;
+    font-size:68px;font-weight:900;box-shadow:0 22px 34px rgba(6,40,42,.32);animation:outcomeBurst 3.25s ease both}
+  .outcome-burst.wicket{background:radial-gradient(circle at 35% 28%,#ffdbe2,var(--red));color:#fff}
+  .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:14px}
+  .confetti i{position:absolute;left:50%;top:50%;width:9px;height:14px;border-radius:2px;background:var(--c);
+    transform:translate(-50%,-50%) rotate(var(--r));animation:confettiPop 1.15s ease-out both;animation-delay:2.15s}
+  .confetti i:nth-child(1){--x:-150px;--y:-88px;--r:18deg;--c:#34c06a}
+  .confetti i:nth-child(2){--x:-96px;--y:-134px;--r:72deg;--c:#f5c84b}
+  .confetti i:nth-child(3){--x:-34px;--y:-112px;--r:135deg;--c:#3aa5ee}
+  .confetti i:nth-child(4){--x:42px;--y:-132px;--r:210deg;--c:#e8455a}
+  .confetti i:nth-child(5){--x:116px;--y:-90px;--r:260deg;--c:#8a55e6}
+  .confetti i:nth-child(6){--x:154px;--y:-26px;--r:318deg;--c:#34c06a}
+  .confetti i:nth-child(7){--x:-144px;--y:34px;--r:44deg;--c:#f5c84b}
+  .confetti i:nth-child(8){--x:-82px;--y:96px;--r:108deg;--c:#3aa5ee}
+  .confetti i:nth-child(9){--x:78px;--y:94px;--r:188deg;--c:#e8455a}
+  .confetti i:nth-child(10){--x:145px;--y:38px;--r:286deg;--c:#8a55e6}
+  .cleared-duel{grid-column:1/-1;min-height:270px;display:grid;place-items:center;text-align:center;color:#dff8f4;
+    border:2px dashed rgba(255,255,255,.22);border-radius:16px;background:rgba(4,74,65,.30);font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.16)}
+  .cleared-duel b{display:block;color:#ffe98a;font-size:64px;line-height:1;margin-bottom:8px;text-shadow:0 4px 0 rgba(0,0,0,.16)}
+  .cleared-duel div div{margin-top:5px}
+  .cleared-duel .btn{margin-top:18px}
+  @keyframes clashLeft{0%,24%{transform:none;opacity:1}46%{transform:translateX(48px) rotate(2deg)}68%{transform:translateX(78px) rotate(-2deg) scale(1.03)}100%{transform:translate(-180px,-36px) rotate(-13deg) scale(.74);opacity:0}}
+  @keyframes clashRight{0%,24%{transform:none;opacity:1}46%{transform:translateX(-48px) rotate(-2deg)}68%{transform:translateX(-78px) rotate(2deg) scale(1.03)}100%{transform:translate(180px,-36px) rotate(13deg) scale(.74);opacity:0}}
+  @keyframes batSwing{0%,42%{transform:translate(-26px,8px) rotate(-28deg);opacity:1}58%{transform:translate(8px,-3px) rotate(18deg)}100%{transform:translate(22px,-20px) rotate(36deg);opacity:0}}
+  @keyframes ballStrike{0%,36%{transform:translate(-34px,0) scale(.8);opacity:0}46%{opacity:1}60%{transform:translate(0,0) scale(1.1)}100%{transform:translate(44px,-46px) scale(.35);opacity:0}}
+  @keyframes outcomeBurst{0%,68%{transform:scale(.35);opacity:0}78%{transform:scale(1.18);opacity:1}94%{transform:scale(1.06);opacity:1}100%{transform:scale(.96);opacity:0}}
+  @keyframes confettiPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(var(--r))}18%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1) rotate(calc(var(--r) + 260deg))}}
+  .offer{padding:10px}.offer .tc{max-width:100%}
+
+  /* --- tactile, hold-a-hand card feel --- */
+  .card{animation:none}
+  .selbadge{z-index:6}
+  .card .sheen{position:absolute;inset:0;border-radius:16px;pointer-events:none;opacity:0;z-index:5;
+    background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.55) 50%,transparent 62%)}
+  .lane-cards{perspective:1300px}
+  .lane-cards .card{margin:0;transform-origin:bottom center;
+    transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));z-index:var(--z,1);
+    transition:transform .2s cubic-bezier(.2,.7,.3,1),box-shadow .2s}
+  .lane-cards .card.selected{transform:translateY(-28px) rotate(0deg) scale(1.18);z-index:55;box-shadow:0 0 0 4px var(--gold),0 22px 38px rgba(4,28,30,.5)}
+  .lane-cards .card:hover{transform:translateY(-30px) rotate(0deg) scale(1.2) rotateX(7deg);z-index:60;box-shadow:0 28px 46px rgba(4,28,30,.55)}
+  .lane-cards .card.dealin .tc{animation:dealIn .42s cubic-bezier(.2,.85,.3,1) both;animation-delay:var(--d,0ms)}
+  .lane-cards .card.throw{animation:throwCard .24s ease-in forwards;z-index:70}
+  .lane-cards .card:hover .sheen{opacity:1;animation:sheen .6s ease}
+  @keyframes dealIn{from{opacity:0;transform:translateY(90px) rotate(13deg) scale(.8)}to{opacity:1;transform:none}}
+  @keyframes throwCard{0%{opacity:1}100%{transform:translateY(-340px) scale(.5) rotate(12deg);opacity:0}}
+  @keyframes sheen{from{transform:translateX(-78%)}to{transform:translateX(78%)}}
+  .duel{perspective:1400px}
+  .dslot.frompile .tc{animation:dealFromPile .48s cubic-bezier(.18,.78,.25,1) both;transform-origin:center}
+  @keyframes dealFromPile{0%{opacity:.18;transform:translate(170px,-76px) rotate(10deg) scale(.44) rotateY(76deg);filter:saturate(.75)}62%{opacity:1;transform:translate(-8px,4px) rotate(-2deg) scale(1.04)}100%{opacity:1;transform:none;filter:none}}
+  @keyframes pileDeal{0%{transform:rotate(3deg)}45%{transform:translate(-14px,-8px) rotate(-9deg)}100%{transform:rotate(3deg)}}
+  .grid6 .card{transition:transform .14s}
+  .grid6 .card:hover{transform:translateY(-6px) scale(1.05)}
+  @media(max-width:880px){.lane-cards{min-height:172px}.lane-cards .card{flex-basis:112px}.coach-slot{min-height:120px}}
+  @media(prefers-reduced-motion:reduce){.lane-cards .card.dealin .tc,.dslot.frompile .tc,.rival-pile.deal .pile-card:nth-child(3),.dslot.clash-left .tc,.dslot.clash-right .tc,.impact-bat,.impact-ball,.outcome-burst,.curve-marker.rolling{animation:none}}
+
+  /* --- who's batting / bowling clarity --- */
+  .roletag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;vertical-align:middle;letter-spacing:.04em}
+  .roletag svg{width:12px;height:12px}
+  .roletag.bat{background:#e7f8ee;color:#137a40}
+  .roletag.bowl{background:#e6f1fb;color:#155fa0}
+  .side.rival .who{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+  .side.you .who{display:flex;align-items:center;gap:6px}
+  .dlabel{display:inline-flex !important;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;font-size:12.5px;font-weight:900;letter-spacing:.03em;box-shadow:0 3px 8px rgba(6,40,42,.18)}
+  .dlabel svg{width:15px;height:15px}
+  .dlabel.bat{background:linear-gradient(180deg,#3fc873,#1f9b53);color:#fff}
+  .dlabel.bowl{background:linear-gradient(180deg,#43a5ee,#1f78c7);color:#fff}
+  #phaseLabel b{color:#fff}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section id="title" class="screen active title">
+    <div class="title-inner">
+      <div class="logo">Power<span>play</span></div>
+      <div class="tag">A roguelike cricket card duel. Bowl an over, then chase one. Build your squad between matches and lift the cup.</div>
+      <button class="btn" id="startBtn">Start Run</button>
+      <div class="pill-row" id="titleStats"></div>
+    </div>
+  </section>
+
+  <section id="match" class="screen">
+    <div class="top">
+      <div>
+        <div class="match-title" id="matchName"></div>
+        <div class="sub" id="phaseLabel"></div>
+        <div class="stepper" id="stepper"></div>
+      </div>
+      <button class="btn secondary sm" id="restartBtn">Restart</button>
+    </div>
+
+    <div class="board">
+      <div class="side you">
+        <div class="who">You <span class="roletag" id="youRole"></span></div>
+        <div class="sc"><span id="youRuns">0</span><small>/<span id="youWk">0</span></small></div>
+        <div class="wkts" id="youWkts"></div>
+        <div class="mini" id="youMeta"></div>
+      </div>
+      <div class="target" id="target"></div>
+      <div class="side rival">
+        <div class="who">Rival <span class="roletag" id="rivalRole"></span></div>
+        <div class="sc"><span id="rivalRuns">0</span><small>/<span id="rivalWk">0</span></small></div>
+        <div class="wkts" id="rivalWkts"></div>
+        <div class="mini" id="rivalMeta"></div>
+      </div>
+    </div>
+
+    <div class="arena">
+      <div class="rival-pile" id="rivalPile" aria-hidden="true">
+        <div class="pile-meta"><span>Rival pile</span><b id="rivalPileCount">12</b></div>
+        <div class="pile-stack"><span class="pile-card"></span><span class="pile-card"></span><span class="pile-card"></span></div>
+      </div>
+      <div class="duel" id="duel"></div>
+      <div class="log" id="log"></div>
+      <div class="actions" id="actions"></div>
+      <div class="explain">
+        <div class="ladder" id="ladder"></div>
+        <div class="feed"><h3>Last balls</h3><div class="feed-list" id="feed"></div></div>
+      </div>
+    </div>
+
+    <div class="hand-bar">
+      <span id="handPrompt"></span>
+      <span class="r">Bench</span>
+    </div>
+    <div class="hand" id="hand"></div>
+  </section>
+
+  <section id="shop" class="screen">
+    <div class="top">
+      <div><div class="match-title">The Clubhouse</div><div class="sub" id="shopSub"></div></div>
+      <div class="coins-tag"><span class="coin"></span><span id="coins">0</span></div>
+    </div>
+
+    <div class="shop-section">
+      <h2>Transfer market</h2>
+      <p class="hint">Sign new players and grab squad upgrades. Bigger matches need a deeper bench.</p>
+      <div class="offers" id="offers"></div>
+      <div class="shop-foot">
+        <button class="btn secondary sm" id="rerollBtn">Reroll · 2</button>
+        <span class="sub" style="color:var(--muted)">Deck: <b id="deckCount">0</b> cards</span>
+      </div>
+    </div>
+
+    <div class="shop-section">
+      <h2>Manage your squad</h2>
+      <p class="hint" id="manageHint">Tap a player, then train or release them. Releasing thins your deck so your stars come up more often.</p>
+      <div class="squad-actions" id="squadActions"></div>
+      <div class="grid6" id="shopSquad"></div>
+    </div>
+
+    <div class="shop-foot">
+      <span></span>
+      <button class="btn" id="nextBtn">Next Match →</button>
+    </div>
+  </section>
+
+  <section id="over" class="screen title">
+    <div class="title-inner">
+      <div class="logo" id="overTitle">Run Over</div>
+      <div class="tag" id="overText"></div>
+      <button class="btn" id="homeBtn">Back To Title</button>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rng=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const uid=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2);
+
+const ICON={
+  bat:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="13.4" y="2" width="3.7" height="12.5" rx="1.8" transform="rotate(40 15 8)"/><rect x="8.6" y="13" width="2.7" height="6.5" rx="1.3" transform="rotate(40 10 16)"/><circle cx="6.4" cy="18.6" r="2.3"/></svg>',
+  ball:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="currentColor"/><path d="M7 9.4Q12 12 17 9.4M7 14.6Q12 12 17 14.6" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="1.5"/></svg>',
+  all:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6l2.6 5.7 6.2.6-4.7 4.1 1.4 6.1L12 16.9 6.5 19.2l1.4-6.1L3.2 8.9l6.2-.6z"/></svg>',
+  coin:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg>',
+  train:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-3V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H4a1 1 0 0 0-1 1v3a4 4 0 0 0 4 4h.3A5 5 0 0 0 11 18.9V21H8v2h8v-2h-3v-2.1A5 5 0 0 0 16.7 15H17a4 4 0 0 0 4-4V8a1 1 0 0 0-1-1zM5 11V9h2v4a2 2 0 0 1-2-2zm14 0a2 2 0 0 1-2 2V9h2z"/></svg>'
+};
+const FIRST=["Arjun","Ravi","Kabir","Dev","Omar","Tariq","Rohan","Vikram","Samar","Nikhil","Yusuf","Karan","Bilal","Hari","Ishan","Milan","Zaid","Aniket","Noah","Liam"];
+const LAST=["Rao","Khan","Menon","Pawar","Iqbal","Joshi","Malik","Singh","Reid","Santos","Das","Naik","Raza","Carter","Gill","Frost","Mehta","Bose","Vance","Cole"];
+const MATCHES=[
+  {name:"Gully Cup",balls:6,wickets:2,reward:6,level:0},
+  {name:"Town League",balls:6,wickets:2,reward:7,level:1},
+  {name:"District Cup",balls:6,wickets:2,reward:8,level:2},
+  {name:"The Final",balls:6,wickets:2,reward:0,level:3}
+];
+const TRAITS=[
+  {name:"Finisher",text:"+8 BAT late in the chase",bat:(c,v)=>c.phase==="bat"&&c.left<=3?v+8:v,bowl:(c,v)=>v},
+  {name:"Strike Bowler",text:"+8 BOWL while bowling",bat:(c,v)=>v,bowl:(c,v)=>c.phase==="bowl"?v+8:v},
+  {name:"Anchor",text:"first batting wicket becomes a dot",bat:(c,v)=>v,bowl:(c,v)=>v},
+  {name:"All-rounder",text:"+4 BAT and +4 BOWL",bat:(c,v)=>v+4,bowl:(c,v)=>v+4}
+];
+const TEAMS=[
+  {name:"Harbour Sharks",c1:"#0b2f6b",c2:"#1f8fd6",cl:"#7fd6f2",badge:"HS"},
+  {name:"Capital Kings",c1:"#46197a",c2:"#a25be0",cl:"#e3c4ff",badge:"CK"},
+  {name:"Desert Falcons",c1:"#a8201a",c2:"#ff6a2a",cl:"#ffbf8c",badge:"DF"},
+  {name:"Royal Tuskers",c1:"#10358a",c2:"#3f7be0",cl:"#ffe79a",badge:"RT"},
+  {name:"Sun Chargers",c1:"#b35200",c2:"#ffae18",cl:"#ffe2a3",badge:"SC"},
+  {name:"Emerald Strikers",c1:"#0b5236",c2:"#23b873",cl:"#9bf0c4",badge:"ES"}
+];
+let svgSeq=1;
+let save={};try{save=JSON.parse(localStorage.getItem("powerplay_rogue")||"{}")}catch(e){}
+save.best=save.best||0;save.cups=save.cups||0;
+let run,m;
+let dealAnim=true,challengeAnim=false,anim=false;
+
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id))}
+function persist(){localStorage.setItem("powerplay_rogue",JSON.stringify(save))}
+function person(){return pick(FIRST)+" "+pick(LAST)}
+function roleName(c){return c.role==="bat"?"Batter":c.role==="bowl"?"Bowler":"All-rounder"}
+function roleClass(c){return c.role==="bat"?"role-bat":c.role==="bowl"?"role-bowl":"role-all"}
+function roleIcon(c){return c.role==="bat"?ICON.bat:c.role==="bowl"?ICON.ball:ICON.all}
+function initials(c){const p=c.name.split(" ");return ((p[0]||"")[0]||"")+((p[1]||"")[0]||"")}
+
+function card(level=0,roleForce){
+  const role=roleForce||pick(["bat","bowl","all"]);
+  const base=54+level*4;
+  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,bat:rng(base-8,base+8),bowl:rng(base-8,base+8),trait:null,used:false};
+  if(role==="bat")c.bat+=rng(10,16);
+  if(role==="bowl")c.bowl+=rng(10,16);
+  if(role==="all"){c.bat+=rng(3,8);c.bowl+=rng(3,8)}
+  c.bat=clamp(c.bat,20,99);c.bowl=clamp(c.bowl,20,99);
+  if(Math.random()<.34+level*.04)c.trait=pick(TRAITS);
+  return c;
+}
+function starter(){return [card(0,"bat"),card(0,"bat"),card(0,"bat"),card(0,"bowl"),card(0,"bowl"),card(0,"bowl"),card(0,"all"),card(0,"all"),card(0,"all"),card(0,"all"),card(0,"all"),card(0,"all")]}
+function enemy(level){const d=[];for(let i=0;i<12;i++)d.push(card(level));return d}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function ctx(){return m?{phase:m.phase,left:m.def.balls-m.ball+1,rivalRuns:m.rival.runs}:{phase:null,left:99,rivalRuns:0}}
+function batVal(c){let v=c.bat;if(c.trait)v=c.trait.bat(ctx(),v);return Math.round(v)}
+function bowlVal(c){let v=c.bowl;if(c.trait)v=c.trait.bowl(ctx(),v);return Math.round(v)}
+function available(){return run.deck.filter(c=>!c.used)}
+function dealHand(){const pool=available();m.hand=pool.length<=5?pool.slice():shuffle(pool.slice()).slice(0,5);dealAnim=true}
+function drawHand(){if(!m.hand)dealHand();return m.hand.filter(c=>!c.used)}
+function rivalCard(kind){const pool=m.rivalDeck.filter(c=>!c.used);let best=pool[0],val=-1;pool.forEach(c=>{const v=kind==="bat"?batVal(c):bowlVal(c);if(v>val){best=c;val=v}});return best}
+
+function startRun(){run={deck:starter(),match:0,coins:3,refreshes:2,wins:0,pending:null};startMatch()}
+function startMatch(){
+  run.deck.forEach(c=>c.used=false);
+  const def=MATCHES[run.match];
+  m={def,phase:"bowl",ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:enemy(def.level),challenge:null,result:null,selected:null,squadOpen:false,history:[],log:"You bowl first. Keep the rival score low."};
+  newChallenge(true);show("match");render();
+}
+function newChallenge(keepLog=false){
+  m.result=null;m.selected=null;challengeAnim=true;
+  m.challenge=m.phase==="bowl"?rivalCard("bat"):rivalCard("bowl");
+  dealHand();
+  if(!keepLog)m.log=m.phase==="bowl"?`Ball ${m.ball}: choose a bowler.`:`Ball ${m.ball}: choose a batter.`;
+}
+function use(c){c.used=true;m.challenge.used=true}
+function play(c){if(m.result||c.used)return;if(m.phase==="bowl")resolveBowl(c);else resolveBat(c)}
+function selectCard(c){if(anim||m.result||c.used)return;m.selected=c;render()}
+function confirmSelected(){
+  if(!m.selected||m.result||anim)return;
+  const el=document.querySelector("#hand .card.selected");
+  if(el){anim=true;el.classList.add("throw");setTimeout(()=>{anim=false;play(m.selected)},230)}
+  else play(m.selected);
+}
+function cancelSelected(){m.selected=null;render()}
+function resolveBowl(c){
+  const mine=bowlVal(c),theirs=batVal(m.challenge),strip=outcomeStrip("bowl",mine-theirs),out=rollOutcome(strip);
+  m.rival.runs+=out.runs;if(out.wicket)m.rival.wk++;
+  use(c);
+  m.selected=null;
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving"};
+  m.log=`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
+  addHistory(out.text,`Bowl ${mine} v Bat ${theirs}`);
+  render(true);
+  settleResult(m.result);
+}
+function resolveBat(c){
+  const mine=batVal(c),theirs=bowlVal(m.challenge),strip=outcomeStrip("bat",mine-theirs),out=rollOutcome(strip);
+  if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
+  m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
+  use(c);
+  m.selected=null;
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving"};
+  m.log=`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
+  addHistory(out.text,`Bat ${mine} v Bowl ${theirs}`);
+  render(true);
+  settleResult(m.result);
+}
+function settleResult(result){
+  setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},3350);
+}
+function outcomeStrip(mode,margin){
+  if(mode==="bowl"){
+    if(margin>=16)return ["W","W","0","0","1","1"];
+    if(margin>=8)return ["W","0","0","1","1","2"];
+    if(margin>=0)return ["0","1","1","2","2","4"];
+    if(margin>=-7)return ["1","2","2","4","4","6"];
+    if(margin>=-14)return ["2","4","4","6","6","6"];
+    return ["4","6","6","6","6","6"];
+  }
+  if(margin>=16)return ["6","6","4","4","2","2"];
+  if(margin>=8)return ["6","4","4","2","2","1"];
+  if(margin>=0)return ["4","2","2","1","1","0"];
+  if(margin>=-5)return ["2","1","1","0","0","W"];
+  if(margin>=-12)return ["1","0","0","W","W","W"];
+  return ["0","W","W","W","W","W"];
+}
+function rollOutcome(strip){
+  const index=rng(0,strip.length-1),token=strip[index];
+  if(token==="W")return {index,runs:0,wicket:true,text:"WICKET"};
+  const runs=Number(token);
+  return {index,runs,wicket:false,text:runs===0?"DOT":runs===1?"Single":runs===2?"Two runs":runs===4?"FOUR":"SIX"};
+}
+function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-6)}
+function nextBall(){
+  if(!m.result)return;
+  if(m.phase==="bat"&&(m.you.runs>m.target||m.you.wk>=m.def.wickets))return finish();
+  if(m.ball>=m.def.balls||(m.phase==="bowl"?m.rival.wk>=m.def.wickets:m.you.wk>=m.def.wickets)){
+    if(m.phase==="bowl"){m.target=m.rival.runs;m.phase="bat";m.ball=1;m.log=`Chase <b>${m.target+1}</b>. Bowling cards used this match are gone.`;newChallenge(true);render();return}
+    return finish();
+  }
+  m.ball++;newChallenge();render();
+}
+function refreshHand(){if(run.refreshes<=0||m.result)return;run.refreshes--;m.selected=null;dealHand();render()}
+function finish(){
+  const won=m.you.runs>m.target;
+  if(won){
+    run.wins++;run.coins+=m.def.reward;save.best=Math.max(save.best,m.you.runs);persist();
+    if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You lifted the cup. Final chase: ${m.you.runs}/${m.you.wk}.`);return}
+    run.match++;run.pending=null;rollShop();show("shop");renderShop();
+  }else end("Run Over",`You needed ${m.target+1}, made ${m.you.runs}/${m.you.wk}.`);
+}
+function end(title,text){$("#overTitle").textContent=title;$("#overText").textContent=text;show("over")}
+
+/* ---------- SHOP ---------- */
+function rollShop(){
+  const lvl=Math.min(run.match,3);
+  const offers=[
+    {type:"card",card:card(lvl,pick(["bat","bowl"])),price:4+lvl},
+    {type:"card",card:card(lvl,pick(["bat","bowl","all"])),price:4+lvl},
+  ];
+  const third=pick([
+    {type:"card",card:card(lvl,"all"),price:5+lvl},
+    {type:"util",util:"refresh",title:"Net Session",desc:"+1 Refresh every match (permanent).",price:5},
+    {type:"util",util:"scout",title:"Scout +2 Coins",desc:"Earn +2 coins after each win (permanent).",price:6},
+  ]);
+  run.shop=[offers[0],offers[1],third];
+}
+function buy(i){
+  const o=run.shop[i];if(!o||o.bought||run.coins<o.price)return;
+  run.coins-=o.price;o.bought=true;
+  if(o.type==="card"){run.deck.push(o.card)}
+  else if(o.type==="util"){
+    if(o.util==="refresh"){run.refreshBonus=(run.refreshBonus||0)+1}
+    if(o.util==="scout"){run.scout=(run.scout||0)+2}
+  }
+  renderShop();
+}
+function startTrain(stat){
+  const cost=3;
+  if(run.coins<cost){flashHint("Not enough coins.");return}
+  run.pending={type:"train",stat,cost};renderShop();
+}
+function startRelease(){run.pending={type:"release"};renderShop()}
+function squadAct(id){
+  const c=run.deck.find(x=>x.id===id);if(!c||!run.pending)return;
+  if(run.pending.type==="train"){
+    run.coins-=run.pending.cost;c[run.pending.stat]=clamp(c[run.pending.stat]+6,20,99);
+  }else if(run.pending.type==="release"){
+    if(run.deck.length<=6){flashHint("Keep at least 6 players.");return}
+    run.deck=run.deck.filter(x=>x.id!==id);run.coins+=2;
+  }
+  run.pending=null;renderShop();
+}
+let hintTimer=null;
+function flashHint(t){const el=$("#manageHint");el.textContent=t;el.style.color="var(--red)";clearTimeout(hintTimer);
+  hintTimer=setTimeout(()=>{el.style.color="";el.textContent="Tap a player, then train or release them. Releasing thins your deck so your stars come up more often.";},1600)}
+
+/* ---------- RENDER: match ---------- */
+function render(pop=false){
+  $("#matchName").textContent=m.def.name;
+  $("#phaseLabel").innerHTML=m.phase==="bowl"?"<b>You bowl</b> · the rival bats — keep their total low":"<b>You bat</b> · the rival bowls — chase the target";
+  $("#phaseLabel").innerHTML=m.phase==="bowl"?"<b>You bowl</b>":"<b>You bat</b>";
+  $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}"></span>`).join("");
+  const left=m.def.balls-m.ball+1;
+  // target panel
+  if(m.phase==="bowl"){
+    $("#target").innerHTML=`<div class="lbl">Bowling</div><div class="big">Ball ${m.ball}<span style="font-size:18px;color:var(--muted)">/${m.def.balls}</span></div><div class="note">keep them low</div>`;
+  }else{
+    $("#target").innerHTML=`<div class="lbl">Need</div><div class="big"><b>${Math.max(0,m.target+1-m.you.runs)}</b></div><div class="note">from ${left} ball${left===1?'':'s'}</div>`;
+  }
+  $("#youRuns").textContent=m.you.runs;$("#youWk").textContent=m.you.wk;
+  $("#rivalRuns").textContent=m.rival.runs;$("#rivalWk").textContent=m.rival.wk;
+  $("#youWkts").innerHTML=wktDots(m.def.wickets,m.you.wk);
+  $("#rivalWkts").innerHTML=wktDots(m.def.wickets,m.rival.wk);
+  $("#youMeta").textContent=m.phase==="bat"?`Chasing · ${m.def.wickets-m.you.wk} wkts left`:"Bowling now";
+  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:`Set ${m.target}`;
+  $("#youMeta").textContent=m.phase==="bat"?`${m.def.wickets-m.you.wk} wkts left`:"On attack";
+  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:`Target ${m.target+1}`;
+  const yb=m.phase==="bat";
+  $("#youRole").className="roletag "+(yb?"bat":"bowl");$("#youRole").innerHTML=(yb?ICON.bat:ICON.ball)+(yb?"BATTING":"BOWLING");
+  $("#rivalRole").className="roletag "+(yb?"bowl":"bat");$("#rivalRole").innerHTML=(yb?ICON.ball:ICON.bat)+(yb?"BOWLING":"BATTING");
+  $("#handPrompt").textContent=m.result?"Ball recorded":m.selected?"Ready":m.phase==="bowl"?"Choose bowler":"Choose batter";
+  $("#handPrompt").textContent=m.result?"Resolved":m.selected?"Locked":m.phase==="bowl"?"Pick a bowler":"Pick a batter";
+  $("#log").innerHTML=m.result?"":m.log;
+  renderDuel(pop);renderActions();renderHand();renderExplainers();
+}
+function wktDots(total,out){let s="";for(let i=0;i<total;i++)s+=`<span class="stump ${i<out?'out':''}"></span>`;return s}
+function renderExplainers(){
+  let strip=null,roll=null;
+  if(m.result){strip=m.result.strip;roll=m.result.roll}
+  else if(m.selected){
+    const mine=m.phase==="bowl"?bowlVal(m.selected):batVal(m.selected);
+    const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
+    strip=outcomeStrip(m.phase,mine-theirs);
+  }
+  $("#ladder").innerHTML=`<h3>${m.result?"Outcome":"Odds"}</h3>${strip?renderCurve(strip,roll,m.phase,m.result?.state==="resolving"):`<div class="feed-item">Pick a card.</div>`}`;
+  if(!strip)$("#ladder").innerHTML=`<h3>${m.result?"Outcome":"Odds"}</h3><div class="feed-item">Awaiting card</div>`;
+  $("#feed").innerHTML=renderOverStrip();
+}
+function renderOverStrip(){
+  const balls=Array.from({length:m.def.balls},(_,i)=>m.history[i]);
+  return `<div class="over-strip">${balls.map((h,i)=>{
+    if(!h)return `<span class="ball-chip">•</span>`;
+    const token=ballToken(h.result),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":"filled");
+    return `<span class="ball-chip ${cls} ${i===m.history.length-1?'current':''}" title="${h.calc}">${token}</span>`;
+  }).join("")}</div>`;
+}
+function ballToken(result){if(result==="WICKET")return "W";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
+function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
+function shouldCelebrate(result){return m.phase==="bowl"?(result.text==="WICKET"||result.text==="DOT"):(result.text==="FOUR"||result.text==="SIX")}
+function confettiHTML(){return `<span class="confetti">${Array.from({length:10},()=>"<i></i>").join("")}</span>`}
+function renderCurve(strip,roll,mode,rolling=false){
+  const order=["W","0","1","2","4","6"];
+  const counts=order.map(t=>strip.filter(x=>x===t).length);
+  const max=Math.max(...counts,1);
+  const points=counts.map((count,i)=>({token:order[i],count,x:30+i*47,y:60-(count/max)*44}));
+  const area=smoothArea(points);
+  const hitToken=roll!=null?strip[roll]:null;
+  const left=mode==="bowl"?"Control":"Collapse",right=mode==="bowl"?"Leaks runs":"Boundaries";
+  return `<div class="curve-box">
+    <svg class="curve-svg" viewBox="0 0 300 92" aria-hidden="true">
+      <line class="curve-axis" x1="30" y1="61" x2="266" y2="61"></line>
+      ${points.map(p=>`<line class="curve-tick" x1="${p.x}" y1="61" x2="${p.x}" y2="66"></line>`).join("")}
+      <path class="curve-area" d="${area}"></path>
+      ${points.map(p=>`<circle class="curve-dot ${curveClass(p.token,mode)} ${hitToken===p.token&&!rolling?"hit":""}" cx="${p.x}" cy="${p.y}" r="${hitToken===p.token&&!rolling?6:4}"></circle>`).join("")}
+      ${hitToken?renderCurveMarker(points,strip,hitToken,rolling):""}
+      ${points.map(p=>`<text class="curve-svg-label ${curveClass(p.token,mode)}" x="${p.x}" y="82">${p.token}</text>`).join("")}
+    </svg>
+    <div class="curve-scale"><span>${left}</span><span>${right}</span></div>
+  </div>`;
+}
+function renderCurveMarker(points,strip,hitToken,rolling){
+  const hit=points.find(p=>p.token===hitToken);
+  if(!rolling)return `<circle class="curve-marker" cx="${hit.x}" cy="${hit.y}" r="7"></circle>`;
+  const byToken=Object.fromEntries(points.map(p=>[p.token,p]));
+  const allTokens=["W","0","1","2","4","6"];
+  const stripTokens=strip.filter((token,i)=>token!==strip[i-1]);
+  const finalTokens=stripTokens.includes(hitToken)?stripTokens:[...stripTokens,hitToken];
+  const sequence=[
+    ...allTokens.map((token,i)=>({token,delay:i*145,slow:false})),
+    ...finalTokens.map((token,i)=>({token,delay:1020+i*285,slow:true})),
+    {token:hitToken,delay:2500,slow:true,final:true}
+  ];
+  const flashes=sequence.map(item=>{
+    const p=byToken[item.token];
+    return `<circle class="curve-flash ${item.slow?"slow":""}" style="animation-delay:${item.delay}ms" cx="${p.x}" cy="${p.y}" r="${item.final?10:item.slow?8:7}"></circle>`;
+  }).join("");
+  return `${flashes}<circle class="curve-marker rolling" cx="${hit.x}" cy="${hit.y}" r="9"></circle>`;
+}
+function smoothArea(points){
+  let d=`M ${points[0].x} 61 L ${points[0].x} ${points[0].y}`;
+  for(let i=1;i<points.length;i++){const prev=points[i-1],cur=points[i],mx=(prev.x+cur.x)/2,my=(prev.y+cur.y)/2;d+=` Q ${prev.x} ${prev.y} ${mx} ${my}`}
+  const last=points[points.length-1];d+=` T ${last.x} ${last.y} L ${last.x} 61 Z`;return d;
+}
+function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t==="4"||t==="6")return mode==="bat"?"good":"danger";return ""}
+
+function limbLines(segs,w,col){return segs.map(s=>`<line x1="${s[0]}" y1="${s[1]}" x2="${s[2]}" y2="${s[3]}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`).join("")}
+function figureSVG(role){
+  let head,segs,extra="";
+  if(role==="bowl"){
+    head=[168,66,16];
+    segs=[[168,90,172,170],[172,170,158,214],[158,214,150,262],[172,170,196,204],[196,204,217,238],[168,96,178,58],[178,58,189,28],[168,96,148,122],[148,122,136,150]];
+    extra=`<circle cx="191" cy="24" r="8" fill="#fff" stroke="#c0303f" stroke-width="2"/>`;
+  }else{
+    head=[176,82,17];
+    segs=[[174,106,166,170],[166,170,150,212],[150,212,124,252],[166,170,188,214],[188,214,206,260],[174,106,152,132],[152,132,136,158],[174,106,158,140],[158,140,140,162]];
+    extra=`<line x1="139" y1="160" x2="110" y2="246" stroke="#7a4a16" stroke-width="9" stroke-linecap="round"/><line x1="139" y1="160" x2="110" y2="246" stroke="#d7ad52" stroke-width="3.5" stroke-linecap="round"/><circle cx="108" cy="251" r="7" fill="#fff" stroke="#c0303f" stroke-width="2"/>`;
+  }
+  const rim="#ffffff",body="#0e1c28";
+  return `<g>${limbLines(segs,30,rim)}<circle cx="${head[0]}" cy="${head[1]}" r="${head[2]+3}" fill="${rim}"/>${limbLines(segs,21,body)}<circle cx="${head[0]}" cy="${head[1]}" r="${head[2]}" fill="${body}"/>${extra}</g>`;
+}
+function raysSVG(cx,cy,cl){let s="",n=14,R=440;for(let i=0;i<n;i++){const a0=i/n*6.2832,a1=(i+0.5)/n*6.2832;s+=`<polygon points="${cx},${cy} ${cx+Math.cos(a0)*R},${cy+Math.sin(a0)*R} ${cx+Math.cos(a1)*R},${cy+Math.sin(a1)*R}" fill="${i%2?'#ffffff':cl}" opacity="${i%2?0.13:0.10}"/>`}return s}
+function cardSVG(c,batNum,bowlNum,emph,dim){
+  const t=c.team,g="g"+(svgSeq++),roleTxt=roleName(c).toUpperCase();
+  const nm=c.name.toUpperCase(),nmSize=nm.length>13?12.5:15;
+  return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Inter,system-ui,sans-serif">
+  <defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.c2}"/><stop offset="1" stop-color="${t.c1}"/></linearGradient>
+  <clipPath id="${g}c"><rect x="10" y="10" width="230" height="330" rx="15"/></clipPath></defs>
+  <rect x="3" y="3" width="244" height="344" rx="20" fill="#f6e09a"/>
+  <rect x="6" y="6" width="238" height="338" rx="17" fill="#c79f37"/>
+  <g clip-path="url(#${g}c)">
+    <rect x="10" y="10" width="230" height="330" fill="url(#${g})"/>
+    ${raysSVG(182,150,t.cl)}
+    <ellipse cx="60" cy="34" rx="150" ry="64" fill="#fff" opacity="0.12"/>
+    ${figureSVG(c.role)}
+    <rect x="10" y="10" width="25" height="330" fill="rgba(6,14,22,.32)"/>
+    <text x="24" y="334" transform="rotate(-90 24 334)" fill="#fff" font-size="${nmSize}" font-weight="800" letter-spacing="1.1">${nm}</text>
+    <rect x="148" y="16" width="86" height="21" rx="10" fill="rgba(6,14,22,.42)"/>
+    <text x="191" y="30.5" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">${roleTxt}</text>
+    ${c.trait?`<rect x="42" y="250" width="${30+c.trait.name.length*6.6}" height="20" rx="10" fill="#f5c84b"/><text x="${57+c.trait.name.length*3.3}" y="264" text-anchor="middle" fill="#241b00" font-size="11" font-weight="800">${c.trait.name.toUpperCase()}</text>`:""}
+    <g opacity="${dim&&emph==='bat'?'0.28':'1'}">
+      <polygon points="10,286 138,286 121,340 10,340" fill="#c92f3f"/>
+      ${emph==='bowl'?`<polygon points="13,289 135,289 119,337 13,337" fill="none" stroke="#ffe27a" stroke-width="4"/>`:''}
+      <text x="57" y="318" text-anchor="middle" fill="#fff" font-size="29" font-weight="900">${bowlNum}</text>
+      <text x="57" y="333" text-anchor="middle" fill="#ffd9de" font-size="9.5" font-weight="800" letter-spacing="1">BOWLING</text>
+    </g>
+    <g opacity="${dim&&emph==='bowl'?'0.28':'1'}">
+      <polygon points="138,286 240,286 240,340 121,340" fill="#1f9b53"/>
+      ${emph==='bat'?`<polygon points="141,289 237,289 237,337 124,337" fill="none" stroke="#ffe27a" stroke-width="4"/>`:''}
+      <text x="195" y="318" text-anchor="middle" fill="#fff" font-size="29" font-weight="900">${batNum}</text>
+      <text x="195" y="333" text-anchor="middle" fill="#d9f5e5" font-size="9.5" font-weight="800" letter-spacing="1">BATTING</text>
+    </g>
+    <circle cx="125" cy="299" r="29" fill="#fff"/><circle cx="125" cy="299" r="25" fill="${t.c1}"/>
+    <text x="125" y="305" text-anchor="middle" fill="#fff" font-size="15" font-weight="900">${t.badge}</text>
+  </g></svg>`;
+}
+function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin}={}){
+  return `<button class="card ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''}" ${disabled?'disabled':''}
+    style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
+    <span class="selbadge">✓</span><span class="sheen"></span>${cardSVG(c,batVal(c),bowlVal(c),emph)}</button>`;
+}
+function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`}
+function renderDuel(pop=false){
+  const d=$("#duel");
+  const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
+  const deal=challengeAnim;challengeAnim=false;
+  $("#rivalPile").classList.toggle("deal",deal);
+  $("#rivalPileCount").textContent=m.rivalDeck.filter(c=>!c.used).length;
+  if(m.result?.state==="resolving"){
+    d.innerHTML=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowled":"You batted",youEmph,false,youEmph,"clash-left")
+      +`<div class="impact-zone"><span class="impact-bat"></span><span class="impact-ball"></span><span class="outcome-burst ${m.result.text==='WICKET'?'wicket':''}">${ballToken(m.result.text)}</span>${shouldCelebrate(m.result)?confettiHTML():""}</div>`
+      +duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival batted":"Rival bowled",rivEmph,false,rivEmph,"clash-right");
+  }else if(m.result){
+    d.innerHTML=`<div class="cleared-duel"><div><b>${ballToken(m.result.text)}</b><div>${m.result.text} recorded</div><div>${resultCalcText(m.result)}</div><button class="btn" id="nextBall">Next Ball →</button></div></div>`;
+  }else{
+    const left=m.selected
+      ?duelCardHTML(m.selected,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph)
+      :`<div class="placeholder">+</div>`;
+    d.innerHTML=left+`<div class="vs">vs</div>`+duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph);
+  }
+  if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
+}
+function renderActions(){
+  const a=$("#actions");
+  if(m.result)a.innerHTML="";
+  else if(m.selected)a.innerHTML=`<button class="btn" id="confirmBtn">${m.phase==="bowl"?"Bowl":"Bat"}</button><button class="btn secondary" id="cancelBtn" aria-label="Cancel selection">Cancel</button>`;
+  else a.innerHTML="";
+  const map={nextBall:nextBall,refreshBtn:refreshHand,confirmBtn:confirmSelected,cancelBtn:cancelSelected};
+  for(const id in map){const el=$("#"+id);if(el)el.onclick=map[id]}
+}
+function renderHand(){
+  const cards=run.deck,animate=dealAnim;dealAnim=false;
+  const lanes=[
+    {key:"bat",cls:"bat",title:"Batsmen",hint:"BAT specialists"},
+    {key:"bowl",cls:"bowl",title:"Bowlers",hint:"BOWL specialists"},
+    {key:"all",cls:"all",title:"All-rounders",hint:"Flexible picks"}
+  ];
+  $("#hand").innerHTML=lanes.map(lane=>renderRoleLane(lane,cards.filter(c=>c.role===lane.key),animate)).join("")
+    +`<section class="role-lane coach"><div class="lane-head"><b>Coach</b><span>empty slot</span></div><div class="coach-slot">+</div></section>`;
+  document.querySelectorAll("#hand .card").forEach(b=>b.onclick=()=>selectCard(run.deck.find(c=>c.id===b.dataset.id)));
+}
+function renderRoleLane(lane,cards,animate){
+  const emph=m.phase;
+  const body=cards.length?cards.map((c,i)=>{
+    const rot=(i-(cards.length-1)/2)*1.8;
+    const fan=`--rot:${rot}deg;--ty:0px;--z:${i+1};--d:${i*45}ms`;
+    return cardHTML(c,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph,fan,dealin:animate});
+  }).join(""):`<div class="coach-slot">No ${lane.title.toLowerCase()} signed</div>`;
+  return `<section class="role-lane ${lane.cls}"><div class="lane-head"><b>${lane.title}</b><span>${lane.hint}</span></div><div class="lane-cards">${body}</div></section>`;
+}
+
+/* ---------- RENDER: shop ---------- */
+function renderShop(){
+  run.refreshes=2+(run.refreshBonus||0);
+  $("#shopSub").textContent=`Next up: ${MATCHES[run.match].name}. Build your squad.`;
+  $("#coins").textContent=run.coins;
+  $("#deckCount").textContent=run.deck.length;
+  $("#offers").innerHTML=run.shop.map((o,i)=>{
+    if(o.type==="card"){
+      return `<div class="offer ${o.bought?'bought':''}">${cardSVG(o.card,o.card.bat,o.card.bowl)}<div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Signed':'Sign'}</button></div>`;
+    }
+    return `<div class="offer util ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--all-l),var(--all))">${ICON.train}</div><h4>${o.title}</h4><p>${o.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Done':'Buy'}</button></div>`;
+  }).join("");
+  document.querySelectorAll("#offers [data-buy]").forEach(b=>b.onclick=()=>buy(+b.dataset.buy));
+
+  // squad management
+  const p=run.pending;
+  $("#squadActions").innerHTML = p
+    ? `<span class="pickhint ${p.type==='release'?'release':''}">${p.type==='train'?`Tap a player to give +6 ${p.stat.toUpperCase()}`:'Tap a player to release (+2 coins)'}</span><button class="btn secondary sm" id="cancelPick">Cancel</button>`
+    : `<button class="btn secondary sm" id="trainBat" ${run.coins<3?'disabled':''}>Train +6 BAT · 3</button>
+       <button class="btn secondary sm" id="trainBowl" ${run.coins<3?'disabled':''}>Train +6 BOWL · 3</button>
+       <button class="btn secondary sm" id="releaseBtn" ${run.deck.length<=6?'disabled':''}>Release a player · +2</button>`;
+  const tb=$("#trainBat");if(tb)tb.onclick=()=>startTrain("bat");
+  const tw=$("#trainBowl");if(tw)tw.onclick=()=>startTrain("bowl");
+  const rb=$("#releaseBtn");if(rb)rb.onclick=startRelease;
+  const cp=$("#cancelPick");if(cp)cp.onclick=()=>{run.pending=null;renderShop()};
+
+  $("#shopSquad").innerHTML=run.deck.map((c,i)=>cardHTML(c,{pickable:!!p,disabled:false,emph:p&&p.type==='train'?p.stat:null,delay:i*14})).join("");
+  if(p)document.querySelectorAll("#shopSquad .card").forEach(b=>b.onclick=()=>squadAct(b.dataset.id));
+}
+function cardOfferInner(c){
+  const traitTxt=c.trait?`${c.trait.name} · ${c.trait.text}`:"No trait";
+  return `<div class="cardtop">${crestHTML(c)}<div class="idblock"><div class="pname">${c.name}</div><div class="prole">${roleName(c)}</div></div><div class="jersey">#${c.num}</div></div>
+    <div class="stats2"><div class="stat bat"><span>BAT</span><b>${c.bat}</b></div><div class="stat bowl"><span>BOWL</span><b>${c.bowl}</b></div></div>
+    <div class="traitline ${c.trait?'':'none'}">${traitTxt}</div>`;
+}
+
+function renderTitle(){$("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`}
+$("#startBtn").onclick=startRun;
+$("#restartBtn").onclick=()=>startRun();
+$("#nextBtn").onclick=startMatch;
+$("#rerollBtn").onclick=()=>{if(run.coins>=2){run.coins-=2;rollShop();renderShop()}};
+$("#homeBtn").onclick=()=>{renderTitle();show("title")};
+renderTitle();
+</script>
+</body>
+</html>

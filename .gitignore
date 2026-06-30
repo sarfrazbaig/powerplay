@@ -1,0 +1,10 @@
+# Keep the public repo lean — just the playable game + README.
+# Internal design docs, backups, and tooling stay local.
+docs/
+tools/
+.agents/
+.codex/
+*.bak
+.DS_Store
+Thumbs.db
+__pycache__/
