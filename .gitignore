@@ -8,3 +8,9 @@ tools/
 .DS_Store
 Thumbs.db
 __pycache__/
+
+# Heavy design source art — keep only assets/players/ in the deploy
+assets/Background Removed/
+assets/With Background/
+assets/With Text/
+assets/Cricket Card.html

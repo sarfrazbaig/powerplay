@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@400;700&family=Work+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@400;700&family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --table:#0c8f86;--felt:#0a7b73;--panel:#fffdf6;--ink:#13313f;--muted:#6a8587;
@@ -447,7 +447,7 @@
   .prep-grid .card{width:100%}
   .prep-grid .card{transition:transform .14s,box-shadow .14s}
   .prep-grid .card:hover{transform:translateY(-5px) scale(1.04)}
-  .draft-card.selected{box-shadow:0 0 0 4px var(--gold),0 18px 34px rgba(6,40,42,.34)}
+  .draft-card.selected{box-shadow:none}
   .draft-card:not(.selected){opacity:.72}
   .prep-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
   .prep-count{font-size:14px;font-weight:900;color:var(--muted)}
@@ -1230,19 +1230,18 @@
     max-height:none;
     aspect-ratio:5/7;
     display:block;
-    padding:6px;
+    padding:0;
     min-width:0;
     min-height:0;
-    overflow:hidden;
+    overflow:visible;
     border:0;
-    border-radius:10px;
-    background:
-      repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0 1px,transparent 1px 3px),
-      linear-gradient(135deg,#f8f0de,#eee4ce 58%,#f7f1e2);
+    border-radius:12px;
+    background:none;
     color:#111;
-    box-shadow:5px 5px 0 rgba(0,0,0,.58), inset 0 0 0 1px rgba(255,255,255,.7);
+    box-shadow:none;
     transition:transform .14s ease,filter .14s ease,opacity .14s ease;
   }
+  .draft-card .tc{display:block;width:100%;height:100%}
   .draft-card:hover{transform:translateY(-8px) rotate(-1deg);z-index:5}
   .draft-card.bat{--role-accent:#18c9ff;--role-deep:#0b68a2;--scene-a:#4aa8e0;--scene-b:#8ad2f0}
   .draft-card.bowl{--role-accent:#ff5b2c;--role-deep:#a61f15;--scene-a:#304682;--scene-b:#f08d56}
@@ -1505,8 +1504,7 @@
   }
   .screen:not(#draft) .match-title{font-size:clamp(22px,2.2vw,34px)}
   .screen:not(#draft) .sub,
-  .screen:not(#draft) .hint,
-  .screen:not(#draft) .tag{
+  .screen:not(#draft) .hint{
     color:#f4f4df;
     font-family:"Archivo Narrow",Inter,sans-serif;
     font-weight:700;
@@ -2403,6 +2401,520 @@
       height:clamp(154px,28vh,250px);
     }
   }
+  /* ============================================================
+     Interaction repair layer: preserve the card art, use selection
+     stickers only, and keep resolution inside the existing arena.
+     ============================================================ */
+  #draft .draft-lane-scroll,
+  #squad .roster-row,
+  #shopSquad,
+  #match .player-fan,
+  #match .rival-fan{
+    perspective:900px;
+    transform-style:preserve-3d;
+  }
+
+  #draft .draft-card{
+    flex-basis:clamp(154px,12.8vw,214px);
+    transform-style:preserve-3d;
+    will-change:transform,filter;
+    transition:transform .18s ease,filter .18s ease,opacity .18s ease;
+  }
+  #draft .draft-empty{flex-basis:clamp(154px,12.8vw,214px)}
+  #draft .draft-card.selected,
+  #draft .draft-card:hover,
+  #draft .draft-card:focus-visible{
+    box-shadow:none !important;
+    outline:0;
+  }
+  #draft .draft-card:hover,
+  #draft .draft-card:focus-visible{
+    transform:perspective(900px) rotateX(5deg) rotateY(-7deg) translateY(-5px) !important;
+    filter:saturate(1.08) contrast(1.05);
+    z-index:8;
+  }
+  #draft .draft-card:after{
+    content:"";
+    position:absolute;
+    inset:-3px;
+    z-index:14;
+    pointer-events:none;
+    border-radius:14px;
+    opacity:0;
+    background:
+      linear-gradient(115deg,transparent 0 34%,rgba(255,255,255,.78) 45%,transparent 57%),
+      linear-gradient(90deg,rgba(255,255,255,.9),transparent 12% 88%,rgba(255,255,255,.72));
+    mix-blend-mode:screen;
+    transform:translateX(-18%) skewX(-10deg);
+    transition:opacity .16s ease,transform .28s ease;
+  }
+  #draft .draft-card:hover:after,
+  #draft .draft-card:focus-visible:after{
+    opacity:.54;
+    transform:translateX(18%) skewX(-10deg);
+  }
+  #draft .draft-card.benched{
+    opacity:.62;
+    filter:grayscale(.86) saturate(.72);
+  }
+  #draft .draft-card.benched:hover,
+  #draft .draft-card.benched:focus-visible{
+    opacity:.82;
+    filter:grayscale(.55) saturate(.95) contrast(1.02);
+  }
+
+  #draft.squad-prep-screen .setup-panel{
+    overflow:auto;
+    scrollbar-width:thin;
+    scrollbar-color:#ffd91f rgba(0,0,0,.35);
+  }
+  #draft.squad-prep-screen .setup-panel::-webkit-scrollbar{width:8px}
+  #draft.squad-prep-screen .setup-panel::-webkit-scrollbar-track{background:rgba(0,0,0,.25)}
+  #draft.squad-prep-screen .setup-panel::-webkit-scrollbar-thumb{background:#ffd91f;border:2px solid #050505}
+  #draft.squad-prep-screen .setup-box{padding:9px}
+  #draft.squad-prep-screen .setup-box p{
+    margin-top:4px;
+    font-size:11px;
+    line-height:1.18;
+  }
+  #draft.squad-prep-screen #draftScoutBars .scout-bar{
+    margin:5px 0;
+    padding-bottom:8px;
+    font-size:11px;
+  }
+  #draft.squad-prep-screen #draftCompare{
+    margin-top:7px;
+    transform-origin:top left;
+  }
+  #draft.squad-prep-screen #draftCompare .draft-compare{gap:4px}
+  #draft.squad-prep-screen #draftCompare .cmp-row{
+    gap:5px;
+    grid-template-columns:minmax(0,1fr) 72px minmax(0,1fr);
+  }
+  #draft.squad-prep-screen #draftCompare .cmp-label{font-size:10px}
+  #draft.squad-prep-screen #draftCompare .cmp-n{font-size:11px}
+  #draft.squad-prep-screen .prep-grid{gap:9px}
+  #draft.squad-prep-screen .draft-lane-scroll{
+    gap:14px;
+    padding:10px 10px 7px;
+  }
+
+  #squad .card.selected,
+  #squad .card.active,
+  #shopSquad .card.active,
+  #shopSquad .card.selected,
+  #match .player-fan .card.selected,
+  #match .rival-fan .card.next,
+  .scout-card.next .tc{
+    box-shadow:none !important;
+  }
+  #squad .card.selected .tc,
+  #squad .card.active .tc,
+  #shopSquad .card.active .tc,
+  #shopSquad .card.selected .tc,
+  #match .player-fan .card.selected .tc,
+  #match .rival-fan .card.next .tc,
+  .scout-card.next .tc{
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,.26)) !important;
+  }
+  #squad .roster-row .card,
+  #shopSquad .card{
+    min-width:clamp(148px,11vw,196px);
+    transform-style:preserve-3d;
+    transition:transform .18s ease,filter .18s ease,opacity .18s ease;
+  }
+  #squad .roster-row .card:hover,
+  #squad .roster-row .card:focus-visible,
+  #shopSquad .card:hover,
+  #shopSquad .card:focus-visible{
+    transform:perspective(900px) rotateX(5deg) rotateY(-7deg) translateY(-4px) !important;
+    filter:saturate(1.08) contrast(1.04);
+  }
+  #squad .roster-row .card:hover .sheen,
+  #squad .roster-row .card:focus-visible .sheen,
+  #shopSquad .card:hover .sheen,
+  #shopSquad .card:focus-visible .sheen,
+  #match .player-fan .card:hover .sheen,
+  #match .player-fan .card:focus-visible .sheen{
+    opacity:.58;
+    animation:sheen .72s ease;
+  }
+
+  #toss .coin-flip.spin{
+    animation:none !important;
+    transform:none !important;
+  }
+  #toss .coin-flip.spin .coin-face{
+    animation:coinSpin .9s ease both !important;
+  }
+
+  #match .player-fan .card.throw{animation:none !important}
+  #match .duel.pop{animation:none !important}
+  #match .duel.resolving .duel-stage,
+  #match .duel.resolving .odds-stage{background:inherit}
+  #match .duel.resolving .duel-stage{padding-top:30px}
+  #match .duel.resolving .odds-stage{margin-bottom:38px}
+
+  /* Polish pass: no sweeping shimmer, only physical card tilt. */
+  .card .sheen,
+  .card:hover .sheen,
+  .card:focus-visible .sheen,
+  #draft .draft-card:after,
+  #draft .draft-card:hover:after,
+  #draft .draft-card:focus-visible:after{
+    content:none !important;
+    display:none !important;
+    opacity:0 !important;
+    animation:none !important;
+  }
+  #match .duel{
+    perspective:1100px;
+  }
+  #match .duel .dslot{
+    transform-style:preserve-3d;
+  }
+  #match .duel .dslot .tc{
+    transform-origin:center;
+    transform-box:fill-box;
+    transition:transform .18s ease,filter .18s ease;
+    will-change:transform,filter;
+    backface-visibility:hidden;
+  }
+  #match .duel:not(.resolving) .dslot:hover .tc,
+  #match .duel:not(.resolving) .dslot:focus-within .tc{
+    transform:perspective(900px) rotateX(4deg) rotateY(-7deg) translateY(-5px);
+    filter:drop-shadow(0 16px 22px rgba(0,0,0,.28)) drop-shadow(0 0 8px rgba(255,255,255,.45));
+  }
+  #match .duel:not(.resolving) .dslot:nth-child(3):hover .tc,
+  #match .duel:not(.resolving) .dslot:nth-child(3):focus-within .tc{
+    transform:perspective(900px) rotateX(4deg) rotateY(7deg) translateY(-5px);
+  }
+
+  /* Match-specific parallax: override older grid rules that flattened cards. */
+  #match .player-fan,
+  #match .rival-fan,
+  #match .duel-stage{
+    perspective:1000px !important;
+    transform-style:preserve-3d;
+  }
+  #match .player-fan .card,
+  #match .rival-fan .card{
+    transform-style:preserve-3d;
+    will-change:transform,filter;
+    transition:transform .18s ease,filter .18s ease,opacity .18s ease !important;
+  }
+  #match .player-fan .card:not(.used):hover,
+  #match .player-fan .card.selected:not(.used),
+  #match .rival-fan .card:not(.used):hover{
+    transform:perspective(850px) rotateX(5deg) rotateY(-8deg) translateY(-5px) scale(1.035) !important;
+    filter:saturate(1.06) contrast(1.04);
+    z-index:9;
+  }
+  #match .rival-fan .card:not(.used):hover{
+    transform:perspective(850px) rotateX(5deg) rotateY(8deg) translateY(-5px) scale(1.035) !important;
+  }
+  #match .duel:not(.resolving) .dslot{
+    transform-style:preserve-3d;
+    transition:transform .18s ease,filter .18s ease;
+    will-change:transform,filter;
+  }
+  #match .duel:not(.resolving) .dslot:hover,
+  #match .duel:not(.resolving) .dslot:focus-within{
+    transform:perspective(950px) rotateX(4deg) rotateY(-8deg) translateY(-7px) scale(1.025) !important;
+    filter:drop-shadow(0 18px 24px rgba(0,0,0,.22));
+    z-index:8;
+  }
+  #match .duel:not(.resolving) .dslot:nth-child(3):hover,
+  #match .duel:not(.resolving) .dslot:nth-child(3):focus-within{
+    transform:perspective(950px) rotateX(4deg) rotateY(8deg) translateY(-7px) scale(1.025) !important;
+  }
+  #match .duel .dslot:hover,
+  #match .duel .dslot:focus-within{
+    transform:none !important;
+    filter:none !important;
+  }
+  #match .duel .dslot:hover .tc,
+  #match .duel .dslot:focus-within .tc{
+    filter:none;
+  }
+
+  .top-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .tc .edge-shine{
+    transform:translateX(-130px);
+    transform-box:fill-box;
+    transform-origin:center;
+    transition:opacity .14s ease;
+  }
+  .card:hover .tc .edge-shine,
+  .draft-card:hover .tc .edge-shine,
+  .dslot:hover .tc .edge-shine{
+    opacity:.82;
+    animation:edgeBandShine .95s ease;
+  }
+  @keyframes edgeBandShine{
+    from{transform:translateX(-130px)}
+    to{transform:translateX(260px)}
+  }
+  #match .curve-area{
+    fill:rgba(28,174,86,.16) !important;
+    stroke:#149447 !important;
+    stroke-width:4;
+  }
+  #match .curve-dot{
+    fill:#fff9ec !important;
+    stroke:#c51627 !important;
+    stroke-width:3;
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));
+  }
+  #match .curve-dot.good,
+  #match .curve-dot.danger{
+    stroke:#c51627 !important;
+  }
+  #match .curve-marker,
+  #match .curve-flash,
+  #match .curve-dot.hit{
+    fill:#c51627 !important;
+    stroke:#fff9ec !important;
+    stroke-width:3;
+    filter:drop-shadow(0 4px 4px rgba(0,0,0,.3));
+  }
+  #match .curve-svg-label.good,
+  #match .curve-svg-label.danger{
+    fill:#111 !important;
+  }
+  #match .bug-balls .over-strip{
+    gap:11px;
+    min-height:42px;
+    align-items:center;
+  }
+  #match .bug-balls .ball-chip{
+    width:38px;
+    height:38px;
+    font-size:15px;
+    border-width:3px;
+  }
+  #match .dslot.winner:after{
+    content:"\1F3C6" !important;
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    padding:0;
+    border-radius:50%;
+    font-family:"Segoe UI Emoji","Apple Color Emoji",sans-serif;
+    font-size:21px;
+    line-height:1;
+  }
+  #match .duel.resolving .duel-stage .dslot{
+    animation:none !important;
+  }
+  #match .empty-slot .placeholder{
+    width:auto;
+    max-width:100%;
+  }
+  #match .hand{
+    position:relative;
+    padding-top:10px;
+  }
+  #match .hand:before,
+  #match .rival-strip-head{
+    margin:0 0 10px !important;
+    padding:8px 11px !important;
+    min-height:48px;
+    box-sizing:border-box;
+    border:3px solid #050505;
+    background:#151817;
+    color:#ffd91f !important;
+    font-family:Anton,Impact,sans-serif !important;
+    font-size:clamp(18px,1.7vw,26px) !important;
+    font-style:italic;
+    letter-spacing:0 !important;
+    line-height:1;
+    text-shadow:2px 2px 0 #000;
+    text-transform:none !important;
+  }
+  #match .hand:before{
+    display:flex;
+    align-items:center;
+  }
+  #match .rival-strip-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  #match .rival-strip-head span:first-child{
+    color:#ffd91f;
+  }
+  #match .rival-strip-head .rs-right{
+    font-family:"Archivo Narrow",Inter,sans-serif;
+    font-size:12px;
+    font-style:normal;
+    letter-spacing:.08em;
+    text-shadow:none;
+    text-transform:uppercase;
+  }
+  #match .own-scan-btn{
+    position:absolute;
+    right:21px;
+    top:17px;
+    z-index:4;
+  }
+  #match .deck-view-btn{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:#ffd91f !important;
+    color:#111 !important;
+    box-shadow:3px 3px 0 #050505 !important;
+    font-family:"Archivo Narrow",Inter,sans-serif !important;
+    font-size:12px !important;
+    font-style:normal !important;
+    font-weight:900 !important;
+    letter-spacing:.06em;
+    text-shadow:none !important;
+    text-transform:uppercase;
+  }
+  #match .player-fan,
+  #match .rival-fan{
+    gap:10px !important;
+  }
+  #match .player-fan .card,
+  #match .rival-fan .card{
+    padding:1px;
+  }
+  #match .rival-fan .card.next,
+  #match .rival-fan .card.next .tc{
+    box-shadow:none !important;
+    outline:0 !important;
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,.24)) !important;
+  }
+  #match .duel{
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+  }
+  #match .coach-strip{
+    margin:10px auto 0;
+    width:min(900px,96%);
+    min-height:76px;
+    display:grid;
+    grid-template-columns:minmax(280px,.9fr) minmax(260px,1fr);
+    gap:12px;
+    align-items:stretch;
+  }
+  #match .coach-slots{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+  #match .coach-arena-slot,
+  #match .match-effects{
+    border:3px solid #050505;
+    background:#fffdf2;
+    box-shadow:3px 3px 0 rgba(0,0,0,.42);
+    color:#111;
+  }
+  #match .coach-arena-slot{
+    min-height:70px;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:7px;
+    border-style:dashed;
+    background:rgba(255,253,242,.75);
+  }
+  #match .coach-arena-slot b{
+    font-family:Anton,Impact,sans-serif;
+    font-size:22px;
+    line-height:1;
+  }
+  #match .coach-arena-slot span,
+  #match .match-effects span,
+  #match .match-effects small{
+    font-weight:900;
+    font-size:11px;
+    color:#53645f;
+  }
+  #match .coach-arena-slot.active{
+    border-style:solid;
+    background:#ffe86a;
+  }
+  #match .match-effects{
+    padding:9px 11px;
+    display:grid;
+    align-content:center;
+    gap:2px;
+  }
+  #match .match-effects b{
+    font-family:Anton,Impact,sans-serif;
+    font-size:20px;
+    color:#006f7a;
+    font-style:italic;
+  }
+  #match .duel-stage{
+    grid-template-columns:minmax(205px,310px) 76px minmax(205px,310px) !important;
+    gap:34px !important;
+    padding-top:16px !important;
+  }
+  #match .duel .dslot .tc,
+  #match .duel .placeholder{
+    height:clamp(246px,40vh,370px) !important;
+  }
+  #match .vs{
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(34px,4vw,58px) !important;
+    color:#ffd91f !important;
+    text-transform:uppercase;
+    text-shadow:4px 4px 0 #050505,0 0 10px rgba(0,0,0,.25);
+  }
+  .scout-panel{
+    max-width:min(1540px,96vw) !important;
+    max-height:90vh !important;
+    border-radius:0 !important;
+  }
+  .scout-grid{
+    grid-template-columns:repeat(auto-fill,minmax(150px,176px)) !important;
+    align-items:start;
+    justify-content:start;
+    gap:16px !important;
+  }
+  .scout-card{
+    width:clamp(150px,10.8vw,176px);
+    transform-style:preserve-3d;
+    transition:transform .16s ease,filter .16s ease,opacity .16s ease;
+  }
+  .scout-card .tc{
+    width:100%;
+    height:auto;
+    display:block;
+  }
+  .scout-card:not(.usedc):hover{
+    transform:perspective(850px) rotateX(5deg) rotateY(-7deg) translateY(-4px) scale(1.03);
+    filter:saturate(1.06) contrast(1.04) drop-shadow(0 15px 18px rgba(0,0,0,.24));
+    z-index:3;
+  }
+  .scout-card.next .tc{
+    box-shadow:none !important;
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,.22)) !important;
+  }
+  .scout-card.next .next-badge{
+    display:none;
+  }
+  @media(max-width:1180px){
+    #match .coach-strip{
+      grid-template-columns:1fr;
+    }
+    #match .duel-stage{
+      grid-template-columns:minmax(150px,250px) 56px minmax(150px,250px) !important;
+    }
+    #match .duel .dslot .tc,
+    #match .duel .placeholder{
+      height:clamp(190px,30vh,290px) !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -2487,7 +2999,10 @@
         <div class="sub" id="phaseLabel"></div>
         <div class="stepper" id="stepper"></div>
       </div>
-      <button class="btn secondary sm" id="restartBtn">Restart</button>
+      <div class="top-actions">
+        <button class="btn secondary sm" id="homeMatchBtn">Main Menu</button>
+        <button class="btn secondary sm" id="restartBtn">Restart Run</button>
+      </div>
     </div>
 
     <div class="board">
@@ -2518,7 +3033,7 @@
     <div class="scorebug" id="scorebug"></div>
 
     <div class="rival-strip">
-      <div class="rival-strip-head"><span>Rival cards</span><span class="rs-right"><span id="rivalStripMeta"></span><button class="btn secondary sm" id="scanBtn" title="See the rival's full deck">Scan ▸</button></span></div>
+      <div class="rival-strip-head"><span>Rival cards</span><span class="rs-right"><span id="rivalStripMeta"></span><button class="btn secondary sm deck-view-btn" id="scanBtn" title="View the rival's full deck">View ▸</button></span></div>
       <div class="rival-mini-row" id="rivalStrip"></div>
     </div>
 
@@ -2530,7 +3045,7 @@
 
     <div class="scout-overlay" id="rivalDrawer">
       <div class="scout-panel">
-        <div class="scout-head"><h3>Rival squad <span id="scoutSub"></span></h3><button class="btn secondary sm" id="closeScout">Close</button></div>
+        <div class="scout-head"><h3><span id="scoutTitle">Rival squad</span> <span id="scoutSub"></span></h3><button class="btn secondary sm" id="closeScout">Close</button></div>
         <div id="rivalDeckGrid"></div>
       </div>
     </div>
@@ -2810,7 +3325,12 @@ function newChallenge(keepLog=false){
 }
 function use(c){c.used=true;m.challenge.used=true}
 function play(c){if(!c||!m.challenge||m.result||c.used)return;if(m.phase==="bowl")resolveBowl(c);else resolveBat(c)}
-function previewCard(c){if(!c||!m.challenge||anim||m.result||c.used)return;if(m.preview===c)return;m.preview=c;render()}
+function previewCard(c){
+  if(!c||!m.challenge||anim||m.result||c.used)return;
+  if(m.preview===c)return;
+  m.preview=c;
+  renderDuel(false);
+}
 function lockCard(c){selectCard(c,true)}
 function selectCard(c,lock=false){
   if(!c||!m.challenge||anim||m.result||c.used)return;
@@ -2822,9 +3342,7 @@ function selectCard(c,lock=false){
 }
 function confirmSelected(){
   if(!m.selected||!m.challenge||m.result||anim)return;
-  const el=document.querySelector("#hand .card.selected");
-  if(el){anim=true;el.classList.add("throw");setTimeout(()=>{anim=false;play(m.selected)},230)}
-  else play(m.selected);
+  play(m.selected);
 }
 function cancelSelected(){m.selected=null;m.preview=null;m.selectionLocked=false;render()}
 function resolveBowl(c){
@@ -3066,6 +3584,15 @@ function renderOverStrip(){
 }
 function ballToken(result){if(result==="WICKET")return "W";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
+function coachStripHTML(){
+  const active=run.coach?[run.coach]:[];
+  const slots=Array.from({length:3},(_,i)=>{
+    const coach=active[i];
+    return `<div class="coach-arena-slot ${coach?'active':''}">${coach?`<b>${coach.name}</b><span>${coach.desc}</span>`:`<b>+</b><span>Coach ${i+1}</span>`}</div>`;
+  }).join("");
+  const state=m.innings===1?(m.phase==="bowl"?"Set target: keep rival low":"Set target: score freely"):(m.phase==="bat"?`Chase ${m.target+1}`:`Defend ${m.target}`);
+  return `<div class="coach-strip"><div class="coach-slots">${slots}</div><div class="match-effects"><b>Match effects</b><span>${state}</span><small>Stadium and boss modifiers will appear here.</small></div></div>`;
+}
 function resultWinner(result){
   const token=ballToken(result.text);
   if(m.phase==="bat")return (token==="W"||token==="0")?"rival":"you";
@@ -3158,7 +3685,8 @@ function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t
 
 function selectedColor(role){return role==="bat"?"#09c18b":role==="bowl"?"#ff5b2c":"#d943ff"}
 function escSVG(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[ch]))}
-function cardShell(g,glow,dim,rarityKey="common",role="all"){
+function headGrad(role){return role==="bowl"?["#8a1414","#d83636"]:role==="all"?["#5a2c9a","#8f68ef"]:["#12589a","#2f8fd6"]}
+function cardShell(g,dim,rarityKey="common",role="all"){
   const metals={
     common:["#53636b","#aebbc0","#f4f0df"],
     uncommon:["#176b39","#5be188","#f5ffe4"],
@@ -3166,52 +3694,77 @@ function cardShell(g,glow,dim,rarityKey="common",role="all"){
     epic:["#7e2ca5","#d891ff","#fff1ff"],
     legendary:["#9b6907","#ffe36f","#fff8c7"]
   }[rarityKey]||["#53636b","#aebbc0","#f4f0df"];
-  const scene=role==="bowl"?["#304682","#f08d56"]:role==="bat"?["#4aa8e0","#8ad2f0"]:["#5ccad2","#8f68ef"];
+  const dusk=role==="bowl";
+  const sky=dusk
+    ? `<stop offset="0" stop-color="#2b3f7a"/><stop offset=".16" stop-color="#6a5aa0"/><stop offset=".33" stop-color="#c06a8e"/><stop offset=".45" stop-color="#ef8a5a"/><stop offset=".53" stop-color="#ffc879"/><stop offset=".6" stop-color="#7fb53f"/><stop offset="1" stop-color="#4f8a1e"/>`
+    : `<stop offset="0" stop-color="#4aa8e0"/><stop offset=".4" stop-color="#7fc4ea"/><stop offset=".56" stop-color="#cfeaf6"/><stop offset=".58" stop-color="#8cc852"/><stop offset="1" stop-color="#5f9f28"/>`;
+  const rr=escSVG((RARITIES[rarityKey]?.label||"Common").toUpperCase()), band=(rr+" ★ ").repeat(9);
+  const flood=cx=>`<rect x="${cx-13}" y="122" width="26" height="14" rx="2" fill="#ece2b0" stroke="#111" stroke-width="2"/><rect x="${cx-2}" y="136" width="4" height="16" fill="#333"/>`;
   return `<defs>
-      <linearGradient id="${g}paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f0de"/><stop offset=".58" stop-color="#eee4ce"/><stop offset="1" stop-color="#f7f1e2"/></linearGradient>
-      <linearGradient id="${g}metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metals[0]}"/><stop offset=".28" stop-color="${metals[1]}"/><stop offset=".48" stop-color="${metals[2]}"/><stop offset=".7" stop-color="${metals[1]}"/><stop offset="1" stop-color="${metals[0]}"/></linearGradient>
-      <linearGradient id="${g}sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${scene[0]}"/><stop offset=".42" stop-color="${scene[1]}"/><stop offset=".58" stop-color="#bfe4f5"/><stop offset=".59" stop-color="#8cc852"/><stop offset="1" stop-color="#5f9f28"/></linearGradient>
-      <clipPath id="${g}clip"><rect x="30" y="30" width="190" height="278" rx="5"/></clipPath>
+      <linearGradient id="${g}paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f0de"/><stop offset=".55" stop-color="#eee4ce"/><stop offset="1" stop-color="#f7f1e2"/></linearGradient>
+      <linearGradient id="${g}metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metals[0]}"/><stop offset=".26" stop-color="${metals[1]}"/><stop offset=".47" stop-color="${metals[2]}"/><stop offset=".7" stop-color="${metals[1]}"/><stop offset="1" stop-color="${metals[0]}"/></linearGradient>
+      <linearGradient id="${g}edgeShine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="transparent"/><stop offset=".42" stop-color="transparent"/><stop offset=".5" stop-color="#fff"/><stop offset=".58" stop-color="transparent"/><stop offset="1" stop-color="transparent"/></linearGradient>
+      <linearGradient id="${g}sky" x1="0" y1="0" x2="0" y2="1">${sky}</linearGradient>
+      <clipPath id="${g}scene"><rect x="26" y="26" width="198" height="298" rx="5"/></clipPath>
+      <clipPath id="${g}bt"><rect x="12" y="12" width="226" height="15"/></clipPath>
+      <clipPath id="${g}bb"><rect x="12" y="323" width="226" height="15"/></clipPath>
+      <clipPath id="${g}bl"><rect x="12" y="12" width="15" height="326"/></clipPath>
+      <clipPath id="${g}br"><rect x="223" y="12" width="15" height="326"/></clipPath>
       <filter id="${g}shadow"><feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000" flood-opacity=".45"/></filter>
     </defs>
-    <rect x="8" y="8" width="234" height="334" rx="14" fill="url(#${g}paper)" filter="url(#${g}shadow)"/>
-    <rect x="16" y="16" width="218" height="318" rx="10" fill="url(#${g}metal)" stroke="#111" stroke-width="3"/>
-    <rect x="27" y="27" width="196" height="284" rx="7" fill="#111"/>
-    <g clip-path="url(#${g}clip)">
-      <rect x="30" y="30" width="190" height="278" fill="url(#${g}sky)"/>
-      <rect x="30" y="147" width="190" height="52" fill="#6b4e96" stroke="#111" stroke-width="3"/>
-      <rect x="30" y="199" width="190" height="109" fill="#74b932" stroke="#111" stroke-width="3"/>
-      <g opacity=".8">
-        ${Array.from({length:9},(_,i)=>`<circle cx="${42+i*20}" cy="${160+(i%2)*13}" r="2" fill="${i%3===0?"#ffd23f":i%3===1?"#ff5c5c":"#4ad1ff"}"/>`).join("")}
-      </g>`;
+    <rect x="6" y="5" width="238" height="340" rx="16" fill="url(#${g}paper)" filter="url(#${g}shadow)"/>
+    <rect x="12" y="12" width="226" height="326" rx="11" fill="url(#${g}metal)" stroke="#111" stroke-width="2.5"/>
+    <g font-family="Oswald,Arial,sans-serif" font-size="6.4" font-weight="600" letter-spacing="1.5" fill="${metals[0]}" opacity=".9">
+      <g clip-path="url(#${g}bt)"><text x="18" y="21">${band}</text></g>
+      <g clip-path="url(#${g}bb)"><text x="18" y="333">${band}</text></g>
+      <g clip-path="url(#${g}bl)"><text x="18" y="21" transform="rotate(90 18 20)">${band}</text></g>
+      <g clip-path="url(#${g}br)"><text x="232" y="21" transform="rotate(90 232 20)">${band}</text></g>
+    </g>
+    <g class="edge-shine" opacity="0">
+      <rect x="-80" y="12" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bt)"/>
+      <rect x="-80" y="323" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bb)"/>
+      <rect x="12" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}bl)" transform="rotate(90 19.5 19.5)"/>
+      <rect x="223" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}br)" transform="rotate(90 230.5 19.5)"/>
+    </g>
+    <rect x="24" y="24" width="202" height="302" rx="7" fill="#111"/>
+    <g clip-path="url(#${g}scene)">
+      <rect x="26" y="26" width="198" height="298" fill="url(#${g}sky)"/>
+      ${flood(66)}${flood(184)}
+      <rect x="26" y="150" width="198" height="42" fill="${dusk?'#3a2c55':'#6b4e96'}"/>
+      <g opacity=".85">${Array.from({length:11},(_,i)=>`<circle cx="${34+i*17}" cy="${159+(i%2)*13}" r="2.1" fill="${i%3===0?'#ffd23f':i%3===1?'#ff5c5c':'#4ad1ff'}"/>`).join("")}</g>
+      <rect x="26" y="192" width="198" height="132" fill="${dusk?'#5f9328':'#74b932'}"/>`;
 }
 function cardSVG(c,batNum,bowlNum,emph,dim,compact){
-  const g="g"+(svgSeq++),rarity=RARITIES[c.rarity]||RARITIES.common;
-  const roleBadge=c.role==="bat"?"BAT":c.role==="bowl"?"BOWL":"AR",glow=selectedColor(c.role);
-  const img=draftArtForCard(c);
-  const name=escSVG(compact?c.name.split(" ").pop():c.name.length>14?c.name.slice(0,13)+"...":c.name);
-  const trait=escSVG(c.trait?c.trait.name:rarity.short);
-  const traitSize=trait.length>10?8:10;
+  const g="g"+(svgSeq++);
+  const hg=headGrad(c.role),img=draftArtForCard(c);
+  const name=escSVG((compact?c.name.split(" ").pop():(c.name.length>13?c.name.slice(0,12)+"…":c.name)).toUpperCase());
+  const trait=escSVG((c.trait?c.trait.name:roleName(c)).toUpperCase());
+  const pillW=Math.min(80,trait.length*5.4+14), pillX=214-pillW;
+  const batHi=emph==="bat", bowlHi=emph==="bowl";
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
-    ${cardShell(g,glow,dim,c.rarity,c.role)}
-      <image href="${img}" x="5" y="68" width="240" height="190" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}"/>
+    ${cardShell(g,dim,c.rarity,c.role)}
+      <image href="${img}" x="30" y="116" width="190" height="208" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}"/>
     </g>
-    <circle cx="58" cy="58" r="18" fill="${glow}" stroke="#111" stroke-width="3"/>
-    <text x="58" y="62" text-anchor="middle" fill="#fff" font-size="9" font-weight="900">${roleBadge}</text>
-    <rect x="158" y="41" width="48" height="20" fill="#f8f0de" stroke="#111" stroke-width="3"/>
-    <text x="182" y="55" text-anchor="middle" fill="#111" font-size="9" font-weight="900">${rarity.short}</text>
-    <rect x="36" y="232" width="54" height="42" rx="4" fill="#fffdf2" stroke="#111" stroke-width="3"/>
-    <text x="47" y="249" fill="#667" font-size="9" font-weight="900">BAT</text>
-    <text x="64" y="268" text-anchor="middle" fill="#e02424" font-size="28" font-weight="900">${batNum}</text>
-    <rect x="160" y="232" width="54" height="42" rx="4" fill="#fffdf2" stroke="#111" stroke-width="3"/>
-    <text x="170" y="249" fill="#667" font-size="9" font-weight="900">BOWL</text>
-    <text x="187" y="268" text-anchor="middle" fill="#1f7fc4" font-size="28" font-weight="900">${bowlNum}</text>
-    <rect x="36" y="286" width="112" height="24" rx="2" fill="#fffdf2" stroke="#111" stroke-width="3"/>
-    <text x="42" y="303" fill="#111" font-size="${name.length>10?10:12}" font-weight="900">${name.toUpperCase()}</text>
-    <rect x="152" y="285" width="60" height="23" rx="12" fill="#ffe23f" stroke="#111" stroke-width="3"/>
-    <text x="182" y="301" text-anchor="middle" fill="#111" font-size="${traitSize}" font-weight="900">${trait.toUpperCase()}</text>
-    <rect x="176" y="301" width="60" height="24" transform="rotate(-10 176 301)" fill="#ffd91f" stroke="#111" stroke-width="3"/>
-    <text x="206" y="318" text-anchor="middle" transform="rotate(-10 206 318)" fill="#111" font-size="13" font-weight="900">${compact?"PLAY":"ACTIVE"}</text>
+    <defs>
+      <linearGradient id="${g}head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${hg[0]}"/><stop offset="1" stop-color="${hg[1]}"/></linearGradient>
+      <clipPath id="${g}pan"><rect x="33" y="30" width="184" height="86" rx="10"/></clipPath>
+    </defs>
+    <g clip-path="url(#${g}pan)">
+      <rect x="33" y="30" width="184" height="86" fill="#f1f5f8"/>
+      <rect x="33" y="30" width="184" height="30" fill="url(#${g}head)"/>
+      ${batHi?'<rect x="35" y="61" width="89" height="53" fill="#fff3d6"/>':''}
+      ${bowlHi?'<rect x="126" y="61" width="89" height="53" fill="#fff3d6"/>':''}
+    </g>
+    <rect x="33" y="30" width="184" height="86" rx="10" fill="none" stroke="#111" stroke-width="3"/>
+    <line x1="33" y1="60" x2="217" y2="60" stroke="#111" stroke-width="3"/>
+    <text x="41" y="51" fill="#fff" font-size="14" font-weight="700" letter-spacing=".4">${name}</text>
+    <rect x="${pillX}" y="36" width="${pillW}" height="18" rx="9" fill="#ffe23f" stroke="#111" stroke-width="2"/>
+    <text x="${(pillX+pillW/2).toFixed(1)}" y="49" text-anchor="middle" fill="#111" font-size="9.5" font-weight="700">${trait}</text>
+    <line x1="125" y1="61" x2="125" y2="115" stroke="#111" stroke-width="3"/>
+    <text x="79" y="78" text-anchor="middle" fill="#5a6b7a" font-size="10" font-weight="700" letter-spacing="1">BAT</text>
+    <text x="79" y="108" text-anchor="middle" fill="#e02424" font-size="30" font-weight="700">${batNum}</text>
+    <text x="171" y="78" text-anchor="middle" fill="#5a6b7a" font-size="10" font-weight="700" letter-spacing="1">BOWL</text>
+    <text x="171" y="108" text-anchor="middle" fill="#1f7fc4" font-size="30" font-weight="700">${bowlNum}</text>
   </svg>`;
 }
 function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini}={}){
@@ -3220,6 +3773,7 @@ function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,acti
     <span class="selbadge">✓</span><span class="sheen"></span>${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</button>`;
 }
 function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`}
+function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div><div class="placeholder">+</div></div>`}
 function renderDuel(pop=false){
   const d=$("#duel");
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
@@ -3227,19 +3781,19 @@ function renderDuel(pop=false){
   if(m.result?.state==="resolving"){
     const left=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph);
     const right=duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,false,rivEmph);
-    d.innerHTML=`<div class="duel-stage">${left}<div class="vs">vs</div>${right}</div>
+    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${right}</div>
       <div class="odds-stage resolving-stage"><div class="arena-odds resolving-odds"><div class="odds-kicker">Resolving</div>${renderResolvePayoff(m.result,m.phase)}<span class="skip-hint">tap to skip ▸</span></div></div>`;
   }else if(m.result){
     const winner=resultWinner(m.result),youClass=winner==="you"?"winner":"loser",rivalClass=winner==="rival"?"winner":"loser";
     const left=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,youClass);
     const right=duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,false,rivEmph,rivalClass);
-    d.innerHTML=`<div class="duel-stage settled-stage">${left}<div class="vs">vs</div>${right}</div>
+    d.innerHTML=`${coachStripHTML()}<div class="duel-stage settled-stage">${left}<div class="vs">vs</div>${right}</div>
       <div class="odds-stage result-stage"><div class="result-summary"><b>${ballToken(m.result.text)}</b><span>${m.result.text} recorded</span><small>${resultCalcText(m.result)}</small></div><div class="actions" id="actions"></div></div>`;
   }else if(m.challenge){
     const left=m.selected
       ?duelCardHTML(m.selected,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph)
-      :`<div class="placeholder">+</div>`;
-    d.innerHTML=`<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${renderOddsStage()}`;
+      :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
+    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${renderOddsStage()}`;
   }else{
     d.innerHTML=`<div class="cleared-duel"><div><b>--</b><div>No rival card available</div><button class="btn" id="nextBall">Resolve Match</button></div></div>`;
   }
@@ -3261,13 +3815,14 @@ function renderActions(){
 function renderHand(){
   const cards=fanSort(activeSquad()),animate=dealAnim;dealAnim=false;
   const emph=m.phase==="bowl"?"bowl":"bat";
-  $("#hand").innerHTML=`<div class="fan-row player-fan">${cards.map((c,i)=>fanCard(c,i,cards.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph,animate})).join("")}</div>`;
+  $("#hand").innerHTML=`<button class="btn secondary sm deck-view-btn own-scan-btn" id="scanMineBtn" title="View your full squad">View ▸</button><div class="fan-row player-fan">${cards.map((c,i)=>fanCard(c,i,cards.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph,animate})).join("")}</div>`;
   document.querySelectorAll("#hand .card").forEach(b=>{
     const card=()=>activeSquad().find(c=>c.id===b.dataset.id);
     b.onclick=()=>lockCard(card());
     b.onmouseenter=()=>previewCard(card());
     b.onfocus=()=>previewCard(card());
   });
+  const scan=$("#scanMineBtn");if(scan)scan.onclick=openPlayerDeck;
 }
 function fanSort(cards){
   const roleOrder={bat:0,all:1,bowl:2};
@@ -3281,21 +3836,28 @@ function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,a
   return cardHTML(c,{selected,used,disabled,emph,dealin:animate,mini:rival,fan:fanStyle(i,total,rival ? .78 : 1.05)});
 }
 
-/* ---------- SCOUT: rival deck ---------- */
+/* ---------- SCOUT: decks ---------- */
 function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
-function renderRivalScout(){
-  const emph=m.phase==="bowl"?"bat":"bowl";
-  const statLbl=m.phase==="bowl"?"batting":"bowling";
-  const remaining=m.rivalDeck.filter(c=>!c.used).sort((a,b)=>rivalRelevant(b)-rivalRelevant(a));
-  const used=m.rivalDeck.filter(c=>c.used);
-  const cell=(c,o={})=>`<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`;
-  $("#scoutSub").textContent=`— they ${m.phase==="bowl"?"bat":"bowl"} their best ${statLbl} card first`;
-  $("#rivalDeckGrid").innerHTML=
-    `<div class="scout-group"><h4>Still to come · ${remaining.length} <em>(sorted by ${statLbl} threat — strongest comes next)</em></h4>
-       <div class="scout-grid">${remaining.length?remaining.map((c,i)=>cell(c,{next:i===0})).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
-    + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>cell(c,{used:true})).join("")}</div></div>`:"");
+function deckScoutCell(c,o={},emph){
+  return `<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`;
 }
-function openRivalDeck(){if(!m)return;renderRivalScout();$("#rivalDrawer").classList.add("show")}
+function renderDeckScout(kind){
+  const player=kind==="player";
+  const emph=player?(m.phase==="bowl"?"bowl":"bat"):(m.phase==="bowl"?"bat":"bowl");
+  const statLbl=m.phase==="bowl"?(player?"bowling":"batting"):(player?"batting":"bowling");
+  const deck=player?activeSquad():m.rivalDeck;
+  const relevant=player?(c=>m.phase==="bowl"?bowlVal(c):batVal(c)):rivalRelevant;
+  const remaining=deck.filter(c=>!c.used).sort((a,b)=>relevant(b)-relevant(a));
+  const used=deck.filter(c=>c.used);
+  $("#scoutTitle").textContent=player?"Your squad":"Rival squad";
+  $("#scoutSub").textContent=player?`— your available ${statLbl} options`:`— they ${m.phase==="bowl"?"bat":"bowl"} their best ${statLbl} card first`;
+  $("#rivalDeckGrid").innerHTML=
+    `<div class="scout-group"><h4>${player?"Available":"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value)</em></h4>
+       <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
+    + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
+}
+function openRivalDeck(){if(!m)return;renderDeckScout("rival");$("#rivalDrawer").classList.add("show")}
+function openPlayerDeck(){if(!m)return;renderDeckScout("player");$("#rivalDrawer").classList.add("show")}
 function closeRivalDeck(){$("#rivalDrawer").classList.remove("show")}
 
 /* ---------- RENDER: shop ---------- */
@@ -3393,52 +3955,18 @@ function draftScoutBarsHTML(rivalCards){
   return rows.map(([label,val])=>`<div class="scout-bar"><span>${label}</span><b>${val}%</b><i style="width:${clamp(val,6,100)}%"></i></div>`).join("");
 }
 function draftArtForCard(c){
-  const bat=[
-    "assets/Background Removed/Batsman_playing_forward_defensive_15.png",
-    "assets/Background Removed/Batsman_hitting_six_10.png",
-    "assets/Background Removed/Left-handed_batsman_playing_lofted_shot_39.png",
-    "assets/Background Removed/Batsman_playing_lofted_drive_17.png"
-  ];
-  const bowl=[
-    "assets/Background Removed/Cricket_bowler_in_delivery_stride_31.png",
-    "assets/Background Removed/Fast_bowler_running_to_bowl_37.png",
-    "assets/Background Removed/Cricket_spinner_releasing_ball_35.png",
-    "assets/Background Removed/Left-handed_bowler_releasing_ball_43.png"
-  ];
-  const all=[
-    "assets/Background Removed/All-rounder_batting_at_crease_01.png",
-    "assets/Background Removed/All-rounder_bowling_leg_break_05.png",
-    "assets/Background Removed/Cricket_player_throwing_ball_34.png",
-    "assets/Background Removed/All-rounder_fielding_a_ball_08.png"
-  ];
+  const bat=["assets/players/bat1.png","assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png"];
+  const bowl=["assets/players/bowl1.png","assets/players/bowl2.png","assets/players/bowl3.png","assets/players/bowl4.png"];
+  const all=["assets/players/all1.png","assets/players/all2.png","assets/players/all3.png"];
   const pool=c.role==="bat"?bat:c.role==="bowl"?bowl:all;
   const idx=Math.abs([...c.id].reduce((n,ch)=>n+ch.charCodeAt(0),0))%pool.length;
-  return encodeURI(pool[idx]);
+  return pool[idx];
 }
 function draftCardHTML(c,selected){
   const role=c.role==="bat"?"bat":c.role==="bowl"?"bowl":"all";
-  const rarity=RARITIES[c.rarity]||RARITIES.common;
-  const roleLabel=roleName(c);
-  const traitLabel=c.trait?c.trait.name:rarity.short;
-  const roleShort=role==="bat"?"BAT":role==="bowl"?"BOWL":"AR";
-  const img=draftArtForCard(c);
   const titleTrait=c.trait?`${c.trait.name}: ${c.trait.text}`:"No trait";
-  return `<button class="draft-card ${role} ${c.rarity} ${selected?'selected':'benched'}" data-id="${c.id}" title="${c.name} - ${roleLabel} - ${titleTrait}">
-    <div class="draft-card-frame">
-      <div class="draft-card-scene">
-        <div class="draft-role-token">${roleShort}</div>
-        <div class="draft-rarity-sign">${rarity.short}</div>
-        <img class="draft-player-img" src="${img}" alt="">
-        <div class="draft-card-stats">
-          <div class="draft-stat stat-bat"><span class="stat-ico">BAT</span><span><span>BAT</span><b>${batVal(c)}</b></span></div>
-          <div class="draft-stat stat-bowl"><span class="stat-ico">●</span><span><span>BOWL</span><b>${bowlVal(c)}</b></span></div>
-        </div>
-        <div class="draft-card-nameplate">
-          <div class="draft-card-name">${c.name}</div>
-          <div class="trait-pill">${traitLabel}</div>
-        </div>
-      </div>
-    </div>
+  return `<button class="draft-card ${role} ${c.rarity} ${selected?'selected':'benched'}" data-id="${c.id}" title="${c.name} - ${roleName(c)} - ${titleTrait}">
+    ${cardSVG(c,batVal(c),bowlVal(c))}
     <span class="draft-status">${selected?'Active':'Bench'}</span>
   </button>`;
 }
@@ -3624,6 +4152,7 @@ function nextBall(){
 function renderTitle(){$("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`}
 $("#startBtn").onclick=startRun;
 $("#restartBtn").onclick=()=>startRun();
+$("#homeMatchBtn").onclick=()=>{renderTitle();show("title")};
 $("#draftRestartBtn").onclick=()=>startRun();
 $("#draftAutoBtn").onclick=autoSelectDraft;
 $("#draftConfirmBtn").onclick=confirmDraft;
@@ -3633,11 +4162,57 @@ $("#rerollBtn").onclick=()=>{const cost=rerollCost();if(run.coins>=cost){run.coi
 $("#squadBackBtn").onclick=()=>{run.pending=null;renderShop();show("shop")};
 $("#squadNextBtn").onclick=beginSquadSelection;
 $("#homeBtn").onclick=()=>{renderTitle();show("title")};
-$("#duel").onclick=()=>skipResolve();
+$("#duel").onclick=e=>{
+  if(e.target.closest("button,.actions"))return;
+  skipResolve();
+};
 $("#scanBtn").onclick=openRivalDeck;
 $("#closeScout").onclick=closeRivalDeck;
 $("#rivalDrawer").onclick=(e)=>{if(e.target.id==="rivalDrawer")closeRivalDeck()};
 document.addEventListener("keydown",(e)=>{if(e.key==="Escape")closeRivalDeck()});
+let parallaxEl=null,parallaxHost=null;
+function clearMatchParallax(){
+  if(!parallaxEl)return;
+  parallaxEl.style.removeProperty("transform");
+  parallaxEl.style.removeProperty("filter");
+  parallaxEl.style.removeProperty("transition");
+  parallaxEl=null;
+  parallaxHost=null;
+}
+function matchParallaxTarget(target){
+  return target?.closest?.("#match.screen.active .player-fan .card:not(.used),#match.screen.active .rival-fan .card:not(.used),#match.screen.active .duel .dslot");
+}
+function pointerInHost(host,e,pad=26){
+  const r=host?.getBoundingClientRect?.();
+  return !!r&&e.clientX>=r.left-pad&&e.clientX<=r.right+pad&&e.clientY>=r.top-pad&&e.clientY<=r.bottom+pad;
+}
+document.addEventListener("pointermove",e=>{
+  const targetHost=matchParallaxTarget(e.target);
+  const host=targetHost||(parallaxHost&&pointerInHost(parallaxHost,e)?parallaxHost:null);
+  if(!host){clearMatchParallax();return}
+  const el=host.classList.contains("dslot")?(host.querySelector(".tc")||host.querySelector(".placeholder")):host;
+  if(!el){clearMatchParallax();return}
+  if(parallaxEl&&parallaxEl!==el)clearMatchParallax();
+  parallaxEl=el;
+  parallaxHost=host;
+  const r=host.getBoundingClientRect();
+  if(!r.width||!r.height)return;
+  const dx=(e.clientX-r.left)/r.width-.5;
+  const dy=(e.clientY-r.top)/r.height-.5;
+  const sx=Math.sin(dx*Math.PI)*.5;
+  const sy=Math.sin(dy*Math.PI)*.5;
+  const hero=host.classList.contains("dslot");
+  const lift=hero?-8:-5;
+  const scale=hero?1.035:1.04;
+  const rotateX=-sy*(hero?9:9);
+  const rotateY=sx*(hero?14:14);
+  el.style.setProperty("transition","filter .12s ease","important");
+  el.style.setProperty("transform",`perspective(820px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(${lift}px) scale(${scale})`,"important");
+  el.style.setProperty("filter","saturate(1.1) contrast(1.05) drop-shadow(0 20px 26px rgba(0,0,0,.34))","important");
+});
+document.addEventListener("pointerout",e=>{
+  if(parallaxHost&&!pointerInHost(parallaxHost,e,18)&&(!e.relatedTarget||!parallaxHost.contains(e.relatedTarget)))clearMatchParallax();
+});
 renderTitle();
 </script>
 </body>
