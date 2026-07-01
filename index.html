@@ -24,11 +24,12 @@
       linear-gradient(180deg,var(--table),var(--felt));
     background-size:34px 34px,34px 34px,auto,auto;background-attachment:fixed}
   button{font:inherit;cursor:pointer;border:0}
-  #app{max-width:1540px;margin:0 auto;padding:10px 14px 14px}
+  #app{max-width:1800px;margin:0 auto;padding:10px 18px 18px}
   .screen{display:none}.screen.active{display:block}
-  #match.screen.active{min-height:calc(100dvh - 24px);display:grid;grid-template-columns:1fr;grid-template-rows:auto auto minmax(430px,1fr) auto auto;grid-template-areas:
+  #match.screen.active{min-height:calc(100dvh - 24px);display:grid;grid-template-columns:1fr;grid-template-rows:auto auto auto minmax(300px,1fr) auto auto;grid-template-areas:
     "top"
     "board"
+    "rivaldeck"
     "arena"
     "squadbar"
     "squad";gap:10px;align-items:start}
@@ -103,10 +104,10 @@
       linear-gradient(135deg,#0f8e76,#086d61);
     background-size:30px 30px,30px 30px,auto,auto,auto;
     border-radius:18px;padding:12px 16px 10px;box-shadow:var(--shadow);border:2px solid rgba(255,255,255,.22)}
-  .arena:before{content:"";position:absolute;inset:14px 18px 122px;border:2px solid rgba(255,255,255,.32);border-radius:20px;pointer-events:none}
-  .arena:after{content:"";position:absolute;left:50%;top:24px;bottom:132px;width:3px;transform:translateX(-50%);
+  .arena:before{content:"";position:absolute;inset:14px 18px 112px;border:2px solid rgba(255,255,255,.32);border-radius:20px;pointer-events:none}
+  .arena:after{content:"";position:absolute;left:50%;top:24px;bottom:122px;width:3px;transform:translateX(-50%);
     background:linear-gradient(transparent,rgba(255,255,255,.5),transparent);opacity:.55;pointer-events:none}
-  .duel{position:relative;z-index:1;display:grid;grid-template-columns:minmax(240px,1fr) 96px minmax(240px,1fr);gap:14px;align-items:center;min-height:270px;flex:1}
+  .duel{position:relative;z-index:1;display:grid;grid-template-columns:minmax(220px,1fr) 76px minmax(220px,1fr);gap:12px;align-items:center;min-height:230px;flex:1}
   .rival-pile{position:absolute;right:20px;top:14px;z-index:4;display:flex;align-items:center;gap:8px;color:var(--muted);
     font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;pointer-events:none}
   .pile-stack{position:relative;width:48px;height:66px}
@@ -123,7 +124,7 @@
   .pile-meta b{font-size:15px;line-height:1;color:var(--red)}
   .vs{display:grid;place-items:center;font-weight:900;color:#eafffb;font-size:14px;text-shadow:0 2px 0 rgba(0,0,0,.18)}
   .placeholder{display:grid;place-items:center;text-align:center;color:rgba(234,255,251,.82);border:2px dashed rgba(255,255,255,.34);
-    border-radius:16px;background:rgba(4,74,65,.34);padding:14px;font-size:48px;font-weight:900;min-height:250px}
+    border-radius:16px;background:rgba(4,74,65,.34);padding:14px;font-size:48px;font-weight:900;min-height:220px}
   .placeholder span{display:block;margin-top:8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(234,255,251,.72)}
   .log{min-height:0;margin:2px 2px 4px;font-size:13px;font-weight:800;line-height:1.2;text-align:center;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.18)}
   .log b{color:#ffe98a}
@@ -136,6 +137,11 @@
   .ladder,.feed{background:rgba(255,253,246,.94);border:1px solid rgba(18,49,63,.1);border-radius:12px;padding:8px 10px;box-shadow:0 7px 16px rgba(4,42,39,.14)}
   .ladder h3,.feed h3{margin:0 0 8px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:800}
   .curve-box{padding:4px 2px 0}
+  .matchup-read{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-1px 0 2px;
+    font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .matchup-read b{color:#13313f}
+  .matchup-read.favored b{color:var(--bat)}
+  .matchup-read.danger b{color:var(--red)}
   .curve-svg{width:100%;height:78px;display:block}
   .curve-area{fill:rgba(31,120,199,.14);stroke:var(--bowl);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
   .curve-dot{fill:#fff;stroke:var(--bowl);stroke-width:2}
@@ -145,7 +151,7 @@
   .curve-flash{fill:var(--gold);stroke:#13313f;stroke-width:3;opacity:0;filter:drop-shadow(0 4px 5px rgba(6,40,42,.28));
     animation:curveFlash .24s steps(1,end) both}
   .curve-flash.slow{animation-duration:.34s}
-  .curve-marker.rolling{opacity:0;animation:curveLand .38s ease both;animation-delay:2.85s}
+  .curve-marker.rolling{opacity:0;animation:curveLand .34s ease both;animation-delay:1.3s}
   .curve-axis{stroke:rgba(18,49,63,.18);stroke-width:2}
   .curve-tick{stroke:rgba(18,49,63,.16);stroke-width:1.5}
   .curve-svg-label{font-size:13px;font-weight:900;text-anchor:middle;dominant-baseline:middle;fill:#13313f}
@@ -154,6 +160,26 @@
   @keyframes curveHit{0%{r:4;opacity:.4}55%{r:9;opacity:1}100%{r:6}}
   @keyframes curveFlash{0%,100%{opacity:0}18%,82%{opacity:1}}
   @keyframes curveLand{0%{opacity:0;transform:scale(.7)}65%{opacity:1;transform:scale(1.28)}100%{opacity:1;transform:scale(1)}}
+  .payoff-stage{position:relative;width:min(460px,100%);min-height:260px;display:grid;place-items:center;isolation:isolate}
+  .payoff-svg{width:100%;height:200px;overflow:visible;filter:drop-shadow(0 14px 20px rgba(0,0,0,.3));animation:payoffEnter .26s ease both,payoffFade .5s ease 1.62s both}
+  .payoff-svg .curve-area{stroke-width:4}
+  .payoff-svg .curve-marker.rolling{animation-delay:1.22s}
+  .payoff-burst{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;opacity:0;pointer-events:none;
+    animation:payoffPop .6s cubic-bezier(.18,.82,.24,1) 1.55s both}
+  .payoff-num{font-size:148px;line-height:.82;font-weight:900;letter-spacing:-.03em;color:#ffe98a;
+    text-shadow:0 0 42px rgba(245,200,75,.6),0 8px 0 rgba(0,0,0,.28)}
+  .payoff-word{font-size:30px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.32)}
+  .payoff-stage.wicket .payoff-num{color:#ff7d8e;text-shadow:0 0 42px rgba(232,69,90,.6),0 8px 0 rgba(0,0,0,.28)}
+  .payoff-stage.wicket .payoff-word{color:#ffb4ab}
+  .payoff-stage.run .payoff-num{color:#dfe8ff;text-shadow:0 0 26px rgba(120,150,210,.4),0 8px 0 rgba(0,0,0,.28)}
+  .payoff-stage .confetti{z-index:4;animation:payoffConfettiHold 1.1s ease 1.6s both}
+  .resolve-zone{width:100%;display:grid;place-items:center;min-height:300px}
+  .duel.resolving{grid-template-columns:1fr;place-items:center}
+  @keyframes payoffEnter{from{opacity:0;transform:translateY(16px) scale(.92)}to{opacity:1;transform:none}}
+  @keyframes payoffFade{to{opacity:.05;transform:scale(.88) translateY(8px)}}
+  @keyframes payoffPop{0%{opacity:0;transform:scale(.32)}55%{opacity:1;transform:scale(1.14)}78%{transform:scale(.97)}100%{opacity:1;transform:scale(1)}}
+  @keyframes payoffConfettiHold{0%{opacity:0}16%,100%{opacity:1}}
+  @media(prefers-reduced-motion:reduce){.payoff-burst{opacity:1;animation:none}.payoff-svg{opacity:.12;animation:none}}
   .feed-list{display:grid;gap:6px;max-height:96px;overflow:auto}
   .feed-item{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
   .feed-item .tag{font-weight:900;color:#13313f;min-width:54px}
@@ -170,7 +196,7 @@
   /* hand */
   .hand-bar{grid-area:squadbar;display:flex;justify-content:space-between;align-items:center;margin:0 2px;color:#eafffb;font-size:12px;text-shadow:0 1px 0 rgba(0,0,0,.18);min-height:16px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
   .hand-bar .r{display:flex;gap:10px;align-items:center}
-  .hand{grid-area:squad;display:flex;gap:6px;align-items:stretch;justify-content:center;overflow-x:visible;overflow-y:visible;
+  .hand{grid-area:squad;display:flex;gap:6px;align-items:stretch;justify-content:center;overflow-x:auto;overflow-y:visible;
     background:
       linear-gradient(90deg,rgba(255,255,255,.11),transparent 16%,transparent 84%,rgba(255,255,255,.11)),
       linear-gradient(180deg,rgba(255,253,246,.96),rgba(232,249,240,.92));border:1px solid rgba(255,255,255,.45);box-shadow:0 7px 0 rgba(4,68,64,.52),var(--shadow);
@@ -186,9 +212,10 @@
     letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
   .lane-head span{display:none}
   .lane-head b{color:#eafffb}
-  .lane-cards{display:flex;gap:5px;align-items:flex-end;min-height:122px;overflow:visible;padding:0 0 2px}
-  .lane-cards .card{flex:0 0 clamp(68px,5.8vw,88px)}
-  .coach-slot{min-height:122px;border:1.5px dashed rgba(19,49,63,.22);border-radius:12px;background:rgba(255,255,255,.28);
+  .lane-cards{display:flex;gap:0;align-items:flex-end;min-height:228px;overflow:visible;padding:0 0 2px}
+  .lane-cards .card{flex:0 0 clamp(142px,8.8vw,176px)}
+  .lane-cards .card + .card{margin-left:clamp(-30px,-1.45vw,-18px)}
+  .coach-slot{min-height:228px;border:1.5px dashed rgba(19,49,63,.22);border-radius:12px;background:rgba(255,255,255,.28);
     display:grid;place-items:center;text-align:center;color:var(--muted);font-size:24px;font-weight:900;line-height:1;padding:8px}
 
   /* CARD */
@@ -253,20 +280,33 @@
   .shop-section{background:rgba(255,253,246,.96);border-radius:16px;padding:16px;box-shadow:var(--shadow);border:1px solid rgba(18,49,63,.08);margin-bottom:14px}
   .shop-section h2{margin:0 0 4px;font-size:18px;font-weight:900;color:#13313f}
   .shop-section .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .build-tags{display:flex;gap:7px;flex-wrap:wrap;margin:-4px 0 12px}
+  .build-tag{border-radius:999px;padding:5px 9px;background:rgba(255,255,255,.62);border:1px solid rgba(18,49,63,.12);
+    font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#365f66}
+  .build-tag b{color:#13313f}
   .offers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .offer{position:relative;background:var(--panel);border-radius:14px;border:1px solid rgba(18,49,63,.12);box-shadow:var(--shadow-sm);
     padding:12px;display:flex;flex-direction:column;gap:10px}
   .offer.bought{opacity:.5}
   .offer .price{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:900}
   .offer.util{text-align:center;align-items:center;justify-content:flex-start}
+  .offer.coach{background:linear-gradient(180deg,#fffdf6,#eef9f7)}
   .offer .ic-lg{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;color:#fff;margin:2px auto 0}
   .offer .ic-lg svg{width:28px;height:28px}
   .offer h4{margin:2px 0 0;font-size:15px;font-weight:900}
   .offer p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.35}
+  .shop-board{display:block}
+  .shop-board h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .shop-board .offers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .shop-board .shop-tools{display:grid;grid-template-columns:1fr;gap:12px}
   .squad-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   .pickhint{font-size:13px;font-weight:800;color:var(--bat);background:#e8f8ee;border:1px solid #b9e6c9;border-radius:9px;padding:8px 12px}
   .pickhint.release{color:var(--red);background:#fdecef;border-color:#f4c2cb}
   .card.pickable{outline:2px dashed rgba(245,200,75,.8);outline-offset:2px}
+  .coach-card{min-height:176px;border:1.5px solid rgba(245,200,75,.55);border-radius:12px;background:linear-gradient(180deg,#fff8dd,#e9fff8);
+    display:flex;flex-direction:column;justify-content:center;gap:6px;padding:10px;color:#13313f;box-shadow:var(--shadow-sm)}
+  .coach-card b{font-size:13px;line-height:1.1}
+  .coach-card span{font-size:11px;line-height:1.25;color:var(--muted);font-weight:800}
   .shop-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px}
 
   /* over */
@@ -291,23 +331,23 @@
   .tc{display:block;width:100%;height:auto;border-radius:16px}
   .duel{align-items:center}
   .dslot{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center}
-  .dslot .tc{max-width:214px}
+  .dslot .tc{width:clamp(142px,8.8vw,176px);max-width:100%}
   .dlabel{font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);text-align:center}
-  .placeholder{min-height:300px;align-self:stretch}
-  .dslot.clash-left .tc{animation:clashLeft 2.65s cubic-bezier(.17,.76,.22,1) both}
-  .dslot.clash-right .tc{animation:clashRight 2.65s cubic-bezier(.17,.76,.22,1) both}
+  .placeholder{min-height:240px;align-self:stretch}
+  .dslot.clash-left .tc{animation:clashLeft 1.5s cubic-bezier(.17,.76,.22,1) both}
+  .dslot.clash-right .tc{animation:clashRight 1.5s cubic-bezier(.17,.76,.22,1) both}
   .impact-zone{position:relative;display:grid;place-items:center;min-height:270px;font-weight:900;color:var(--muted)}
   .impact-bat{position:absolute;width:84px;height:12px;border-radius:999px;background:linear-gradient(90deg,#7a4a16,#e0b653);
-    transform:rotate(-28deg);box-shadow:0 3px 0 rgba(80,42,8,.28);animation:batSwing 2.65s ease both}
+    transform:rotate(-28deg);box-shadow:0 3px 0 rgba(80,42,8,.28);animation:batSwing 1.5s ease both}
   .impact-ball{position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #c0303f;
-    box-shadow:0 0 0 5px rgba(245,200,75,.3);animation:ballStrike 2.65s ease both}
+    box-shadow:0 0 0 5px rgba(245,200,75,.3);animation:ballStrike 1.5s ease both}
   .outcome-burst{position:absolute;z-index:3;min-width:148px;height:148px;border-radius:50%;display:grid;place-items:center;
     background:radial-gradient(circle at 35% 28%,#fff8bd,var(--gold));border:4px solid #fff;color:#241b00;
-    font-size:68px;font-weight:900;box-shadow:0 22px 34px rgba(6,40,42,.32);animation:outcomeBurst 3.25s ease both}
+    font-size:68px;font-weight:900;box-shadow:0 22px 34px rgba(6,40,42,.32);animation:outcomeBurst 1.5s ease both}
   .outcome-burst.wicket{background:radial-gradient(circle at 35% 28%,#ffdbe2,var(--red));color:#fff}
   .confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:14px}
   .confetti i{position:absolute;left:50%;top:50%;width:9px;height:14px;border-radius:2px;background:var(--c);
-    transform:translate(-50%,-50%) rotate(var(--r));animation:confettiPop 1.15s ease-out both;animation-delay:2.15s}
+    transform:translate(-50%,-50%) rotate(var(--r));animation:confettiPop 1.05s ease-out both;animation-delay:1.05s}
   .confetti i:nth-child(1){--x:-150px;--y:-88px;--r:18deg;--c:#34c06a}
   .confetti i:nth-child(2){--x:-96px;--y:-134px;--r:72deg;--c:#f5c84b}
   .confetti i:nth-child(3){--x:-34px;--y:-112px;--r:135deg;--c:#3aa5ee}
@@ -323,11 +363,11 @@
   .cleared-duel b{display:block;color:#ffe98a;font-size:64px;line-height:1;margin-bottom:8px;text-shadow:0 4px 0 rgba(0,0,0,.16)}
   .cleared-duel div div{margin-top:5px}
   .cleared-duel .btn{margin-top:18px}
-  @keyframes clashLeft{0%,24%{transform:none;opacity:1}46%{transform:translateX(48px) rotate(2deg)}68%{transform:translateX(78px) rotate(-2deg) scale(1.03)}100%{transform:translate(-180px,-36px) rotate(-13deg) scale(.74);opacity:0}}
-  @keyframes clashRight{0%,24%{transform:none;opacity:1}46%{transform:translateX(-48px) rotate(-2deg)}68%{transform:translateX(-78px) rotate(2deg) scale(1.03)}100%{transform:translate(180px,-36px) rotate(13deg) scale(.74);opacity:0}}
+  @keyframes clashLeft{0%,25%{transform:none;opacity:1}58%{transform:translateX(18px) scale(1.02)}100%{transform:translateX(-28px) scale(.9);opacity:0}}
+  @keyframes clashRight{0%,25%{transform:none;opacity:1}58%{transform:translateX(-18px) scale(1.02)}100%{transform:translateX(28px) scale(.9);opacity:0}}
   @keyframes batSwing{0%,42%{transform:translate(-26px,8px) rotate(-28deg);opacity:1}58%{transform:translate(8px,-3px) rotate(18deg)}100%{transform:translate(22px,-20px) rotate(36deg);opacity:0}}
   @keyframes ballStrike{0%,36%{transform:translate(-34px,0) scale(.8);opacity:0}46%{opacity:1}60%{transform:translate(0,0) scale(1.1)}100%{transform:translate(44px,-46px) scale(.35);opacity:0}}
-  @keyframes outcomeBurst{0%,68%{transform:scale(.35);opacity:0}78%{transform:scale(1.18);opacity:1}94%{transform:scale(1.06);opacity:1}100%{transform:scale(.96);opacity:0}}
+  @keyframes outcomeBurst{0%,42%{transform:scale(.35);opacity:0}66%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
   @keyframes confettiPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(var(--r))}18%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1) rotate(calc(var(--r) + 260deg))}}
   .offer{padding:10px}.offer .tc{max-width:100%}
 
@@ -340,8 +380,8 @@
   .lane-cards .card{margin:0;transform-origin:bottom center;
     transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));z-index:var(--z,1);
     transition:transform .2s cubic-bezier(.2,.7,.3,1),box-shadow .2s}
-  .lane-cards .card.selected{transform:translateY(-28px) rotate(0deg) scale(1.18);z-index:55;box-shadow:0 0 0 4px var(--gold),0 22px 38px rgba(4,28,30,.5)}
-  .lane-cards .card:hover{transform:translateY(-30px) rotate(0deg) scale(1.2) rotateX(7deg);z-index:60;box-shadow:0 28px 46px rgba(4,28,30,.55)}
+  .lane-cards .card.selected{transform:translateY(-34px) rotate(0deg) scale(1.14);z-index:55;box-shadow:0 0 0 4px var(--gold),0 22px 38px rgba(4,28,30,.5)}
+  .lane-cards .card:hover{transform:translateY(-36px) rotate(0deg) scale(1.16) rotateX(7deg);z-index:60;box-shadow:0 28px 46px rgba(4,28,30,.55)}
   .lane-cards .card.dealin .tc{animation:dealIn .42s cubic-bezier(.2,.85,.3,1) both;animation-delay:var(--d,0ms)}
   .lane-cards .card.throw{animation:throwCard .24s ease-in forwards;z-index:70}
   .lane-cards .card:hover .sheen{opacity:1;animation:sheen .6s ease}
@@ -355,7 +395,7 @@
   .grid6 .card{transition:transform .14s}
   .grid6 .card:hover{transform:translateY(-6px) scale(1.05)}
   @media(max-width:880px){.lane-cards{min-height:172px}.lane-cards .card{flex-basis:112px}.coach-slot{min-height:120px}}
-  @media(prefers-reduced-motion:reduce){.lane-cards .card.dealin .tc,.dslot.frompile .tc,.rival-pile.deal .pile-card:nth-child(3),.dslot.clash-left .tc,.dslot.clash-right .tc,.impact-bat,.impact-ball,.outcome-burst,.curve-marker.rolling{animation:none}}
+  @media(prefers-reduced-motion:reduce){.lane-cards .card.dealin .tc,.dslot.frompile .tc,.rival-pile.deal .pile-card:nth-child(3),.dslot.clash-left .tc,.dslot.clash-right .tc,.impact-bat,.impact-ball,.outcome-burst,.payoff-svg,.payoff-eruption,.payoff-score-svg,.curve-marker.rolling{animation:none}}
 
   /* --- who's batting / bowling clarity --- */
   .roletag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:900;padding:3px 9px;border-radius:999px;vertical-align:middle;letter-spacing:.04em}
@@ -369,6 +409,432 @@
   .dlabel.bat{background:linear-gradient(180deg,#3fc873,#1f9b53);color:#fff}
   .dlabel.bowl{background:linear-gradient(180deg,#43a5ee,#1f78c7);color:#fff}
   #phaseLabel b{color:#fff}
+
+  /* --- scout rival deck --- */
+  .rival-pile{pointer-events:auto;cursor:pointer;transition:transform .12s}
+  .rival-pile:hover{transform:scale(1.06)}
+  .rival-pile:hover .pile-meta b{color:#ff7d8e}
+  .scout-overlay{position:fixed;inset:0;z-index:60;background:rgba(4,28,26,.74);display:none;align-items:center;justify-content:center;padding:18px}
+  .scout-overlay.show{display:flex}
+  .scout-panel{background:var(--panel);border-radius:18px;max-width:1500px;width:100%;max-height:88vh;overflow:auto;
+    padding:16px 20px 20px;box-shadow:var(--shadow);border:1px solid rgba(18,49,63,.14)}
+  .scout-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;position:sticky;top:-16px;background:var(--panel);padding-top:6px;z-index:2}
+  .scout-head h3{margin:0;font-size:20px;font-weight:900;color:#13313f}
+  .scout-head h3 span{font-size:13px;font-weight:700;color:var(--muted)}
+  .scout-group{margin-bottom:16px}
+  .scout-group h4{margin:0 0 9px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:900}
+  .scout-group h4 em{text-transform:none;letter-spacing:0;font-weight:600;font-style:normal;color:var(--muted)}
+  .scout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+  .scout-card{position:relative}
+  .scout-card.usedc{filter:grayscale(.75);opacity:.5}
+  .scout-card.next .tc{box-shadow:0 0 0 3px var(--gold),0 10px 22px rgba(6,40,42,.3)}
+  .next-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);z-index:3;background:var(--gold);color:#241b00;
+    font-size:10px;font-weight:900;letter-spacing:.05em;padding:2px 9px;border-radius:999px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .scout-empty{color:var(--muted);font-weight:700;padding:8px}
+  @media(max-width:880px){.scout-grid{grid-template-columns:repeat(3,1fr)}}
+
+  /* draft, toss, always-visible rival deck */
+  .screen.active.prep{display:grid;grid-template-areas:"prepTop" "prepBody";grid-template-rows:auto minmax(0,1fr);min-height:calc(100dvh - 28px)}
+  .prep .top{grid-area:prepTop}
+  .draft-layout,.toss-layout{grid-area:prepBody}
+  .prep{min-height:calc(100dvh - 46px)}
+  .prep .top{margin-bottom:14px}
+  .prep-panel{background:rgba(255,253,246,.96);border-radius:18px;padding:22px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.42);
+    min-height:calc(100dvh - 126px);display:flex;flex-direction:column}
+  .prep-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;flex:1;align-content:center;
+    width:min(100%,1280px);margin:0 auto}
+  .prep-grid .card{width:100%}
+  .prep-grid .card{transition:transform .14s,box-shadow .14s}
+  .prep-grid .card:hover{transform:translateY(-5px) scale(1.04)}
+  .draft-card.selected{box-shadow:0 0 0 4px var(--gold),0 18px 34px rgba(6,40,42,.34)}
+  .draft-card:not(.selected){opacity:.72}
+  .prep-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+  .prep-count{font-size:14px;font-weight:900;color:var(--muted)}
+  .toss-layout{display:grid;grid-template-columns:220px 1fr;gap:14px;align-items:stretch;min-height:calc(100dvh - 126px)}
+  .coin-flip{height:188px;border-radius:18px;background:radial-gradient(circle at 38% 30%,#fff7bf,var(--gold) 56%,#bd871b);box-shadow:0 8px 0 #8f6816,0 16px 28px rgba(34,24,0,.2);display:grid;place-items:center;text-align:center;color:#241b00;font-weight:900}
+  .coin-flip b{display:block;font-size:42px;line-height:1}
+  .coin-flip.spin{animation:coinSpin .9s ease both}
+  .rival-strip{grid-area:rivaldeck;background:linear-gradient(180deg,rgba(255,253,246,.96),rgba(232,249,240,.92));border:1px solid rgba(255,255,255,.45);border-radius:16px;padding:8px 10px 10px;box-shadow:0 7px 0 rgba(4,68,64,.52),var(--shadow-sm)}
+  .rival-strip-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .rival-mini-row{display:flex;gap:6px;overflow-x:auto;overflow-y:visible;padding:10px 2px 4px}
+  .rival-mini-row.table-bench{align-items:stretch;justify-content:center}
+  .rival-mini-row.table-bench .role-lane{background:rgba(8,58,57,.08)}
+  .rival-mini-row.table-bench .lane-cards .card{flex-basis:clamp(142px,8.8vw,176px)}
+  .rival-mini-row.table-bench .lane-cards .card.next .tc{box-shadow:0 0 0 4px var(--gold),0 16px 30px rgba(6,40,42,.32)}
+  .rival-mini-row.prep-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;overflow:visible;padding:0;
+    width:min(100%,1120px);margin:0 auto;flex:1;align-content:center}
+  .rival-mini-card{position:relative;flex:0 0 170px}
+  .rival-mini-card .tc{border-radius:9px}
+  .rival-mini-card.next .tc{box-shadow:0 0 0 3px var(--gold)}
+  .rival-mini-card.used{filter:grayscale(.8);opacity:.42}
+  .shop-columns{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+  .shop-tools{display:grid;grid-template-columns:1fr;gap:12px}
+  @keyframes coinSpin{0%{transform:rotateY(0) scale(.9)}45%{transform:rotateY(540deg) scale(1.06)}100%{transform:rotateY(1080deg) scale(1)}}
+  @media(max-width:980px){.screen.active.prep{display:block}.prep-panel{min-height:auto}.prep-grid,.rival-mini-row.prep-grid{grid-template-columns:repeat(auto-fit,minmax(138px,1fr));width:100%}.toss-layout,.shop-columns{grid-template-columns:1fr;min-height:auto}.rival-mini-card{flex-basis:138px}}
+
+  /* --- polished dark layout pass --- */
+  :root{
+    --bg:#050916;--panel-d:#0c1425;--panel-d2:#111b30;--line:#22314b;--line2:#31435f;
+    --neon:#09c18b;--cyan:#05a8ff;--violet:#7a5cff;--amber:#f5b84b;
+  }
+  html,body{background:
+    radial-gradient(1000px 560px at 50% -20%,rgba(41,65,120,.28),transparent 62%),
+    linear-gradient(180deg,#050916,#070b18 46%,#040712);color:#dfe8ff}
+  #app{max-width:none;width:100%;padding:18px 22px 24px}
+  .top{margin-bottom:16px;background:linear-gradient(135deg,rgba(19,30,58,.96),rgba(12,20,38,.94));border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:none}
+  .match-title{color:#fff;text-shadow:none;font-size:26px}
+  .sub{color:#7f93b7;font-weight:800}
+  .btn{border-radius:10px;background:linear-gradient(180deg,#0dd6a0,#0baa82);box-shadow:none;color:#02110d}
+  .btn.secondary{background:#152238;color:#dce8ff;border:1px solid var(--line2);box-shadow:none}
+  .btn:disabled{background:#2a3449;color:#8793aa;box-shadow:none}
+
+  .draft-layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:18px;min-height:calc(100dvh - 132px);width:100%}
+  .setup-panel,.prep-panel,.shop-section,.rival-strip,.arena,.side,.target,.hand{background:rgba(12,20,38,.96);border:1px solid var(--line);box-shadow:none}
+  .setup-panel{border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:18px}
+  .setup-panel h3{margin:0;color:#fff;font-size:20px}
+  .setup-row{display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:900;color:#8195ba}
+  .setup-row b{color:var(--neon)}
+  .setup-meter{height:7px;background:#050916;border:1px solid #17243c;border-radius:999px;overflow:hidden}
+  .setup-meter span{display:block;height:100%;width:var(--p,0%);background:linear-gradient(90deg,#0dd6a0,#24efb9)}
+  .setup-box{background:#0a1221;border:1px solid #17243c;border-radius:12px;padding:14px}
+  .setup-box.big{text-align:left;background:linear-gradient(180deg,#151b3a,#0d1529)}
+  .setup-box .big-num{font-size:44px;font-weight:900;color:#e8eeff;line-height:1}
+  .setup-box p{margin:6px 0 0;color:#7f93b7;font-size:12px;font-weight:800;line-height:1.35}
+  .setup-actions{margin-top:auto;display:grid;gap:10px}
+
+  .prep-panel{border-radius:16px;padding:16px;min-height:0}
+  .prep-panel.full{display:flex;flex-direction:column;gap:12px}
+  .deck-title{display:flex;justify-content:space-between;align-items:center;background:#070d1b;border:1px solid #17243c;border-radius:10px;padding:10px 12px;font-size:13px;font-weight:900;color:#fff}
+  .deck-title span{color:#7f93b7;font-size:12px}
+  .prep-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;width:100%;max-width:none;align-content:start;overflow:auto;padding:4px}
+  .prep-grid .card{min-width:0}
+  .prep-actions{margin-top:0;padding-top:10px;border-top:1px solid #17243c}
+  .prep-count{color:#8ca0c5}
+
+  #match.screen.active{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"top" "board" "arena" "squad";gap:14px;min-height:calc(100dvh - 42px)}
+  #match .top{display:flex;margin-bottom:0}
+  .rival-strip,.hand-bar{display:none}
+  .board{grid-area:board;grid-template-columns:minmax(0,2fr) minmax(360px,1fr);gap:18px;margin:0}
+  .side{border-radius:16px;padding:20px;min-height:130px}
+  .side.you{grid-column:1}.side.rival{grid-column:2;text-align:left}
+  .target{display:none}
+  .side .sc{font-size:42px;color:var(--neon)}
+  .side.rival .sc{color:var(--cyan)}
+  .side .who{font-size:12px;color:#8ca0c5}
+  .side .mini{font-size:12px;color:#7f93b7}
+  .arena{grid-area:arena;display:grid;grid-template-columns:320px minmax(0,1fr) 360px;gap:18px;min-height:0;padding:0;border:0;background:transparent;overflow:visible}
+  .arena:before,.arena:after,.rival-pile,.log{display:none}
+  .duel{grid-column:2;min-height:360px;background:#0c1425;border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:minmax(150px,1fr) 80px minmax(150px,1fr);align-items:center;overflow:hidden;padding:22px}
+  .duel .dslot .tc{width:150px}
+  .duel .impact-zone{min-height:260px}
+  .duel .placeholder{background:#070d1b;border-color:#1f304d;color:#8ca0c5;min-height:260px}
+  .explain{grid-column:3;grid-row:1;display:flex;flex-direction:column;margin:0;gap:14px}
+  .ladder,.feed{background:#0c1425;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:none;min-height:160px}
+  .feed{flex:1}
+  .hand{grid-area:squad;border-radius:16px;padding:16px;display:block;overflow:hidden}
+  .hand:before{content:"Select your player response";display:block;color:#fff;font-size:15px;font-weight:900;margin-bottom:12px}
+  .hand .role-lane{display:contents}
+  .hand .lane-head,.hand .coach{display:none}
+  .hand .lane-cards{display:flex;gap:14px;min-height:auto;overflow-x:auto;padding:4px 2px 10px}
+  .hand .lane-cards .card{flex:0 0 150px;margin-left:0}
+  .hand .lane-cards .card + .card{margin-left:0}
+  .hand .lane-cards .card:hover{transform:translateY(-8px)}
+  /* action bar (confirm/cancel) restored for dark layout */
+  .actions{display:flex;left:50%;bottom:16px;z-index:40;gap:10px;background:rgba(9,15,29,.94);
+    border:1px solid var(--line2);border-radius:14px;padding:9px 11px;box-shadow:0 14px 32px rgba(0,0,0,.55)}
+  .actions:empty{display:none}
+  .actions .btn{min-width:118px}
+  .skip-hint{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:6;font-size:11px;font-weight:900;
+    letter-spacing:.08em;text-transform:uppercase;color:#8ca0c5;pointer-events:none}
+  .duel .impact-zone{cursor:pointer}
+
+  .match-side-panel{display:none}
+  .arena .match-side-panel{display:block;background:#0c1425;border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel-title{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#7387aa;font-weight:900;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #17243c}
+  .focus-card{width:150px;margin:0 auto}
+  .mini-deck{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;max-height:280px;overflow:auto}
+  .mini-pill{background:#070d1b;border:1px solid #263750;border-radius:9px;padding:7px 8px;color:#cfe0ff;font-size:10px;font-weight:900}
+  .mini-pill span{color:#7f93b7}
+  .mini-pill.active{border-color:var(--amber);color:#fff;box-shadow:0 0 0 1px rgba(245,184,75,.35)}
+  .mini-pill.used{opacity:.38;text-decoration:line-through}
+
+  .card{border-radius:14px}
+  .tc{border-radius:14px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.22))}
+  .card.selected .tc,.card.next .tc{filter:drop-shadow(0 0 0 rgba(0,0,0,0)) drop-shadow(0 0 12px rgba(9,193,139,.65))}
+  .selbadge{background:var(--neon);color:#03130f}
+
+  @media(max-width:1100px){
+    .draft-layout{grid-template-columns:1fr}
+    .arena{grid-template-columns:1fr}
+    .duel,.explain{grid-column:auto}
+    .board{grid-template-columns:1fr}
+  }
+  /* toss: coin call + squad comparison */
+  .coin-flip{display:flex;flex-direction:column;gap:12px;justify-content:center;align-items:center;background:#0c1425;border:1px solid var(--line);border-radius:16px;padding:18px;height:auto}
+  .coin-face{width:96px;height:96px;border-radius:999px;display:grid;place-items:center;font-size:42px;font-weight:900;color:#241b00;
+    background:radial-gradient(circle at 38% 30%,#fff7bf,#f5c84b 56%,#bd871b);box-shadow:0 8px 0 #8f6816,0 16px 28px rgba(34,24,0,.25)}
+  .coin-flip.spin .coin-face{animation:coinSpin .9s ease both}
+  .coin-msg{text-align:center;font-size:13px;font-weight:800;color:#cfe0ff;line-height:1.45;max-width:210px}
+  .coin-msg b{color:#fff}
+  .coin-calls{display:flex;gap:8px;justify-content:center}
+  .arch-line{background:#0a1221;border:1px solid #17243c;border-radius:10px;padding:11px 13px;font-size:13px;color:#bcd0ef;line-height:1.45;margin-bottom:16px}
+  .arch-line b{color:#fff}
+  .cmp{display:flex;flex-direction:column;gap:14px}
+  .cmp-row{display:grid;grid-template-columns:1fr 130px 1fr;align-items:center;gap:10px}
+  .cmp-label{text-align:center;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#c2d2ec}
+  .cmp-side{display:flex;align-items:center;gap:10px}
+  .cmp-side.you{justify-content:flex-end}
+  .cmp-side.rival{justify-content:flex-start}
+  .cmp-n{font-size:22px;font-weight:900;color:#fff;min-width:16px;text-align:center}
+  .cmp-bar{height:13px;width:130px;background:#0a1221;border:1px solid #1d2c45;border-radius:999px;overflow:hidden;display:flex}
+  .cmp-side.you .cmp-bar{justify-content:flex-end}
+  .cmp-bar span{display:block;height:100%}
+  .r-bat .cmp-bar span{background:#ff7b51}
+  .r-bowl .cmp-bar span{background:#00daf3}
+  .r-all .cmp-bar span{background:#50dea9}
+  .cmp-foot{display:flex;justify-content:space-between;margin-top:16px;font-size:11px;font-weight:900;letter-spacing:.08em;color:#7f93b7}
+
+  /* --- correction pass: readable squad, visible rival, probability curve --- */
+  .screen.active.prep{min-height:calc(100dvh - 28px)}
+  .draft-layout{grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:18px}
+  .prep-grid{grid-template-columns:repeat(5,minmax(120px,1fr));align-content:start;overflow:visible}
+  .prep-grid .card{max-width:190px}
+
+  #match.screen.active{
+    grid-template-rows:auto auto auto minmax(340px,1fr) auto;
+    grid-template-areas:"top" "board" "rivaldeck" "arena" "squad";
+    gap:12px;
+  }
+  .rival-strip{display:block;grid-area:rivaldeck;border-radius:16px;padding:12px 16px;background:#0c1425;border:1px solid var(--line);box-shadow:none}
+  .rival-strip-head{color:#7f93b7;margin-bottom:0}
+  .rival-mini-row{overflow:visible}
+  .arena{grid-template-columns:300px minmax(0,1.35fr) 340px}
+  .duel{grid-template-columns:minmax(160px,1fr) 84px minmax(160px,1fr);gap:16px;min-height:360px}
+
+  .fan-row{--card-w:clamp(112px,8.4vw,156px);--overlap:calc(var(--card-w) * -.32);
+    display:flex;align-items:flex-end;justify-content:center;min-height:210px;padding:30px 20px 14px;isolation:isolate;perspective:1300px}
+  .fan-row .card{flex:0 0 var(--card-w);width:var(--card-w);margin-left:var(--overlap);transform-origin:bottom center;
+    transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));z-index:var(--z,1);
+    transition:transform .18s cubic-bezier(.2,.7,.3,1),filter .18s,opacity .18s}
+  .fan-row .card:first-child{margin-left:0}
+  .fan-row .card:hover,.fan-row .card.selected{transform:translateY(-38px) rotate(0deg) scale(1.13);z-index:90}
+  .fan-row .card.selected{box-shadow:0 0 0 4px var(--gold),0 22px 38px rgba(0,0,0,.48)}
+  .fan-row .card.used{opacity:.35;filter:grayscale(.85)}
+  .fan-row .card.dealin .tc{animation:dealIn .42s cubic-bezier(.2,.85,.3,1) both;animation-delay:var(--d,0ms)}
+  .fan-row .card.throw{animation:throwCard .24s ease-in forwards;z-index:100}
+  .fan-row .card:hover .sheen{opacity:1;animation:sheen .6s ease}
+  .hand{overflow:visible;padding:12px 16px 10px}
+  .hand:before{margin-bottom:0}
+  .hand .fan-row{--card-w:clamp(118px,8.7vw,160px);min-height:220px;padding-top:34px}
+  .rival-strip .fan-row{--card-w:clamp(92px,6.5vw,128px);--overlap:calc(var(--card-w) * -.38);min-height:156px;padding:22px 12px 6px}
+  .rival-strip .fan-row .card:hover{transform:translateY(-24px) rotate(0deg) scale(1.08)}
+  .rival-strip .fan-row .card.next{filter:drop-shadow(0 0 10px rgba(245,184,75,.7))}
+  .rival-strip .fan-row .card.next .tc{box-shadow:0 0 0 3px var(--amber)}
+  .rival-strip .fan-row .card:disabled{cursor:default}
+
+  .quick-stat{position:absolute;left:7px;z-index:4;display:flex;align-items:center;gap:3px;min-width:48px;height:20px;padding:0 6px;
+    border-radius:999px;color:#fff;font-size:10px;font-weight:900;letter-spacing:.02em;box-shadow:0 4px 10px rgba(0,0,0,.24);pointer-events:none}
+  .quick-stat b{font-size:13px;line-height:1}
+  .quick-stat.bat{bottom:18px;background:#0aa86c}
+  .quick-stat.bowl{bottom:42px;background:#d23a50}
+  .quick-stat.dim{opacity:.48}
+
+  .cmp{gap:16px}
+  .cmp-read{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;color:#cfe0ff;font-size:13px;font-weight:900}
+  .cmp-read b{color:#fff}
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .cmp-deck{background:#070d1b;border:1px solid #17243c;border-radius:13px;padding:12px;min-height:0}
+  .cmp-deck h4{margin:0 0 10px;color:#fff;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+  .cmp-role{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;align-items:start;padding:8px 0;border-top:1px solid #17243c}
+  .cmp-role:first-of-type{border-top:0}
+  .cmp-role label{color:#7f93b7;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+  .cmp-cards{display:flex;flex-wrap:wrap;gap:6px}
+  .cmp-card{border:1px solid #263750;background:#0c1425;border-radius:999px;padding:5px 8px;color:#dce8ff;font-size:11px;font-weight:900;white-space:nowrap}
+  .cmp-card b{color:#fff}
+  .cmp-card.bat{border-color:rgba(9,193,139,.48)}
+  .cmp-card.bowl{border-color:rgba(5,168,255,.48)}
+  .cmp-card.all{border-color:rgba(122,92,255,.55)}
+
+  @media(max-width:1100px){
+    #match.screen.active{grid-template-rows:auto auto auto auto auto}
+    .arena{grid-template-columns:1fr}
+    .fan-row{justify-content:flex-start;overflow-x:auto}
+    .cmp-grid{grid-template-columns:1fr}
+  }
+  @media(max-height:820px) and (min-width:980px){
+    #app{padding:10px 14px 12px}
+    .screen.active.prep{min-height:calc(100dvh - 22px)}
+    .prep .top{padding:10px 14px;margin-bottom:8px}
+    .draft-layout{grid-template-columns:280px minmax(0,1fr);gap:12px;min-height:auto}
+    .setup-panel{padding:13px;gap:10px}
+    .setup-panel h3{font-size:17px}
+    .setup-box{padding:10px}
+    .setup-box .big-num{font-size:34px}
+    .setup-box p{font-size:11px;line-height:1.25}
+    .prep-panel{padding:12px;min-height:auto}
+    .deck-title{padding:8px 10px}
+    .prep-grid{grid-template-columns:repeat(5,minmax(88px,1fr));gap:10px;align-content:start}
+    .prep-grid .card{max-width:132px}
+    .toss-layout{grid-template-columns:190px 1fr;gap:12px;min-height:auto}
+    .coin-face{width:78px;height:78px;font-size:34px}
+    .cmp-grid{gap:10px}
+    .cmp-role{grid-template-columns:82px minmax(0,1fr);padding:6px 0}
+    .cmp-card{font-size:10px;padding:4px 7px}
+    #match.screen.active{grid-template-rows:auto auto auto minmax(230px,1fr) auto;gap:8px;min-height:calc(100dvh - 22px)}
+    #match .top{padding:10px 14px}
+    #match .match-title{font-size:22px}
+    #match .sub{font-size:12px}
+    .board{gap:8px}
+    .side{min-height:54px;padding:8px 12px}
+    .side .sc{font-size:27px}
+    .side .mini{font-size:10px;margin-top:1px}
+    .wkts{display:none}
+    .rival-strip{padding:6px 12px}
+    .rival-strip .fan-row{--card-w:clamp(70px,5.4vw,92px);min-height:88px;padding:12px 10px 0}
+    .arena{grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+    .arena .match-side-panel{display:none}
+    .duel{grid-column:1;min-height:238px;padding:16px;grid-template-columns:minmax(116px,1fr) 58px minmax(116px,1fr)}
+    .explain{grid-column:2;grid-row:1}
+    .duel .dslot .tc{width:clamp(108px,7.8vw,132px)}
+    .duel .placeholder{min-height:190px}
+    .duel .impact-zone{min-height:205px}
+    .payoff-stage{min-height:198px;width:min(330px,100%)}
+    .payoff-svg{height:178px}
+    .focus-card{width:112px}
+    .mini-deck{grid-template-columns:repeat(2,1fr);max-height:138px}
+    .ladder,.feed{min-height:110px;padding:12px}
+    .curve-svg{height:66px}
+    .hand{padding:6px 14px}
+    .hand:before{display:none}
+    .hand .fan-row{--card-w:clamp(84px,6.8vw,112px);min-height:126px;padding:4px 16px 0}
+  }
+
+  /* --- full UI overhaul: cricket-card table screens --- */
+  html,body{height:100%;overflow:hidden;background:
+    linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),
+    radial-gradient(900px 520px at 50% -18%,rgba(255,232,150,.20),transparent 64%),
+    linear-gradient(180deg,#0b8b7d,#075b57 54%,#063d43);
+    background-size:34px 34px,34px 34px,auto,auto}
+  #app{height:100dvh;max-width:none;padding:12px 16px;overflow:hidden}
+  .screen.active{height:calc(100dvh - 24px);overflow:hidden}
+  .screen.active.title{height:calc(100dvh - 24px);min-height:0}
+  .top{margin-bottom:10px;padding:11px 14px;border-radius:13px;background:linear-gradient(135deg,rgba(7,18,32,.93),rgba(13,36,48,.88));border-color:rgba(177,232,223,.22)}
+  .match-title{font-size:clamp(20px,1.8vw,27px)}
+  .sub{font-size:12px;color:#b8ded9}
+  .btn{border-radius:12px}
+  .btn.sm{border-radius:10px}
+  .coins-tag{background:#0b1728;color:#fff;border-color:rgba(177,232,223,.24);box-shadow:none}
+
+  .screen.active.prep{height:calc(100dvh - 24px);min-height:0;grid-template-rows:auto minmax(0,1fr);gap:0}
+  .draft-layout,.toss-layout,.squad-room{height:100%;min-height:0;gap:12px}
+  .draft-layout{grid-template-columns:minmax(260px,310px) minmax(0,1fr)}
+  .setup-panel,.prep-panel,.shop-section,.rival-strip,.arena,.hand{background:rgba(7,18,32,.92);border:1px solid rgba(177,232,223,.22);box-shadow:0 14px 34px rgba(0,0,0,.18)}
+  .setup-panel{min-height:0;overflow:hidden;padding:14px;gap:12px}
+  .setup-panel h3{font-size:18px}
+  .setup-box{background:rgba(3,12,24,.62);border-color:rgba(177,232,223,.16);padding:11px}
+  .setup-box.big{background:linear-gradient(180deg,rgba(18,38,66,.82),rgba(5,16,31,.68))}
+  .setup-box .big-num{font-size:34px}
+  .setup-box p{font-size:11px;line-height:1.28;color:#a9c3d7}
+  .setup-actions{gap:8px}
+  .prep-panel{min-height:0;height:100%;overflow:hidden;padding:12px}
+  .deck-title{padding:8px 10px;background:rgba(3,12,24,.72);border-color:rgba(177,232,223,.15)}
+  .prep-grid{height:100%;min-height:0;grid-template-columns:repeat(5,minmax(108px,1fr));gap:10px;align-content:center;justify-items:center;overflow:hidden;padding:4px}
+  .prep-grid .card{width:clamp(108px,8.8vw,148px);max-width:none}
+  .prep-grid .card:hover{transform:translateY(-8px) scale(1.11);z-index:20}
+  .draft-compare{display:grid;gap:7px;margin-top:10px}
+  .draft-compare .cmp-row{grid-template-columns:1fr 82px 1fr;gap:7px}
+  .draft-compare .cmp-label{font-size:10px}
+  .draft-compare .cmp-bar{width:74px;height:10px}
+  .draft-compare .cmp-n{font-size:16px}
+
+  .toss-layout{grid-template-columns:minmax(220px,280px) minmax(0,1fr)}
+  .coin-flip{height:100%;min-height:0;background:rgba(7,18,32,.92);border-color:rgba(177,232,223,.22)}
+  .coin-face{width:clamp(82px,9vw,112px);height:clamp(82px,9vw,112px)}
+  .toss-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;height:100%;align-content:center}
+  .toss-card{background:rgba(3,12,24,.64);border:1px solid rgba(177,232,223,.16);border-radius:13px;padding:14px;color:#dce8ff}
+  .toss-card b{display:block;font-size:22px;color:#fff}
+  .toss-card span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8da7c8;font-weight:900}
+
+  #match.screen.active{height:calc(100dvh - 24px);min-height:0;grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:8px}
+  #match .top{margin-bottom:0}
+  .board{margin:0;grid-template-columns:minmax(0,1fr) 104px minmax(0,1fr);gap:8px}
+  .side.you,.side.rival{grid-column:auto}
+  .side{min-height:68px;padding:10px 13px;border-radius:13px;background:linear-gradient(135deg,rgba(7,18,32,.92),rgba(14,43,53,.86))}
+  .side .sc{font-size:30px}
+  .side .mini{font-size:10px}
+  .target{display:grid;min-width:86px;min-height:86px;padding:8px}
+  .target .big{font-size:22px}
+  .rival-strip{display:block;padding:7px 10px;border-radius:13px}
+  .rival-strip .fan-row{--card-w:clamp(74px,5.7vw,104px);--overlap:calc(var(--card-w) * -.42);min-height:clamp(86px,13vh,128px);padding:10px 8px 0}
+  .arena{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,320px);gap:10px;min-height:0;padding:0;border:0;background:transparent;box-shadow:none;overflow:visible}
+  .arena:before,.arena:after,.arena .match-side-panel,.rival-pile{display:none}
+  .duel{grid-column:1;min-height:0;height:100%;grid-template-columns:minmax(116px,1fr) 58px minmax(116px,1fr);gap:10px;padding:14px;border-radius:14px;background:rgba(7,18,32,.88);border:1px solid rgba(177,232,223,.22)}
+  .duel .dslot .tc{width:clamp(112px,8vw,148px)}
+  .duel .placeholder{min-height:170px}
+  .duel .impact-zone{min-height:190px}
+  .explain{grid-column:2;grid-row:1;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:10px;margin:0;min-height:0}
+  .ladder,.feed{min-height:0;padding:10px;border-radius:13px;background:rgba(7,18,32,.88);border-color:rgba(177,232,223,.18)}
+  .feed{flex:none}
+  .feed h3,.ladder h3{margin-bottom:6px}
+  .over-strip{justify-content:center;gap:6px}
+  .ball-chip{width:28px;height:28px;font-size:11px}
+  .curve-svg{height:70px}
+  .hand{padding:7px 12px;border-radius:13px;overflow:visible}
+  .hand:before{display:none}
+  .hand .fan-row{--card-w:clamp(88px,6.6vw,124px);--overlap:calc(var(--card-w) * -.31);min-height:clamp(112px,17vh,160px);padding:8px 18px 0}
+  .actions{bottom:12px}
+
+  #shop.screen.active{display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;gap:10px}
+  #shop .shop-section{margin:0;padding:12px;border-radius:14px;min-height:0;overflow:hidden}
+  #shop .shop-section h2{color:#fff;font-size:18px}
+  #shop .shop-section .hint{color:#a9c3d7;font-size:12px;margin-bottom:9px}
+  #shop .build-tags{display:none}
+  .shop-board{height:100%;min-height:0}
+  .shop-columns{height:100%;min-height:0;display:grid;grid-template-columns:1.15fr .85fr;gap:10px}
+  .shop-board h3{color:#b8ded9;font-size:11px}
+  .shop-board .offers{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .shop-board .shop-tools{gap:10px}
+  .offer{min-height:0;padding:10px;border-radius:13px;background:rgba(3,12,24,.65);border-color:rgba(177,232,223,.16);box-shadow:none;color:#dce8ff}
+  .offer .tc{width:clamp(86px,8vw,122px);margin:0 auto}
+  .offer h4{color:#fff}
+  .offer p{font-size:11px;color:#a9c3d7}
+  .offer .price{font-size:13px}
+  .squad-entry{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+  .squad-entry #shopSquad{display:none}
+  .squad-entry .squad-actions{margin:0;justify-content:flex-end}
+  #shop>.shop-foot{margin:0}
+
+  #squad.screen.active{display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}
+  .squad-room{display:grid;grid-template-columns:minmax(260px,310px) minmax(0,1fr)}
+  .squad-rail{height:100%}
+  .roster-groups{height:100%;min-height:0;display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:10px;overflow:hidden}
+  .roster-group{min-height:0;background:rgba(3,12,24,.55);border:1px solid rgba(177,232,223,.14);border-radius:13px;padding:10px}
+  .roster-group h3{margin:0 0 7px;color:#b8ded9;font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .roster-row{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 4px 10px;min-height:0}
+  .roster-row .card{flex:0 0 clamp(96px,7vw,132px)}
+  .roster-row .card.active .tc{filter:drop-shadow(0 0 12px rgba(9,193,139,.58))}
+  .roster-row .card:hover{transform:translateY(-8px) scale(1.08);z-index:20}
+
+  @media(max-height:820px) and (min-width:900px){
+    #app{padding:8px 12px}
+    .screen.active{height:calc(100dvh - 16px)}
+    .top{padding:8px 12px;margin-bottom:8px}
+    .draft-layout,.squad-room{grid-template-columns:250px minmax(0,1fr);gap:9px}
+    .setup-panel{padding:10px;gap:8px}
+    .setup-box{padding:8px}
+    .prep-panel{padding:9px}
+    .prep-grid{gap:8px}
+    .prep-grid .card{width:clamp(90px,7.4vw,118px)}
+    .rival-strip .fan-row{--card-w:clamp(62px,5.1vw,86px);min-height:76px}
+    .duel{padding:10px}
+    .duel .dslot .tc{width:clamp(92px,7vw,120px)}
+    .duel .placeholder{min-height:145px}
+    .ladder,.feed{padding:8px}
+    .hand .fan-row{--card-w:clamp(76px,6.1vw,104px);min-height:104px}
+    .offer .tc{width:clamp(72px,7vw,104px)}
+    .roster-row .card{flex-basis:clamp(82px,6.2vw,108px)}
+  }
 </style>
 </head>
 <body>
@@ -380,6 +846,69 @@
       <div class="tag">A roguelike cricket card duel. Bowl an over, then chase one. Build your squad between matches and lift the cup.</div>
       <button class="btn" id="startBtn">Start Run</button>
       <div class="pill-row" id="titleStats"></div>
+    </div>
+  </section>
+
+  <section id="draft" class="screen prep">
+    <div class="top">
+      <div>
+        <div class="match-title" id="draftTitle">Pick Your 12</div>
+        <div class="sub" id="draftSub">Scout the rival, then lock the 12 players for this match.</div>
+      </div>
+      <button class="btn secondary sm" id="draftRestartBtn">Restart</button>
+    </div>
+    <div class="draft-layout">
+      <aside class="setup-panel">
+        <h3>Squad Setup</h3>
+        <div>
+          <div class="setup-row"><span>Selected Team</span><b id="draftCount">0/12</b></div>
+          <div class="setup-meter" id="draftMeter" style="--p:0%"><span></span></div>
+        </div>
+        <div class="setup-box">
+          <div class="setup-row"><span>Batsmen</span><b id="draftBatCount">0 selected</b></div>
+          <div class="setup-row"><span>Bowlers</span><b id="draftBowlCount">0 selected</b></div>
+          <div class="setup-row"><span>All-rounders</span><b id="draftAllCount">0 selected</b></div>
+        </div>
+        <div class="setup-box big">
+          <div class="sub" style="color:#7a8cff">Squad Shape</div>
+          <div class="big-num" id="draftReadiness">0/3</div>
+          <p id="draftShapeHint">Balance your batting, bowling, and all-round options against this rival.</p>
+        </div>
+        <div class="setup-box">
+          <div class="setup-row"><span>Scout Report</span><b id="draftOppName">--</b></div>
+          <p id="draftOppRead">Build a squad that can handle them — at least four batting and four bowling options.</p>
+        </div>
+        <div class="setup-actions">
+          <button class="btn secondary sm" id="draftAutoBtn">Auto Select Best</button>
+          <button class="btn" id="draftConfirmBtn">Lock 12</button>
+        </div>
+      </aside>
+      <div class="prep-panel full">
+        <div class="deck-title"><b id="draftDeckTitle">Your Roster</b><span>Click cards to toggle selection</span></div>
+        <div class="prep-grid" id="draftGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="toss" class="screen prep">
+    <div class="top">
+      <div>
+        <div class="match-title" id="tossTitle">Toss</div>
+        <div class="sub" id="tossSub">Scout the rival, then choose whether to bat or bowl first.</div>
+      </div>
+      <button class="btn secondary sm" id="tossRestartBtn">Restart</button>
+    </div>
+    <div class="toss-layout">
+      <div class="coin-flip" id="coinFlip"></div>
+      <div class="prep-panel">
+        <div class="rival-strip-head"><span>Coin toss</span></div>
+        <div id="archLine" class="arch-line"></div>
+        <div id="squadCompare"></div>
+        <div class="prep-actions">
+          <span class="prep-count" id="tossHint"></span>
+          <span id="tossChoices"></span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -410,9 +939,15 @@
     </div>
 
     <div class="arena">
-      <div class="rival-pile" id="rivalPile" aria-hidden="true">
-        <div class="pile-meta"><span>Rival pile</span><b id="rivalPileCount">12</b></div>
+      <div class="rival-pile" id="rivalPile" title="See the rival's full deck" role="button" tabindex="0">
+        <div class="pile-meta"><span>Scout rival ▸</span><b id="rivalPileCount">12</b></div>
         <div class="pile-stack"><span class="pile-card"></span><span class="pile-card"></span><span class="pile-card"></span></div>
+      </div>
+      <div class="match-side-panel" id="opponentPanel">
+        <div class="panel-title">Opponent Card</div>
+        <div id="opponentFocus"></div>
+        <div class="panel-title" style="margin-top:16px">Upcoming Deck</div>
+        <div class="mini-deck" id="opponentUpcoming"></div>
       </div>
       <div class="duel" id="duel"></div>
       <div class="log" id="log"></div>
@@ -423,11 +958,23 @@
       </div>
     </div>
 
+    <div class="rival-strip">
+      <div class="rival-strip-head"><span>Rival cards</span><span id="rivalStripMeta"></span></div>
+      <div class="rival-mini-row" id="rivalStrip"></div>
+    </div>
+
     <div class="hand-bar">
       <span id="handPrompt"></span>
       <span class="r">Bench</span>
     </div>
     <div class="hand" id="hand"></div>
+
+    <div class="scout-overlay" id="rivalDrawer">
+      <div class="scout-panel">
+        <div class="scout-head"><h3>Rival squad <span id="scoutSub"></span></h3><button class="btn secondary sm" id="closeScout">Close</button></div>
+        <div id="rivalDeckGrid"></div>
+      </div>
+    </div>
   </section>
 
   <section id="shop" class="screen">
@@ -438,24 +985,63 @@
 
     <div class="shop-section">
       <h2>Transfer market</h2>
-      <p class="hint">Sign new players and grab squad upgrades. Bigger matches need a deeper bench.</p>
+      <p class="hint">Buy a player, hire a coach, or save coins for the next opponent.</p>
+      <div class="build-tags" aria-label="Build paths">
+        <span class="build-tag"><b>Wickets</b> Yorker + Strike Bowler</span>
+        <span class="build-tag"><b>Economy</b> dots + coaches</span>
+        <span class="build-tag"><b>Boundary</b> Power Hitter + Finisher</span>
+        <span class="build-tag"><b>Toss</b> first-ball tempo</span>
+        <span class="build-tag"><b>Academy</b> commons + training</span>
+      </div>
       <div class="offers" id="offers"></div>
       <div class="shop-foot">
         <button class="btn secondary sm" id="rerollBtn">Reroll · 2</button>
-        <span class="sub" style="color:var(--muted)">Deck: <b id="deckCount">0</b> cards</span>
+        <span class="sub" style="color:var(--muted)">Roster: <b id="deckCount">0</b> cards</span>
       </div>
     </div>
 
-    <div class="shop-section">
-      <h2>Manage your squad</h2>
-      <p class="hint" id="manageHint">Tap a player, then train or release them. Releasing thins your deck so your stars come up more often.</p>
+    <div class="shop-section squad-entry">
+      <h2>Squad room</h2>
+      <p class="hint" id="manageHint">Train players or sell surplus bench cards. You must always own at least 12 players.</p>
       <div class="squad-actions" id="squadActions"></div>
       <div class="grid6" id="shopSquad"></div>
     </div>
 
     <div class="shop-foot">
       <span></span>
-      <button class="btn" id="nextBtn">Next Match →</button>
+      <button class="btn" id="nextBtn">Scout Next Rival</button>
+    </div>
+  </section>
+
+  <section id="squad" class="screen">
+    <div class="top">
+      <div>
+        <div class="match-title">Squad Room</div>
+        <div class="sub" id="squadSub">Train players, sell surplus bench cards, then scout the next rival.</div>
+      </div>
+      <div class="coins-tag"><span class="coin"></span><span id="squadCoins">0</span></div>
+    </div>
+    <div class="squad-room">
+      <aside class="setup-panel squad-rail">
+        <h3>Roster</h3>
+        <div class="setup-box">
+          <div class="setup-row"><span>Owned players</span><b id="rosterCount">12</b></div>
+          <div class="setup-row"><span>Active squad</span><b id="activeCount">12/12</b></div>
+          <div class="setup-row"><span>Bench</span><b id="benchCount">0</b></div>
+        </div>
+        <div class="setup-box">
+          <p id="squadManageHint">Pick an action, then tap a card.</p>
+        </div>
+        <div class="squad-actions" id="squadManageActions"></div>
+        <div class="setup-actions">
+          <button class="btn secondary sm" id="squadBackBtn">Back to Shop</button>
+          <button class="btn" id="squadNextBtn">Scout Next Rival</button>
+        </div>
+      </aside>
+      <div class="prep-panel full">
+        <div class="deck-title"><b>Owned Cards</b><span>Grouped by role</span></div>
+        <div class="roster-groups" id="squadGrid"></div>
+      </div>
     </div>
   </section>
 
@@ -486,16 +1072,41 @@ const ICON={
 const FIRST=["Arjun","Ravi","Kabir","Dev","Omar","Tariq","Rohan","Vikram","Samar","Nikhil","Yusuf","Karan","Bilal","Hari","Ishan","Milan","Zaid","Aniket","Noah","Liam"];
 const LAST=["Rao","Khan","Menon","Pawar","Iqbal","Joshi","Malik","Singh","Reid","Santos","Das","Naik","Raza","Carter","Gill","Frost","Mehta","Bose","Vance","Cole"];
 const MATCHES=[
-  {name:"Gully Cup",balls:6,wickets:2,reward:6,level:0},
-  {name:"Town League",balls:6,wickets:2,reward:7,level:1},
-  {name:"District Cup",balls:6,wickets:2,reward:8,level:2},
-  {name:"The Final",balls:6,wickets:2,reward:0,level:3}
+  {cup:"Street Cup",name:"Lane Opener",balls:6,wickets:2,reward:5,level:0,rarities:["common"],shop:["common"],enemyShift:-5,enemyCap:35},
+  {cup:"Street Cup",name:"Park Rivals",balls:6,wickets:2,reward:6,level:1,rarities:["common"],shop:["common","common","uncommon"],enemyShift:-3,enemyCap:37},
+  {cup:"Street Cup",name:"Market Knockout",balls:6,wickets:2,reward:8,level:2,rarities:["common","common","uncommon"],shop:["common","uncommon"],enemyShift:-3,enemyCap:52,enemyTraitRate:.25},
+  {cup:"Street Cup",name:"Underpass Semi",balls:6,wickets:2,reward:9,level:3,rarities:["common","uncommon"],shop:["uncommon","rare"],enemyShift:-4,enemyCap:52,enemyTraitRate:.25},
+  {cup:"Street Cup",name:"Street Cup Final",balls:6,wickets:2,reward:11,level:4,rarities:["uncommon","uncommon","rare"],shop:["uncommon","rare"],enemyShift:-10,enemyCap:56,enemyTraitRate:.2},
+  {cup:"City Cup",name:"Club Opener",balls:6,wickets:2,reward:10,level:5,rarities:["uncommon","uncommon","rare"],shop:["uncommon","rare"],enemyShift:-12,enemyCap:60,enemyTraitRate:.22},
+  {cup:"City Cup",name:"Railway Derby",balls:6,wickets:2,reward:10,level:6,rarities:["uncommon","rare"],shop:["uncommon","rare","rare"],enemyShift:-10,enemyCap:64,enemyTraitRate:.35},
+  {cup:"City Cup",name:"Stadium Lights",balls:6,wickets:2,reward:11,level:7,rarities:["rare","rare","uncommon"],shop:["rare","epic"],enemyShift:-6,enemyCap:70,enemyTraitRate:.6},
+  {cup:"City Cup",name:"City Semi",balls:6,wickets:2,reward:11,level:8,rarities:["rare","rare","rare"],shop:["rare","epic"],enemyShift:-7,enemyCap:72,enemyTraitRate:.65},
+  {cup:"City Cup",name:"PowerPlay Final",balls:6,wickets:2,reward:0,level:9,rarities:["rare","rare","epic"],shop:["rare","epic"],enemyShift:-8,enemyCap:76,enemyTraitRate:.75}
 ];
+const RARITIES={
+  common:{label:"Common",short:"COM",min:20,max:40,trait:0,price:3,fill:"#8aa0a8"},
+  uncommon:{label:"Uncommon",short:"UNC",min:40,max:58,trait:.35,price:5,fill:"#34c06a"},
+  rare:{label:"Rare",short:"RARE",min:56,max:74,trait:.72,price:7,fill:"#3aa5ee"},
+  epic:{label:"Epic",short:"EPIC",min:72,max:88,trait:1,price:9,fill:"#8a55e6"},
+  legendary:{label:"Legendary",short:"LEG",min:84,max:99,trait:.85,price:12,fill:"#f5c84b"}
+};
 const TRAITS=[
-  {name:"Finisher",text:"+8 BAT late in the chase",bat:(c,v)=>c.phase==="bat"&&c.left<=3?v+8:v,bowl:(c,v)=>v},
-  {name:"Strike Bowler",text:"+8 BOWL while bowling",bat:(c,v)=>v,bowl:(c,v)=>c.phase==="bowl"?v+8:v},
-  {name:"Anchor",text:"first batting wicket becomes a dot",bat:(c,v)=>v,bowl:(c,v)=>v},
-  {name:"All-rounder",text:"+4 BAT and +4 BOWL",bat:(c,v)=>v+4,bowl:(c,v)=>v+4}
+  {name:"Finisher",role:"bat",text:"+8 BAT late in the chase",bat:(c,v)=>c.phase==="bat"&&c.left<=3?v+8:v,bowl:(c,v)=>v},
+  {name:"Strike Bowler",role:"bowl",text:"+8 BOWL while bowling",bat:(c,v)=>v,bowl:(c,v)=>c.phase==="bowl"?v+8:v},
+  {name:"Anchor",role:"bat",text:"first batting wicket becomes a dot",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bat"&&!m?.you?.anchor?replaceOne(strip,"W","0"):strip},
+  {name:"All-rounder",role:"all",text:"+4 BAT and +4 BOWL",bat:(c,v)=>v+4,bowl:(c,v)=>v+4},
+  {name:"Yorker",role:"bowl",text:"while bowling, one scoring slot becomes W",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bowl"?replaceWorstRun(strip,"W"):strip},
+  {name:"Economy",role:"bowl",text:"while bowling, one boundary slot becomes 0",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bowl"?replaceBoundary(strip,"0"):strip},
+  {name:"Power Hitter",role:"bat",text:"while batting, one dot slot becomes 4",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bat"?replaceOne(strip,"0","4"):strip},
+  {name:"Toss Tempo",role:"all",text:"if used first after toss, one bad slot becomes 2",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip,c)=>c.tossLive?replaceBadSlot(strip,mode,"2"):strip}
+];
+const COACHES=[
+  {id:"bat_mentor",name:"Batting Coach",unlock:1,price:5,desc:"+3 BAT for batter cards.",bonus:(stat,c)=>stat==="bat"&&c.role==="bat"?3:0},
+  {id:"bowling_mentor",name:"Bowling Coach",unlock:1,price:5,desc:"+3 BOWL for bowler cards.",bonus:(stat,c)=>stat==="bowl"&&c.role==="bowl"?3:0},
+  {id:"academy_coach",name:"Academy Coach",unlock:2,price:6,desc:"+2 to both stats on Common cards.",bonus:(stat,c)=>c.rarity==="common"?2:0},
+  {id:"death_bowler",name:"Death Bowler",unlock:4,price:7,desc:"+5 BOWL on the last 2 balls.",bonus:(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"&&x.left<=2?5:0},
+  {id:"chase_guru",name:"Chase Guru",unlock:5,price:7,desc:"+5 BAT on the last 2 balls of a chase.",bonus:(stat,c,x)=>stat==="bat"&&x.phase==="bat"&&x.left<=2?5:0},
+  {id:"all_round_coach",name:"Utility Coach",unlock:6,price:8,desc:"+3 to both stats for all-rounders.",bonus:(stat,c)=>c.role==="all"?3:0}
 ];
 const TEAMS=[
   {name:"Harbour Sharks",c1:"#0b2f6b",c2:"#1f8fd6",cl:"#7fd6f2",badge:"HS"},
@@ -511,41 +1122,124 @@ save.best=save.best||0;save.cups=save.cups||0;
 let run,m;
 let dealAnim=true,challengeAnim=false,anim=false;
 
-function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id))}
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
+  window.scrollTo(0,0);
+}
 function persist(){localStorage.setItem("powerplay_rogue",JSON.stringify(save))}
 function person(){return pick(FIRST)+" "+pick(LAST)}
 function roleName(c){return c.role==="bat"?"Batter":c.role==="bowl"?"Bowler":"All-rounder"}
 function roleClass(c){return c.role==="bat"?"role-bat":c.role==="bowl"?"role-bowl":"role-all"}
 function roleIcon(c){return c.role==="bat"?ICON.bat:c.role==="bowl"?ICON.ball:ICON.all}
 function initials(c){const p=c.name.split(" ");return ((p[0]||"")[0]||"")+((p[1]||"")[0]||"")}
+function matchLabel(def){return `${def.cup}: ${def.name}`}
 
-function card(level=0,roleForce){
+function card(rarityKey="common",roleForce,opts={}){
   const role=roleForce||pick(["bat","bowl","all"]);
-  const base=54+level*4;
-  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,bat:rng(base-8,base+8),bowl:rng(base-8,base+8),trait:null,used:false};
-  if(role==="bat")c.bat+=rng(10,16);
-  if(role==="bowl")c.bowl+=rng(10,16);
-  if(role==="all"){c.bat+=rng(3,8);c.bowl+=rng(3,8)}
-  c.bat=clamp(c.bat,20,99);c.bowl=clamp(c.bowl,20,99);
-  if(Math.random()<.34+level*.04)c.trait=pick(TRAITS);
+  const key=RARITIES[rarityKey]?rarityKey:"common";
+  const rarity=RARITIES[key];
+  const shift=opts.shift||0,cap=opts.cap||99;
+  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,rarity:key,bat:rarityStat(rarity,role,"bat")+shift,bowl:rarityStat(rarity,role,"bowl")+shift,trait:null,used:false};
+  c.bat=clamp(c.bat,20,cap);c.bowl=clamp(c.bowl,20,cap);
+  if(opts.forceTrait||Math.random()<rarity.trait)c.trait=pickTrait(role);
   return c;
 }
-function starter(){return [card(0,"bat"),card(0,"bat"),card(0,"bat"),card(0,"bowl"),card(0,"bowl"),card(0,"bowl"),card(0,"all"),card(0,"all"),card(0,"all"),card(0,"all"),card(0,"all"),card(0,"all")]}
-function enemy(level){const d=[];for(let i=0;i<12;i++)d.push(card(level));return d}
+function pickTrait(role){
+  const pool=TRAITS.filter(t=>t.role===role||t.role==="all");
+  return pick(pool.length?pool:TRAITS);
+}
+function rarityStat(rarity,role,stat){
+  const span=rarity.max-rarity.min,low=rarity.min,high=rarity.max;
+  const primary=role==="all"||role===stat;
+  const min=primary?Math.round(low+span*.45):low;
+  const max=primary?high:Math.round(low+span*.62);
+  return rng(min,max);
+}
+function starter(){return ["bat","bat","bat","bowl","bowl","bowl","all","all","all","all","all","all"].map(role=>card("common",role))}
+function rarityFromPool(pool){return pick(pool&&pool.length?pool:["common"])}
+const ARCHS=[
+  {key:"bat",name:"an aggressive batting side",comp:{bat:5,bowl:2,all:5},tiltBat:5,read:"Stacked with batters — their bowling is thinner. Defend well, then cash in when you bowl."},
+  {key:"bowl",name:"a bowling-heavy unit",comp:{bat:2,bowl:5,all:5},tiltBowl:5,read:"A deep bowling attack — runs are hard to find when you bat. Their batting is beatable."},
+  {key:"all",name:"an all-rounder heavy team",comp:{bat:2,bowl:2,all:8},read:"Flexible and adaptable — no glaring weakness, but no specialists to fear either."},
+  {key:"bal",name:"a balanced side",comp:{bat:4,bowl:4,all:4},read:"No obvious strength or weakness — win it matchup by matchup."},
+  {key:"top",name:"a top-order batting side",comp:{bat:5,bowl:4,all:3},tiltBat:4,read:"Dangerous with the bat, decent bowlers — bring your best in both innings."}
+];
+function enemy(def){
+  const arch=pick(ARCHS);
+  const roles=[];Object.entries(arch.comp).forEach(([r,n])=>{for(let i=0;i<n;i++)roles.push(r)});
+  const opts={shift:def.enemyShift||0,cap:def.enemyCap||99};
+  const deck=roles.map(role=>{
+    const c=card(rarityFromPool(def.rarities),role,opts);
+    if(arch.tiltBat&&(role==="bat"||role==="all"))c.bat=clamp(c.bat+arch.tiltBat,20,opts.cap);
+    if(arch.tiltBowl&&(role==="bowl"||role==="all"))c.bowl=clamp(c.bowl+arch.tiltBowl,20,opts.cap);
+    if(def.enemyTraitRate!=null&&c.trait&&Math.random()>def.enemyTraitRate)c.trait=null;
+    return c;
+  });
+  return {deck,arch};
+}
+function cardPrice(c){return (RARITIES[c.rarity]||RARITIES.common).price}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function cardPower(c){return Math.max(c.bat,c.bowl)*2+Math.min(c.bat,c.bowl)+(c.trait?14:0)}
+function sortStrong(a,b){return cardPower(b)-cardPower(a)}
 function ctx(){return m?{phase:m.phase,left:m.def.balls-m.ball+1,rivalRuns:m.rival.runs}:{phase:null,left:99,rivalRuns:0}}
-function batVal(c){let v=c.bat;if(c.trait)v=c.trait.bat(ctx(),v);return Math.round(v)}
-function bowlVal(c){let v=c.bowl;if(c.trait)v=c.trait.bowl(ctx(),v);return Math.round(v)}
-function available(){return run.deck.filter(c=>!c.used)}
+function coachBonus(stat,c){return run?.coach?run.coach.bonus(stat,c,ctx()):0}
+function batVal(c){let v=c.bat+coachBonus("bat",c);if(c.trait)v=c.trait.bat(ctx(),v);return Math.round(v)}
+function bowlVal(c){let v=c.bowl+coachBonus("bowl",c);if(c.trait)v=c.trait.bowl(ctx(),v);return Math.round(v)}
+function replaceOne(strip,from,to){const s=strip.slice(),i=s.indexOf(from);if(i>=0)s[i]=to;return s}
+function replaceWorstRun(strip,to){
+  const s=strip.slice();
+  for(const token of ["6","4","2","1"]){const i=s.lastIndexOf(token);if(i>=0){s[i]=to;break}}
+  return s;
+}
+function replaceBoundary(strip,to){const s=strip.slice();let i=s.lastIndexOf("6");if(i<0)i=s.lastIndexOf("4");if(i>=0)s[i]=to;return s}
+function replaceBadSlot(strip,mode,to){return mode==="bat"?replaceOne(strip,"W",to):replaceWorstRun(strip,to)}
+function withTraitContext(card){
+  if(!card)return card;
+  card.tossLive=!!(m?.ball===1&&m.innings===1);
+  return card;
+}
+function applyCardStripTrait(mode,strip,card){
+  withTraitContext(card);
+  return card?.trait?.strip?card.trait.strip(mode,strip.slice(),card):strip;
+}
+function roster(){return run.roster||(run.roster=run.deck||[])}
+function activeSquad(){return run.deck||[]}
+function activeIds(){return new Set(activeSquad().map(c=>c.id))}
+function fillToTwelve(ids,pool){
+  pool.slice().sort(sortStrong).forEach(c=>{if(ids.size<12)ids.add(c.id)});
+  return ids;
+}
+function beginSquadSelection(){
+  const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
+  if(!run.nextRival||run.nextRival.def!==def)prepNextRival();
+  const pool=roster().slice().sort(sortStrong);
+  const valid=new Set(pool.map(c=>c.id));
+  const ids=new Set(activeSquad().map(c=>c.id).filter(id=>valid.has(id)));
+  fillToTwelve(ids,pool);
+  run.draftPool=pool;
+  run.draftSelected=ids;
+  run.pending=null;
+  renderDraft();
+  show("draft");
+}
+function selectedDraftCards(){
+  const ids=run.draftSelected||new Set();
+  return roster().filter(c=>ids.has(c.id)).sort(sortStrong);
+}
+function available(){return activeSquad().filter(c=>!c.used)}
 function dealHand(){const pool=available();m.hand=pool.length<=5?pool.slice():shuffle(pool.slice()).slice(0,5);dealAnim=true}
 function drawHand(){if(!m.hand)dealHand();return m.hand.filter(c=>!c.used)}
 function rivalCard(kind){const pool=m.rivalDeck.filter(c=>!c.used);let best=pool[0],val=-1;pool.forEach(c=>{const v=kind==="bat"?batVal(c):bowlVal(c);if(v>val){best=c;val=v}});return best}
 
-function startRun(){run={deck:starter(),match:0,coins:3,refreshes:2,wins:0,pending:null};startMatch()}
+function startRun(){
+  const startingRoster=starterDraft();
+  run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coach:null};
+  beginSquadSelection();
+}
 function startMatch(){
   run.deck.forEach(c=>c.used=false);
   const def=MATCHES[run.match];
-  m={def,phase:"bowl",ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:enemy(def.level),challenge:null,result:null,selected:null,squadOpen:false,history:[],log:"You bowl first. Keep the rival score low."};
+  m={def,phase:"bowl",ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:enemy(def).deck,challenge:null,result:null,selected:null,squadOpen:false,history:[],log:"You bowl first. Keep the rival score low."};
   newChallenge(true);show("match");render();
 }
 function newChallenge(keepLog=false){
@@ -565,7 +1259,7 @@ function confirmSelected(){
 }
 function cancelSelected(){m.selected=null;render()}
 function resolveBowl(c){
-  const mine=bowlVal(c),theirs=batVal(m.challenge),strip=outcomeStrip("bowl",mine-theirs),out=rollOutcome(strip);
+  const mine=bowlVal(c),theirs=batVal(m.challenge),strip=applyCardStripTrait("bowl",outcomeStrip("bowl",mine-theirs),c),out=rollOutcome(strip);
   m.rival.runs+=out.runs;if(out.wicket)m.rival.wk++;
   use(c);
   m.selected=null;
@@ -576,7 +1270,7 @@ function resolveBowl(c){
   settleResult(m.result);
 }
 function resolveBat(c){
-  const mine=batVal(c),theirs=bowlVal(m.challenge),strip=outcomeStrip("bat",mine-theirs),out=rollOutcome(strip);
+  const mine=batVal(c),theirs=bowlVal(m.challenge),strip=applyCardStripTrait("bat",outcomeStrip("bat",mine-theirs),c),out=rollOutcome(strip);
   if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
   m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
   use(c);
@@ -587,25 +1281,43 @@ function resolveBat(c){
   render(true);
   settleResult(m.result);
 }
-function settleResult(result){
-  setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},3350);
-}
+let settleTimer=null;
+function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},2800)}
+function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(settleTimer);m.result.state="settled";render()}}
 function outcomeStrip(mode,margin){
   if(mode==="bowl"){
-    if(margin>=16)return ["W","W","0","0","1","1"];
-    if(margin>=8)return ["W","0","0","1","1","2"];
-    if(margin>=0)return ["0","1","1","2","2","4"];
-    if(margin>=-7)return ["1","2","2","4","4","6"];
-    if(margin>=-14)return ["2","4","4","6","6","6"];
-    return ["4","6","6","6","6","6"];
+    if(margin>=16)return ["W","W","W","W","W","W","0","0","0","0","0","1"];
+    if(margin>=8)return ["W","W","W","W","0","0","0","0","0","1","1","1"];
+    if(margin>=3)return ["W","W","W","0","0","0","0","1","1","1","2","2"];
+    if(margin>=1)return ["W","W","0","0","0","1","1","1","2","2","2","4"];
+    if(margin===0)return ["W","0","0","1","1","2","2","2","4","4","6","6"];
+    if(margin>=-2)return ["0","1","1","2","2","2","4","4","4","6","6","6"];
+    if(margin>=-7)return ["1","1","2","2","4","4","4","4","6","6","6","6"];
+    if(margin>=-15)return ["2","2","4","4","4","6","6","6","6","6","6","6"];
+    return ["4","4","4","6","6","6","6","6","6","6","6","6"];
   }
-  if(margin>=16)return ["6","6","4","4","2","2"];
-  if(margin>=8)return ["6","4","4","2","2","1"];
-  if(margin>=0)return ["4","2","2","1","1","0"];
-  if(margin>=-5)return ["2","1","1","0","0","W"];
-  if(margin>=-12)return ["1","0","0","W","W","W"];
-  return ["0","W","W","W","W","W"];
+  if(margin>=16)return ["4","4","6","6","6","6","6","6","6","6","6","6"];
+  if(margin>=8)return ["2","4","4","4","4","6","6","6","6","6","6","6"];
+  if(margin>=3)return ["2","2","2","2","4","4","4","4","4","6","6","6"];
+  if(margin>=1)return ["1","1","2","2","2","2","4","4","4","4","6","6"];
+  if(margin===0)return ["W","0","1","1","2","2","2","4","4","4","6","6"];
+  if(margin>=-2)return ["W","0","0","1","1","2","2","2","4","4","4","6"];
+  if(margin>=-7)return ["W","W","0","0","1","1","2","2","2","4","4","6"];
+  if(margin>=-15)return ["W","W","W","0","0","0","1","1","2","2","4","4"];
+  return ["W","W","W","W","W","0","0","0","1","1","2","2"];
 }
+function outcomeBand(margin){
+  if(margin>=16)return "Strong advantage";
+  if(margin>=8)return "Advantage";
+  if(margin>=3)return "Favored";
+  if(margin>=1)return "Slight edge";
+  if(margin===0)return "Even";
+  if(margin>=-2)return "Slight danger";
+  if(margin>=-7)return "Danger";
+  if(margin>=-15)return "Big danger";
+  return "Collapse risk";
+}
+function bandClass(margin){return margin>=1?"favored":margin<0?"danger":"even"}
 function rollOutcome(strip){
   const index=rng(0,strip.length-1),token=strip[index];
   if(token==="W")return {index,runs:0,wicket:true,text:"WICKET"};
@@ -626,8 +1338,9 @@ function refreshHand(){if(run.refreshes<=0||m.result)return;run.refreshes--;m.se
 function finish(){
   const won=m.you.runs>m.target;
   if(won){
-    run.wins++;run.coins+=m.def.reward;save.best=Math.max(save.best,m.you.runs);persist();
-    if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You lifted the cup. Final chase: ${m.you.runs}/${m.you.wk}.`);return}
+    const reward=m.def.reward+(run.scout||0);
+    run.wins++;run.coins+=reward;save.best=Math.max(save.best,m.you.runs);persist();
+    if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You won both cups. Final chase: ${m.you.runs}/${m.you.wk}.`);return}
     run.match++;run.pending=null;rollShop();show("shop");renderShop();
   }else end("Run Over",`You needed ${m.target+1}, made ${m.you.runs}/${m.you.wk}.`);
 }
@@ -635,24 +1348,36 @@ function end(title,text){$("#overTitle").textContent=title;$("#overText").textCo
 
 /* ---------- SHOP ---------- */
 function rollShop(){
-  const lvl=Math.min(run.match,3);
+  const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
+  const pool=def.shop||def.rarities||["common"];
+  const offerCard=(role,rarityKey=rarityFromPool(pool),forceTrait=false)=>{
+    const c=card(rarityKey,role,{forceTrait});
+    return {type:"card",card:c,price:cardPrice(c)};
+  };
+  const coachPool=COACHES.filter(c=>c.unlock<=run.match);
+  const offerCoach=()=>{
+    const coach=pick(coachPool.length?coachPool:COACHES.slice(0,2));
+    return {type:"coach",coach,price:coach.price};
+  };
   const offers=[
-    {type:"card",card:card(lvl,pick(["bat","bowl"])),price:4+lvl},
-    {type:"card",card:card(lvl,pick(["bat","bowl","all"])),price:4+lvl},
+    offerCard(pick(["bat","bowl"])),
+    offerCard(pick(["bat","bowl","all"]),pool[pool.length-1],pool[pool.length-1]!=="common"),
   ];
   const third=pick([
-    {type:"card",card:card(lvl,"all"),price:5+lvl},
-    {type:"util",util:"refresh",title:"Net Session",desc:"+1 Refresh every match (permanent).",price:5},
-    {type:"util",util:"scout",title:"Scout +2 Coins",desc:"Earn +2 coins after each win (permanent).",price:6},
+    offerCoach(),
+    {type:"util",util:"nets",title:"Better Nets",desc:"Training gives +8 instead of +6 for this run.",price:6},
+    {type:"util",util:"scout",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6},
   ]);
   run.shop=[offers[0],offers[1],third];
 }
+function rerollCost(){return run.match<=2?1:2}
 function buy(i){
   const o=run.shop[i];if(!o||o.bought||run.coins<o.price)return;
   run.coins-=o.price;o.bought=true;
-  if(o.type==="card"){run.deck.push(o.card)}
+  if(o.type==="card"){roster().push(o.card)}
+  else if(o.type==="coach"){run.coach=o.coach}
   else if(o.type==="util"){
-    if(o.util==="refresh"){run.refreshBonus=(run.refreshBonus||0)+1}
+    if(o.util==="nets"){run.trainBoost=2}
     if(o.util==="scout"){run.scout=(run.scout||0)+2}
   }
   renderShop();
@@ -660,33 +1385,72 @@ function buy(i){
 function startTrain(stat){
   const cost=3;
   if(run.coins<cost){flashHint("Not enough coins.");return}
-  run.pending={type:"train",stat,cost};renderShop();
+  run.pending={type:"train",stat,cost};renderManagementScreens();
 }
-function startRelease(){run.pending={type:"release"};renderShop()}
+function startRelease(){run.pending={type:"release"};renderManagementScreens()}
+function sellValue(c){return Math.max(2,Math.round((RARITIES[c.rarity]||RARITIES.common).price*0.6))}
 function squadAct(id){
-  const c=run.deck.find(x=>x.id===id);if(!c||!run.pending)return;
+  const c=roster().find(x=>x.id===id);if(!c||!run.pending)return;
   if(run.pending.type==="train"){
-    run.coins-=run.pending.cost;c[run.pending.stat]=clamp(c[run.pending.stat]+6,20,99);
+    run.coins-=run.pending.cost;c[run.pending.stat]=clamp(c[run.pending.stat]+6+(run.trainBoost||0),20,99);
   }else if(run.pending.type==="release"){
-    if(run.deck.length<=6){flashHint("Keep at least 6 players.");return}
-    run.deck=run.deck.filter(x=>x.id!==id);run.coins+=2;
+    if(run.deck.length<=12){flashHint("Keep at least 12 players — you need them for a match.");return}
+    run.coins+=sellValue(c);run.deck=run.deck.filter(x=>x.id!==id);
   }
   run.pending=null;renderShop();
 }
 let hintTimer=null;
 function flashHint(t){const el=$("#manageHint");el.textContent=t;el.style.color="var(--red)";clearTimeout(hintTimer);
-  hintTimer=setTimeout(()=>{el.style.color="";el.textContent="Tap a player, then train or release them. Releasing thins your deck so your stars come up more often.";},1600)}
+  hintTimer=setTimeout(()=>{el.style.color="";el.textContent="Train players or sell surplus bench cards. You must always own at least 12 players.";},1600)}
+
+function managementHintEl(){return $("#squad")?.classList.contains("active")?$("#squadManageHint"):$("#manageHint")}
+function renderManagementScreens(){
+  if($("#squad")?.classList.contains("active"))renderSquadManager();
+  else renderShop();
+}
+function flashHint(t){
+  const el=managementHintEl();if(!el)return;
+  el.textContent=t;el.style.color="var(--red)";clearTimeout(hintTimer);
+  hintTimer=setTimeout(()=>{
+    el.style.color="";
+    el.textContent=$("#squad")?.classList.contains("active")?"Pick an action, then tap a card.":"Train players or sell surplus bench cards. You must always own at least 12 players.";
+  },1600);
+}
+function squadAct(id){
+  const c=roster().find(x=>x.id===id);if(!c||!run.pending)return;
+  if(run.pending.type==="train"){
+    run.coins-=run.pending.cost;c[run.pending.stat]=clamp(c[run.pending.stat]+6+(run.trainBoost||0),20,99);
+  }else if(run.pending.type==="release"){
+    if(roster().length<=12){flashHint("Keep at least 12 players for every match.");return}
+    if(activeIds().has(id)){flashHint("Only bench cards can be sold.");return}
+    run.coins+=sellValue(c);
+    run.roster=roster().filter(x=>x.id!==id);
+    run.deck=activeSquad().filter(x=>x.id!==id);
+    if(run.draftSelected)run.draftSelected.delete(id);
+  }
+  run.pending=null;renderManagementScreens();
+}
 
 /* ---------- RENDER: match ---------- */
+function phaseLabelText(){
+  const left=m.def.balls-m.ball+1;
+  if(m.innings===2){
+    if(m.phase==="bat"){const need=Math.max(0,m.target+1-m.you.runs);return `<b>Chasing</b> — need <b>${need}</b> from <b>${left}</b> ball${left===1?'':'s'}`}
+    const need=Math.max(0,m.target+1-m.rival.runs);return `<b>Defending ${m.target}</b> — rival needs <b>${need}</b> from <b>${left}</b>`;
+  }
+  return m.phase==="bowl"?`<b>You bowl</b> — keep them low · ball ${m.ball}/${m.def.balls}`:`<b>You bat</b> — set a target · ball ${m.ball}/${m.def.balls}`;
+}
 function render(pop=false){
-  $("#matchName").textContent=m.def.name;
-  $("#phaseLabel").innerHTML=m.phase==="bowl"?"<b>You bowl</b> · the rival bats — keep their total low":"<b>You bat</b> · the rival bowls — chase the target";
-  $("#phaseLabel").innerHTML=m.phase==="bowl"?"<b>You bowl</b>":"<b>You bat</b>";
-  $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}"></span>`).join("");
+  $("#matchName").textContent=matchLabel(m.def);
+  $("#phaseLabel").innerHTML=phaseLabelText();
+  $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
   const left=m.def.balls-m.ball+1;
   // target panel
   if(m.phase==="bowl"){
-    $("#target").innerHTML=`<div class="lbl">Bowling</div><div class="big">Ball ${m.ball}<span style="font-size:18px;color:var(--muted)">/${m.def.balls}</span></div><div class="note">keep them low</div>`;
+    const defending=m.innings===2&&m.firstChoice==="bat";
+    $("#target").innerHTML=`<div class="lbl">${defending?"Defend":"Bowling"}</div><div class="big">${defending?Math.max(0,m.target+1-m.rival.runs):`Ball ${m.ball}`}<span style="font-size:18px;color:var(--muted)">${defending?"":"/"+m.def.balls}</span></div><div class="note">${defending?`from ${left} ball${left===1?'':'s'}`:"keep them low"}</div>`;
+  }else if(m.target==null){
+    $("#target").innerHTML=`<div class="lbl">Batting</div><div class="big">Ball ${m.ball}<span style="font-size:18px;color:var(--muted)">/${m.def.balls}</span></div><div class="note">set a target</div>`;
   }else{
     $("#target").innerHTML=`<div class="lbl">Need</div><div class="big"><b>${Math.max(0,m.target+1-m.you.runs)}</b></div><div class="note">from ${left} ball${left===1?'':'s'}</div>`;
   }
@@ -696,28 +1460,41 @@ function render(pop=false){
   $("#rivalWkts").innerHTML=wktDots(m.def.wickets,m.rival.wk);
   $("#youMeta").textContent=m.phase==="bat"?`Chasing · ${m.def.wickets-m.you.wk} wkts left`:"Bowling now";
   $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:`Set ${m.target}`;
-  $("#youMeta").textContent=m.phase==="bat"?`${m.def.wickets-m.you.wk} wkts left`:"On attack";
-  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:`Target ${m.target+1}`;
+  $("#youMeta").textContent=m.phase==="bat"?`${m.def.wickets-m.you.wk} wkts left`:(m.innings===2?"Defending":"On attack");
+  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:(m.target==null?"Bowling first":`Target ${m.target+1}`);
   const yb=m.phase==="bat";
   $("#youRole").className="roletag "+(yb?"bat":"bowl");$("#youRole").innerHTML=(yb?ICON.bat:ICON.ball)+(yb?"BATTING":"BOWLING");
   $("#rivalRole").className="roletag "+(yb?"bowl":"bat");$("#rivalRole").innerHTML=(yb?ICON.ball:ICON.bat)+(yb?"BOWLING":"BATTING");
   $("#handPrompt").textContent=m.result?"Ball recorded":m.selected?"Ready":m.phase==="bowl"?"Choose bowler":"Choose batter";
   $("#handPrompt").textContent=m.result?"Resolved":m.selected?"Locked":m.phase==="bowl"?"Pick a bowler":"Pick a batter";
   $("#log").innerHTML=m.result?"":m.log;
-  renderDuel(pop);renderActions();renderHand();renderExplainers();
+  renderDuel(pop);renderActions();renderHand();renderExplainers();renderRivalStrip();renderOpponentContext();
 }
 function wktDots(total,out){let s="";for(let i=0;i<total;i++)s+=`<span class="stump ${i<out?'out':''}"></span>`;return s}
 function renderExplainers(){
-  let strip=null,roll=null;
-  if(m.result){strip=m.result.strip;roll=m.result.roll}
+  let strip=null,roll=null,margin=null;
+  if(m.result){strip=m.result.strip;roll=m.result.roll;margin=m.result.mine-m.result.theirs}
   else if(m.selected){
     const mine=m.phase==="bowl"?bowlVal(m.selected):batVal(m.selected);
     const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
-    strip=outcomeStrip(m.phase,mine-theirs);
+    margin=mine-theirs;
+    strip=applyCardStripTrait(m.phase,outcomeStrip(m.phase,margin),m.selected);
   }
-  $("#ladder").innerHTML=`<h3>${m.result?"Outcome":"Odds"}</h3>${strip?renderCurve(strip,roll,m.phase,m.result?.state==="resolving"):`<div class="feed-item">Pick a card.</div>`}`;
+  if(m.result?.state==="resolving"){
+    $("#ladder").innerHTML=`<h3>Resolving</h3><div class="feed-item">Ball in play</div>`;
+    $("#feed").innerHTML=renderOverStrip();
+    return;
+  }
+  $("#ladder").innerHTML=`<h3>${m.result?"Outcome":"Odds"}</h3>${strip?renderMatchupRead(margin,strip)+renderCurve(strip,roll,m.phase,m.result?.state==="resolving"):`<div class="feed-item">Pick a card.</div>`}`;
   if(!strip)$("#ladder").innerHTML=`<h3>${m.result?"Outcome":"Odds"}</h3><div class="feed-item">Awaiting card</div>`;
   $("#feed").innerHTML=renderOverStrip();
+}
+function renderMatchupRead(margin,strip){
+  return `<div class="matchup-read ${bandClass(margin)}"><b>${outcomeBand(margin)}</b><span>${margin>0?"+":""}${margin} · ${oddsSummary(strip)}</span></div>`;
+}
+function oddsSummary(strip){
+  const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
+  return ["W","0","1","2","4","6"].filter(t=>counts[t]).map(t=>`${t}:${Math.round(counts[t]/strip.length*100)}%`).join(" ");
 }
 function renderOverStrip(){
   const balls=Array.from({length:m.def.balls},(_,i)=>m.history[i]);
@@ -731,11 +1508,19 @@ function ballToken(result){if(result==="WICKET")return "W";if(result==="DOT"||re
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
 function shouldCelebrate(result){return m.phase==="bowl"?(result.text==="WICKET"||result.text==="DOT"):(result.text==="FOUR"||result.text==="SIX")}
 function confettiHTML(){return `<span class="confetti">${Array.from({length:10},()=>"<i></i>").join("")}</span>`}
-function renderCurve(strip,roll,mode,rolling=false){
+function curvePointData(strip){
   const order=["W","0","1","2","4","6"];
   const counts=order.map(t=>strip.filter(x=>x===t).length);
-  const max=Math.max(...counts,1);
-  const points=counts.map((count,i)=>({token:order[i],count,x:30+i*47,y:60-(count/max)*44}));
+  const sigma=.82;
+  const smoothed=counts.map((_,i)=>counts.reduce((sum,count,j)=>{
+    const d=i-j;
+    return sum+count*Math.exp(-(d*d)/(2*sigma*sigma));
+  },0));
+  const max=Math.max(...smoothed,1);
+  return counts.map((count,i)=>({token:order[i],count,x:30+i*47,y:61-(smoothed[i]/max)*43,r:count?Math.min(7,3.5+count*.35):2.5}));
+}
+function renderCurve(strip,roll,mode,rolling=false){
+  const points=curvePointData(strip);
   const area=smoothArea(points);
   const hitToken=roll!=null?strip[roll]:null;
   const left=mode==="bowl"?"Control":"Collapse",right=mode==="bowl"?"Leaks runs":"Boundaries";
@@ -744,30 +1529,60 @@ function renderCurve(strip,roll,mode,rolling=false){
       <line class="curve-axis" x1="30" y1="61" x2="266" y2="61"></line>
       ${points.map(p=>`<line class="curve-tick" x1="${p.x}" y1="61" x2="${p.x}" y2="66"></line>`).join("")}
       <path class="curve-area" d="${area}"></path>
-      ${points.map(p=>`<circle class="curve-dot ${curveClass(p.token,mode)} ${hitToken===p.token&&!rolling?"hit":""}" cx="${p.x}" cy="${p.y}" r="${hitToken===p.token&&!rolling?6:4}"></circle>`).join("")}
-      ${hitToken?renderCurveMarker(points,strip,hitToken,rolling):""}
+      ${points.map(p=>`<circle class="curve-dot ${curveClass(p.token,mode)} ${hitToken===p.token&&!rolling?"hit":""}" cx="${p.x}" cy="${p.y}" r="${hitToken===p.token&&!rolling?7:p.r}"></circle>`).join("")}
+      ${hitToken?renderCurveMarker(points,strip,hitToken,rolling,roll):""}
       ${points.map(p=>`<text class="curve-svg-label ${curveClass(p.token,mode)}" x="${p.x}" y="82">${p.token}</text>`).join("")}
     </svg>
     <div class="curve-scale"><span>${left}</span><span>${right}</span></div>
   </div>`;
 }
-function renderCurveMarker(points,strip,hitToken,rolling){
+function payoffWord(result){
+  const t=result.text;
+  return t==="SIX"?"SIX!":t==="FOUR"?"FOUR!":t==="WICKET"?"WICKET!":t==="DOT"?"DOT BALL":t==="Single"?"1 RUN":t==="Two runs"?"2 RUNS":t.toUpperCase();
+}
+function renderResolvePayoff(result,mode){
+  const strip=result.strip,roll=result.roll,hitToken=strip[roll],points=curvePointData(strip),area=smoothArea(points);
+  const token=ballToken(result.text),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":"run");
+  return `<div class="payoff-stage ${cls}">
+    <svg class="curve-svg payoff-svg" viewBox="0 0 300 92" aria-hidden="true">
+      <line class="curve-axis" x1="30" y1="61" x2="266" y2="61"></line>
+      ${points.map(p=>`<line class="curve-tick" x1="${p.x}" y1="61" x2="${p.x}" y2="66"></line>`).join("")}
+      <path class="curve-area" d="${area}"></path>
+      ${points.map(p=>`<circle class="curve-dot ${curveClass(p.token,mode)}" cx="${p.x}" cy="${p.y}" r="${p.r}"></circle>`).join("")}
+      ${renderCurveMarker(points,strip,hitToken,true,roll)}
+      ${points.map(p=>`<text class="curve-svg-label ${curveClass(p.token,mode)}" x="${p.x}" y="82">${p.token}</text>`).join("")}
+    </svg>
+    <div class="payoff-burst ${cls}"><span class="payoff-num">${token}</span><span class="payoff-word">${payoffWord(result)}</span></div>
+    ${shouldCelebrate(result)?confettiHTML():""}
+  </div>`;
+}
+function renderCurveMarker(points,strip,hitToken,rolling,roll){
   const hit=points.find(p=>p.token===hitToken);
   if(!rolling)return `<circle class="curve-marker" cx="${hit.x}" cy="${hit.y}" r="7"></circle>`;
   const byToken=Object.fromEntries(points.map(p=>[p.token,p]));
   const allTokens=["W","0","1","2","4","6"];
-  const stripTokens=strip.filter((token,i)=>token!==strip[i-1]);
-  const finalTokens=stripTokens.includes(hitToken)?stripTokens:[...stripTokens,hitToken];
+  const slowTokens=nearbyRollTokens(strip,roll);
   const sequence=[
-    ...allTokens.map((token,i)=>({token,delay:i*145,slow:false})),
-    ...finalTokens.map((token,i)=>({token,delay:1020+i*285,slow:true})),
-    {token:hitToken,delay:2500,slow:true,final:true}
+    ...allTokens.map((token,i)=>({token,delay:i*85,slow:false})),
+    ...slowTokens.map((token,i)=>({token,delay:540+i*150,slow:true})),
+    {token:hitToken,delay:1180,slow:true,final:true}
   ];
   const flashes=sequence.map(item=>{
     const p=byToken[item.token];
     return `<circle class="curve-flash ${item.slow?"slow":""}" style="animation-delay:${item.delay}ms" cx="${p.x}" cy="${p.y}" r="${item.final?10:item.slow?8:7}"></circle>`;
   }).join("");
   return `${flashes}<circle class="curve-marker rolling" cx="${hit.x}" cy="${hit.y}" r="9"></circle>`;
+}
+function nearbyRollTokens(strip,roll){
+  const seen=new Set(),tokens=[];
+  const add=i=>{
+    if(i<0||i>=strip.length)return;
+    const token=strip[i];
+    if(!seen.has(token)){seen.add(token);tokens.push(token)}
+  };
+  add(roll-1);add(roll);add(roll+1);
+  if(tokens[tokens.length-1]!==strip[roll])tokens.push(strip[roll]);
+  return tokens;
 }
 function smoothArea(points){
   let d=`M ${points[0].x} 61 L ${points[0].x} ${points[0].y}`;
@@ -794,6 +1609,7 @@ function figureSVG(role){
 function raysSVG(cx,cy,cl){let s="",n=14,R=440;for(let i=0;i<n;i++){const a0=i/n*6.2832,a1=(i+0.5)/n*6.2832;s+=`<polygon points="${cx},${cy} ${cx+Math.cos(a0)*R},${cy+Math.sin(a0)*R} ${cx+Math.cos(a1)*R},${cy+Math.sin(a1)*R}" fill="${i%2?'#ffffff':cl}" opacity="${i%2?0.13:0.10}"/>`}return s}
 function cardSVG(c,batNum,bowlNum,emph,dim){
   const t=c.team,g="g"+(svgSeq++),roleTxt=roleName(c).toUpperCase();
+  const rarity=RARITIES[c.rarity]||RARITIES.common;
   const nm=c.name.toUpperCase(),nmSize=nm.length>13?12.5:15;
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Inter,system-ui,sans-serif">
   <defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.c2}"/><stop offset="1" stop-color="${t.c1}"/></linearGradient>
@@ -809,25 +1625,67 @@ function cardSVG(c,batNum,bowlNum,emph,dim){
     <text x="24" y="334" transform="rotate(-90 24 334)" fill="#fff" font-size="${nmSize}" font-weight="800" letter-spacing="1.1">${nm}</text>
     <rect x="148" y="16" width="86" height="21" rx="10" fill="rgba(6,14,22,.42)"/>
     <text x="191" y="30.5" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">${roleTxt}</text>
+    <rect x="42" y="16" width="58" height="21" rx="10" fill="${rarity.fill}" opacity=".96"/>
+    <text x="71" y="30.5" text-anchor="middle" fill="${c.rarity==="legendary"?"#231700":"#fff"}" font-size="11" font-weight="900">${rarity.short}</text>
     ${c.trait?`<rect x="42" y="250" width="${30+c.trait.name.length*6.6}" height="20" rx="10" fill="#f5c84b"/><text x="${57+c.trait.name.length*3.3}" y="264" text-anchor="middle" fill="#241b00" font-size="11" font-weight="800">${c.trait.name.toUpperCase()}</text>`:""}
-    <g opacity="${dim&&emph==='bat'?'0.28':'1'}">
-      <polygon points="10,286 138,286 121,340 10,340" fill="#c92f3f"/>
-      ${emph==='bowl'?`<polygon points="13,289 135,289 119,337 13,337" fill="none" stroke="#ffe27a" stroke-width="4"/>`:''}
-      <text x="57" y="318" text-anchor="middle" fill="#fff" font-size="29" font-weight="900">${bowlNum}</text>
-      <text x="57" y="333" text-anchor="middle" fill="#ffd9de" font-size="9.5" font-weight="800" letter-spacing="1">BOWLING</text>
+    <g opacity="${dim&&emph==='bat'?'0.32':'1'}">
+      <rect x="38" y="282" width="86" height="28" rx="8" fill="#c92f3f"/>
+      ${emph==='bowl'?`<rect x="41" y="285" width="80" height="22" rx="6" fill="none" stroke="#ffe27a" stroke-width="4"/>`:''}
+      <text x="48" y="301" fill="#ffd9de" font-size="12" font-weight="900">●</text>
+      <text x="66" y="302" fill="#fff" font-size="24" font-weight="900">${bowlNum}</text>
+      <text x="105" y="300" text-anchor="middle" fill="#ffd9de" font-size="9" font-weight="900">BOWL</text>
     </g>
-    <g opacity="${dim&&emph==='bowl'?'0.28':'1'}">
-      <polygon points="138,286 240,286 240,340 121,340" fill="#1f9b53"/>
-      ${emph==='bat'?`<polygon points="141,289 237,289 237,337 124,337" fill="none" stroke="#ffe27a" stroke-width="4"/>`:''}
-      <text x="195" y="318" text-anchor="middle" fill="#fff" font-size="29" font-weight="900">${batNum}</text>
-      <text x="195" y="333" text-anchor="middle" fill="#d9f5e5" font-size="9.5" font-weight="800" letter-spacing="1">BATTING</text>
+    <g opacity="${dim&&emph==='bowl'?'0.32':'1'}">
+      <rect x="38" y="314" width="86" height="28" rx="8" fill="#1f9b53"/>
+      ${emph==='bat'?`<rect x="41" y="317" width="80" height="22" rx="6" fill="none" stroke="#ffe27a" stroke-width="4"/>`:''}
+      <text x="48" y="333" fill="#d9f5e5" font-size="13" font-weight="900">▰</text>
+      <text x="66" y="334" fill="#fff" font-size="24" font-weight="900">${batNum}</text>
+      <text x="105" y="332" text-anchor="middle" fill="#d9f5e5" font-size="9" font-weight="900">BAT</text>
     </g>
-    <circle cx="125" cy="299" r="29" fill="#fff"/><circle cx="125" cy="299" r="25" fill="${t.c1}"/>
-    <text x="125" y="305" text-anchor="middle" fill="#fff" font-size="15" font-weight="900">${t.badge}</text>
+    <rect x="148" y="308" width="82" height="25" rx="12" fill="rgba(6,14,22,.34)"/>
+    <text x="189" y="325" text-anchor="middle" fill="#fff" font-size="12" font-weight="900">${t.badge}</text>
   </g></svg>`;
 }
-function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin}={}){
-  return `<button class="card ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''}" ${disabled?'disabled':''}
+function selectedColor(role){return role==="bat"?"#09c18b":role==="bowl"?"#05a8ff":"#8d5cff"}
+function cardSVG(c,batNum,bowlNum,emph,dim){
+  const t=c.team,g="g"+(svgSeq++),rarity=RARITIES[c.rarity]||RARITIES.common;
+  const roleBadge=c.role==="bat"?"BAT":c.role==="bowl"?"BOWL":"AR",glow=selectedColor(c.role);
+  const trait=c.trait?c.trait.name:"No traits",traitText=c.trait?c.trait.text:"Ready for selection";
+  const name=c.name.length>18?c.name.slice(0,17)+"...":c.name;
+  const traitSize=trait.length>16?9:11;
+  return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Inter,system-ui,sans-serif">
+    <defs>
+      <linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#18253d"/><stop offset="1" stop-color="#0a1020"/></linearGradient>
+      <filter id="${g}glow"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="${glow}" flood-opacity=".55"/></filter>
+    </defs>
+    <rect x="8" y="8" width="234" height="334" rx="18" fill="url(#${g})" stroke="#334762" stroke-width="3"/>
+    <rect x="10" y="10" width="230" height="330" rx="16" fill="none" stroke="${glow}" stroke-width="${dim?2:4}" opacity="${dim ? .75 : 1}" filter="url(#${g}glow)"/>
+    <rect x="14" y="142" width="48" height="94" rx="12" fill="#050916" opacity=".86" stroke="#263750"/>
+    <text x="38" y="163" text-anchor="middle" fill="#0dd6a0" font-size="9" font-weight="900">BAT</text>
+    <text x="38" y="185" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="900">${batNum}</text>
+    <line x1="22" y1="195" x2="54" y2="195" stroke="#263750"/>
+    <text x="38" y="212" text-anchor="middle" fill="#ff6b7d" font-size="9" font-weight="900">BOWL</text>
+    <text x="38" y="232" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="900">${bowlNum}</text>
+    <rect x="22" y="24" width="58" height="22" rx="10" fill="${rarity.fill}" opacity=".88"/>
+    <text x="51" y="39" text-anchor="middle" fill="#dce8ff" font-size="10" font-weight="900">${rarity.short}</text>
+    <rect x="198" y="24" width="30" height="28" rx="8" fill="${glow}" opacity=".18"/>
+    <text x="213" y="42" text-anchor="middle" fill="${glow}" font-size="11" font-weight="900">${roleBadge}</text>
+    <text x="125" y="96" text-anchor="middle" fill="#f7fbff" font-size="${name.length>15?14:16}" font-weight="900">${name}</text>
+    <text x="125" y="116" text-anchor="middle" fill="#7f93b7" font-size="11" font-weight="800">${t.name}</text>
+    <rect x="32" y="148" width="186" height="78" rx="14" fill="#070d1b" stroke="#17243c"/>
+    <text x="78" y="184" text-anchor="middle" fill="${emph==="bat"?glow:"#8da0c0"}" font-size="34" font-weight="900">${batNum}</text>
+    <text x="78" y="204" text-anchor="middle" fill="#647797" font-size="9" font-weight="900">BAT</text>
+    <line x1="125" y1="162" x2="125" y2="212" stroke="#20304a"/>
+    <text x="172" y="184" text-anchor="middle" fill="${emph==="bowl"?glow:"#8da0c0"}" font-size="34" font-weight="900">${bowlNum}</text>
+    <text x="172" y="204" text-anchor="middle" fill="#647797" font-size="9" font-weight="900">BOWL</text>
+    <rect x="34" y="258" width="182" height="26" rx="9" fill="${c.trait?"#3b270b":"#111b30"}" stroke="${c.trait?"#7b520e":"#17243c"}"/>
+    <text x="125" y="276" text-anchor="middle" fill="${c.trait?"#f5b84b":"#52647f"}" font-size="${traitSize}" font-weight="900">${trait}</text>
+    <text x="125" y="318" text-anchor="middle" fill="#52647f" font-size="10" font-style="italic">${traitText.length>30?traitText.slice(0,29)+"...":traitText}</text>
+  </svg>`;
+}
+function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active}={}){
+  const rarity=RARITIES[c.rarity]||RARITIES.common;
+  return `<button class="card ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''}" ${disabled?'disabled':''}
     style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
     <span class="selbadge">✓</span><span class="sheen"></span>${cardSVG(c,batVal(c),bowlVal(c),emph)}</button>`;
 }
@@ -839,9 +1697,7 @@ function renderDuel(pop=false){
   $("#rivalPile").classList.toggle("deal",deal);
   $("#rivalPileCount").textContent=m.rivalDeck.filter(c=>!c.used).length;
   if(m.result?.state==="resolving"){
-    d.innerHTML=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowled":"You batted",youEmph,false,youEmph,"clash-left")
-      +`<div class="impact-zone"><span class="impact-bat"></span><span class="impact-ball"></span><span class="outcome-burst ${m.result.text==='WICKET'?'wicket':''}">${ballToken(m.result.text)}</span>${shouldCelebrate(m.result)?confettiHTML():""}</div>`
-      +duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival batted":"Rival bowled",rivEmph,false,rivEmph,"clash-right");
+    d.innerHTML=`<div class="impact-zone resolve-zone">${renderResolvePayoff(m.result,m.phase)}</div><span class="skip-hint">tap to skip ▸</span>`;
   }else if(m.result){
     d.innerHTML=`<div class="cleared-duel"><div><b>${ballToken(m.result.text)}</b><div>${m.result.text} recorded</div><div>${resultCalcText(m.result)}</div><button class="btn" id="nextBall">Next Ball →</button></div></div>`;
   }else{
@@ -850,6 +1706,7 @@ function renderDuel(pop=false){
       :`<div class="placeholder">+</div>`;
     d.innerHTML=left+`<div class="vs">vs</div>`+duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph);
   }
+  d.classList.toggle("resolving",m.result?.state==="resolving");
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
 }
 function renderActions(){
@@ -861,15 +1718,27 @@ function renderActions(){
   for(const id in map){const el=$("#"+id);if(el)el.onclick=map[id]}
 }
 function renderHand(){
-  const cards=run.deck,animate=dealAnim;dealAnim=false;
-  const lanes=[
-    {key:"bat",cls:"bat",title:"Batsmen",hint:"BAT specialists"},
-    {key:"bowl",cls:"bowl",title:"Bowlers",hint:"BOWL specialists"},
-    {key:"all",cls:"all",title:"All-rounders",hint:"Flexible picks"}
-  ];
-  $("#hand").innerHTML=lanes.map(lane=>renderRoleLane(lane,cards.filter(c=>c.role===lane.key),animate)).join("")
-    +`<section class="role-lane coach"><div class="lane-head"><b>Coach</b><span>empty slot</span></div><div class="coach-slot">+</div></section>`;
-  document.querySelectorAll("#hand .card").forEach(b=>b.onclick=()=>selectCard(run.deck.find(c=>c.id===b.dataset.id)));
+  const cards=fanSort(activeSquad()),animate=dealAnim;dealAnim=false;
+  const emph=m.phase==="bowl"?"bowl":"bat";
+  $("#hand").innerHTML=`<div class="fan-row player-fan">${cards.map((c,i)=>fanCard(c,i,cards.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph,animate})).join("")}</div>`;
+  document.querySelectorAll("#hand .card").forEach(b=>b.onclick=()=>selectCard(activeSquad().find(c=>c.id===b.dataset.id)));
+}
+function fanSort(cards){
+  const roleOrder={bat:0,all:1,bowl:2};
+  return cards.slice().sort((a,b)=>roleOrder[a.role]-roleOrder[b.role]||sortStrong(a,b));
+}
+function fanStyle(i,total,spread=1.05){
+  const mid=(total-1)/2,offset=i-mid;
+  return `--rot:${(offset*spread).toFixed(2)}deg;--z:${i+1};--d:${i*24}ms`;
+}
+function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,animate=false,rival=false}={}){
+  return cardHTML(c,{selected,used,disabled,emph,dealin:animate,fan:fanStyle(i,total,rival ? .78 : 1.05)});
+}
+function renderCoachSlot(){
+  const c=run.coach;
+  return `<section class="role-lane coach"><div class="lane-head"><b>Coach</b><span>${c?"active":"empty slot"}</span></div>${
+    c?`<div class="coach-card"><b>${c.name}</b><span>${c.desc}</span></div>`:`<div class="coach-slot">+</div>`
+  }</section>`;
 }
 function renderRoleLane(lane,cards,animate){
   const emph=m.phase;
@@ -881,15 +1750,36 @@ function renderRoleLane(lane,cards,animate){
   return `<section class="role-lane ${lane.cls}"><div class="lane-head"><b>${lane.title}</b><span>${lane.hint}</span></div><div class="lane-cards">${body}</div></section>`;
 }
 
+/* ---------- SCOUT: rival deck ---------- */
+function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
+function renderRivalScout(){
+  const emph=m.phase==="bowl"?"bat":"bowl";
+  const statLbl=m.phase==="bowl"?"batting":"bowling";
+  const remaining=m.rivalDeck.filter(c=>!c.used).sort((a,b)=>rivalRelevant(b)-rivalRelevant(a));
+  const used=m.rivalDeck.filter(c=>c.used);
+  const cell=(c,o={})=>`<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`;
+  $("#scoutSub").textContent=`— they ${m.phase==="bowl"?"bat":"bowl"} their best ${statLbl} card first`;
+  $("#rivalDeckGrid").innerHTML=
+    `<div class="scout-group"><h4>Still to come · ${remaining.length} <em>(sorted by ${statLbl} threat — strongest comes next)</em></h4>
+       <div class="scout-grid">${remaining.length?remaining.map((c,i)=>cell(c,{next:i===0})).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
+    + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>cell(c,{used:true})).join("")}</div></div>`:"");
+}
+function openRivalDeck(){if(!m)return;renderRivalScout();$("#rivalDrawer").classList.add("show")}
+function closeRivalDeck(){$("#rivalDrawer").classList.remove("show")}
+
 /* ---------- RENDER: shop ---------- */
-function renderShop(){
+function renderShopLegacyUnused(){
   run.refreshes=2+(run.refreshBonus||0);
-  $("#shopSub").textContent=`Next up: ${MATCHES[run.match].name}. Build your squad.`;
+  $("#shopSub").textContent=`Next up: ${matchLabel(MATCHES[run.match])} (${run.match+1}/${MATCHES.length}). Build your squad.`;
   $("#coins").textContent=run.coins;
   $("#deckCount").textContent=run.deck.length;
   $("#offers").innerHTML=run.shop.map((o,i)=>{
     if(o.type==="card"){
       return `<div class="offer ${o.bought?'bought':''}">${cardSVG(o.card,o.card.bat,o.card.bowl)}<div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Signed':'Sign'}</button></div>`;
+    }
+    if(o.type==="coach"){
+      const current=run.coach?.id===o.coach.id;
+      return `<div class="offer coach ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--gold),var(--bat-l))">${ICON.train}</div><h4>${o.coach.name}</h4><p>${o.coach.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||current||run.coins<o.price?'disabled':''}>${current?'Active':o.bought?'Hired':'Hire'}</button></div>`;
     }
     return `<div class="offer util ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--all-l),var(--all))">${ICON.train}</div><h4>${o.title}</h4><p>${o.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Done':'Buy'}</button></div>`;
   }).join("");
@@ -897,6 +1787,7 @@ function renderShop(){
 
   // squad management
   const p=run.pending;
+  const trainGain=6+(run.trainBoost||0);
   $("#squadActions").innerHTML = p
     ? `<span class="pickhint ${p.type==='release'?'release':''}">${p.type==='train'?`Tap a player to give +6 ${p.stat.toUpperCase()}`:'Tap a player to release (+2 coins)'}</span><button class="btn secondary sm" id="cancelPick">Cancel</button>`
     : `<button class="btn secondary sm" id="trainBat" ${run.coins<3?'disabled':''}>Train +6 BAT · 3</button>
@@ -917,12 +1808,397 @@ function cardOfferInner(c){
     <div class="traitline ${c.trait?'':'none'}">${traitTxt}</div>`;
 }
 
+function renderShopLegacyUnused2(){
+  run.refreshes=2+(run.refreshBonus||0);
+  const next=MATCHES[run.match];
+  const trainGain=6+(run.trainBoost||0);
+  const offerMarkup=(o,i)=>{
+    if(o.type==="card"){
+      return `<div class="offer ${o.bought?'bought':''}">${cardSVG(o.card,o.card.bat,o.card.bowl)}<div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Signed':'Sign'}</button></div>`;
+    }
+    if(o.type==="coach"){
+      const current=run.coach?.id===o.coach.id;
+      return `<div class="offer coach ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--gold),var(--bat-l))">${ICON.train}</div><h4>${o.coach.name}</h4><p>${o.coach.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||current||run.coins<o.price?'disabled':''}>${current?'Active':o.bought?'Hired':'Hire'}</button></div>`;
+    }
+    return `<div class="offer util ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--all-l),var(--all))">${ICON.train}</div><h4>${o.title}</h4><p>${o.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Done':'Buy'}</button></div>`;
+  };
+  $("#shopSub").innerHTML=`Next: <b>${matchLabel(next)}</b> (${run.match+1}/${MATCHES.length}) · they look like <b>${run.nextRival?run.nextRival.arch.name:"a balanced side"}</b> — ${run.nextRival?run.nextRival.arch.read:"build a balanced squad."}`;
+  $("#coins").textContent=run.coins;
+  $("#deckCount").textContent=run.deck.length;
+  $("#rerollBtn").textContent=`Reroll - ${rerollCost()}`;
+  $("#rerollBtn").disabled=run.coins<rerollCost();
+  $("#offers").className="shop-board";
+  $("#offers").innerHTML=`<div class="shop-columns">
+    <div><h3>Player signings</h3><div class="offers">${run.shop.map((o,i)=>o.type==="card"?offerMarkup(o,i):"").join("")}</div></div>
+    <div><h3>Coaches & upgrades</h3><div class="shop-tools">${run.shop.map((o,i)=>o.type!=="card"?offerMarkup(o,i):"").join("")}</div></div>
+  </div>`;
+  document.querySelectorAll("#offers [data-buy]").forEach(b=>b.onclick=()=>buy(+b.dataset.buy));
+
+  const p=run.pending;
+  $("#squadActions").innerHTML = p
+    ? `<span class="pickhint ${p.type==='release'?'release':''}">${p.type==='train'?`Tap a player to give +${trainGain} ${p.stat.toUpperCase()}`:'Tap a player to sell — coins returned by rarity'}</span><button class="btn secondary sm" id="cancelPick">Cancel</button>`
+    : `<button class="btn secondary sm" id="trainBat" ${run.coins<3?'disabled':''}>Train +${trainGain} BAT - 3</button>
+       <button class="btn secondary sm" id="trainBowl" ${run.coins<3?'disabled':''}>Train +${trainGain} BOWL - 3</button>
+       <button class="btn secondary sm" id="sellBtn" ${run.deck.length<=12?'disabled':''} title="Need at least 12 players for a match">Sell a player</button>`;
+  const tb=$("#trainBat");if(tb)tb.onclick=()=>startTrain("bat");
+  const tw=$("#trainBowl");if(tw)tw.onclick=()=>startTrain("bowl");
+  const rb=$("#sellBtn");if(rb)rb.onclick=startRelease;
+  const cp=$("#cancelPick");if(cp)cp.onclick=()=>{run.pending=null;renderShop()};
+
+  $("#shopSquad").innerHTML=run.deck.map((c,i)=>cardHTML(c,{pickable:!!p,disabled:false,emph:p&&p.type==='train'?p.stat:null,delay:i*14})).join("");
+  if(p)document.querySelectorAll("#shopSquad .card").forEach(b=>b.onclick=()=>squadAct(b.dataset.id));
+}
+
+function renderShop(){
+  run.refreshes=2+(run.refreshBonus||0);
+  const next=MATCHES[run.match];
+  const offerMarkup=(o,i)=>{
+    if(o.type==="card"){
+      return `<div class="offer ${o.bought?'bought':''}">${cardSVG(o.card,o.card.bat,o.card.bowl)}<div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Signed':'Sign'}</button></div>`;
+    }
+    if(o.type==="coach"){
+      const current=run.coach?.id===o.coach.id;
+      return `<div class="offer coach ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--gold),var(--bat-l))">${ICON.train}</div><h4>${o.coach.name}</h4><p>${o.coach.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||current||run.coins<o.price?'disabled':''}>${current?'Active':o.bought?'Hired':'Hire'}</button></div>`;
+    }
+    return `<div class="offer util ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--all-l),var(--all))">${ICON.train}</div><h4>${o.title}</h4><p>${o.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Done':'Buy'}</button></div>`;
+  };
+  $("#shopSub").innerHTML=`Next: <b>${matchLabel(next)}</b> (${run.match+1}/${MATCHES.length}). Spend coins, then scout before picking your 12.`;
+  $("#nextBtn").textContent="Scout Next Rival";
+  $("#coins").textContent=run.coins;
+  $("#deckCount").textContent=roster().length;
+  $("#rerollBtn").textContent=`Reroll - ${rerollCost()}`;
+  $("#rerollBtn").disabled=run.coins<rerollCost();
+  $("#offers").className="shop-board";
+  $("#offers").innerHTML=`<div class="shop-columns">
+    <div><h3>Player signings</h3><div class="offers">${run.shop.map((o,i)=>o.type==="card"?offerMarkup(o,i):"").join("")}</div></div>
+    <div><h3>Coaches & upgrades</h3><div class="shop-tools">${run.shop.map((o,i)=>o.type!=="card"?offerMarkup(o,i):"").join("")}</div></div>
+  </div>`;
+  document.querySelectorAll("#offers [data-buy]").forEach(b=>b.onclick=()=>buy(+b.dataset.buy));
+  $("#manageHint").textContent=`Roster ${roster().length}. Active squad ${activeSquad().length}/12. Sell only surplus bench cards.`;
+  $("#squadActions").innerHTML=`<button class="btn secondary sm" id="manageSquadBtn">Manage Squad</button>`;
+  $("#shopSquad").innerHTML="";
+  const ms=$("#manageSquadBtn");if(ms)ms.onclick=openSquadRoom;
+}
+
+function openSquadRoom(){
+  run.pending=null;
+  renderSquadManager();
+  show("squad");
+}
+function squadActionHTML(){
+  const p=run.pending,trainGain=6+(run.trainBoost||0);
+  if(p){
+    return `<span class="pickhint ${p.type==='release'?'release':''}">${p.type==='train'?`Tap a player for +${trainGain} ${p.stat.toUpperCase()}`:`Tap a surplus player to sell for coins`}</span><button class="btn secondary sm" id="cancelSquadPick">Cancel</button>`;
+  }
+  return `<button class="btn secondary sm" id="squadTrainBat" ${run.coins<3?'disabled':''}>Train +${trainGain} BAT - 3</button>
+    <button class="btn secondary sm" id="squadTrainBowl" ${run.coins<3?'disabled':''}>Train +${trainGain} BOWL - 3</button>
+    <button class="btn secondary sm" id="squadSellBtn" ${roster().length<=12?'disabled':''} title="Keep at least 12 owned players">Sell surplus</button>`;
+}
+function bindSquadActions(){
+  const tb=$("#squadTrainBat");if(tb)tb.onclick=()=>startTrain("bat");
+  const tw=$("#squadTrainBowl");if(tw)tw.onclick=()=>startTrain("bowl");
+  const sb=$("#squadSellBtn");if(sb)sb.onclick=startRelease;
+  const cp=$("#cancelSquadPick");if(cp)cp.onclick=()=>{run.pending=null;renderSquadManager()};
+}
+function renderSquadManager(){
+  const owned=roster().slice().sort(sortStrong),ids=activeIds(),p=run.pending;
+  $("#squadCoins").textContent=run.coins;
+  $("#rosterCount").textContent=owned.length;
+  $("#activeCount").textContent=`${activeSquad().length}/12`;
+  $("#benchCount").textContent=Math.max(0,owned.length-activeSquad().length);
+  $("#squadManageHint").textContent=p?(p.type==="train"?"Choose a player to train.":"Choose a surplus player to sell. You keep at least 12."):"Pick an action, then tap a card.";
+  $("#squadManageActions").innerHTML=squadActionHTML();
+  bindSquadActions();
+  const groups=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]];
+  $("#squadGrid").innerHTML=groups.map(([role,label])=>{
+    const cards=owned.filter(c=>c.role===role);
+    const body=cards.map((c,i)=>cardHTML(c,{pickable:!!p,active:ids.has(c.id),emph:p?.type==="train"?p.stat:null,dealin:false,fan:`--d:${i*12}ms`})).join("");
+    return `<section class="roster-group"><h3>${label} (${cards.length})</h3><div class="roster-row">${body||'<div class="scout-empty">No cards</div>'}</div></section>`;
+  }).join("");
+  if(p)document.querySelectorAll("#squadGrid .card").forEach(b=>b.onclick=()=>squadAct(b.dataset.id));
+}
+
+function starterDraft(){
+  return ["bat","bat","bat","bat","bowl","bowl","bowl","bowl","all","all","all","all","all","all","all"].map(role=>card("common",role)).sort(sortStrong);
+}
+function compactCompareHTML(yourCards,rivalCards){
+  const roles=[["bat","Bat"],["bowl","Bowl"],["all","AR"]],max=8;
+  return `<div class="cmp draft-compare">${roles.map(([r,label])=>{
+    const y=roleCount(yourCards,r),t=roleCount(rivalCards,r);
+    return `<div class="cmp-row r-${r}">
+      <div class="cmp-side you"><span class="cmp-n">${y}</span><div class="cmp-bar"><span style="width:${Math.min(100,y/max*100)}%"></span></div></div>
+      <div class="cmp-label">${label}</div>
+      <div class="cmp-side rival"><div class="cmp-bar"><span style="width:${Math.min(100,t/max*100)}%"></span></div><span class="cmp-n">${t}</span></div>
+    </div>`;
+  }).join("")}</div>`;
+}
+function renderDraft(){
+  run.draftPool=roster().slice().sort(sortStrong);
+  const selected=selectedDraftCards();
+  $("#draftTitle").textContent=`Pick Your 12`;
+  $("#draftSub").textContent=`Round ${run.match+1}/${MATCHES.length}. Scout the rival before the toss.`;
+  $("#draftDeckTitle").textContent=`Your Roster (${roster().length} players)`;
+  const oppLabel=$("#draftOppName")?.previousElementSibling;if(oppLabel)oppLabel.textContent="Scout Report";
+  $("#draftGrid").innerHTML=run.draftPool.map(c=>cardHTML(c,{selected:run.draftSelected.has(c.id),active:activeIds().has(c.id),dataId:c.id,emph:null,dealin:true})).join("");
+  const batCount=selected.filter(c=>c.role==="bat").length,bowlCount=selected.filter(c=>c.role==="bowl").length,allCount=selected.filter(c=>c.role==="all").length;
+  $("#draftCount").textContent=`${run.draftSelected.size}/12`;
+  $("#draftMeter").style.setProperty("--p",`${Math.round(run.draftSelected.size/12*100)}%`);
+  $("#draftBatCount").textContent=`${batCount} selected`;
+  $("#draftBowlCount").textContent=`${bowlCount} selected`;
+  $("#draftAllCount").textContent=`${allCount} selected`;
+  const ready=(batCount>=4?1:0)+(bowlCount>=4?1:0)+(allCount>=2?1:0);
+  $("#draftReadiness").textContent=`${ready}/3`;
+  if(run.nextRival){
+    const a=run.nextRival.arch,on=$("#draftOppName"),or=$("#draftOppRead");
+    if(on)on.textContent=a.name.replace(/^an? /,"");
+    if(or){
+      or.innerHTML=`${a.read}`;
+      let dc=$("#draftCompare");
+      if(!dc){or.insertAdjacentHTML("afterend",'<div id="draftCompare"></div>');dc=$("#draftCompare")}
+      dc.innerHTML=compactCompareHTML(selected,run.nextRival.deck);
+    }
+  }
+  $("#draftConfirmBtn").disabled=run.draftSelected.size!==12;
+  document.querySelectorAll("#draftGrid .card").forEach(b=>b.onclick=()=>toggleDraft(b.dataset.id));
+}
+function autoSelectDraft(){
+  run.draftSelected=new Set(roster().slice().sort(sortStrong).slice(0,12).map(c=>c.id));
+  renderDraft();
+}
+function toggleDraft(id){
+  if(run.draftSelected.has(id))run.draftSelected.delete(id);
+  else if(run.draftSelected.size<12)run.draftSelected.add(id);
+  renderDraft();
+}
+function confirmDraft(){
+  if(run.draftSelected.size!==12)return;
+  run.deck=selectedDraftCards();
+  setupToss();
+}
+function prepNextRival(){
+  const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
+  const en=enemy(def);
+  run.nextRival={def,deck:en.deck,arch:en.arch};
+  return run.nextRival;
+}
+function createMatchShell(def){
+  run.deck.forEach(c=>c.used=false);
+  const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,squadOpen:false,history:[],log:"Scout the rival and choose your innings."};
+}
+function setupToss(){
+  if(activeSquad().length!==12){beginSquadSelection();return}
+  const def=MATCHES[run.match];
+  m=createMatchShell(def);
+  m.coinFace=null;
+  renderToss();
+  show("toss");
+}
+function callToss(side){
+  if(m.tossCall)return;
+  m.tossCall=side;m.coinFace=Math.random()<.5?"H":"T";m.tossWon=(side===m.coinFace);
+  if(!m.tossWon){const b=m.rivalDeck.reduce((s,c)=>s+c.bat,0),w=m.rivalDeck.reduce((s,c)=>s+c.bowl,0);m.rivalBatsFirst=b>=w;}
+  renderToss();
+}
+function startLostToss(){chooseInnings(m.rivalBatsFirst?"bowl":"bat");}
+function roleCount(arr,r){return arr.filter(c=>c.role===r).length}
+function squadCompareHTML(){
+  const roles=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]],max=8;
+  const rows=roles.map(([r,label])=>{
+    const y=roleCount(run.deck,r),t=roleCount(m.rivalDeck,r);
+    return `<div class="cmp-row r-${r}">
+      <div class="cmp-side you"><span class="cmp-n">${y}</span><div class="cmp-bar"><span style="width:${Math.min(100,y/max*100)}%"></span></div></div>
+      <div class="cmp-label">${label}</div>
+      <div class="cmp-side rival"><div class="cmp-bar"><span style="width:${Math.min(100,t/max*100)}%"></span></div><span class="cmp-n">${t}</span></div>
+    </div>`;
+  }).join("");
+  return `<div class="cmp">${rows}</div><div class="cmp-foot"><span>YOUR SQUAD · ${run.deck.length}</span><span>RIVAL · ${m.rivalDeck.length}</span></div>`;
+}
+function avgStat(cards,stat){
+  if(!cards.length)return 0;
+  return Math.round(cards.reduce((sum,c)=>sum+(stat==="bat"?batVal(c):bowlVal(c)),0)/cards.length);
+}
+function deckLean(cards){
+  const bat=avgStat(cards,"bat"),bowl=avgStat(cards,"bowl");
+  const counts={bat:roleCount(cards,"bat"),bowl:roleCount(cards,"bowl"),all:roleCount(cards,"all")};
+  if(bowl-bat>=4||counts.bowl>counts.bat)return "bowling heavy";
+  if(bat-bowl>=4||counts.bat>counts.bowl)return "batting heavy";
+  if(counts.all>counts.bat&&counts.all>counts.bowl)return "all-rounder heavy";
+  return "balanced";
+}
+function compareDeckBlock(title,cards){
+  const roles=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]];
+  return `<div class="cmp-deck"><h4>${title}</h4>${roles.map(([role,label])=>`<div class="cmp-role"><label>${label}</label><div class="cmp-cards">${cards.filter(c=>c.role===role).sort(sortStrong).map(c=>`<span class="cmp-card ${role}" title="${c.name}">${firstName(c)} <b>${batVal(c)}/${bowlVal(c)}</b></span>`).join("")||`<span class="cmp-card ${role}">None</span>`}</div></div>`).join("")}</div>`;
+}
+function firstName(c){return c.name.split(" ")[0]}
+function squadCompareHTML(){
+  const roles=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]],max=8;
+  const yBat=avgStat(run.deck,"bat"),yBowl=avgStat(run.deck,"bowl");
+  const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
+  const rows=roles.map(([r,label])=>{
+    const y=roleCount(run.deck,r),t=roleCount(m.rivalDeck,r);
+    return `<div class="cmp-row r-${r}">
+      <div class="cmp-side you"><span class="cmp-n">${y}</span><div class="cmp-bar"><span style="width:${Math.min(100,y/max*100)}%"></span></div></div>
+      <div class="cmp-label">${label}</div>
+      <div class="cmp-side rival"><div class="cmp-bar"><span style="width:${Math.min(100,t/max*100)}%"></span></div><span class="cmp-n">${t}</span></div>
+    </div>`;
+  }).join("");
+  return `<div class="cmp-read"><span>Your avg <b>BAT ${yBat}</b> / <b>BOWL ${yBowl}</b></span><span>Rival reads <b>${deckLean(m.rivalDeck)}</b> - avg <b>BAT ${rBat}</b> / <b>BOWL ${rBowl}</b></span></div>
+    <div class="cmp">${rows}</div>
+    <div class="cmp-grid">
+      ${compareDeckBlock("Your squad",run.deck)}
+      ${compareDeckBlock("Rival squad",m.rivalDeck)}
+    </div>
+    <div class="cmp-foot"><span>YOUR SQUAD - ${run.deck.length}</span><span>RIVAL - ${m.rivalDeck.length}</span></div>`;
+}
+function renderTossLegacyUnused(){
+  $("#tossTitle").textContent=`Toss — ${matchLabel(m.def)}`;
+  $("#tossSub").innerHTML=`Round ${run.match+1}/${MATCHES.length}. Win the toss to choose your innings. <b style="color:#ff8da0">One loss ends your run.</b>`;
+  $("#coinFlip").classList.toggle("spin",!!m.tossCall);
+  if(!m.tossCall){
+    $("#coinFlip").innerHTML=`<div class="coin-face">?</div><div class="coin-msg">Call the toss</div>
+      <div class="coin-calls"><button class="btn sm" data-call="H">Heads</button><button class="btn sm" data-call="T">Tails</button></div>`;
+  }else{
+    const res=m.coinFace==="H"?"HEADS":"TAILS",called=m.tossCall==="H"?"heads":"tails";
+    $("#coinFlip").innerHTML=`<div class="coin-face spin">${m.coinFace}</div><div class="coin-msg">${m.tossWon?`You called ${called} — <b>${res}</b>. You won the toss!`:`You called ${called} — it's <b>${res}</b>. Rival won the toss.`}</div>`;
+  }
+  $("#archLine").innerHTML=`<b>Rival looks like ${m.arch.name}.</b> ${m.arch.read}`;
+  $("#squadCompare").innerHTML=squadCompareHTML();
+  if(!m.tossCall){$("#tossHint").textContent="Heads or tails?";$("#tossChoices").innerHTML="";}
+  else if(m.tossWon){$("#tossHint").textContent="You won the toss — bat or bowl first?";
+    $("#tossChoices").innerHTML=`<button class="btn sm" data-innings="bat">Bat First</button> <button class="btn sm" data-innings="bowl">Bowl First</button>`;}
+  else{$("#tossHint").innerHTML=`Rival chose to <b>${m.rivalBatsFirst?"bat":"bowl"} first</b> — you ${m.rivalBatsFirst?"bowl":"bat"} first.`;
+    $("#tossChoices").innerHTML=`<button class="btn sm" id="startLost">Start match →</button>`;}
+  $("#coinFlip").querySelectorAll("[data-call]").forEach(b=>b.onclick=()=>callToss(b.dataset.call));
+  $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>chooseInnings(b.dataset.innings));
+  const sl=$("#startLost");if(sl)sl.onclick=startLostToss;
+}
+function tossSummaryHTML(){
+  const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
+  const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
+  return `<div class="toss-summary">
+    <div class="toss-card"><span>Your 12</span><b>${activeSquad().length}/12</b><small>BAT ${yBat} / BOWL ${yBowl}</small></div>
+    <div class="toss-card"><span>Rival read</span><b>${deckLean(m.rivalDeck)}</b><small>BAT ${rBat} / BOWL ${rBowl}</small></div>
+    <div class="toss-card"><span>Decision</span><b>${m.tossCall?m.tossWon?"Your call":"Rival call":"Call toss"}</b><small>${m.tossCall?"Choose innings after the flip.":"Heads or tails."}</small></div>
+  </div>`;
+}
+function renderToss(){
+  $("#tossTitle").textContent=`Toss - ${matchLabel(m.def)}`;
+  $("#tossSub").textContent=`Your 12 are locked. Call the coin, then choose innings if you win.`;
+  const tossHead=$("#squadCompare")?.parentElement?.querySelector(".rival-strip-head span");if(tossHead)tossHead.textContent="Coin toss";
+  $("#coinFlip").classList.toggle("spin",!!m.tossCall);
+  if(!m.tossCall){
+    $("#coinFlip").innerHTML=`<div class="coin-face">?</div><div class="coin-msg">Call the toss</div>
+      <div class="coin-calls"><button class="btn sm" data-call="H">Heads</button><button class="btn sm" data-call="T">Tails</button></div>`;
+  }else{
+    const res=m.coinFace==="H"?"HEADS":"TAILS",called=m.tossCall==="H"?"heads":"tails";
+    $("#coinFlip").innerHTML=`<div class="coin-face spin">${m.coinFace}</div><div class="coin-msg">${m.tossWon?`You called ${called}. ${res}. You won the toss!`:`You called ${called}. It is ${res}. Rival won the toss.`}</div>`;
+  }
+  $("#archLine").innerHTML=`<b>${m.arch.name}.</b> Squad is locked; this is only the innings call.`;
+  $("#squadCompare").innerHTML=tossSummaryHTML();
+  if(!m.tossCall){$("#tossHint").textContent="Heads or tails?";$("#tossChoices").innerHTML="";}
+  else if(m.tossWon){$("#tossHint").textContent="You won the toss:";
+    $("#tossChoices").innerHTML=`<button class="btn sm" data-innings="bat">Bat First</button> <button class="btn sm" data-innings="bowl">Bowl First</button>`;}
+  else{$("#tossHint").innerHTML=`Rival chose to <b>${m.rivalBatsFirst?"bat":"bowl"} first</b>.`;
+    $("#tossChoices").innerHTML=`<button class="btn sm" id="startLost">Start Match</button>`;}
+  $("#coinFlip").querySelectorAll("[data-call]").forEach(b=>b.onclick=()=>callToss(b.dataset.call));
+  $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>chooseInnings(b.dataset.innings));
+  const sl=$("#startLost");if(sl)sl.onclick=startLostToss;
+}
+function chooseInnings(choice){
+  if(!m.coinFace)return;
+  m.phase=choice;
+  m.firstChoice=choice;
+  m.innings=1;
+  m.ball=1;
+  m.log=choice==="bowl"?"You chose to bowl first. Keep the rival score low.":"You chose to bat first. Set a target.";
+  newChallenge(true);show("match");render();
+}
+function renderMiniDeck(cards,nextId,emph){
+  return cards.map(c=>`<div class="rival-mini-card ${c.used?'used':''} ${nextId===c.id?'next':''}">${cardSVG(c,c.bat,c.bowl,emph,true)}</div>`).join("");
+}
+function renderRivalStrip(){
+  if(!m?.rivalDeck)return;
+  const emph=m.phase==="bowl"?"bat":"bowl";
+  const head=$("#rivalStripMeta")?.parentElement;if(head?.firstElementChild)head.firstElementChild.textContent="Rival cards";
+  $("#rivalStripMeta").textContent=`${m.rivalDeck.filter(c=>!c.used).length} left`;
+  const cards=fanSort(m.rivalDeck);
+  $("#rivalStrip").className="rival-mini-row table-bench fan-row rival-fan";
+  $("#rivalStrip").innerHTML=cards.map((c,i)=>fanCard(c,i,cards.length,{used:c.used,disabled:true,emph,rival:true})).join("");
+  const next=$("#rivalStrip .card[data-id='"+m.challenge?.id+"']");
+  if(next)next.classList.add("next");
+}
+function renderOpponentContext(){
+  if(!m?.challenge||!$("#opponentFocus"))return;
+  const emph=m.phase==="bowl"?"bat":"bowl";
+  $("#opponentFocus").innerHTML=`<div class="focus-card">${cardSVG(m.challenge,batVal(m.challenge),bowlVal(m.challenge),emph,true)}</div>
+    <div class="setup-box" style="margin-top:12px"><div class="setup-row"><span>Role</span><b>${roleName(m.challenge)}</b></div>
+    <div class="setup-row"><span>${emph.toUpperCase()}</span><b>${emph==="bat"?batVal(m.challenge):bowlVal(m.challenge)}</b></div></div>`;
+  const cards=m.rivalDeck.slice().sort((a,b)=>a.used-b.used || (emph==="bat"?batVal(b)-batVal(a):bowlVal(b)-bowlVal(a)));
+  $("#opponentUpcoming").innerHTML=cards.map(c=>`<div class="mini-pill ${m.challenge?.id===c.id?'active':''} ${c.used?'used':''}">${c.name.split(" ")[0]}<br><span>${emph==="bat"?"BAT":"BOWL"} ${emph==="bat"?batVal(c):bowlVal(c)}</span></div>`).join("");
+}
+function renderRivalBench(emph){
+  const lanes=[
+    {key:"bat",cls:"bat",title:"Rival Batsmen",hint:"BAT threats"},
+    {key:"bowl",cls:"bowl",title:"Rival Bowlers",hint:"BOWL threats"},
+    {key:"all",cls:"all",title:"Rival All-rounders",hint:"Flexible threats"}
+  ];
+  return lanes.map(lane=>{
+    const cards=m.rivalDeck.filter(c=>c.role===lane.key).sort((a,b)=>emph==="bat"?batVal(b)-batVal(a):bowlVal(b)-bowlVal(a));
+    const body=cards.map((c,i)=>{
+      const rot=(i-(cards.length-1)/2)*1.4;
+      const fan=`--rot:${rot}deg;--ty:0px;--z:${i+1}`;
+      return `<div class="card ${c.used?'used':''} ${m.challenge?.id===c.id?'next':''}" style="${fan}" title="${c.name}${c.trait?' - '+c.trait.name+': '+c.trait.text:''}"><span class="sheen"></span>${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`;
+    }).join("");
+    return `<section class="role-lane ${lane.cls}"><div class="lane-head"><b>${lane.title}</b><span>${lane.hint}</span></div><div class="lane-cards">${body}</div></section>`;
+  }).join("");
+}
+function completeMatchWin(){
+  const reward=m.def.reward+(run.scout||0);
+  run.wins++;run.coins+=reward;save.best=Math.max(save.best,m.you.runs);persist();
+  if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You won both cups. Final: ${m.you.runs}/${m.you.wk} vs ${m.rival.runs}/${m.rival.wk}.`);return}
+  run.match++;run.pending=null;prepNextRival();rollShop();show("shop");renderShop();
+}
+function finish(){
+  const won=m.firstChoice==="bat"?m.rival.runs<=m.target:m.you.runs>m.target;
+  if(won)completeMatchWin();
+  else end("Run Over",`Final: you ${m.you.runs}/${m.you.wk}, rival ${m.rival.runs}/${m.rival.wk}.`);
+}
+function nextBall(){
+  if(!m.result)return;
+  if(m.innings===2){
+    if(m.phase==="bat"&&m.you.runs>m.target)return finish();
+    if(m.phase==="bowl"&&m.rival.runs>m.target)return finish();
+  }
+  const inningsDone=m.ball>=m.def.balls||(m.phase==="bowl"?m.rival.wk>=m.def.wickets:m.you.wk>=m.def.wickets);
+  if(inningsDone){
+    if(m.innings===1){
+      if(m.phase==="bowl"){m.target=m.rival.runs;m.phase="bat";m.innings=2;m.ball=1;m.history=[];m.log=`Chase <b>${m.target+1}</b>. Bowling cards used this match are gone.`}
+      else{m.target=m.you.runs;m.phase="bowl";m.innings=2;m.ball=1;m.history=[];m.log=`Defend <b>${m.target}</b>. Batting cards used this match are gone.`}
+      newChallenge(true);render();return;
+    }
+    return finish();
+  }
+  m.ball++;newChallenge();render();
+}
 function renderTitle(){$("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`}
 $("#startBtn").onclick=startRun;
 $("#restartBtn").onclick=()=>startRun();
-$("#nextBtn").onclick=startMatch;
-$("#rerollBtn").onclick=()=>{if(run.coins>=2){run.coins-=2;rollShop();renderShop()}};
+$("#draftRestartBtn").onclick=()=>startRun();
+$("#draftAutoBtn").onclick=autoSelectDraft;
+$("#draftConfirmBtn").onclick=confirmDraft;
+$("#tossRestartBtn").onclick=()=>startRun();
+$("#nextBtn").onclick=beginSquadSelection;
+$("#rerollBtn").onclick=()=>{const cost=rerollCost();if(run.coins>=cost){run.coins-=cost;rollShop();renderShop()}};
+$("#squadBackBtn").onclick=()=>{run.pending=null;renderShop();show("shop")};
+$("#squadNextBtn").onclick=beginSquadSelection;
 $("#homeBtn").onclick=()=>{renderTitle();show("title")};
+$("#duel").onclick=()=>skipResolve();
+$("#rivalPile").onclick=openRivalDeck;
+$("#rivalPile").onkeydown=(e)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openRivalDeck()}};
+$("#closeScout").onclick=closeRivalDeck;
+$("#rivalDrawer").onclick=(e)=>{if(e.target.id==="rivalDrawer")closeRivalDeck()};
+document.addEventListener("keydown",(e)=>{if(e.key==="Escape")closeRivalDeck()});
 renderTitle();
 </script>
 </body>
