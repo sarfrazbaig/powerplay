@@ -5494,7 +5494,26 @@ COACHES.push(
   flagCoach("umpires_nightmare","Umpire's Nightmare","rare",3,8,"Rival bowlers leak wides and no-balls TWICE as often.",{extrasBoost:true}),
   flagCoach("front_foot_police","Front-Foot Police","uncommon",2,6,"Your bowlers never bowl a wide or no-ball.",{noExtras:true}),
   flagCoach("freehit_franchise","Free-Hit Franchise","legendary",5,10,"On free hits your boundary chances surge (+50%).",{freeHitAmp:true}),
-  flagCoach("wide_boy","Wide Boy","rare",4,8,"Every rival wide gifts you +1 extra run.",{wideRuns:true})
+  flagCoach("wide_boy","Wide Boy","rare",4,8,"Every rival wide gifts you +1 extra run.",{wideRuns:true}),
+  flagCoach("slow_over_rate","Slow Over Rate","rare",4,8,"The extras cap rises from 3 to 5 per innings — chaos has more room.",{extraCapUp:true}),
+  coinCoach("extras_alchemist","Extras Alchemist","uncommon",3,7,"Every wide or no-ball (either side) pays you +2 coins.",(out,mode)=>out.extra?2:0),
+  /* ---- M. sabotage: coach the OTHER dressing room (new lever) ---- */
+  Object.assign(flagCoach("sledger","The Sledger","rare",3,8,"Rival cards lose 12 Nerve — words are weapons.",{}),{rivalSub:{nerve:12}}),
+  Object.assign(flagCoach("ball_scuffer","Ball Scuffer","rare",4,8,"Rival bowlers lose 8 Accuracy — the ball won't behave (extras rise).",{}),{rivalSub:{accuracy:8}}),
+  Object.assign(flagCoach("pitch_doctor","Pitch Doctor","rare",4,8,"Rival batters lose 8 Technique — the gate is always open.",{}),{rivalSub:{technique:8}}),
+  Object.assign(flagCoach("hostile_crowd","Hostile Crowd","legendary",5,10,"Rival cards lose 5 Power, Technique, Accuracy AND Nerve. Nowhere is safe.",{}),{rivalSub:{power:5,technique:5,accuracy:5,nerve:5}}),
+  /* ---- N. team & bloodline (clone payoffs) ---- */
+  statCoach("franchise_owner","Franchise Owner","rare",3,8,"+2 BAT and +2 BOWL per card of your most common team (max +12).",(stat,c)=>{
+    const counts={};roster().forEach(k=>counts[k.team?.name]=(counts[k.team?.name]||0)+1);
+    return Math.min(12,2*Math.max(0,...Object.values(counts)))}),
+  statCoach("bloodline","Bloodline","rare",4,8,"+8 BAT and +8 BOWL for clones (Jr. / II / III).",(stat,c)=>/( Jr\.| II| III)$/.test(c.name)?8:0),
+  /* ---- O. personality & gamble depth ---- */
+  flagCoach("personality_cult","Personality Cult","legendary",5,10,"Sub-stat trait personalities (Slogger, Metronome...) hit TWICE as hard.",{subTraitEcho:true}),
+  statCoach("rabbits_foot","Rabbit's Foot","uncommon",2,6,"+5 BAT and +5 BOWL whenever the luck of the ball is with you.",(stat,c,x)=>x.luckyTick?5:0),
+  statCoach("high_roller","High Roller","rare",4,9,"Luck swings harder: +12 when hot, -6 when cold.",(stat,c,x)=>x.luckyTick?12:-6),
+  statCoach("clutch_gene","Clutch Gene","rare",4,8,"+8 BAT and +8 BOWL under pressure (last 2 balls, or a wicket down).",(stat,c,x)=>(x.left<=2||x.yourWk>=1)?8:0),
+  /* ---- P. death-overs spice ---- */
+  stripCoach("death_rattle","Death Rattle","rare",5,8,"Bowling the last 2 balls: one run slot becomes a WICKET.",(mode,s,x)=>mode==="bowl"&&x.left<=2?replaceWorstRun(s,"W"):s)
 );
 /* ---- Coach EDITIONS (rolled at pack reveal; hexes can grant them) ---- */
 const EDITIONS={
@@ -5584,7 +5603,18 @@ const HEXES=[
       const best=cs.slice().sort((a,b)=>(tiers[b.tier]||0)-(tiers[a.tier]||0))[0];
       run.coaches.push({...best,edition:"negative",instId:uid()});
       run.consumables=[];
-      return `${best.name} echoes from the void.`}}
+      return `${best.name} echoes from the void.`}},
+  {id:"hex_chosen",name:"The Chosen Few",desc:"Every survivor gains +2 BAT and +2 BOWL per card consumed.",cost:"Your roster burns down to exactly 12.",
+    use(){let n=0;while(roster().length>12){const v=roster().slice().sort(sortStrong).pop();
+      run.roster=roster().filter(c=>c.id!==v.id);run.deck=activeSquad().filter(c=>c.id!==v.id);
+      if(run.draftSelected)run.draftSelected.delete(v.id);n++}
+      if(!n)return "You are already the chosen few.";
+      roster().forEach(c=>boostCard(c,2*n,2*n));
+      return `${n} consumed. The twelve grow +${2*n}/+${2*n} stronger.`}},
+  {id:"hex_pact_chaos",name:"Pact of Chaos",desc:"EVERY traitless card learns WILDCARD (+6 hot / -3 cold, every ball).",cost:"Lose 5 coins to the void.",
+    use(){const pool=roster().filter(c=>!c.trait);const wc=TRAITS.find(x=>x.name==="Wildcard");
+      pool.forEach(c=>c.trait=wc);run.coins=Math.max(0,run.coins-5);
+      return `${pool.length} cards start hearing the coin.`}}
 ];
 /* ============================================================
    CONSUMABLES — two kinds:
@@ -5630,7 +5660,17 @@ const CONSUMABLES=[
   {id:"slog_clinic",name:"Slog Clinic",mode:"train",kind:"instant",desc:"Your 3 best batters gain +6 Power forever.",
     use(){const ts=roster().slice().sort((a,b)=>b.bat-a.bat).slice(0,3);ts.forEach(t=>{t.batting.power=clamp(t.batting.power+6,12,99);syncRatings(t)});return `${ts.length} batters +6 Power.`}},
   {id:"bowling_camp",name:"Bowling Camp",mode:"train",kind:"instant",desc:"Every bowler gains +5 Accuracy forever.",
-    use(){const ts=roster().filter(c=>c.role!=="bat");ts.forEach(t=>{t.bowling.accuracy=clamp(t.bowling.accuracy+5,12,99);syncRatings(t)});return `${ts.length} bowlers +5 Accuracy.`}}
+    use(){const ts=roster().filter(c=>c.role!=="bat");ts.forEach(t=>{t.bowling.accuracy=clamp(t.bowling.accuracy+5,12,99);syncRatings(t)});return `${ts.length} bowlers +5 Accuracy.`}},
+  {id:"transfer_window",name:"Transfer Window",mode:"train",kind:"instant",desc:"Your weakest card transfers to your most common team (feeds Insider and Franchise builds).",
+    use(){const counts={};roster().forEach(k=>counts[k.team?.name]=(counts[k.team?.name]||0)+1);
+      const topTeam=Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
+      const team=TEAMS.find(t=>t.name===topTeam);if(!team)return "No team to join.";
+      const w=roster().slice().sort(sortStrong).pop();if(!w)return "No cards.";
+      w.team=team;return `${w.name} signs for the ${team.name}.`}},
+  {id:"lucky_bat",name:"Lucky Bat",mode:"train",kind:"instant",desc:"A random traitless card learns WILDCARD (+6 hot / -3 cold).",
+    use(){const pool=roster().filter(c=>!c.trait);if(!pool.length)return "Everyone has a personality already.";
+      const t=pick(pool);t.trait=TRAITS.find(x=>x.name==="Wildcard");return `${t.name} starts gambling.`}},
+  {id:"beamer_complaint",name:"Beamer Complaint",mode:"bat",desc:"Next batting ball: one WICKET slot becomes a WIDE — the umpire has words.",apply:s=>replaceOne(s,"W","WD")}
 ];
 const VOUCHERS=[
   {id:"local_sponsor",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6,buy:()=>{run.scout=(run.scout||0)+2}},
@@ -5999,11 +6039,13 @@ function effSubs(c,disc){
   let flat=(disc==="bat"?c.batBoost:c.bowlBoost)||0;
   flat+=coachBonus(disc,c)+traitStatDelta(c,disc);
   const mine=!isRivalCard(c);
+  const cultEcho=mine&&activeCoaches().some(co=>co.subTraitEcho); // Personality Cult
   const o={};
   for(const key in src){
     let v=src[key]+flat;
-    if(c.trait?.sub?.[key])v+=c.trait.sub[key];               // trait personality (both sides)
+    if(c.trait?.sub?.[key])v+=c.trait.sub[key]*(cultEcho?2:1);  // trait personality (both sides)
     if(mine)activeCoaches().forEach(co=>{if(co.sub?.[key]&&(!co.subGate||co.subGate(c)))v+=co.sub[key]});
+    else activeCoaches().forEach(co=>{if(co.rivalSub?.[key])v-=co.rivalSub[key]}); // sabotage
     o[key]=v;
   }
   return o;
@@ -6039,7 +6081,8 @@ function outcomeWeights(mode,myCard,theirCard){
   }
   // extras leak from a wayward bowler, decaying per extra already bowled
   let extras=0;
-  if((m?.extrasCount||0)<CURVE.extraMax){
+  const extraCap=CURVE.extraMax+(activeCoaches().some(co=>co.extraCapUp)?2:0); // Slow Over Rate
+  if((m?.extrasCount||0)<extraCap){
     extras=CURVE.extraBase*2*(1-edge(L.accuracy,CURVE.extraPivot))*Math.pow(CURVE.extraDecay,m?.extrasCount||0);
     if(batterMine&&activeCoaches().some(co=>co.extrasBoost))extras*=2;   // Umpire's Nightmare
     if(!batterMine&&activeCoaches().some(co=>co.noExtras))extras=0;      // Front-Foot Police
