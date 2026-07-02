@@ -5256,7 +5256,7 @@
       radial-gradient(420px 240px at 82% 0%, rgba(255,246,214,.09), transparent 70%);
   }
   .av-duelrow{
-    display:grid;grid-template-columns:minmax(140px,215px) minmax(240px,340px) minmax(140px,215px);
+    display:grid;grid-template-columns:minmax(140px,215px) minmax(260px,440px) minmax(140px,215px);
     align-items:center;justify-content:center;gap:clamp(10px,2.5vw,34px);
     min-height:0;position:relative;z-index:2;
   }
@@ -5270,7 +5270,7 @@
   }
   .av-duelrow .dslot .dlabel svg{width:13px;height:13px}
   .av-duelrow .placeholder{
-    width:100%;aspect-ratio:5/7;max-height:38vh;border-radius:14px;
+    width:min(100%,calc(40vh*5/7));aspect-ratio:5/7;max-height:40vh;border-radius:14px;
     border:2px dashed rgba(255,255,255,.16);display:grid;place-items:center;
     color:rgba(255,255,255,.25);font-size:34px;background:rgba(255,255,255,.02);
   }
@@ -5295,7 +5295,7 @@
   }
   @keyframes fhBob{0%,100%{transform:translateX(-50%) rotate(-2deg)}50%{transform:translateX(-50%) rotate(2deg)}}
   /* ---------- the field ring ---------- */
-  .av-ringwrap{position:relative;width:min(100%,min(340px,34vh));aspect-ratio:1;margin:0 auto}
+  .av-ringwrap{position:relative;width:min(100%,min(430px,46vh));aspect-ratio:1;margin:0 auto}
   .ring-svg{width:100%;height:100%;display:block}
   .ring-svg.ghost{opacity:.30;filter:saturate(.25)}
   .ring-sec path{transition:filter .18s ease}
@@ -5309,6 +5309,14 @@
   .ring-center{
     position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;
   }
+  .ring-center>*{grid-area:1/1}
+  .ring-center .ring-read{transform:translateY(-16px)}
+  .ring-center .actions{
+    pointer-events:auto;display:flex;gap:8px;justify-content:center;align-self:center;
+    transform:translateY(34px);
+  }
+  .ring-center .actions .btn{padding:7px 18px;font-size:12px}
+  .ring-center .actions:empty{display:none}
   .ring-read{
     width:56%;aspect-ratio:1;border-radius:50%;display:grid;place-content:center;gap:2px;
     text-align:center;padding:8px;
@@ -5334,10 +5342,8 @@
   #match .av-pitch .commentary-strip{position:relative;z-index:2}
   #match .commentary-strip.quiet,#match .commentary-strip.quiet.muted{color:#a9c0b1 !important}
   #match .commentary-strip.live .c-line{color:#dcebdc !important}
-  .av-pitchfoot{display:flex;justify-content:center;position:relative;z-index:2;min-height:42px}
-  .av-pitchfoot .actions{display:flex;gap:10px}
-  /* ---------- your hand: the fan ---------- */
-  .av-fanwrap{position:relative;height:172px;z-index:8;overflow:visible}
+  /* ---------- your hand: the fan (tucks over the pitch edge) ---------- */
+  .av-fanwrap{position:relative;height:158px;z-index:8;overflow:visible;margin-top:-42px}
   .av-fan{
     position:relative;height:100%;display:flex;justify-content:center;align-items:flex-end;
     padding-bottom:2px;
@@ -7036,22 +7042,36 @@ function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><
    The strip IS the field — the ball lands in a sector. Build changes
    visibly reshape it; the roll is a decelerating sweep, not a graph. */
 const RING_COLORS={W:"#ff4155","0":"#46605a","1":"#2fb98b","2":"#25d3a0","4":"#ffd23f","6":"#ff9430",WD:"#b98cff",NB:"#b98cff"};
-function ringSectorPath(i,n,cx,cy,r0,r1,gapDeg=2.4){
-  const a0=(-90+i*(360/n)+gapDeg/2)*Math.PI/180, a1=(-90+(i+1)*(360/n)-gapDeg/2)*Math.PI/180;
+/* Proportional field: ONE sector per outcome, its AREA = its true chance.
+   Even matchup = even zones; a better batsman visibly grows 4 and 6.
+   Coach/consumable edits permanently fatten their zones. */
+const RING_ORDER=["W","0","1","2","4","6","WD","NB"];
+function ringFracs(strip){
+  const counts={};strip.forEach(t=>counts[t]=(counts[t]||0)+1);
+  return RING_ORDER.filter(t=>counts[t]).map(t=>({tk:t,frac:counts[t]/strip.length}));
+}
+function fracMap(data){const o={};data.forEach(d=>o[d.tk]=d.frac);return o}
+function ringArcPath(cx,cy,r0,r1,a0d,a1d){
+  const a0=a0d*Math.PI/180,a1=a1d*Math.PI/180,large=(a1d-a0d)>180?1:0;
   const p=(a,r)=>`${(cx+Math.cos(a)*r).toFixed(1)} ${(cy+Math.sin(a)*r).toFixed(1)}`;
-  return `M ${p(a0,r0)} A ${r0} ${r0} 0 0 1 ${p(a1,r0)} L ${p(a1,r1)} A ${r1} ${r1} 0 0 0 ${p(a0,r1)} Z`;
+  return `M ${p(a0,r0)} A ${r0} ${r0} 0 ${large} 1 ${p(a1,r0)} L ${p(a1,r1)} A ${r1} ${r1} 0 ${large} 0 ${p(a0,r1)} Z`;
 }
 function fieldRingSVG(strip,opts={}){
-  const n=strip.length,cx=170,cy=170,r0=158,r1=104;
-  const prev=opts.prev||null;
-  const secs=strip.map((tk,i)=>{
-    const col=RING_COLORS[tk]||"#46605a";
-    const changed=prev&&prev[i]!==tk;
-    const mid=(-90+(i+.5)*(360/n))*Math.PI/180, lr=(r0+r1)/2;
-    const lx=(cx+Math.cos(mid)*lr).toFixed(1), ly=(cy+Math.sin(mid)*lr+6).toFixed(1);
-    return `<g class="ring-sec ${changed?'flash':''} ${opts.landed===i?'landed':''}" data-i="${i}">
-      <path d="${ringSectorPath(i,n,cx,cy,r0,r1)}" fill="${col}" stroke="#0a1214" stroke-width="2.5"/>
-      <text x="${lx}" y="${ly}" text-anchor="middle" font-size="19" font-weight="700" fill="#fff" stroke="#0a1214" stroke-width="3.5" paint-order="stroke">${tk==="0"?"·":tk}</text>
+  const data=(opts.fracs||ringFracs(strip)).filter(d=>d.frac>0.0001);
+  const cx=170,cy=170,r0=158,r1=104,gap=2.2;
+  const usable=360-gap*data.length;
+  let acc=-90;
+  const secs=data.map(d=>{
+    const sweep=Math.min(354,usable*d.frac);
+    const a0=acc+gap/2,a1=a0+sweep;acc=a1+gap/2;
+    const mid=(a0+a1)/2*Math.PI/180,lr=(r0+r1)/2;
+    const lx=(cx+Math.cos(mid)*lr).toFixed(1),ly=cy+Math.sin(mid)*lr;
+    const fs=Math.max(13,Math.min(26,sweep*.5));
+    const wide=sweep>34;
+    const pct=wide?`<text x="${lx}" y="${(ly+16).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="800" fill="rgba(255,255,255,.8)" stroke="#0a1214" stroke-width="2.5" paint-order="stroke">${Math.round(d.frac*100)}%</text>`:"";
+    return `<g class="ring-sec ${opts.changed&&opts.changed.has(d.tk)?'flash':''}" data-tk="${d.tk}">
+      <path d="${ringArcPath(cx,cy,r0,r1,a0,a1)}" fill="${RING_COLORS[d.tk]||"#46605a"}" stroke="#0a1214" stroke-width="2.5"/>
+      <text x="${lx}" y="${(ly+(wide?4:6)).toFixed(1)}" text-anchor="middle" font-size="${fs.toFixed(0)}" font-weight="700" fill="#fff" stroke="#0a1214" stroke-width="3.5" paint-order="stroke">${d.tk==="0"?"·":d.tk}</text>${pct}
     </g>`;
   }).join("");
   return `<svg class="ring-svg" viewBox="0 0 340 340" aria-hidden="true">
@@ -7061,7 +7081,29 @@ function fieldRingSVG(strip,opts={}){
     ${secs}
   </svg>`;
 }
-function ghostRingSVG(){return fieldRingSVG(Array(12).fill("0")).replace('class="ring-svg"','class="ring-svg ghost"')}
+const GHOST_FRACS=["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}));
+function ghostRingSVG(){return fieldRingSVG(null,{fracs:GHOST_FRACS}).replace('class="ring-svg"','class="ring-svg ghost"')}
+/* Smooth morph: zones grow/shrink into their new share, then flash. */
+let morphRAF=null;
+function animateRing(prevMap,data){
+  cancelAnimationFrame(morphRAF);
+  const union=RING_ORDER.filter(t=>(prevMap[t]||0)>0.0001||data.some(d=>d.tk===t&&d.frac>0.0001));
+  const from=union.map(t=>prevMap[t]||0);
+  const to=union.map(t=>{const d=data.find(x=>x.tk===t);return d?d.frac:0});
+  const changed=new Set(union.filter((t,i)=>Math.abs(from[i]-to[i])>0.004));
+  if(!changed.size)return;
+  const t0=performance.now(),dur=420;
+  const step=now=>{
+    const host=document.querySelector(".av-ringwrap .ring-svg:not(.ghost)");
+    if(!host)return;
+    const p=Math.min(1,(now-t0)/dur);
+    const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    const cur=union.map((t,i)=>({tk:t,frac:from[i]+(to[i]-from[i])*e}));
+    host.outerHTML=fieldRingSVG(null,{fracs:cur,changed:p>=1?changed:null});
+    if(p<1)morphRAF=requestAnimationFrame(step);
+  };
+  morphRAF=requestAnimationFrame(step);
+}
 function ringCenterRead(info){
   if(!info)return `<div class="ring-read wait"><b>PICK A CARD</b><span>the field takes shape</span></div>`;
   const cls=bandClass(info.margin);
@@ -7074,16 +7116,21 @@ function ringResultHTML(){
 }
 let spinTimers=[];
 function clearSpin(){spinTimers.forEach(clearTimeout);spinTimers=[]}
-function startRingSpin(target,n){
+function startRingSpin(rollToken){
   clearSpin();
-  const total=n+((target-0)%n+n)%n; // one full lap, land on target
+  const secs=[...document.querySelectorAll(".ring-sec")];
+  const n=secs.length;
+  if(!n)return 1200;
+  let target=secs.findIndex(el=>el.dataset.tk===rollToken);
+  if(target<0)target=0;
+  const total=n*2+target; // two laps, land on the outcome zone
   let t=280;
   for(let k=0;k<=total;k++){
     const p=k/total,delay=t;
-    t+=42+300*p*p;
+    t+=55+330*p*p;
     spinTimers.push(setTimeout(()=>{
-      document.querySelectorAll(".ring-sec.lit").forEach(el=>el.classList.remove("lit"));
-      const el=document.querySelector(`.ring-sec[data-i="${k%n}"]`);
+      secs.forEach(el=>el.classList.remove("lit"));
+      const el=secs[k%n];
       if(el)el.classList.add("lit");
       if(k===total){
         if(el)el.classList.add("landed");
@@ -7113,7 +7160,7 @@ function pitchStripInfo(){
   const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
   return {strip:getStripFor(m.phase,card),roll:null,margin:mine-theirs};
 }
-let lastRingStrip=null;
+let lastRingFracs=null;
 function renderDuel(pop=false){
   const d=$("#duel");
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
@@ -7121,8 +7168,8 @@ function renderDuel(pop=false){
   const info=pitchStripInfo();
   const danger=!m.result&&dangerRead()==="danger";
   const answered=!m.result&&info&&info.margin>=3;
-  const prevStrip=lastRingStrip;lastRingStrip=info?info.strip.slice():null;
-  const ring=info?fieldRingSVG(info.strip,{prev:prevStrip&&prevStrip.length===info.strip.length?prevStrip:null}):ghostRingSVG();
+  const data=info?ringFracs(info.strip):null;
+  const ring=data?fieldRingSVG(null,{fracs:data}):ghostRingSVG();
   const fh=m.freeHit&&!m.result?`<div class="av-freehit">FREE HIT</div>`:"";
   const youCard=m.result?m.result.you:(m.selected||null);
   const youSlot=youCard
@@ -7140,26 +7187,28 @@ function renderDuel(pop=false){
   const centerBits=resolving
     ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>LIVE</b><span>tap to skip ▸</span></div></div>`
     :m.result
-      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}</div>`
-      :`<div class="ring-center" id="ringCenter">${ringCenterRead(info)}</div>`;
+      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"></div></div>`
+      :`<div class="ring-center" id="ringCenter">${ringCenterRead(info)}<div class="actions" id="actions"></div></div>`;
   d.innerHTML=`${fh}
     <div class="av-duelrow ${danger?'threat':''} ${answered?'answered':''}">
       ${youSlot}
       <div class="av-ringwrap">${ring}${centerBits}</div>
       ${rivSlot}
     </div>
-    ${commentaryHTML()}
-    <div class="av-pitchfoot"><div class="actions" id="actions"></div></div>`;
+    ${commentaryHTML()}`;
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
   if(resolving&&!m.result.spinStarted){
     m.result.spinStarted=true;
-    m.result.spinDur=startRingSpin(m.result.roll,m.result.strip.length);
+    m.result.spinDur=startRingSpin(m.result.strip[m.result.roll]);
   }else if(m.result?.state==="settled"){
-    const el=d.querySelector(`.ring-sec[data-i="${m.result.roll}"]`);
+    const el=d.querySelector(`.ring-sec[data-tk="${m.result.strip[m.result.roll]}"]`);
     if(el)el.classList.add("landed");
+  }else if(data&&lastRingFracs){
+    animateRing(lastRingFracs,data); // zones grow into their new share
   }
+  lastRingFracs=data&&!m.result?fracMap(data):null;
   renderActions();
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
 }
