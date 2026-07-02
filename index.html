@@ -285,21 +285,8 @@
   .build-tag{border-radius:999px;padding:5px 9px;background:rgba(255,255,255,.62);border:1px solid rgba(18,49,63,.12);
     font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#365f66}
   .build-tag b{color:#13313f}
-  .offers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .offer{position:relative;background:var(--panel);border-radius:14px;border:1px solid rgba(18,49,63,.12);box-shadow:var(--shadow-sm);
-    padding:12px;display:flex;flex-direction:column;gap:10px}
-  .offer.bought{opacity:.5}
-  .offer .price{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:900}
-  .offer.util{text-align:center;align-items:center;justify-content:flex-start}
-  .offer.coach{background:linear-gradient(180deg,#fffdf6,#eef9f7)}
-  .offer .ic-lg{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;color:#fff;margin:2px auto 0}
-  .offer .ic-lg svg{width:28px;height:28px}
-  .offer h4{margin:2px 0 0;font-size:15px;font-weight:900}
-  .offer p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.35}
   .shop-board{display:block}
   .shop-board h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-  .shop-board .offers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-  .shop-board .shop-tools{display:grid;grid-template-columns:1fr;gap:12px}
   .squad-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
   .pickhint{font-size:13px;font-weight:800;color:var(--bat);background:#e8f8ee;border:1px solid #b9e6c9;border-radius:9px;padding:8px 12px}
   .pickhint.release{color:var(--red);background:#fdecef;border-color:#f4c2cb}
@@ -320,7 +307,6 @@
     .explain{grid-template-columns:1fr}
     .hand{grid-template-columns:1fr}
     .grid6{grid-template-columns:repeat(2,1fr)}
-    .offers{grid-template-columns:1fr}
   }
 
   /* --- SVG trump-card overrides --- */
@@ -370,8 +356,6 @@
   @keyframes ballStrike{0%,36%{transform:translate(-34px,0) scale(.8);opacity:0}46%{opacity:1}60%{transform:translate(0,0) scale(1.1)}100%{transform:translate(44px,-46px) scale(.35);opacity:0}}
   @keyframes outcomeBurst{0%,42%{transform:scale(.35);opacity:0}66%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
   @keyframes confettiPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(var(--r))}18%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(1) rotate(calc(var(--r) + 260deg))}}
-  .offer{padding:10px}.offer .tc{max-width:100%}
-
   /* --- tactile, hold-a-hand card feel --- */
   .card{animation:none}
   .selbadge{z-index:6}
@@ -468,10 +452,8 @@
   .rival-mini-card .tc{border-radius:9px}
   .rival-mini-card.next .tc{box-shadow:0 0 0 3px var(--gold)}
   .rival-mini-card.used{filter:grayscale(.8);opacity:.42}
-  .shop-columns{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
-  .shop-tools{display:grid;grid-template-columns:1fr;gap:12px}
   @keyframes coinSpin{0%{transform:rotateY(0) scale(.9)}45%{transform:rotateY(540deg) scale(1.06)}100%{transform:rotateY(1080deg) scale(1)}}
-  @media(max-width:980px){.screen.active.prep{display:block}.prep-panel{min-height:auto}.prep-grid,.rival-mini-row.prep-grid{grid-template-columns:repeat(auto-fit,minmax(138px,1fr));width:100%}.toss-layout,.shop-columns{grid-template-columns:1fr;min-height:auto}.rival-mini-card{flex-basis:138px}}
+  @media(max-width:980px){.screen.active.prep{display:block}.prep-panel{min-height:auto}.prep-grid,.rival-mini-row.prep-grid{grid-template-columns:repeat(auto-fit,minmax(138px,1fr));width:100%}.toss-layout{grid-template-columns:1fr;min-height:auto}.rival-mini-card{flex-basis:138px}}
 
   /* --- polished dark layout pass --- */
   :root{
@@ -916,25 +898,7 @@
   #shop .shop-section .hint{color:var(--txt-dim);font-size:12px;margin:0 0 9px}
   #shop .build-tags{display:none}
   .shop-board{height:100%;min-height:0}
-  .shop-columns{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;height:100%;min-height:0}
   .shop-board h3{margin:0 0 8px;color:var(--txt-head);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
-  .shop-board .offers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-content:start}
-  .shop-board .shop-tools{display:grid;grid-template-columns:1fr;gap:10px}
-  .offer{display:flex;flex-direction:column;gap:8px;min-height:0;padding:10px;border-radius:12px;
-    border:1px solid var(--ln-2);background:var(--pnl-2);box-shadow:none;color:var(--txt)}
-  .offer .tc{width:clamp(84px,7.5vw,118px);margin:0 auto}
-  .offer h4{margin:2px 0 0;color:#fff;font-size:14px;font-weight:900}
-  .offer p{margin:0;font-size:11px;color:var(--txt-dim);line-height:1.3}
-  .offer .price{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:6px;font-weight:900;font-size:13px}
-  .offer.util,.offer.coach{text-align:center;align-items:center}
-  .offer .ic-lg{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#fff;margin:2px auto 0}
-  .offer .ic-lg svg{width:26px;height:26px}
-  .shop-section.squad-entry{display:grid;grid-template-columns:1fr auto;grid-template-areas:"h btn" "hint btn";
-    align-items:center;column-gap:12px;row-gap:2px}
-  .squad-entry h2{grid-area:h}
-  .squad-entry .hint{grid-area:hint;margin:0 !important}
-  .squad-entry .squad-actions{grid-area:btn;margin:0}
-  .squad-entry #shopSquad{display:none}
   .shop-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0}
 
   /* --- SQUAD ROOM --- */
@@ -959,7 +923,7 @@
     .arena{grid-template-columns:1fr}
     .duel,.explain{grid-column:auto;grid-row:auto}
     .board{grid-template-columns:1fr}
-    .draft-layout,.squad-room,.toss-layout,.shop-columns{grid-template-columns:1fr}
+    .draft-layout,.squad-room,.toss-layout{grid-template-columns:1fr}
     .toss-layout{grid-template-rows:auto auto}
   }
 
@@ -1729,17 +1693,7 @@
     background:#1976bf;
   }
   #shop .hint,
-  #squad .setup-box p,
-  #manageHint{color:#111}
-  .offer{
-    border:3px solid #050505;
-    border-radius:0;
-    background:#fffdf2;
-    color:#111;
-    box-shadow:3px 3px 0 rgba(0,0,0,.42);
-  }
-  .offer h4{color:#111;font-family:Anton,Impact,sans-serif;text-transform:uppercase}
-  .offer p{color:#333}
+  #squad .setup-box p{color:#111}
   .price{color:#111}
   .coins-tag{
     border:3px solid #050505;
@@ -1853,62 +1807,6 @@
     bottom:6px;
   }
 
-  #shop.screen.active{
-    display:grid;
-    grid-template-columns:minmax(0,1.12fr) minmax(320px,.88fr);
-    grid-template-rows:auto minmax(0,1fr) auto;
-    grid-template-areas:
-      "top top"
-      "market squad"
-      "foot foot";
-    gap:10px;
-  }
-  #shop .top{grid-area:top}
-  #shop > .shop-section:first-of-type{grid-area:market}
-  #shop > .shop-section.squad-entry{
-    grid-area:squad;
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    gap:10px;
-  }
-  #shop > .shop-foot:last-child{grid-area:foot}
-  #shop .shop-section{
-    min-height:0;
-  }
-  #shop .shop-columns{
-    grid-template-columns:minmax(0,1.35fr) minmax(230px,.65fr);
-  }
-  #shop .shop-board .offers{
-    grid-template-columns:repeat(2,minmax(142px,1fr));
-  }
-  #shop .shop-board .shop-tools{
-    align-content:start;
-  }
-  #shop .offer .tc{
-    width:clamp(96px,8.6vw,136px);
-  }
-  #shop .squad-entry .hint,
-  #shop .squad-entry .squad-actions,
-  #shop .squad-entry h2{
-    grid-area:auto;
-  }
-  #shop .squad-entry #shopSquad{
-    display:grid;
-    flex:1;
-    min-height:0;
-    grid-template-columns:repeat(3,minmax(82px,1fr));
-    gap:8px;
-    overflow:auto;
-    padding:4px;
-  }
-  #shop .squad-entry #shopSquad .card{
-    min-width:0;
-  }
-  #shop .squad-entry #shopSquad .tc{
-    width:100%;
-  }
-
   #squad.screen.active{
     grid-template-rows:auto minmax(0,1fr);
   }
@@ -1931,17 +1829,6 @@
   }
   #squad .roster-row .card{
     flex:0 0 clamp(118px,8.8vw,158px);
-  }
-
-  @media(max-width:1000px){
-    #shop.screen.active{
-      grid-template-columns:1fr;
-      grid-template-rows:auto auto auto auto;
-      grid-template-areas:"top" "market" "squad" "foot";
-    }
-    #shop .shop-columns{
-      grid-template-columns:1fr;
-    }
   }
 
   /* Match arena v2: broadcast scorebug + center-only odds */
@@ -2407,7 +2294,6 @@
      ============================================================ */
   #draft .draft-lane-scroll,
   #squad .roster-row,
-  #shopSquad,
   #match .player-fan,
   #match .rival-fan{
     perspective:900px;
@@ -2501,8 +2387,6 @@
 
   #squad .card.selected,
   #squad .card.active,
-  #shopSquad .card.active,
-  #shopSquad .card.selected,
   #match .player-fan .card.selected,
   #match .rival-fan .card.next,
   .scout-card.next .tc{
@@ -2510,30 +2394,23 @@
   }
   #squad .card.selected .tc,
   #squad .card.active .tc,
-  #shopSquad .card.active .tc,
-  #shopSquad .card.selected .tc,
   #match .player-fan .card.selected .tc,
   #match .rival-fan .card.next .tc,
   .scout-card.next .tc{
     filter:drop-shadow(0 10px 18px rgba(0,0,0,.26)) !important;
   }
-  #squad .roster-row .card,
-  #shopSquad .card{
+  #squad .roster-row .card{
     min-width:clamp(148px,11vw,196px);
     transform-style:preserve-3d;
     transition:transform .18s ease,filter .18s ease,opacity .18s ease;
   }
   #squad .roster-row .card:hover,
-  #squad .roster-row .card:focus-visible,
-  #shopSquad .card:hover,
-  #shopSquad .card:focus-visible{
+  #squad .roster-row .card:focus-visible{
     transform:perspective(900px) rotateX(5deg) rotateY(-7deg) translateY(-4px) !important;
     filter:saturate(1.08) contrast(1.04);
   }
   #squad .roster-row .card:hover .sheen,
   #squad .roster-row .card:focus-visible .sheen,
-  #shopSquad .card:hover .sheen,
-  #shopSquad .card:focus-visible .sheen,
   #match .player-fan .card:hover .sheen,
   #match .player-fan .card:focus-visible .sheen{
     opacity:.58;
@@ -2644,6 +2521,11 @@
     justify-content:flex-end;
     gap:8px;
     flex-wrap:wrap;
+  }
+  .test-win-btn{
+    background:#ffd91f !important;
+    color:#111 !important;
+    border-color:#050505 !important;
   }
   .tc .edge-shine{
     transform:translateX(-130px);
@@ -2842,6 +2724,31 @@
     border-style:solid;
     background:#ffe86a;
   }
+  #match .coach-arena-slot.active{
+    grid-template-columns:64px minmax(0,1fr);
+    gap:8px;
+    text-align:left;
+  }
+  #match .coach-arena-art{
+    width:64px;
+    aspect-ratio:1.35/1;
+    overflow:hidden;
+    border:2px solid #050505;
+    background:#fffdf2;
+    box-shadow:2px 2px 0 rgba(0,0,0,.28);
+  }
+  #match .coach-arena-art img{
+    width:120%;
+    height:120%;
+    object-fit:contain;
+    transform:translate(-8%,4%);
+    filter:drop-shadow(2px 3px 0 rgba(0,0,0,.25));
+  }
+  #match .coach-arena-info{
+    display:grid;
+    gap:3px;
+    min-width:0;
+  }
   #match .match-effects{
     padding:9px 11px;
     display:grid;
@@ -2914,6 +2821,1540 @@
     #match .duel .placeholder{
       height:clamp(190px,30vh,290px) !important;
     }
+  }
+
+  /* Match polish: quieter header, balanced labels, coach row, commentary beat. */
+  #match .top{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(180deg,#181d19 0,#111512 72%,#080a09 100%) !important;
+    border-color:#050505 !important;
+    box-shadow:4px 4px 0 #050505, inset 0 -5px 0 #ffd91f !important;
+  }
+  #match .top:after{
+    content:"";
+    position:absolute;
+    left:14px;
+    right:14px;
+    bottom:6px;
+    height:2px;
+    background:linear-gradient(90deg,transparent,#33c36b 16%,#ffd91f 50%,#33c36b 84%,transparent);
+    opacity:.7;
+    pointer-events:none;
+  }
+  #match .hand:before,
+  #match .rival-strip-head{
+    height:58px !important;
+    min-height:58px !important;
+    padding-top:0 !important;
+    padding-bottom:0 !important;
+  }
+  #match .hand:before{
+    padding-right:118px !important;
+  }
+  #match .rival-strip-head span:first-child{
+    display:flex;
+    align-items:center;
+    min-height:52px;
+  }
+  #match .own-scan-btn{
+    top:20px !important;
+  }
+  #match .duel{
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+  }
+  #match .coach-strip{
+    width:min(980px,96%) !important;
+    min-height:132px !important;
+    margin:8px auto 0 !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto auto !important;
+    gap:8px !important;
+  }
+  #match .match-effects{
+    min-height:40px;
+    display:grid !important;
+    grid-template-columns:auto minmax(160px,1fr) auto;
+    align-items:center;
+    gap:12px;
+    padding:6px 12px !important;
+  }
+  #match .match-effects b{
+    font-size:18px !important;
+  }
+  #match .match-effects span{
+    text-align:center;
+  }
+  #match .coach-slots{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(150px,1fr)) !important;
+    gap:12px !important;
+    width:min(720px,100%);
+    justify-self:center;
+  }
+  #match .coach-arena-slot{
+    min-height:78px !important;
+    aspect-ratio:2.15 / 1;
+    padding:8px 10px !important;
+  }
+  #match .coach-arena-slot b{
+    font-size:24px !important;
+  }
+  #match .duel-stage{
+    padding-top:8px !important;
+  }
+  #match .commentary-strip{
+    position:relative;
+    width:min(860px,96%);
+    min-height:48px;
+    margin:0 auto;
+    padding:8px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border:3px solid #050505;
+    background:#151817;
+    color:#fff9df;
+    box-shadow:4px 4px 0 rgba(0,0,0,.42);
+    font-family:"Archivo Narrow",Inter,sans-serif;
+    font-size:clamp(15px,1.35vw,21px);
+    font-weight:900;
+    line-height:1.08;
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+  #match .commentary-strip.muted{
+    color:#91a29c;
+  }
+  #match .commentary-strip.settled{
+    background:#fffdf2;
+    color:#111;
+  }
+  #match .commentary-strip.live .c-line{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 16px;
+    opacity:0;
+  }
+  #match .commentary-strip.live .l1{animation:commentaryBeat 1.7s ease 0s both}
+  #match .commentary-strip.live .l2{animation:commentaryBeat 1.9s ease 1.55s both}
+  #match .commentary-strip.live .l3{animation:commentaryFinal 1.75s ease 3.55s both}
+  @keyframes commentaryBeat{
+    0%{opacity:0;transform:translateY(8px)}
+    14%,82%{opacity:1;transform:none}
+    100%{opacity:0;transform:translateY(-8px)}
+  }
+  @keyframes commentaryFinal{
+    0%{opacity:0;transform:scale(.96)}
+    18%,100%{opacity:1;transform:none}
+  }
+  #match .duel.resolving .duel-stage .dslot{
+    pointer-events:none;
+    animation:commentaryAnticipate 5.15s ease-in-out both !important;
+  }
+  #match .duel.resolving .duel-stage .dslot:nth-child(3){
+    animation-delay:.08s !important;
+  }
+  @keyframes commentaryAnticipate{
+    0%,100%{transform:translateX(0) rotate(0deg)}
+    12%{transform:translateX(-2px) rotate(-.45deg)}
+    24%{transform:translateX(2px) rotate(.45deg)}
+    39%{transform:translateX(-3px) rotate(-.65deg)}
+    54%{transform:translateX(3px) rotate(.65deg)}
+    70%{transform:translateX(-1px) rotate(-.25deg)}
+    84%{transform:translateX(1px) rotate(.25deg)}
+  }
+  #match .duel.resolving .dslot:hover .tc .edge-shine{
+    opacity:0 !important;
+    animation:none !important;
+  }
+  #match .duel.resolving .payoff-svg{
+    animation:payoffEnter .35s ease both,payoffFade .75s ease 4.25s both !important;
+  }
+  #match .duel.resolving .payoff-svg .curve-marker.rolling{
+    animation-delay:3.28s !important;
+    animation-duration:.48s !important;
+  }
+  #match .duel.resolving .curve-flash.slow{
+    animation-duration:.5s !important;
+  }
+  #match .duel.resolving .payoff-burst{
+    animation:payoffPop .82s cubic-bezier(.18,.82,.24,1) 4.05s both !important;
+  }
+  #match .duel.resolving .payoff-stage .confetti{
+    animation-delay:4.2s !important;
+  }
+
+  /* Clubhouse v2: pack-rip shop, not direct player buying. */
+  #shop.screen.active{
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    grid-template-areas:
+      "top"
+      "market"
+      "foot" !important;
+    gap:12px !important;
+  }
+  #shop > .shop-section:first-of-type{
+    overflow:auto !important;
+  }
+  #shop .shop-section:first-of-type h2{
+    font-family:Anton,Impact,sans-serif;
+    color:#ffd91f !important;
+    font-size:clamp(24px,2.5vw,38px) !important;
+    font-style:italic;
+    text-shadow:3px 3px 0 #050505;
+    text-transform:uppercase;
+  }
+  #shop .shop-board{
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr) auto;
+    gap:14px;
+    height:100%;
+    min-height:0;
+  }
+  .coach-bench{
+    display:grid;
+    gap:10px;
+  }
+  .coach-bench h3,
+  .pack-market h3,
+  .voucher-board h3,
+  .owned-consumables h3{
+    margin:0;
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(18px,1.5vw,25px);
+    color:#111;
+    text-transform:uppercase;
+    font-style:italic;
+  }
+  .coach-bench h3 span{
+    color:#00875a;
+    font-family:"Archivo Narrow",Inter,sans-serif;
+    font-size:14px;
+    font-style:normal;
+  }
+  .coach-bench-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+  }
+  .coach-bench-card{
+    min-height:104px;
+    padding:12px;
+    border:3px dashed #7d897f;
+    background:#fffdf2;
+    color:#111;
+    box-shadow:4px 4px 0 rgba(0,0,0,.45);
+    display:grid;
+    align-content:center;
+    gap:7px;
+  }
+  .coach-bench-card.active{
+    border-style:solid;
+    background:linear-gradient(135deg,#ffe665,#fff8bc);
+  }
+  .coach-bench-card b,
+  .pack-choice b,
+  .voucher-card b{
+    font-family:Anton,Impact,sans-serif;
+    font-size:22px;
+    line-height:1;
+    text-transform:uppercase;
+  }
+  .coach-bench-card p,
+  .pack-choice p,
+  .voucher-card p{
+    margin:0;
+    color:#34433d;
+    font-family:"Archivo Narrow",Inter,sans-serif;
+    font-size:13px;
+    font-weight:900;
+    line-height:1.15;
+  }
+  .clubhouse-grid{
+    display:grid;
+    grid-template-columns:minmax(230px,.32fr) minmax(0,1fr);
+    gap:14px;
+    min-height:0;
+  }
+  .voucher-board,
+  .pack-market,
+  .owned-consumables{
+    border:3px solid #050505;
+    background:#fffdf2;
+    color:#111;
+    box-shadow:4px 4px 0 rgba(0,0,0,.45);
+    padding:12px;
+  }
+  .voucher-board{
+    display:grid;
+    align-content:start;
+    gap:10px;
+  }
+  .voucher-board > p{
+    margin:0;
+    color:#53645f;
+    font-size:12px;
+    font-weight:900;
+  }
+  .voucher-card{
+    display:grid;
+    gap:7px;
+    padding:11px;
+    border:3px solid #050505;
+    background:#f0f7ff;
+    box-shadow:3px 3px 0 #050505;
+  }
+  .voucher-card.bought{
+    opacity:.52;
+    filter:grayscale(.8);
+  }
+  .pack-market{
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:10px;
+  }
+  .pack-row{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
+    min-height:0;
+  }
+  .pack-card{
+    min-height:360px;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:10px;
+    padding:12px;
+    border:3px solid #050505;
+    background:
+      radial-gradient(circle at 25% 16%,rgba(255,255,255,.38),transparent 24%),
+      linear-gradient(145deg,#202720,#0f120f);
+    color:#fffdf2;
+    box-shadow:5px 5px 0 #050505;
+    position:relative;
+    overflow:hidden;
+  }
+  .pack-card:before{
+    content:"";
+    position:absolute;
+    inset:-25%;
+    background:repeating-linear-gradient(135deg,rgba(255,255,255,.08) 0 8px,transparent 8px 16px);
+    transform:rotate(-8deg);
+    pointer-events:none;
+  }
+  .pack-card > *{
+    position:relative;
+    z-index:1;
+  }
+  .pack-player{background:linear-gradient(145deg,#105ab8,#38b7ec)}
+  .pack-coach{background:linear-gradient(145deg,#c58806,#ffe15a);color:#111}
+  .pack-consumable{background:linear-gradient(145deg,#8128a7,#f55ce8)}
+  .pack-card.picked{
+    opacity:.74;
+  }
+  .pack-face{
+    min-height:150px;
+    display:grid;
+    align-content:center;
+    justify-items:start;
+    gap:6px;
+    padding:16px;
+    border:3px solid currentColor;
+    background:rgba(0,0,0,.18);
+  }
+  .pack-face span{
+    padding:3px 8px;
+    background:#050505;
+    color:#ffd91f;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+  }
+  .pack-face b{
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(30px,3.2vw,50px);
+    line-height:.9;
+    text-transform:uppercase;
+    font-style:italic;
+    text-shadow:3px 3px 0 rgba(0,0,0,.45);
+  }
+  .pack-face p{
+    margin:0;
+    font-weight:900;
+    max-width:18ch;
+  }
+  .pack-card .price,
+  .voucher-card .price{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    font-weight:900;
+  }
+  .pack-choices{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:9px;
+    min-height:0;
+    overflow:auto;
+    padding-right:3px;
+  }
+  .pack-choice{
+    min-height:96px;
+    display:grid;
+    gap:7px;
+    align-content:center;
+    padding:10px;
+    border:3px solid #050505;
+    background:#fffdf2;
+    color:#111;
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+  }
+  .player-choice{
+    grid-template-columns:88px minmax(86px,auto);
+    align-items:center;
+  }
+  .player-choice .tc{
+    width:88px;
+    height:auto;
+  }
+  .tool-choice.bat{background:#eafff5}
+  .tool-choice.bowl{background:#fff0e8}
+  .replace-row{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .replace-row .btn{
+    flex:1 1 68px;
+    min-width:0;
+    padding-inline:8px;
+  }
+  .owned-consumables{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    gap:12px;
+    align-items:center;
+  }
+  .owned-consumables > div{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .owned-consumable{
+    display:inline-grid;
+    gap:1px;
+    padding:7px 10px;
+    border:2px solid #050505;
+    background:#eafff5;
+    color:#111;
+    box-shadow:2px 2px 0 #050505;
+    font-weight:900;
+  }
+  .owned-consumable.bowl{background:#fff0e8}
+  .owned-consumable.any{background:#f5e9ff}
+  .owned-consumable small{
+    color:#53645f;
+    font-size:10px;
+    text-transform:uppercase;
+  }
+  #shop .squad-entry{
+    min-height:84px !important;
+  }
+  @media(max-width:1100px){
+    .clubhouse-grid,
+    .pack-row,
+    .coach-bench-grid{
+      grid-template-columns:1fr;
+    }
+    .pack-card{
+      min-height:260px;
+    }
+    .owned-consumables{
+      grid-template-columns:1fr;
+    }
+  }
+
+  /* Pack asset integration: native recreation of assets/Card Packs Standalone.html. */
+  #shop .shop-section:first-of-type{
+    padding:14px !important;
+  }
+  #shop .shop-board{
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:12px !important;
+  }
+  .clubhouse-grid{
+    grid-template-columns:minmax(220px,280px) minmax(0,1fr) !important;
+    align-items:stretch;
+  }
+  .coach-bench-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+  .coach-bench-card{
+    min-height:82px !important;
+    padding:10px 12px !important;
+  }
+  .coach-bench-card.active{
+    grid-template-columns:94px minmax(0,1fr) auto;
+    align-items:center;
+  }
+  .coach-thumb{
+    position:relative;
+    width:94px;
+    aspect-ratio:1.55/1;
+    overflow:hidden;
+    border:3px solid #050505;
+    background:linear-gradient(180deg,#ffe36f,#fff6bf);
+    box-shadow:3px 3px 0 rgba(0,0,0,.35);
+  }
+  .coach-thumb img{
+    width:116%;
+    height:116%;
+    object-fit:contain;
+    transform:translate(-7%,2%);
+    filter:drop-shadow(3px 5px 0 rgba(0,0,0,.32)) saturate(1.08);
+  }
+  .coach-info{
+    display:grid;
+    gap:5px;
+    min-width:0;
+  }
+  .pack-market{
+    min-height:0;
+    overflow:hidden;
+  }
+  .pack-row{
+    grid-template-columns:repeat(3,minmax(205px,1fr)) !important;
+    align-items:start;
+    overflow:auto;
+    padding:4px 4px 10px;
+  }
+  .pack-card{
+    min-height:0 !important;
+    display:grid !important;
+    grid-template-rows:auto auto !important;
+    align-content:start;
+    justify-items:center;
+    gap:12px !important;
+    padding:12px !important;
+    background:#14382a !important;
+    border:3px solid #0d2b1f !important;
+    color:#eef7ee !important;
+  }
+  .pack-card.opened{
+    justify-items:stretch;
+  }
+  .pack-face{
+    width:100%;
+    min-height:0 !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    display:grid !important;
+    place-items:center !important;
+  }
+  .pack-art{
+    --pack-top:#2f8fe0;
+    --pack-bottom:#1553a8;
+    --pack-accent:#f5c518;
+    position:relative;
+    width:clamp(166px,13.8vw,230px);
+    aspect-ratio:230/340;
+    padding:16px 12px 18px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    overflow:hidden;
+    border:3px solid rgba(0,0,0,.55);
+    border-radius:14px;
+    color:#fff;
+    background:linear-gradient(155deg,var(--pack-top) 0%,var(--pack-top) 42%,var(--pack-bottom) 100%);
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -30px 40px rgba(0,0,0,.35),0 0 0 2px rgba(255,255,255,.18),0 16px 24px rgba(0,0,0,.42);
+    clip-path:polygon(0 0,6.66% 2.1%,13.33% 0,20% 2.1%,26.66% 0,33.33% 2.1%,40% 0,46.66% 2.1%,53.33% 0,60% 2.1%,66.66% 0,73.33% 2.1%,80% 0,86.66% 2.1%,93.33% 0,100% 2.1%,100% 97.9%,93.33% 100%,86.66% 97.9%,80% 100%,73.33% 97.9%,66.66% 100%,60% 97.9%,53.33% 100%,46.66% 97.9%,40% 100%,33.33% 97.9%,26.66% 100%,20% 97.9%,13.33% 100%,6.66% 97.9%,0 100%);
+    transform-style:preserve-3d;
+    transition:transform .2s ease,filter .2s ease;
+  }
+  .pack-card:not(.opened):hover .pack-art{
+    transform:perspective(900px) rotateX(5deg) rotateY(-7deg) translateY(-5px);
+    filter:saturate(1.08) contrast(1.05);
+  }
+  .pack-art-player{--pack-top:#2f8fe0;--pack-bottom:#1553a8;--pack-accent:#f5c518}
+  .pack-art-coach{--pack-top:#caa24a;--pack-bottom:#8a6a1e;--pack-accent:#5b3fa0}
+  .pack-art-consumable{--pack-top:#e0483e;--pack-bottom:#8f1f18;--pack-accent:#fff}
+  .pack-shine{
+    position:absolute;
+    top:-60%;
+    left:-60%;
+    width:60%;
+    height:220%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+    animation:packShine 5.5s ease-in-out infinite;
+    mix-blend-mode:overlay;
+  }
+  .pack-dots{
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.16) 1.4px,transparent 1.4px);
+    background-size:13px 13px;
+  }
+  .pack-burst{
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:92%;
+    aspect-ratio:1;
+    transform:translate(-50%,-56%);
+    border-radius:50%;
+    background:repeating-conic-gradient(rgba(255,255,255,.14) 0deg 8deg,transparent 8deg 16deg);
+  }
+  .pack-streak{
+    position:absolute;
+    top:11%;
+    left:-20%;
+    width:160%;
+    height:30px;
+    background:rgba(255,255,255,.16);
+    transform:rotate(-16deg);
+    border-radius:3px;
+  }
+  .pack-rip{
+    position:relative;
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:7px;
+    padding:5px 14px;
+    background:rgba(0,0,0,.22);
+    border-top:1px dashed rgba(255,255,255,.5);
+    border-bottom:1px dashed rgba(255,255,255,.5);
+    z-index:2;
+  }
+  .pack-rip span{
+    background:transparent !important;
+    color:rgba(255,255,255,.75) !important;
+    padding:0 !important;
+    font-size:10px !important;
+  }
+  .pack-rip i{
+    flex:1;
+    border-top:2px dashed rgba(255,255,255,.55);
+  }
+  .pack-window{
+    position:relative;
+    z-index:2;
+    flex:1;
+    display:grid;
+    place-items:center;
+    width:72%;
+    font-size:clamp(54px,5vw,94px);
+    color:#fff;
+    filter:drop-shadow(-2px -2px 1px rgba(255,255,255,.38)) drop-shadow(3px 4px 2px rgba(0,0,0,.42));
+  }
+  .pack-window img{
+    width:150%;
+    max-width:none;
+    height:auto;
+    transform:translateY(7%) scale(1.04);
+    object-fit:contain;
+    filter:drop-shadow(4px 7px 0 rgba(0,0,0,.32)) saturate(1.1) contrast(1.04);
+  }
+  .pack-art-coach .pack-window img{
+    width:142%;
+  }
+  .pack-art-consumable .pack-window img{
+    width:132%;
+  }
+  .pack-art-coach .pack-window img{
+    transform:translateY(9%) scale(1.08);
+  }
+  .pack-name{
+    position:relative;
+    z-index:2;
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(25px,2.4vw,38px);
+    line-height:.92;
+    text-align:center;
+    text-transform:uppercase;
+    font-style:italic;
+    text-shadow:3px 3px 0 rgba(0,0,0,.45);
+  }
+  .pack-teaser{
+    position:relative;
+    z-index:2;
+    margin-top:6px;
+    text-align:center;
+    font-weight:900;
+    font-size:12px;
+    color:rgba(255,255,255,.86);
+  }
+  .pack-cost{
+    position:absolute;
+    right:10px;
+    top:34px;
+    bottom:auto;
+    z-index:3;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 9px;
+    border:3px solid #0d2b1f;
+    background:#f5c518;
+    color:#111;
+    font-weight:900;
+    box-shadow:3px 3px 0 rgba(0,0,0,.36);
+  }
+  @keyframes packShine{
+    0%{transform:translateX(-120%) translateY(-120%) rotate(25deg)}
+    100%{transform:translateX(120%) translateY(120%) rotate(25deg)}
+  }
+  .pack-card.opened .pack-art{
+    width:clamp(116px,8.5vw,146px);
+    align-self:center;
+  }
+  .pack-card.opened .pack-window,
+  .pack-card.opened .pack-teaser{
+    display:none;
+  }
+  .pack-card.opened .pack-name{
+    margin:auto 0;
+    font-size:24px;
+  }
+  .pack-card.opening .pack-art{
+    animation:packBuyShake .58s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .pack-card.picked .pack-art{
+    filter:grayscale(.85) brightness(.78);
+  }
+  .pack-choices{
+    width:100%;
+    max-height:clamp(220px,34vh,360px);
+  }
+  .tool-choice.train{background:#fff7cd}
+  .owned-consumable.train{background:#fff7cd}
+  .pack-open-screen.active{
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:12px;
+  }
+  .pack-open-stage{
+    min-height:0;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr) auto;
+    gap:14px;
+    padding:18px;
+    border:4px solid #050505;
+    background:
+      radial-gradient(circle at 50% 28%,rgba(255,217,31,.34),transparent 34%),
+      radial-gradient(circle at 18% 78%,rgba(32,209,107,.28),transparent 28%),
+      linear-gradient(180deg,#173f2f,#0f261e);
+    box-shadow:6px 6px 0 #050505;
+    overflow:hidden;
+  }
+  .pack-open-hero{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+  }
+  .pack-open-hero .pack-art{
+    width:clamp(118px,10vw,170px);
+    animation:packStageFloat 2.4s ease-in-out infinite;
+  }
+  .pack-open-copy{
+    max-width:420px;
+    color:#fffdf2;
+    font-weight:900;
+    text-transform:uppercase;
+  }
+  .pack-open-copy b{
+    display:block;
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(30px,3.2vw,54px);
+    color:#ffd91f;
+    text-shadow:3px 3px 0 #050505;
+  }
+  .pack-open-copy span{
+    color:#d7ead4;
+    font-size:14px;
+  }
+  .pack-reward-fan{
+    min-height:0;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(190px,1fr));
+    align-items:center;
+    justify-items:center;
+    gap:clamp(14px,2.4vw,34px);
+    padding:10px clamp(8px,4vw,70px);
+  }
+  .pack-open-choice{
+    width:min(100%,280px);
+    min-height:clamp(280px,46vh,460px);
+    display:grid;
+    align-content:center;
+    justify-items:center;
+    gap:12px;
+    padding:14px;
+    border:4px solid #050505;
+    background:#fffdf2;
+    color:#111;
+    box-shadow:6px 6px 0 rgba(0,0,0,.46);
+    transform:rotate(var(--tilt,0deg));
+    transition:transform .16s ease,filter .16s ease;
+  }
+  .pack-open-choice:nth-child(1){--tilt:-3deg}
+  .pack-open-choice:nth-child(2){--tilt:1deg}
+  .pack-open-choice:nth-child(3){--tilt:3deg}
+  .pack-open-choice:hover,
+  .pack-open-choice:focus-within{
+    transform:rotate(0deg) translateY(-10px) scale(1.035);
+    z-index:3;
+  }
+  .pack-open-choice .tc{
+    width:min(100%,190px);
+  }
+  .pack-open-coach-art{
+    position:relative;
+    width:min(100%,210px);
+    aspect-ratio:1.35/1;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    border:4px solid #050505;
+    background:
+      radial-gradient(circle at 50% 22%,rgba(255,217,31,.45),transparent 42%),
+      linear-gradient(180deg,#fdf7d6,#d7ead4);
+    box-shadow:5px 5px 0 rgba(0,0,0,.42);
+  }
+  .pack-open-coach-art img{
+    width:122%;
+    height:122%;
+    object-fit:contain;
+    transform:translateY(3%);
+    filter:drop-shadow(5px 7px 0 rgba(0,0,0,.32)) saturate(1.08) contrast(1.03);
+  }
+  .pack-open-choice h3{
+    margin:0;
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(25px,2.1vw,36px);
+    line-height:.95;
+    text-align:center;
+    text-transform:uppercase;
+  }
+  .pack-open-choice p{
+    margin:0;
+    color:#34433d;
+    font-weight:900;
+    line-height:1.14;
+    text-align:center;
+  }
+  .pack-open-icon{
+    width:92px;
+    height:92px;
+    display:grid;
+    place-items:center;
+    border:4px solid #050505;
+    background:#ffd91f;
+    color:#111;
+    box-shadow:4px 4px 0 #050505;
+  }
+  .pack-open-icon svg{
+    width:52px;
+    height:52px;
+  }
+  .pack-open-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding-top:4px;
+  }
+  .pack-open-actions .sub{
+    color:#d7ead4;
+    font-weight:900;
+  }
+  @keyframes packBuyShake{
+    0%,100%{transform:translate(0,0) rotate(0)}
+    16%{transform:translate(-5px,1px) rotate(-2.5deg)}
+    32%{transform:translate(5px,-1px) rotate(2.5deg)}
+    48%{transform:translate(-4px,2px) rotate(-1.8deg)}
+    64%{transform:translate(4px,-2px) rotate(1.8deg)}
+    80%{transform:translate(-2px,1px) rotate(-.8deg)}
+  }
+  @keyframes packStageFloat{
+    0%,100%{transform:translateY(0) rotate(-1deg)}
+    50%{transform:translateY(-8px) rotate(1deg)}
+  }
+  @media(max-width:1100px){
+    .clubhouse-grid,
+    .coach-bench-grid{
+      grid-template-columns:1fr !important;
+    }
+    .pack-row{
+      grid-template-columns:repeat(3,minmax(190px,1fr)) !important;
+    }
+    .pack-reward-fan{
+      grid-template-columns:1fr;
+      overflow:auto;
+    }
+    .pack-open-stage{
+      overflow:auto;
+    }
+  }
+
+  /* ============================================================
+     SHOP REVAMP — arena-theme pack counter + Balatro pack opening
+     ============================================================ */
+  #shop.screen.active{position:relative}
+  .shopx-body{
+    grid-area:market;
+    display:grid;
+    grid-template-columns:minmax(225px,285px) minmax(0,1fr) minmax(235px,300px);
+    gap:10px;
+    min-height:0;
+  }
+  /* felt rails — same recipe as the arena side panels */
+  .shopx-rail{
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:8px;
+    min-height:0;
+    padding:10px;
+    border:3px solid #050505;
+    background:
+      radial-gradient(#152417 1.1px,transparent 1.1px),
+      linear-gradient(180deg,#40b653,#2f8f46);
+    background-size:11px 11px,auto;
+    box-shadow:4px 4px 0 #050505;
+    overflow:hidden;
+  }
+  .railx-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:7px 10px;
+    border:3px solid #050505;
+    background:#151817;
+    color:#ffd91f;
+    font-family:Anton,Impact,sans-serif;
+    font-size:clamp(16px,1.5vw,23px);
+    font-style:italic;
+    text-transform:uppercase;
+    text-shadow:2px 2px 0 #000;
+  }
+  .railx-head em{font-style:normal;font-family:"Work Sans",Inter,sans-serif;font-size:13px;color:#fff}
+  .railx-head.sub-head{margin-top:10px;font-size:clamp(14px,1.2vw,18px)}
+  .railx-scroll{min-height:0;overflow:auto;display:block;scrollbar-width:thin;padding:2px}
+  .railx-empty{
+    padding:10px;border:2px dashed rgba(0,0,0,.5);background:rgba(255,255,255,.16);
+    color:#0d2b1f;font-weight:800;font-size:12px;text-align:center;
+  }
+  /* vouchers */
+  .vcard-list{display:grid;gap:8px}
+  .vcard{
+    display:grid;gap:5px;padding:9px 10px;
+    border:3px solid #050505;background:#f8f6e8;color:#141414;
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+  }
+  .vcard-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .vcard b{font-family:"Work Sans",Inter,sans-serif;font-weight:900;text-transform:uppercase;font-size:13px}
+  .vcard p{margin:0;font-size:11.5px;line-height:1.3;color:#3a4540;font-weight:600}
+  .vcard-price{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border:2px solid #050505;background:#ffd91f;font-weight:900;font-size:12px}
+  .vcard.bought{opacity:.55;filter:grayscale(.4)}
+  .vcard .btn{justify-self:start}
+  /* market-stall singles */
+  .singlex.is-scouted{border-color:#0d6b46;background:#eafaf0;box-shadow:3px 3px 0 rgba(13,107,70,.5)}
+  .singlex-scouted{
+    padding:2px 8px;border:2px solid #050505;background:#12c79a;color:#06110e;
+    font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  }
+  .singlex-tier{
+    padding:2px 8px;border:2px solid #050505;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;
+  }
+  .singlex-tier.tier-common{background:#cbd5d1;color:#1c2422}
+  .singlex-tier.tier-uncommon{background:#7ee2a8;color:#0b2e1b}
+  .singlex-tier.tier-rare{background:#8ec5ff;color:#0d2440}
+  .singlex-tier.tier-legendary{background:#ffd91f;color:#241b00}
+  .singlex-note{display:block;font-size:10px;font-weight:800;color:#0d6b46;line-height:1.3}
+  /* consumable chips */
+  .chipx-list{display:flex;flex-wrap:wrap;gap:6px}
+  .chipx{
+    display:grid;gap:1px;padding:6px 9px;border:2.5px solid #050505;
+    background:#fffdf2;box-shadow:2px 2px 0 rgba(0,0,0,.4);
+  }
+  .chipx b{font-size:11.5px;font-weight:900;color:#111}
+  .chipx small{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#667}
+  .chipx.bat{background:#e8f8ee}.chipx.bowl{background:#fdecec}.chipx.any{background:#f3eaff}.chipx.train{background:#fff7cd}
+  /* cream pack stage */
+  .shopx-stage{
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+    gap:6px;
+    min-height:0;
+    padding:12px 16px;
+    border:3px solid #050505;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.14),transparent 18%,transparent 82%,rgba(0,0,0,.1)),
+      rgba(248,246,232,.98);
+    box-shadow:3px 3px 0 rgba(0,0,0,.42);
+    overflow:hidden;
+  }
+  .stagex-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .stagex-head b{
+    font-family:Anton,Impact,sans-serif;font-style:italic;text-transform:uppercase;
+    font-size:clamp(22px,2.2vw,34px);color:#111;text-shadow:2px 2px 0 rgba(0,0,0,.14);
+  }
+  .stagex-head span{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6d7a72}
+  .packx-row{
+    display:flex;
+    gap:clamp(14px,2.5vw,40px);
+    align-items:center;
+    justify-content:center;
+    min-height:0;
+  }
+  .packx{
+    position:relative;
+    display:grid;
+    justify-items:center;
+    gap:10px;
+    padding:6px 6px 10px;
+    background:transparent;
+    border:0;
+    cursor:pointer;
+  }
+  .packx:disabled{cursor:not-allowed}
+  .packx:disabled:not(.picked){filter:saturate(.55) brightness(.85)}
+  .packx-tilt{
+    width:min(clamp(168px,14.5vw,225px),36vh);
+    perspective:900px;
+    transform-style:preserve-3d;
+    animation:packFloat 5.5s ease-in-out infinite;
+  }
+  .packx:nth-child(2) .packx-tilt{animation-delay:.8s}
+  .packx:nth-child(3) .packx-tilt{animation-delay:1.6s}
+  .packx-tilt .pack-art{
+    width:100%;
+    transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+    transition:transform .09s linear;
+  }
+  .packx:not(:hover) .packx-tilt .pack-art{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+  .packx-cta{
+    padding:8px 18px;
+    border:3px solid #050505;
+    background:#12c79a;
+    color:#06110e;
+    font-family:"Work Sans",Inter,sans-serif;
+    font-weight:900;
+    font-size:13px;
+    text-transform:uppercase;
+    box-shadow:3px 3px 0 #050505;
+    transition:transform .1s ease;
+  }
+  .packx:not(:disabled):hover .packx-cta{transform:translateY(-2px)}
+  .packx-cta.opened{background:#ffd91f}
+  .packx-cta.picked{background:#9aa39c;color:#2c332e}
+  .packx.picked .pack-art{filter:grayscale(.85) brightness(.8)}
+  .packx.picked .packx-tilt{animation:none}
+  .packx-stamp{
+    position:absolute;
+    top:38%;
+    left:50%;
+    transform:translate(-50%,-50%) rotate(-14deg);
+    padding:6px 14px;
+    border:3px solid #050505;
+    background:#ffd91f;
+    color:#111;
+    font-family:Anton,Impact,sans-serif;
+    font-size:22px;
+    letter-spacing:.04em;
+    box-shadow:3px 3px 0 #050505;
+    pointer-events:none;
+  }
+  @keyframes packFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  /* embossed foil icon + wrinkles + sparkles on the pack art */
+  .pack-window img.emboss{
+    width:64%;
+    max-width:none;
+    transform:none;
+    filter:brightness(0) invert(1) drop-shadow(-2px -2px 1px rgba(255,255,255,.5)) drop-shadow(2px 3px 2px rgba(0,0,0,.4));
+    opacity:.95;
+  }
+  .pack-wrinkle-a{
+    position:absolute;top:20%;left:-10%;width:55%;height:10px;
+    background:rgba(255,255,255,.18);border-radius:50%;transform:rotate(-8deg);filter:blur(2px);
+  }
+  .pack-wrinkle-b{
+    position:absolute;bottom:26%;right:-8%;width:45%;height:8px;
+    background:rgba(0,0,0,.15);border-radius:50%;transform:rotate(6deg);filter:blur(2px);
+  }
+  .pack-sparkles{position:absolute;inset:0;pointer-events:none;z-index:3}
+  .pack-sparkles i{
+    position:absolute;width:6px;height:6px;background:#fff;border-radius:50%;
+    box-shadow:0 0 8px 2px #fff;animation:packTwinkle 2s ease-in-out infinite;
+  }
+  .pack-sparkles i:nth-child(1){top:14%;left:20%}
+  .pack-sparkles i:nth-child(2){top:32%;left:78%;width:5px;height:5px;animation-delay:.4s}
+  .pack-sparkles i:nth-child(3){top:60%;left:12%;width:4px;height:4px;animation-delay:.8s}
+  .pack-sparkles i:nth-child(4){top:70%;left:66%;animation-delay:1.1s}
+  @keyframes packTwinkle{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+  /* footer band */
+  .shopx-foot{
+    grid-area:foot;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 12px;
+    border:3px solid #050505;
+    background:#151817;
+    box-shadow:4px 4px 0 #050505;
+  }
+  .shopx-foot-cell{display:flex;gap:8px}
+  .shopx-roster{color:#c9d4cd;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+  .shopx-roster b{color:#ffd91f}
+
+  /* ---------- Balatro pack-opening overlay ---------- */
+  .pack-overlay{display:none}
+  .pack-overlay.show{
+    display:grid;
+    position:fixed;
+    inset:0;
+    z-index:80;
+    place-items:center;
+    background:rgba(5,14,9,.82);
+    backdrop-filter:blur(2px);
+  }
+  .pov{
+    position:relative;
+    width:min(1180px,96vw);
+    max-height:96dvh;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr) auto;
+    justify-items:center;
+    gap:14px;
+    padding:10px;
+  }
+  .pov-pack{
+    position:absolute;
+    left:50%;top:44%;
+    width:min(240px,34vh);
+    transform:translate(-50%,-50%);
+    z-index:5;
+    pointer-events:none;
+  }
+  .pov-pack .pack-art{width:100%}
+  .pov-tear{
+    position:absolute;
+    inset:0;
+    clip-path:inset(0 0 78% 0);
+  }
+  .pov.rip .pov-pack-body{animation:povShake 1s ease-in-out both}
+  .pov.rip .pov-tear{animation:povShake 1s ease-in-out both,povTear .5s ease-in .52s forwards}
+  .pov.rip .pov-head,.pov.rip .pov-row,.pov.rip .pov-actions{opacity:0}
+  .pov.reveal .pov-pack{animation:povPackAway .5s cubic-bezier(.5,-.2,.7,.4) forwards}
+  .pov.reveal .pov-head{animation:povFade .4s .15s both}
+  .pov.reveal .pov-actions{animation:povFade .4s .5s both}
+  @keyframes povShake{
+    0%{transform:rotate(0)}
+    15%{transform:rotate(-3deg) translateX(-4px)}
+    30%{transform:rotate(3deg) translateX(4px)}
+    45%{transform:rotate(-4deg) translateX(-6px)}
+    60%{transform:rotate(4deg) translateX(6px)}
+    75%{transform:rotate(-2.5deg) scale(1.03)}
+    90%{transform:rotate(2deg) scale(1.05)}
+    100%{transform:rotate(0) scale(1.05)}
+  }
+  @keyframes povTear{
+    to{transform:translate(58%,-130%) rotate(28deg);opacity:0}
+  }
+  @keyframes povPackAway{
+    to{transform:translate(-50%,-240%) scale(.55) rotate(-8deg);opacity:0}
+  }
+  @keyframes povFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .pov-head{
+    text-align:center;
+    color:#fffdf2;
+  }
+  .pov-head b{
+    display:block;
+    font-family:Anton,Impact,sans-serif;
+    font-style:italic;
+    font-size:clamp(30px,3.4vw,52px);
+    text-transform:uppercase;
+    color:#ffd91f;
+    text-shadow:3px 3px 0 #050505;
+  }
+  .pov-head span{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#cfe0d4}
+  .pov-row{
+    display:flex;
+    align-items:stretch;
+    justify-content:center;
+    gap:clamp(14px,2vw,30px);
+    min-height:0;
+  }
+  .pov-actions{display:flex;justify-content:center}
+  /* choice flip cards */
+  .pchoice{perspective:1200px;display:grid}
+  .pflip{
+    position:relative;
+    transform-style:preserve-3d;
+    transform:rotateY(180deg) translateY(46px);
+    opacity:0;
+  }
+  .pov.reveal .pflip{animation:pflipIn .6s cubic-bezier(.2,.75,.3,1.05) var(--d,220ms) both}
+  @keyframes pflipIn{
+    from{transform:rotateY(180deg) translateY(46px) scale(.72);opacity:0}
+    45%{opacity:1}
+    to{transform:rotateY(0deg) translateY(0) scale(1);opacity:1}
+  }
+  .pface{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .pface.front{
+    display:grid;
+    justify-items:center;
+    align-content:start;
+    gap:10px;
+    transform:rotateY(0deg);
+  }
+  .pface.back{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    transform:rotateY(180deg);
+    display:grid;
+    place-items:center;
+    overflow:hidden;
+    border:3px solid #050505;
+    border-radius:14px;
+    background:linear-gradient(155deg,#1c2a4a,#0e1730 70%);
+    box-shadow:0 14px 26px rgba(0,0,0,.5);
+  }
+  .pback-rays{
+    position:absolute;
+    inset:-40%;
+    background:repeating-conic-gradient(rgba(255,255,255,.09) 0deg 9deg,transparent 9deg 18deg);
+  }
+  .pface.back span{
+    position:relative;
+    font-family:Anton,Impact,sans-serif;
+    font-style:italic;
+    font-size:clamp(17px,1.8vw,24px);
+    color:#ffd91f;
+    text-shadow:2px 2px 0 #050505;
+    letter-spacing:.06em;
+  }
+  /* retire the back face once the flip lands (kills z-fight ghosting) */
+  .pov.reveal .pface.back{animation:pbackHide 0s calc(var(--d,220ms) + .62s) forwards}
+  @keyframes pbackHide{to{visibility:hidden}}
+  .pov-actions{margin-top:6px}
+  .pchoice:hover .pflip{transition:transform .16s ease}
+  .pov.reveal .pchoice:hover .pflip{transform:translateY(-8px)}
+  .pchoice-card .tc{
+    display:block;
+    width:min(clamp(158px,15.5vw,212px),40dvh);
+    height:auto;
+    filter:drop-shadow(0 14px 22px rgba(0,0,0,.45));
+  }
+  .pchoice-pick{
+    min-width:120px;
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:#ffd91f !important;
+    color:#111 !important;
+    font-weight:900 !important;
+    text-transform:uppercase;
+    box-shadow:3px 3px 0 #050505 !important;
+  }
+  .pchoice-pick:disabled{background:#8b948d !important;color:#2c332e !important}
+  .swap-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+    justify-content:center;
+    padding:7px 9px;
+    border:3px solid #050505;
+    background:#f8f6e8;
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+  }
+  .swap-row span{font-size:11px;font-weight:900;text-transform:uppercase;color:#333}
+  /* consumable sticker */
+  .toolx{
+    position:relative;
+    display:grid;
+    justify-items:center;
+    align-content:center;
+    gap:8px;
+    width:min(clamp(180px,16vw,225px),40dvh);
+    aspect-ratio:5/6.4;
+    padding:16px 14px;
+    text-align:center;
+    border:3px solid #050505;
+    border-radius:14px;
+    background:
+      radial-gradient(circle at 50% 28%,rgba(255,255,255,.2),transparent 46%),
+      repeating-conic-gradient(from 0deg at 50% 30%,rgba(255,255,255,.08) 0deg 8deg,transparent 8deg 16deg),
+      linear-gradient(155deg,#e0483e 0%,#b52c22 55%,#8f1f18 100%);
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.3),inset 0 -24px 32px rgba(0,0,0,.3),0 14px 24px rgba(0,0,0,.45);
+    color:#fff;
+  }
+  .toolx.train{background:
+      radial-gradient(circle at 50% 28%,rgba(255,255,255,.24),transparent 46%),
+      repeating-conic-gradient(from 0deg at 50% 30%,rgba(255,255,255,.08) 0deg 8deg,transparent 8deg 16deg),
+      linear-gradient(155deg,#caa24a 0%,#a97f28 55%,#8a6a1e 100%)}
+  .toolx-tag{
+    position:absolute;
+    top:10px;left:10px;
+    padding:3px 9px;
+    border:2.5px solid #050505;
+    background:#151817;
+    color:#ffd91f;
+    font-size:10px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .toolx-ico{width:58px;height:58px;display:grid;place-items:center;font-size:44px;
+    filter:drop-shadow(-2px -2px 1px rgba(255,255,255,.4)) drop-shadow(2px 3px 2px rgba(0,0,0,.4))}
+  .toolx-ico svg{width:52px;height:52px;color:#fff}
+  .toolx b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:21px;text-transform:uppercase;text-shadow:2px 2px 0 rgba(0,0,0,.4)}
+  .toolx p{margin:0;font-size:12.5px;line-height:1.35;font-weight:700;color:rgba(255,255,255,.92)}
+  /* ---------- coach sticker card (from Coach Card design) ---------- */
+  .ccard{
+    width:min(clamp(280px,26vw,352px),56dvh);
+    aspect-ratio:396/300;
+  }
+  .ccard.compact{width:100%}
+  .ccard-frame{
+    position:relative;
+    width:100%;
+    height:100%;
+    padding:16px;
+    border-radius:10px;
+    background:
+      repeating-linear-gradient(0deg,rgba(0,0,0,.015) 0 2px,transparent 2px 4px),
+      linear-gradient(135deg,#f5efe0 0%,#efe7d3 50%,#f3ecdc 100%);
+    box-shadow:0 14px 30px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.5);
+  }
+  .ccard-frame:before{
+    content:"";
+    position:absolute;
+    inset:7px;
+    border-radius:8px;
+    background:linear-gradient(135deg,#2e6b3e 0%,#7fd68f 22%,#eafff0 45%,#4f9c60 68%,#2e6b3e 100%);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.5),inset 0 0 8px rgba(15,60,25,.5),0 0 0 2px #164423;
+  }
+  .ccard-rr{
+    position:absolute;
+    z-index:2;
+    overflow:hidden;
+    font-family:Oswald,Inter,sans-serif;
+    font-weight:600;
+    font-size:8px;
+    letter-spacing:2px;
+    white-space:nowrap;
+    color:#184a26;
+    text-shadow:0 1px 0 rgba(255,255,255,.65);
+    display:flex;
+    align-items:center;
+    user-select:none;
+  }
+  .rr-top{top:7px;left:22px;right:22px;height:14px}
+  .rr-bottom{bottom:7px;left:22px;right:22px;height:14px}
+  .rr-left{top:20px;bottom:20px;left:7px;width:14px;writing-mode:vertical-rl;transform:rotate(180deg);justify-content:center}
+  .rr-right{top:20px;bottom:20px;right:7px;width:14px;writing-mode:vertical-rl;justify-content:center}
+  .ccard-scene{
+    position:absolute;
+    inset:21px;
+    z-index:3;
+    border:3.5px solid #111;
+    border-radius:5px;
+    overflow:hidden;
+    box-shadow:0 3px 8px rgba(0,0,0,.3);
+  }
+  .ccard-sky{position:absolute;inset:0;background:linear-gradient(180deg,#bcd9ea 0%,#d7e9c8 30%,#a9d46a 55%,#7fb63f 100%)}
+  .ccard-ad{position:absolute;left:0;right:0;top:50%;height:13px;background:repeating-linear-gradient(90deg,#1f6fd6 0 38px,#e02424 38px 76px);opacity:.9}
+  .ccard-rope{position:absolute;left:0;right:0;top:calc(50% + 13px);height:5px;background:repeating-linear-gradient(90deg,#e8e2c8 0 14px,#b7301f 14px 28px);box-shadow:0 2px 4px rgba(0,0,0,.2)}
+  .ccard-grass{position:absolute;left:0;right:0;bottom:0;height:44%;background:linear-gradient(180deg,#9fd25a 0%,#7ab82f 55%,#5b9422 100%)}
+  .ccard-grass:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(0,0,0,.05) 0 14px,transparent 14px 28px)}
+  .ccard-art{
+    position:absolute;
+    right:-9%;
+    bottom:0;
+    height:104%;
+    width:auto;
+    max-width:70%;
+    object-fit:contain;
+    object-position:bottom center;
+    z-index:4;
+    filter:drop-shadow(0 6px 6px rgba(0,0,0,.35));
+  }
+  .ccard-badge{
+    position:absolute;
+    left:7px;top:7px;
+    z-index:6;
+    padding:2px 10px;
+    border:2.5px solid #111;
+    border-radius:16px;
+    background:linear-gradient(180deg,#1e6e34,#164423);
+    color:#fff;
+    font-family:Oswald,Inter,sans-serif;
+    font-weight:700;
+    font-size:9.5px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    box-shadow:1px 2px 0 rgba(0,0,0,.35);
+  }
+  .ccard-info{
+    position:absolute;
+    left:7px;
+    bottom:7px;
+    width:56%;
+    z-index:6;
+    border:3px solid #111;
+    border-radius:9px;
+    overflow:hidden;
+    background:linear-gradient(180deg,#fff,#e9eff3);
+    box-shadow:0 3px 0 rgba(0,0,0,.35),0 6px 12px rgba(0,0,0,.35);
+  }
+  .ccard-name{
+    padding:6px 8px;
+    background:linear-gradient(90deg,#1e6e34 0%,#3fa858 100%);
+    border-bottom:2.5px solid #111;
+    color:#fff;
+    font-family:Oswald,Inter,sans-serif;
+    font-weight:700;
+    font-size:13px;
+    line-height:1.1;
+    text-transform:uppercase;
+    text-align:center;
+    text-shadow:0 2px 3px rgba(0,0,0,.4);
+  }
+  .ccard-effect{
+    padding:6px 8px 7px;
+    font-family:Oswald,Inter,sans-serif;
+    font-weight:600;
+    font-size:10.5px;
+    line-height:1.25;
+    color:#1e6e34;
+    text-align:center;
+  }
+  .ccard-shine{
+    position:absolute;
+    inset:0;
+    z-index:7;
+    background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.75) 48%,rgba(255,255,255,.85) 52%,transparent 68%);
+    background-size:250% 250%;
+    background-position:160% 160%;
+    opacity:0;
+    pointer-events:none;
+    mix-blend-mode:screen;
+  }
+  .pchoice:hover .ccard-shine,.staffx:hover .ccard-shine{opacity:1;animation:ccardSweep 1.3s linear infinite}
+  @keyframes ccardSweep{0%{background-position:160% 160%}100%{background-position:-60% -60%}}
+  /* compact coach card fit (rail slots) */
+  .ccard.compact .ccard-art{height:94%;max-width:56%;right:-7%}
+  .ccard.compact .ccard-info{width:62%}
+  .ccard.compact .ccard-name{font-size:11px;padding:5px 6px}
+  .ccard.compact .ccard-effect{font-size:9.5px;padding:5px 6px 6px}
+  .ccard.compact .ccard-badge{font-size:8.5px;padding:2px 8px}
+  /* coach slots in the rail */
+  .staffx-list{display:grid;gap:10px}
+  .staffx{display:grid;gap:7px;justify-items:center}
+  .staffx .btn{justify-self:center}
+  .staffx.empty{
+    display:grid;
+    place-content:center;
+    gap:3px;
+    min-height:96px;
+    text-align:center;
+    border:3px dashed rgba(0,0,0,.55);
+    background:rgba(255,255,255,.16);
+    color:#0d2b1f;
+  }
+  .staffx.empty span{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;text-transform:uppercase}
+  .staffx.empty small{font-size:11px;font-weight:800}
+  @media(max-width:1100px){
+    .shopx-body{grid-template-columns:1fr;overflow:auto}
+    .shopx-rail,.shopx-stage{overflow:visible}
+    .packx-row{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+    .pov-row{flex-wrap:wrap;overflow:auto}
+  }
+  /* ---------- HEX pack theme (spectral) ---------- */
+  .pack-art-hex{--pack-top:#6d28d9;--pack-bottom:#1e1038;--pack-accent:#d8b4fe}
+  .pack-art-hex .pack-burst{background:repeating-conic-gradient(rgba(216,180,254,.22) 0deg 8deg,transparent 8deg 16deg)}
+  .pack-art-hex .pack-name{color:#e9d5ff;text-shadow:0 0 12px rgba(168,85,247,.9),2px 2px 0 rgba(0,0,0,.5)}
+  .pack-art-hex .pack-window img.emboss{filter:brightness(0) invert(1) drop-shadow(0 0 6px rgba(216,180,254,.9)) drop-shadow(2px 3px 2px rgba(0,0,0,.5))}
+  .packx.is-hex .packx-tilt{animation:packFloat 3.4s ease-in-out infinite,hexPulse 2.2s ease-in-out infinite}
+  @keyframes hexPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(168,85,247,.35))}50%{filter:drop-shadow(0 0 18px rgba(168,85,247,.85))}}
+  .pack-jumbo{
+    position:absolute;left:50%;top:32px;transform:translateX(-50%) rotate(-4deg);z-index:3;
+    padding:2px 9px;border:2.5px solid #050505;background:#ffd91f;color:#111;
+    font-family:Anton,Impact,sans-serif;font-size:11px;letter-spacing:.05em;box-shadow:2px 2px 0 #050505;white-space:nowrap;
+  }
+  /* hex choice sticker */
+  .hexx{
+    position:relative;display:grid;justify-items:center;align-content:center;gap:8px;
+    width:min(clamp(190px,17vw,240px),42dvh);aspect-ratio:5/6.4;padding:16px 14px;text-align:center;
+    border:3px solid #050505;border-radius:14px;color:#f3e8ff;
+    background:
+      radial-gradient(circle at 50% 24%,rgba(216,180,254,.35),transparent 44%),
+      repeating-conic-gradient(from 0deg at 50% 28%,rgba(216,180,254,.10) 0deg 7deg,transparent 7deg 14deg),
+      linear-gradient(160deg,#4c1d95 0%,#2e1065 55%,#150826 100%);
+    box-shadow:inset 0 3px 0 rgba(255,255,255,.22),inset 0 -24px 34px rgba(0,0,0,.45),0 0 22px rgba(139,92,246,.45),0 14px 24px rgba(0,0,0,.5);
+  }
+  .hexx-tag{
+    position:absolute;top:10px;left:10px;padding:3px 9px;border:2.5px solid #050505;
+    background:#a855f7;color:#12061f;font-size:10px;font-weight:900;letter-spacing:.1em;
+  }
+  .hexx-sigil{font-size:44px;line-height:1;color:#e9d5ff;text-shadow:0 0 16px rgba(216,180,254,.95);animation:hexSigil 2.6s ease-in-out infinite}
+  @keyframes hexSigil{0%,100%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.12)}}
+  .hexx b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:22px;text-transform:uppercase;color:#f5ecff;text-shadow:2px 2px 0 rgba(0,0,0,.5)}
+  .hexx-power{margin:0;font-size:12.5px;line-height:1.35;font-weight:800;color:#e9d5ff}
+  .hexx-cost{margin:0;padding:5px 8px;border:2px dashed rgba(248,113,113,.65);background:rgba(127,29,29,.35);
+    font-size:11px;line-height:1.3;font-weight:800;color:#fecaca;text-transform:uppercase}
+  .pchoice.hexc .pchoice-pick{background:#a855f7 !important;color:#12061f !important}
+  .pov-hex .pov-head b{color:#d8b4fe;text-shadow:0 0 14px rgba(168,85,247,.8),3px 3px 0 #050505}
+  /* ---------- coach EDITION effects ---------- */
+  .ccard-edition{
+    position:absolute;right:7px;top:7px;z-index:7;padding:2px 9px;border:2.5px solid #111;border-radius:14px;
+    font-family:Oswald,Inter,sans-serif;font-weight:700;font-size:9px;letter-spacing:.8px;text-transform:uppercase;
+    box-shadow:1px 2px 0 rgba(0,0,0,.35);
+  }
+  .ed-foil{background:linear-gradient(135deg,#cbd5e1,#f8fafc 45%,#94a3b8);color:#1e293b}
+  .ed-holographic{background:linear-gradient(115deg,#f87171,#facc15,#4ade80,#38bdf8,#c084fc);color:#111}
+  .ed-polychrome{background:conic-gradient(#f87171,#facc15,#4ade80,#38bdf8,#c084fc,#f87171);color:#111}
+  .ed-negative{background:#0a0a0a;color:#e9d5ff;border-color:#a855f7}
+  .ed-note{display:block;margin-top:2px;font-style:normal;font-size:9px;color:#8a5b00;font-weight:700}
+  .ccard-fx{position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:3px}
+  .ccard--foil .ccard-fx{background:linear-gradient(115deg,transparent 30%,rgba(226,232,240,.5) 46%,rgba(255,255,255,.7) 50%,rgba(226,232,240,.5) 54%,transparent 70%);
+    background-size:240% 240%;animation:foilSweep 3.4s linear infinite;mix-blend-mode:screen}
+  @keyframes foilSweep{0%{background-position:170% 170%}100%{background-position:-70% -70%}}
+  .ccard--holographic .ccard-fx{background:linear-gradient(115deg,rgba(248,113,113,.30),rgba(250,204,21,.30),rgba(74,222,128,.30),rgba(56,189,248,.30),rgba(192,132,252,.30));
+    background-size:300% 300%;animation:holoShift 3.2s ease-in-out infinite alternate;mix-blend-mode:color-dodge}
+  @keyframes holoShift{0%{background-position:0% 0%}100%{background-position:100% 100%}}
+  .ccard--polychrome .ccard-fx{background:
+      linear-gradient(115deg,rgba(248,113,113,.34),rgba(250,204,21,.34),rgba(74,222,128,.34),rgba(56,189,248,.34),rgba(192,132,252,.34)),
+      linear-gradient(115deg,transparent 34%,rgba(255,255,255,.55) 50%,transparent 66%);
+    background-size:300% 300%,240% 240%;animation:holoShift 2.6s ease-in-out infinite alternate,foilSweep 2.6s linear infinite;mix-blend-mode:color-dodge}
+  .ccard--negative .ccard-scene{filter:invert(.92) hue-rotate(180deg) saturate(1.25)}
+  .ccard--negative .ccard-fx{box-shadow:inset 0 0 26px rgba(168,85,247,.75);mix-blend-mode:normal}
+  .ccard--negative .ccard-frame{background:
+      repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 2px,transparent 2px 4px),
+      linear-gradient(135deg,#171123 0%,#241b36 50%,#191227 100%)}
+  @media(prefers-reduced-motion:reduce){
+    .packx-tilt,.pack-shine,.pack-sparkles i,.pov.rip .pov-pack-body,.pov.rip .pov-tear{animation:none !important}
+    .pflip{transform:none;opacity:1}
+    .pov.reveal .pflip{animation:none}
+    .ccard-fx,.hexx-sigil,.packx.is-hex .packx-tilt{animation:none !important}
   }
 </style>
 </head>
@@ -3000,6 +4441,7 @@
         <div class="stepper" id="stepper"></div>
       </div>
       <div class="top-actions">
+        <button class="btn secondary sm test-win-btn" id="testWinBtn" title="Testing shortcut: mark this match as won and open the shop">Test Win</button>
         <button class="btn secondary sm" id="homeMatchBtn">Main Menu</button>
         <button class="btn secondary sm" id="restartBtn">Restart Run</button>
       </div>
@@ -3057,34 +4499,18 @@
       <div class="coins-tag"><span class="coin"></span><span id="coins">0</span></div>
     </div>
 
-    <div class="shop-section">
-      <h2>Transfer market</h2>
-      <p class="hint">Buy a player, hire a coach, or save coins for the next opponent.</p>
-      <div class="build-tags" aria-label="Build paths">
-        <span class="build-tag"><b>Wickets</b> Yorker + Strike Bowler</span>
-        <span class="build-tag"><b>Economy</b> dots + coaches</span>
-        <span class="build-tag"><b>Boundary</b> Power Hitter + Finisher</span>
-        <span class="build-tag"><b>Toss</b> first-ball tempo</span>
-        <span class="build-tag"><b>Academy</b> commons + training</span>
-      </div>
-      <div class="offers" id="offers"></div>
-      <div class="shop-foot">
-        <button class="btn secondary sm" id="rerollBtn">Reroll · 2</button>
-        <span class="sub" style="color:var(--muted)">Roster: <b id="deckCount">0</b> cards</span>
-      </div>
-    </div>
+    <div class="shopx-body" id="offers"></div>
 
-    <div class="shop-section squad-entry">
-      <h2>Squad room</h2>
-      <p class="hint" id="manageHint">Train players or sell surplus bench cards. You must always own at least 12 players.</p>
-      <div class="squad-actions" id="squadActions"></div>
-      <div class="grid6" id="shopSquad"></div>
-    </div>
-
-    <div class="shop-foot">
-      <span></span>
+    <div class="shopx-foot">
+      <div class="shopx-foot-cell">
+        <button class="btn secondary sm" id="shopSquadBtn">Go to Squad</button>
+        <button class="btn secondary sm" id="rerollBtn">Reroll - 2</button>
+      </div>
+      <span class="shopx-roster">Roster <b id="deckCount">0</b> cards</span>
       <button class="btn" id="nextBtn">Scout Next Rival</button>
     </div>
+
+    <div class="pack-overlay" id="packOverlay"></div>
   </section>
 
   <section id="squad" class="screen">
@@ -3174,13 +4600,265 @@ const TRAITS=[
   {name:"Power Hitter",role:"bat",text:"while batting, one dot slot becomes 4",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bat"?replaceOne(strip,"0","4"):strip},
   {name:"Toss Tempo",role:"all",text:"if used first after toss, one bad slot becomes 2",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip,c)=>c.tossLive?replaceBadSlot(strip,mode,"2"):strip}
 ];
+/* ============================================================
+   COACHES — persistent build engines. Levers:
+   - bonus(stat,card,ctx): shifts the MARGIN (band jumps, capped)
+   - strip(mode,strip,ctx,card): rewrites PROBABILITY slots (stacks)
+   - onOutcome / onMatchEnd -> coins; flags: traitEcho, packBonus,
+     coachPackBonus, toolPackBonus, haggler, freeReroll, sellBoost,
+     hexDowser, traitScout, curator, archivist, counterDouble
+   Tiers weight pack pulls: common 55 / uncommon 30 / rare 13 / legendary 2.
+   ============================================================ */
+function statCoach(id,name,tier,unlock,price,desc,fn){return {id,name,tier,unlock,price,desc,bonus:fn}}
+function stripCoach(id,name,tier,unlock,price,desc,fn){return {id,name,tier,unlock,price,desc,bonus:()=>0,strip:fn}}
+function coinCoach(id,name,tier,unlock,price,desc,fn){return {id,name,tier,unlock,price,desc,bonus:()=>0,onOutcome:fn}}
+function flagCoach(id,name,tier,unlock,price,desc,flags){return Object.assign({id,name,tier,unlock,price,desc,bonus:()=>0},flags)}
+function teamCoach(team,slug){return statCoach("team_"+slug,team+" Insider","common",1,5,`+5 BAT and +5 BOWL for ${team} cards.`,(stat,c)=>c.team?.name===team?5:0)}
+function traitGuru(traitName,slug,stripTrait){
+  return stripTrait
+    ?flagCoach("guru_"+slug,traitName+" Guru","rare",4,8,`${traitName} cards: the trait's strip effect triggers TWICE.`,{traitEcho:traitName})
+    :statCoach("guru_"+slug,traitName+" Guru","rare",4,8,`${traitName} cards: +6 to that trait's stat.`,(stat,c)=>c.trait?.name===traitName?6:0);
+}
 const COACHES=[
-  {id:"bat_mentor",name:"Batting Coach",unlock:1,price:5,desc:"+3 BAT for batter cards.",bonus:(stat,c)=>stat==="bat"&&c.role==="bat"?3:0},
-  {id:"bowling_mentor",name:"Bowling Coach",unlock:1,price:5,desc:"+3 BOWL for bowler cards.",bonus:(stat,c)=>stat==="bowl"&&c.role==="bowl"?3:0},
-  {id:"academy_coach",name:"Academy Coach",unlock:2,price:6,desc:"+2 to both stats on Common cards.",bonus:(stat,c)=>c.rarity==="common"?2:0},
-  {id:"death_bowler",name:"Death Bowler",unlock:4,price:7,desc:"+5 BOWL on the last 2 balls.",bonus:(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"&&x.left<=2?5:0},
-  {id:"chase_guru",name:"Chase Guru",unlock:5,price:7,desc:"+5 BAT on the last 2 balls of a chase.",bonus:(stat,c,x)=>stat==="bat"&&x.phase==="bat"&&x.left<=2?5:0},
-  {id:"all_round_coach",name:"Utility Coach",unlock:6,price:8,desc:"+3 to both stats for all-rounders.",bonus:(stat,c)=>c.role==="all"?3:0}
+  /* ---- A. floors: role / rarity / team (16) ---- */
+  statCoach("bat_mentor","Batting Coach","common",0,5,"+4 BAT for batter cards.",(stat,c)=>stat==="bat"&&c.role==="bat"?4:0),
+  statCoach("bowling_mentor","Bowling Coach","common",0,5,"+4 BOWL for bowler cards.",(stat,c)=>stat==="bowl"&&c.role==="bowl"?4:0),
+  statCoach("all_round_coach","Utility Coach","common",1,6,"+3 BAT and +3 BOWL for all-rounders.",(stat,c)=>c.role==="all"?3:0),
+  statCoach("cross_trainer","Cross Trainer","uncommon",2,7,"Batters get +5 BOWL, bowlers get +5 BAT.",(stat,c)=>(stat==="bowl"&&c.role==="bat")||(stat==="bat"&&c.role==="bowl")?5:0),
+  statCoach("academy_coach","Academy Coach","common",1,5,"+4 BAT and +4 BOWL on Common cards.",(stat,c)=>c.rarity==="common"?4:0),
+  statCoach("talent_polisher","Talent Polisher","common",2,5,"+4 BAT and +4 BOWL on Uncommon cards.",(stat,c)=>c.rarity==="uncommon"?4:0),
+  statCoach("star_handler","Star Handler","uncommon",4,7,"+4 BAT and +4 BOWL on Rare or better cards.",(stat,c)=>["rare","epic","legendary"].includes(c.rarity)?4:0),
+  statCoach("no_name_eleven","No-Name Eleven","rare",3,8,"+7 BAT and +7 BOWL on cards WITHOUT a trait.",(stat,c)=>!c.trait?7:0),
+  statCoach("trait_believer","Trait Believer","uncommon",3,7,"+4 BAT and +4 BOWL on cards WITH a trait.",(stat,c)=>c.trait?4:0),
+  statCoach("southpaw_coach","Southpaw Coach","common",1,5,"+6 BAT and +6 BOWL on cards with jersey numbers 1-33.",(stat,c)=>c.num<=33?6:0),
+  teamCoach("Harbour Sharks","sharks"),teamCoach("Capital Kings","kings"),teamCoach("Desert Falcons","falcons"),
+  teamCoach("Royal Tuskers","tuskers"),teamCoach("Sun Chargers","chargers"),teamCoach("Emerald Strikers","strikers"),
+  /* ---- B. phase & position conditionals (14) ---- */
+  statCoach("death_bowler","Death Overs Coach","uncommon",3,7,"+6 BOWL on the last 2 balls.",(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"&&x.left<=2?6:0),
+  statCoach("chase_guru","Chase Guru","uncommon",3,7,"+6 BAT on the last 2 balls of a chase.",(stat,c,x)=>stat==="bat"&&x.phase==="bat"&&x.left<=2?6:0),
+  statCoach("opening_act","Opening Act","common",1,6,"+6 BAT and +6 BOWL on ball 1 of each innings.",(stat,c,x)=>x.ball===1?6:0),
+  statCoach("middle_overs","Middle Overs Pro","common",2,6,"+5 BAT and +5 BOWL on balls 3 and 4.",(stat,c,x)=>x.ball===3||x.ball===4?5:0),
+  statCoach("powerplay_pro","Powerplay Pro","uncommon",2,7,"+5 BAT and +5 BOWL on the first 2 balls.",(stat,c,x)=>x.ball<=2?5:0),
+  statCoach("second_wind","Second Wind","common",2,6,"+5 BAT and +5 BOWL in the second innings.",(stat,c,x)=>x.innings===2?5:0),
+  statCoach("comeback_kid","Comeback Kid","uncommon",3,7,"+7 BAT and +7 BOWL when you are a wicket down.",(stat,c,x)=>x.yourWk>=1?7:0),
+  statCoach("pressure_cooker","Pressure Cooker","rare",5,8,"+9 BOWL while defending in the second innings.",(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"&&x.innings===2?9:0),
+  statCoach("slow_starter","Slow Starter","common",2,6,"+2 BAT per ball elapsed this innings (max +10).",(stat,c,x)=>stat==="bat"?Math.min(10,2*(x.ball-1)):0),
+  statCoach("fresh_legs","Fresh Legs","common",1,6,"+5 BAT and +5 BOWL while 6+ of your cards are unused.",(stat,c)=>activeSquad().filter(k=>!k.used).length>=6?5:0),
+  statCoach("tail_ender","Tail-Ender's Pride","rare",4,8,"+8 BAT and +8 BOWL when 3 or fewer cards remain unused.",(stat,c)=>activeSquad().filter(k=>!k.used).length<=3?8:0),
+  statCoach("underdog_spirit","Underdog Spirit","rare",3,8,"+8 to your stat whenever it is LOWER than the rival card's.",(stat,c,x)=>c[stat]<x.theirRaw?8:0),
+  statCoach("overkill_artist","Overkill Artist","uncommon",3,7,"+4 to your stat whenever it is already higher than the rival card's.",(stat,c,x)=>c[stat]>x.theirRaw?4:0),
+  statCoach("big_final","Big Match Player","rare",5,8,"+8 BAT and +8 BOWL during City Cup matches.",(stat,c)=>run&&run.match>=5?8:0),
+  /* ---- C. strip editors — bowling (10) ---- */
+  stripCoach("dot_sergeant","Dot Sergeant","uncommon",1,6,"Bowling: one Single slot becomes a DOT every ball.",(mode,s)=>mode==="bowl"?replaceOne(s,"1","0"):s),
+  stripCoach("slip_cordon","Slip Cordon","rare",2,8,"Bowling with a BOWLER card: one DOT slot becomes a WICKET.",(mode,s,x,card)=>mode==="bowl"&&card?.role==="bowl"?replaceOne(s,"0","W"):s),
+  stripCoach("boundary_rider","Boundary Rider","uncommon",4,7,"Bowling: every SIX slot becomes a FOUR.",(mode,s)=>mode==="bowl"?replaceAll(s,"6","4"):s),
+  stripCoach("yorker_drill","Yorker Drill","rare",4,8,"Bowling: the rival's best run slot becomes a WICKET.",(mode,s)=>mode==="bowl"?replaceWorstRun(s,"W"):s),
+  stripCoach("tight_line","Tight Line","common",1,5,"Bowling: one TWO slot becomes a Single.",(mode,s)=>mode==="bowl"?replaceOne(s,"2","1"):s),
+  stripCoach("choke_artist","Choke Artist","rare",5,9,"Bowling with a 2+ dot chain: every Single becomes a DOT.",(mode,s,x)=>mode==="bowl"&&x.chain>=2?replaceAll(s,"1","0"):s),
+  stripCoach("swing_coach","Swing Coach","uncommon",3,7,"Bowling on balls 1-2: one FOUR slot becomes a WICKET.",(mode,s,x)=>mode==="bowl"&&x.ball<=2?replaceOne(s,"4","W"):s),
+  stripCoach("death_squeeze","Death Squeeze","rare",5,8,"Bowling on the last 2 balls: every FOUR becomes a Single.",(mode,s,x)=>mode==="bowl"&&x.left<=2?replaceAll(s,"4","1"):s),
+  stripCoach("maiden_hunter","Maiden Hunter","uncommon",2,7,"Bowling ball 1 of an innings: the two best run slots become DOTS.",(mode,s,x)=>mode==="bowl"&&x.ball===1?replaceWorstRun(replaceWorstRun(s,"0"),"0"):s),
+  stripCoach("leg_trap","Leg Trap","rare",5,9,"Bowling: one SIX becomes a WICKET — but one DOT becomes a TWO.",(mode,s)=>mode==="bowl"?replaceOne(replaceOne(s,"6","W"),"0","2"):s),
+  /* ---- D. strip editors — batting (10) ---- */
+  stripCoach("sloggers_den","Slogger's Den","uncommon",1,6,"Batting: one Single slot becomes a FOUR every ball.",(mode,s)=>mode==="bat"?replaceOne(s,"1","4"):s),
+  stripCoach("night_watchman","Night Watchman","uncommon",2,7,"Batting: one WICKET slot becomes a DOT every ball.",(mode,s)=>mode==="bat"?replaceOne(s,"W","0"):s),
+  stripCoach("sixer_king","Sixer King","rare",6,9,"Batting: every FOUR becomes a SIX — but one DOT becomes a WICKET.",(mode,s)=>mode==="bat"?replaceOne(replaceAll(s,"4","6"),"0","W"):s),
+  stripCoach("gap_finder","Gap Finder","common",1,5,"Batting: one DOT slot becomes a Single.",(mode,s)=>mode==="bat"?replaceOne(s,"0","1"):s),
+  stripCoach("strike_rotator","Strike Rotator","uncommon",2,7,"Batting: every DOT becomes a Single — but every SIX becomes a FOUR.",(mode,s)=>mode==="bat"?replaceAll(replaceAll(s,"0","1"),"6","4"):s),
+  stripCoach("lofted_drive","Lofted Drive","uncommon",3,7,"Batting: one TWO slot becomes a SIX.",(mode,s)=>mode==="bat"?replaceOne(s,"2","6"):s),
+  stripCoach("slog_sweep","Slog Sweep School","rare",5,9,"Batting on the last 2 balls: every TWO becomes a SIX.",(mode,s,x)=>mode==="bat"&&x.left<=2?replaceAll(s,"2","6"):s),
+  stripCoach("opening_blitz","Opening Blitz","uncommon",2,7,"Batting ball 1 of an innings: every Single becomes a FOUR.",(mode,s,x)=>mode==="bat"&&x.ball===1?replaceAll(s,"1","4"):s),
+  stripCoach("helmet_guard","Helmet Guard","uncommon",3,7,"Batting while a wicket down: one WICKET slot becomes a Single.",(mode,s,x)=>mode==="bat"&&x.yourWk>=1?replaceOne(s,"W","1"):s),
+  stripCoach("anchor_school","Anchor School","rare",4,8,"Batting with an ALL-ROUNDER: one WICKET becomes a DOT.",(mode,s,x,card)=>mode==="bat"&&card?.role==="all"?replaceOne(s,"W","0"):s),
+  /* ---- E. engines & momentum (12) ---- */
+  statCoach("chain_master","Chain Master","rare",4,8,"+4 BOWL per consecutive dot or wicket bowled this innings (max +12).",(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"?Math.min(12,4*x.chain):0),
+  statCoach("launch_pad","Launch Pad","rare",4,8,"+3 BAT per boundary you hit this match (max +12).",(stat,c,x)=>stat==="bat"&&x.phase==="bat"?Math.min(12,3*x.boundaries):0),
+  statCoach("bloodhound","Bloodhound","rare",5,8,"After taking a wicket, your next bowl gets +10 BOWL.",(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"&&x.hotHand?10:0),
+  statCoach("rhythm_bowler","Rhythm Section","uncommon",3,7,"+2 BOWL per ball bowled this innings (max +10).",(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"?Math.min(10,2*(x.ball-1)):0),
+  statCoach("crowd_favorite","Crowd Favourite","rare",4,9,"+2 BAT and +2 BOWL per boundary or wicket this match (max +10).",(stat,c,x)=>Math.min(10,2*(x.boundaries+x.wicketsTaken))),
+  statCoach("workhorse","Workhorse","uncommon",3,7,"+1 BAT and +1 BOWL per card you have used this match (max +10).",(stat,c)=>Math.min(10,activeSquad().filter(k=>k.used).length)),
+  statCoach("hot_streak","Hot Streak","rare",4,8,"After hitting a boundary, your next bat gets +8 BAT.",(stat,c,x)=>stat==="bat"&&x.phase==="bat"&&x.hotBat?8:0),
+  statCoach("wall_builder","Wall Builder","uncommon",3,7,"+3 BOWL per dot bowled this match (max +12).",(stat,c,x)=>stat==="bowl"?Math.min(12,3*x.dotsBowled):0),
+  statCoach("momentum_bank","Momentum Bank","rare",4,9,"+1 BAT and +1 BOWL per match won this run (max +8).",(stat,c)=>Math.min(8,run?.wins||0)),
+  statCoach("giant_slayer","Giant Slayer","uncommon",3,7,"+6 to your stat when the rival card's stat is 60 or higher.",(stat,c,x)=>x.theirRaw>=60?6:0),
+  statCoach("bull_market","Bull Market","rare",6,9,"+1 BAT and +1 BOWL per 6 coins you hold (max +8).",(stat,c,x)=>Math.min(8,Math.floor(x.coins/6))),
+  statCoach("pauper_power","Pauper Power","rare",4,8,"+10 BAT and +10 BOWL while you have 3 coins or fewer.",(stat,c,x)=>x.coins<=3?10:0),
+  /* ---- F. economy (12) ---- */
+  coinCoach("bookies_friend","Bookie's Friend","uncommon",2,6,"Every wicket you take pays +2 coins.",(out,mode)=>mode==="bowl"&&out.wicket?2:0),
+  coinCoach("insurance_broker","Insurance Broker","uncommon",5,7,"When you lose a batting wicket, collect +4 coins.",(out,mode)=>mode==="bat"&&out.wicket?4:0),
+  coinCoach("boundary_bonus","Boundary Sponsor","common",2,6,"Every FOUR you hit pays +1 coin.",(out,mode)=>mode==="bat"&&out.runs===4?1:0),
+  coinCoach("six_appeal","Six Appeal","uncommon",3,7,"Every SIX you hit pays +2 coins.",(out,mode)=>mode==="bat"&&out.runs===6?2:0),
+  coinCoach("dot_collector","Dot Collector","common",2,6,"Every dot you bowl pays +1 coin.",(out,mode)=>mode==="bowl"&&!out.wicket&&out.runs===0?1:0),
+  coinCoach("run_tax","Run Tax","rare",5,8,"Every run the rival scores pays you +1 coin (their boundaries pay 2).",(out,mode)=>mode==="bowl"&&out.runs>0?(out.runs>=4?2:1):0),
+  {id:"interest_banker",name:"Interest Banker",tier:"uncommon",unlock:3,price:7,desc:"After each match: +1 coin per 5 coins held (max +5).",bonus:()=>0,onMatchEnd:()=>Math.min(5,Math.floor(run.coins/5))},
+  {id:"merch_stand",name:"Merch Stand",tier:"common",unlock:2,price:6,desc:"+3 extra coins after every match win.",bonus:()=>0,onMatchEnd:()=>3},
+  flagCoach("haggler","The Haggler","uncommon",2,7,"Packs cost 1 coin less.",{haggler:true}),
+  flagCoach("flea_market","Flea Market","rare",3,8,"Shop rerolls are FREE.",{freeRerollFlag:true}),
+  flagCoach("pawn_broker","Pawn Broker","uncommon",3,7,"Selling cards and coaches pays 50% more.",{sellBoost:true}),
+  coinCoach("golden_duck","Golden Duck Club","rare",4,8,"Bowling a wicket on ball 1 of an innings pays +6 coins.",(out,mode)=>mode==="bowl"&&out.wicket&&m?.ball===1?6:0),
+  /* ---- G. meta & pack (10) ---- */
+  flagCoach("scout_network","Scout Network","rare",3,7,"Player Packs reveal 4 cards instead of 3.",{packBonus:true}),
+  flagCoach("coaching_tree","Coaching Tree","rare",3,7,"Coach Packs reveal 4 coaches instead of 3.",{coachPackBonus:true}),
+  flagCoach("supply_chain","Supply Chain","uncommon",2,6,"Consumable Packs reveal 4 tools instead of 3.",{toolPackBonus:true}),
+  flagCoach("hex_dowser","Hex Dowser","rare",3,8,"Hex Packs appear in the shop twice as often.",{hexDowser:true}),
+  flagCoach("method_coach","Method Coach","rare",5,9,"ALL card trait strip effects trigger TWICE.",{traitEcho:true}),
+  flagCoach("trait_headhunter","Trait Headhunter","rare",4,8,"Player Pack cards ALWAYS have a trait.",{traitScout:true}),
+  flagCoach("curator","The Curator","rare",5,9,"Player Pack cards have a 50% chance to jump one rarity tier.",{curator:true}),
+  flagCoach("archivist","The Archivist","legendary",5,10,"Armed consumables have a 30% chance NOT to be consumed.",{archivist:true}),
+  flagCoach("showman","The Showman","legendary",5,10,"Your dot-chain and boundary counters count DOUBLE.",{counterDouble:true}),
+  statCoach("minimalist","The Minimalist","legendary",3,9,"+8 BAT and +8 BOWL while this is your ONLY coach.",(stat,c)=>activeCoaches().length===1?8:0),
+  /* ---- H. risk / reward (8) ---- */
+  statCoach("all_in","All-In Al","rare",4,8,"+10 BAT — but batting strips get one DOT turned into a WICKET.",(stat,c,x)=>stat==="bat"?10:0,{}),
+  statCoach("fortress_first","Fortress First","rare",4,8,"+10 BOWL while bowling, but -4 BAT while batting.",(stat,c,x)=>stat==="bowl"&&x.phase==="bowl"?10:(stat==="bat"&&x.phase==="bat"?-4:0)),
+  statCoach("glass_cannon","Glass Cannon","rare",5,9,"+12 BAT and +12 BOWL on Epic+ cards, -4 on Commons.",(stat,c)=>["epic","legendary"].includes(c.rarity)?12:(c.rarity==="common"?-4:0)),
+  statCoach("gambler","The Gambler","rare",3,8,"Each ball: 50% chance of +10, otherwise -3.",(stat,c,x)=>x.luckyTick?10:-3),
+  statCoach("superstition","Superstition","uncommon",2,6,"+8 BAT and +8 BOWL on odd balls, -2 on even balls.",(stat,c,x)=>x.ball%2===1?8:-2),
+  statCoach("street_smart","Street Smart","uncommon",1,6,"+8 BAT and +8 BOWL during Street Cup matches only.",(stat,c)=>run&&run.match<5?8:0),
+  stripCoach("tempo_thief","Tempo Thief","rare",4,8,"Ball 1 of each innings: the rival's best run slot becomes a Single.",(mode,s,x)=>x.ball===1&&mode==="bowl"?replaceWorstRun(s,"1"):s),
+  statCoach("thin_squad","Skeleton Crew","legendary",4,10,"+8 BAT and +8 BOWL while you own 13 or fewer cards.",(stat,c)=>roster().length<=13?8:0),
+  /* ---- I. trait gurus (8) ---- */
+  traitGuru("Finisher","finisher",false),
+  traitGuru("Strike Bowler","strike_bowler",false),
+  traitGuru("All-rounder","all_rounder",false),
+  traitGuru("Yorker","yorker",true),
+  traitGuru("Economy","economy",true),
+  traitGuru("Power Hitter","power_hitter",true),
+  traitGuru("Anchor","anchor",true),
+  traitGuru("Toss Tempo","toss_tempo",true),
+  /* ---- J. squad composition (8) ---- */
+  statCoach("batting_lineup","Batting Lineup","common",2,6,"+1 BAT per batter in your active squad (max +8).",(stat,c)=>stat==="bat"?Math.min(8,activeSquad().filter(k=>k.role==="bat").length):0),
+  statCoach("bowling_battery","Bowling Battery","common",2,6,"+1 BOWL per bowler in your active squad (max +8).",(stat,c)=>stat==="bowl"?Math.min(8,activeSquad().filter(k=>k.role==="bowl").length):0),
+  statCoach("flex_system","Flex System","common",2,6,"+1 BAT and +1 BOWL per all-rounder in your squad (max +8).",(stat,c)=>Math.min(8,activeSquad().filter(k=>k.role==="all").length)),
+  statCoach("common_touch","Common Touch","uncommon",2,7,"+1 BAT and +1 BOWL per Common card you own (max +10).",(stat,c)=>Math.min(10,roster().filter(k=>k.rarity==="common").length)),
+  statCoach("star_power","Star Power","rare",5,8,"+5 BAT and +5 BOWL while you own a Legendary card.",(stat,c)=>roster().some(k=>k.rarity==="legendary")?5:0),
+  statCoach("full_house","Full House","rare",3,8,"+5 BAT and +5 BOWL if your squad has 4+ batters, 4+ bowlers and 3+ all-rounders.",(stat,c)=>{const s=activeSquad();return s.filter(k=>k.role==="bat").length>=4&&s.filter(k=>k.role==="bowl").length>=4&&s.filter(k=>k.role==="all").length>=3?5:0}),
+  statCoach("deep_bench","Deep Bench","uncommon",4,7,"+1 BAT and +1 BOWL per card owned beyond 14 (max +8).",(stat,c)=>Math.min(8,Math.max(0,roster().length-14))),
+  statCoach("trait_parade","Trait Parade","rare",4,9,"+2 BAT and +2 BOWL per trait card in your active squad (max +12).",(stat,c)=>Math.min(12,2*activeSquad().filter(k=>k.trait).length))
+];
+// All-In Al's drawback rides the strip pipeline:
+COACHES.find(c=>c.id==="all_in").strip=(mode,s)=>mode==="bat"?replaceOne(s,"0","W"):s;
+/* ---- Coach EDITIONS (rolled at pack reveal; hexes can grant them) ---- */
+const EDITIONS={
+  foil:{label:"Foil",sell:2,desc:"+3 BAT & +3 BOWL to every card."},
+  holographic:{label:"Holographic",sell:3,desc:"Softens one bad slot every ball."},
+  polychrome:{label:"Polychrome",sell:5,desc:"Foil and Holographic combined."},
+  negative:{label:"Negative",sell:6,desc:"Takes up NO coach slot."}
+};
+function rollEdition(boost=0){
+  const r=Math.random()*100-boost;
+  if(r<1.2)return "negative";
+  if(r<3.2)return "polychrome";
+  if(r<7)return "holographic";
+  if(r<13)return "foil";
+  return null;
+}
+const TIER_WEIGHT={common:55,uncommon:30,rare:13,legendary:2};
+function weightedCoachPick(pool){
+  const total=pool.reduce((s,c)=>s+(TIER_WEIGHT[c.tier]||30),0);
+  let r=Math.random()*total;
+  for(const c of pool){r-=(TIER_WEIGHT[c.tier]||30);if(r<=0)return c}
+  return pool[pool.length-1];
+}
+const COACH_ART_POOL=["bat_mentor","bowling_mentor","academy_coach","death_bowler","chase_guru","all_round_coach"].map(n=>"assets/coaches/"+n+".png");
+/* ---- HEX CARDS — broken power at a cost (spectral tier) ---- */
+function destroyWeakest(n,exceptId=null){
+  let destroyed=0;
+  while(destroyed<n&&roster().length>12){
+    const victims=roster().slice().sort(sortStrong).filter(c=>c.id!==exceptId);
+    const v=victims[victims.length-1];
+    if(!v)break;
+    run.roster=roster().filter(c=>c.id!==v.id);
+    run.deck=activeSquad().filter(c=>c.id!==v.id);
+    if(run.draftSelected)run.draftSelected.delete(v.id);
+    destroyed++;
+  }
+  return destroyed;
+}
+const HEXES=[
+  {id:"hex_aura",name:"Aura",desc:"A random active coach gains a random edition.",cost:"No cost.",
+    use(){const cs=activeCoaches();if(!cs.length)return "No coach to enchant.";const t=pick(cs);t.edition=pick(["foil","holographic","polychrome"]);return `${t.name} is now ${EDITIONS[t.edition].label}!`}},
+  {id:"hex_ectoplasm",name:"Ectoplasm",desc:"A random active coach becomes NEGATIVE (frees its slot).",cost:"Your weakest card is destroyed.",
+    use(){const cs=activeCoaches();if(!cs.length)return "No coach to transmute.";const t=pick(cs);t.edition="negative";destroyWeakest(1);return `${t.name} went Negative.`}},
+  {id:"hex_cryptid",name:"Cryptid",desc:"Add TWO clones of your best card to the roster.",cost:"Lose ALL your coins.",
+    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";for(let i=0;i<2;i++)roster().push({...b,id:uid(),used:false,name:b.name.split(" ")[0]+" "+(i?"III":"II")});run.coins=0;return `${b.name} duplicated twice.`}},
+  {id:"hex_immolate",name:"Immolate",desc:"Gain +15 coins.",cost:"Your 3 weakest cards are destroyed.",
+    use(){const n=destroyWeakest(3);run.coins+=15;return `${n} cards burned. +15 coins.`}},
+  {id:"hex_ankh",name:"Ankh",desc:"Duplicate a random active coach (effects STACK).",cost:"Another random coach is destroyed.",
+    use(){const cs=activeCoaches();if(!cs.length)return "No coach to copy.";const src=pick(cs);const copy={...src,instId:uid()};
+      const others=cs.filter(c=>c!==src);
+      if(others.length)run.coaches.splice(run.coaches.indexOf(pick(others)),1);
+      else if(usedCoachSlots()>=coachSlotLimit())copy.edition="negative";
+      run.coaches.push(copy);return `${src.name} duplicated.`}},
+  {id:"hex_blood_pact",name:"Blood Pact",desc:"Your best card gains +20 BAT and +20 BOWL.",cost:"Your second-best card is destroyed.",
+    use(){const sorted=roster().slice().sort(sortStrong);const b=sorted[0];if(!b)return "No cards.";
+      const second=sorted[1];
+      if(second&&roster().length>12){run.roster=roster().filter(c=>c.id!==second.id);run.deck=activeSquad().filter(c=>c.id!==second.id);if(run.draftSelected)run.draftSelected.delete(second.id)}
+      b.bat=clamp(b.bat+20,20,99);b.bowl=clamp(b.bowl+20,20,99);return `${b.name} +20/+20.`}},
+  {id:"hex_void",name:"Void Contract",desc:"EVERY Common card becomes Uncommon with rerolled stats.",cost:"Lose 6 coins.",
+    use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>{c.rarity="uncommon";const r=RARITIES.uncommon;c.bat=clamp(rarityStat(r,c.role,"bat"),20,99);c.bowl=clamp(rarityStat(r,c.role,"bowl"),20,99)});run.coins=Math.max(0,run.coins-6);return `${cs.length} commons ascended.`}},
+  {id:"hex_phantom",name:"Phantom Coach",desc:"Gain a random RARE+ coach with a guaranteed edition.",cost:"If your slots are full, a random coach is destroyed first.",
+    use(){const owned=new Set(activeCoaches().map(c=>c.id));const pool=COACHES.filter(c=>(c.tier==="rare"||c.tier==="legendary")&&!owned.has(c.id));
+      if(!pool.length)return "No phantom answered.";
+      const coach={...pick(pool),edition:pick(["foil","holographic","polychrome","negative"])};
+      if(coach.edition!=="negative"&&usedCoachSlots()>=coachSlotLimit()){const cs=activeCoaches();run.coaches.splice(run.coaches.indexOf(pick(cs)),1)}
+      run.coaches.push(coach);return `${coach.name} (${EDITIONS[coach.edition].label}) appears.`}},
+  {id:"hex_greed",name:"Hex of Greed",desc:"DOUBLE your coins right now.",cost:"All packs cost +1 for the rest of the run.",
+    use(){run.coins*=2;run.packTax=(run.packTax||0)+1;return `Coins doubled to ${run.coins}.`}},
+  {id:"hex_soul_trade",name:"Soul Trade",desc:"Your best card gains +3 BAT and +3 BOWL per card consumed.",cost:"Up to 5 of your weakest cards are destroyed.",
+    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";const n=destroyWeakest(5,b.id);
+      b.bat=clamp(b.bat+3*n,20,99);b.bowl=clamp(b.bowl+3*n,20,99);return `${n} souls traded. ${b.name} +${3*n}/+${3*n}.`}},
+  {id:"hex_poltergeist",name:"Poltergeist",desc:"EVERY card in your active 12 gains +4 BAT and +4 BOWL.",cost:"2 random bench cards are destroyed.",
+    use(){activeSquad().forEach(c=>{c.bat=clamp(c.bat+4,20,99);c.bowl=clamp(c.bowl+4,20,99)});
+      let killed=0;const ids=activeIds();
+      for(let i=0;i<2;i++){const bench=roster().filter(c=>!ids.has(c.id));if(!bench.length||roster().length<=12)break;
+        const v=pick(bench);run.roster=roster().filter(c=>c.id!==v.id);killed++}
+      return `Active 12 blessed. ${killed} bench souls taken.`}},
+  {id:"hex_seance",name:"Séance",desc:"Your next 2 packs are FREE.",cost:"You cannot reroll this shop again.",
+    use(){run.freePacks=(run.freePacks||0)+2;run.noReroll=true;return "The spirits stock the counter."}}
+];
+/* ============================================================
+   CONSUMABLES — two kinds:
+   - strip (default): armed, auto-fires on your next matching ball
+   - instant: permanent roster/economy surgery, applied on pick
+   ============================================================ */
+const CONSUMABLES=[
+  // --- next-ball strip edits (probability spikes) ---
+  {id:"boundary_charm",name:"Boundary Charm",mode:"bat",desc:"Next batting ball: one Single slot becomes FOUR.",apply:s=>replaceOne(s,"1","4")},
+  {id:"strike_reset",name:"Strike Reset",mode:"bat",desc:"Next batting ball: one WICKET slot becomes TWO.",apply:s=>replaceOne(s,"W","2")},
+  {id:"dot_plan",name:"Dot Plan",mode:"bowl",desc:"Next bowling ball: the best run slot becomes DOT.",apply:s=>replaceWorstRun(s,"0")},
+  {id:"wicket_call",name:"Wicket Call",mode:"bowl",desc:"Next bowling ball: one boundary slot becomes WICKET.",apply:s=>replaceBoundary(s,"W")},
+  {id:"ice_towel",name:"Ice Towel",mode:"any",desc:"Next ball: one bad slot softens toward TWO.",apply:(s,mode)=>replaceBadSlot(s,mode,"2")},
+  {id:"bouncer_barrage",name:"Bouncer Barrage",mode:"bowl",desc:"Next bowling ball: the TWO best run slots become WICKETS.",apply:s=>replaceWorstRun(replaceWorstRun(s,"W"),"W")},
+  {id:"helicopter",name:"Helicopter Shot",mode:"bat",desc:"Next batting ball: two DOT slots become SIXES.",apply:s=>replaceN(s,"0","6",2)},
+  {id:"dead_pitch",name:"Dead Pitch",mode:"bowl",desc:"Next bowling ball: every SIX slot becomes a Single.",apply:s=>replaceAll(s,"6","1")},
+  {id:"tailwind",name:"Tailwind",mode:"bat",desc:"Next batting ball: every TWO slot becomes a FOUR.",apply:s=>replaceAll(s,"2","4")},
+  {id:"slower_ball",name:"Slower Ball",mode:"bowl",desc:"Next bowling ball: every FOUR slot becomes a DOT.",apply:s=>replaceAll(s,"4","0")},
+  {id:"guardian_ball",name:"Guardian Angel",mode:"bat",desc:"Next batting ball: EVERY wicket slot becomes a Single.",apply:s=>replaceAll(s,"W","1")},
+  // --- instant, permanent (build-makers) ---
+  {id:"star_session",name:"Star Session",mode:"train",kind:"instant",desc:"Your best card gains +6 BAT and +6 BOWL forever.",
+    use(){const t=roster().slice().sort(sortStrong)[0];if(!t)return "No cards.";t.bat=clamp(t.bat+6,20,99);t.bowl=clamp(t.bowl+6,20,99);return `${t.name} +6/+6.`}},
+  {id:"rookie_camp",name:"Rookie Camp",mode:"train",kind:"instant",desc:"EVERY Common card gains +4 BAT and +4 BOWL forever.",
+    use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>{c.bat=clamp(c.bat+4,20,99);c.bowl=clamp(c.bowl+4,20,99)});return `${cs.length} commons trained.`}},
+  {id:"specialist_course",name:"Specialist Course",mode:"train",kind:"instant",desc:"Teach a TRAIT to a random card that has none.",
+    use(){const pool=roster().filter(c=>!c.trait);if(!pool.length)return "Everyone already has a trait.";const t=pick(pool);t.trait=pickTrait(t.role);return `${t.name} learns ${t.trait.name}.`}},
+  {id:"mirror_drill",name:"Mirror Drill",mode:"train",kind:"instant",desc:"Add a CLONE of your best card to the roster.",
+    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";roster().push({...b,id:uid(),used:false,name:b.name.split(" ")[0]+" Jr."});return `${b.name} cloned.`}},
+  {id:"talent_scout",name:"Talent Scout",mode:"train",kind:"instant",desc:"Your weakest card jumps a rarity tier and rerolls stats.",
+    use(){const order=["common","uncommon","rare","epic","legendary"];const w=roster().slice().sort(sortStrong).pop();if(!w)return "No cards.";
+      const ni=Math.min(order.length-1,order.indexOf(w.rarity)+1);w.rarity=order[ni];
+      const r=RARITIES[w.rarity];w.bat=clamp(rarityStat(r,w.role,"bat"),20,99);w.bowl=clamp(rarityStat(r,w.role,"bowl"),20,99);
+      if(!w.trait&&Math.random()<r.trait)w.trait=pickTrait(w.role);
+      return `${w.name} is now ${r.label}.`}},
+  {id:"sponsor_cheque",name:"Sponsor Cheque",mode:"train",kind:"instant",desc:"Collect 6 coins immediately.",
+    use(){run.coins+=6;return "+6 coins."}},
+  {id:"captains_talk",name:"Captain's Talk",mode:"train",kind:"instant",desc:"Every card in your active 12 gains +2 BAT and +2 BOWL.",
+    use(){activeSquad().forEach(c=>{c.bat=clamp(c.bat+2,20,99);c.bowl=clamp(c.bowl+2,20,99)});return "Active squad +2/+2."}}
+];
+const VOUCHERS=[
+  {id:"local_sponsor",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6,buy:()=>{run.scout=(run.scout||0)+2}},
+  {id:"pack_coupon",title:"Pack Coupon",desc:"Next shop reroll is free.",price:4,buy:()=>{run.freeReroll=(run.freeReroll||0)+1}},
+  {id:"refresh_deal",title:"Refresh Deal",desc:"Rerolls cost 1 less for this run.",price:5,buy:()=>{run.rerollDiscount=(run.rerollDiscount||0)+1}},
+  {id:"extra_pack",title:"Backroom Stock",desc:"Refresh the packs without changing voucher offers.",price:5,buy:()=>{const def=MATCHES[Math.min(run.match,MATCHES.length-1)];run.shop.packs=["coach","player","consumable"].map(type=>makePack(type,def))}}
 ];
 const TEAMS=[
   {name:"Harbour Sharks",c1:"#0b2f6b",c2:"#1f8fd6",cl:"#7fd6f2",badge:"HS"},
@@ -3259,11 +4937,40 @@ function cardPrice(c){return (RARITIES[c.rarity]||RARITIES.common).price}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function cardPower(c){return Math.max(c.bat,c.bowl)*2+Math.min(c.bat,c.bowl)+(c.trait?14:0)}
 function sortStrong(a,b){return cardPower(b)-cardPower(a)}
-function ctx(){return m?{phase:m.phase,left:m.def.balls-m.ball+1,rivalRuns:m.rival.runs}:{phase:null,left:99,rivalRuns:0}}
-function coachBonus(stat,c){return run?.coach?run.coach.bonus(stat,c,ctx()):0}
+function coachSlotLimit(){return 3}
+function usedCoachSlots(){return activeCoaches().filter(c=>c.edition!=="negative").length}
+function ctx(){
+  const coins=run?.coins||0;
+  if(!m)return {phase:null,left:99,rivalRuns:0,ball:1,innings:1,yourWk:0,rivalWk:0,chain:0,boundaries:0,dotsBowled:0,wicketsTaken:0,hotHand:false,hotBat:false,luckyTick:false,theirRaw:0,coins};
+  const dbl=activeCoaches().some(co=>co.counterDouble)?2:1;
+  const theirRaw=m.challenge?(m.phase==="bowl"?m.challenge.bat:m.challenge.bowl):0;
+  return {
+    phase:m.phase,left:m.def.balls-m.ball+1,rivalRuns:m.rival.runs,
+    ball:m.ball,innings:m.innings||1,yourWk:m.you.wk,rivalWk:m.rival.wk,
+    chain:(m.chain||0)*dbl,boundaries:(m.boundaries||0)*dbl,
+    dotsBowled:(m.dotsBowled||0)*dbl,wicketsTaken:(m.wicketsTaken||0)*dbl,
+    hotHand:!!m.hotHand,hotBat:!!m.hotBat,luckyTick:!!m.luckyTick,theirRaw,coins
+  };
+}
+function activeCoaches(){
+  if(!run)return [];
+  if(run.coach&&!run.coaches)run.coaches=[run.coach];
+  run.coaches=run.coaches||[];
+  return run.coaches;
+}
+function coachBonus(stat,c){
+  const x=ctx();
+  return activeCoaches().reduce((sum,coach)=>{
+    let v=coach.bonus(stat,c,x);
+    if(coach.edition==="foil"||coach.edition==="polychrome")v+=3;
+    return sum+v;
+  },0);
+}
 function batVal(c){let v=c.bat+coachBonus("bat",c);if(c.trait)v=c.trait.bat(ctx(),v);return Math.round(v)}
 function bowlVal(c){let v=c.bowl+coachBonus("bowl",c);if(c.trait)v=c.trait.bowl(ctx(),v);return Math.round(v)}
 function replaceOne(strip,from,to){const s=strip.slice(),i=s.indexOf(from);if(i>=0)s[i]=to;return s}
+function replaceAll(strip,from,to){return strip.map(t=>t===from?to:t)}
+function replaceN(strip,from,to,n){let s=strip.slice();for(let i=0;i<n;i++)s=replaceOne(s,from,to);return s}
 function replaceWorstRun(strip,to){
   const s=strip.slice();
   for(const token of ["6","4","2","1"]){const i=s.lastIndexOf(token);if(i>=0){s[i]=to;break}}
@@ -3278,7 +4985,47 @@ function withTraitContext(card){
 }
 function applyCardStripTrait(mode,strip,card){
   withTraitContext(card);
-  return card?.trait?.strip?card.trait.strip(mode,strip.slice(),card):strip;
+  if(!card?.trait?.strip)return strip;
+  let s=card.trait.strip(mode,strip.slice(),card);
+  if(activeCoaches().some(co=>co.traitEcho===true||co.traitEcho===card.trait.name))s=card.trait.strip(mode,s.slice(),card);
+  return s;
+}
+function applyCoachStrips(mode,strip,card){
+  let s=strip;
+  const x=ctx();
+  activeCoaches().forEach(co=>{
+    if(co.strip)s=co.strip(mode,s.slice(),x,card);
+    if(co.edition==="holographic"||co.edition==="polychrome")s=replaceBadSlot(s,mode,"0");
+  });
+  return s;
+}
+function nextConsumable(mode){
+  return (run?.consumables||[]).find(c=>!c.kind&&(c.mode==="any"||c.mode===mode));
+}
+function applyOwnedConsumableStrip(mode,strip,consume=false){
+  const owned=nextConsumable(mode);
+  if(!owned)return strip;
+  const def=CONSUMABLES.find(c=>c.id===owned.id);
+  if(!def)return strip;
+  const next=def.apply(strip.slice(),mode);
+  if(consume){
+    const saved=activeCoaches().some(co=>co.archivist)&&Math.random()<.3;
+    if(saved)m.log+=` <b>Archivist saves ${def.name}!</b>`;
+    else run.consumables=(run.consumables||[]).filter(c=>c.ownedId!==owned.ownedId);
+  }
+  return next;
+}
+function applyMatchModifiers(mode,strip,card,consume=false){
+  return applyOwnedConsumableStrip(mode,applyCoachStrips(mode,applyCardStripTrait(mode,strip,card),card),consume);
+}
+function applyInstantConsumable(def){
+  const report=def.use?def.use():"";
+  flashHint(`${def.name}: ${report||"done."}`);
+}
+function coachOutcome(out,mode){
+  let paid=0;
+  activeCoaches().forEach(co=>{if(co.onOutcome)paid+=co.onOutcome(out,mode)||0});
+  if(paid>0){run.coins+=paid;m.log+=` <b>+${paid} coins.</b>`}
 }
 function roster(){return run.roster||(run.roster=run.deck||[])}
 function activeSquad(){return run.deck||[]}
@@ -3308,11 +5055,12 @@ function rivalCard(kind){const pool=m.rivalDeck.filter(c=>!c.used);let best=pool
 
 function startRun(){
   const startingRoster=starterDraft();
-  run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coach:null};
+  run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
   beginSquadSelection();
 }
 function newChallenge(keepLog=false){
   m.result=null;m.selected=null;m.preview=null;m.selectionLocked=false;challengeAnim=true;
+  m.luckyTick=Math.random()<.5;
   m.challenge=m.phase==="bowl"?rivalCard("bat"):rivalCard("bowl");
   if(!m.challenge){
     challengeAnim=false;dealAnim=false;
@@ -3346,30 +5094,38 @@ function confirmSelected(){
 }
 function cancelSelected(){m.selected=null;m.preview=null;m.selectionLocked=false;render()}
 function resolveBowl(c){
-  const mine=bowlVal(c),theirs=batVal(m.challenge),strip=applyCardStripTrait("bowl",outcomeStrip("bowl",mine-theirs),c),out=rollOutcome(strip);
+  const mine=bowlVal(c),theirs=batVal(m.challenge),strip=applyMatchModifiers("bowl",outcomeStrip("bowl",mine-theirs),c,true),out=rollOutcome(strip);
   m.rival.runs+=out.runs;if(out.wicket)m.rival.wk++;
+  m.chain=out.runs===0?(m.chain||0)+1:0;
+  m.hotHand=out.wicket;
+  if(out.wicket)m.wicketsTaken=(m.wicketsTaken||0)+1;
+  else if(out.runs===0)m.dotsBowled=(m.dotsBowled||0)+1;
   use(c);
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving"};
   m.log=`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
+  coachOutcome(out,"bowl");
   addHistory(out.text,`Bowl ${mine} v Bat ${theirs}`);
   render(true);
   settleResult(m.result);
 }
 function resolveBat(c){
-  const mine=batVal(c),theirs=bowlVal(m.challenge),strip=applyCardStripTrait("bat",outcomeStrip("bat",mine-theirs),c),out=rollOutcome(strip);
+  const mine=batVal(c),theirs=bowlVal(m.challenge),strip=applyMatchModifiers("bat",outcomeStrip("bat",mine-theirs),c,true),out=rollOutcome(strip);
   if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
   m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
+  if(out.runs>=4)m.boundaries=(m.boundaries||0)+1;
+  m.hotBat=out.runs>=4;
   use(c);
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving"};
   m.log=`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
+  coachOutcome(out,"bat");
   addHistory(out.text,`Bat ${mine} v Bowl ${theirs}`);
   render(true);
   settleResult(m.result);
 }
 let settleTimer=null;
-function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},4200)}
+function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},5600)}
 function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(settleTimer);m.result.state="settled";render()}}
 function outcomeStrip(mode,margin){
   if(mode==="bowl"){
@@ -3418,39 +5174,250 @@ function end(title,text){
 }
 
 /* ---------- SHOP ---------- */
-function rollShop(){
+// Counter-mode vs the next rival's archetype: batting-heavy rival -> you
+// need BOWL tools; bowling-heavy -> BAT tools. The Scouted Deal quirk.
+function scoutedMode(){
+  const key=run.nextRival?.arch?.key;
+  if(key==="bat"||key==="top")return "bowl";
+  if(key==="bowl")return "bat";
+  return pick(["bat","bowl"]);
+}
+function rollSingles(){
+  const mode=scoutedMode();
+  const tools=CONSUMABLES.filter(c=>c.mode===mode);
+  const scoutedItem=pick(tools.length?tools:CONSUMABLES);
+  const scoutedPrice=Math.max(1,(scoutedItem.kind==="instant"?4:3)-1);
+  const owned=new Set(activeCoaches().map(c=>c.id));
+  let pool=COACHES.filter(c=>c.unlock<=run.match&&!owned.has(c.id));
+  if(!pool.length)pool=COACHES.filter(c=>!owned.has(c.id));
+  const coach=weightedCoachPick(pool.length?pool:COACHES);
+  return [
+    {kind:"consumable",item:scoutedItem,price:scoutedPrice,scouted:true,mode,bought:false},
+    {kind:"coach",item:coach,price:coach.price,scouted:false,bought:false}
+  ];
+}
+function rollShop(keepVouchers=false){
+  const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
+  const bought=new Set(run.voucherIds||[]);
+  const vouchers=keepVouchers&&run.shop?.vouchers
+    ?run.shop.vouchers
+    :shuffle(VOUCHERS.filter(v=>!bought.has(v.id)).slice()).slice(0,1);
+  // Weighted pack lineup — the reroll chase. Hex is the rare slot.
+  const hexW=activeCoaches().some(co=>co.hexDowser)?12:6;
+  const packCount=Math.random()<.65?3:2;
+  const packs=[];let hexSeen=false;
+  for(let i=0;i<packCount;i++){
+    let r=Math.random()*100;
+    let type;
+    if(r<hexW&&!hexSeen&&run.match>=1){type="hex";hexSeen=true}
+    else{
+      r=Math.random()*100;
+      type=r<38?"player":r<70?"coach":"consumable";
+    }
+    const jumbo=type!=="hex"&&Math.random()<.16;
+    packs.push(makePack(type,def,jumbo));
+  }
+  // never an all-consumable dud lineup
+  if(packs.every(p=>p.type==="consumable"))packs[0]=makePack("player",def,false);
+  run.shop={packs,vouchers,singles:rollSingles()};
+}
+function makePack(type,def,jumbo=false){
+  const base=type==="player"?6:type==="coach"?5:type==="hex"?5:3;
+  return {type,jumbo,price:base+(jumbo?2:0),opened:false,picked:false,choices:[],defLevel:def.level};
+}
+function packPrice(pack){
+  if((run.freePacks||0)>0&&!pack.opened)return 0;
+  let p=pack.price+(run.packTax||0);
+  if(activeCoaches().some(co=>co.haggler))p-=1;
+  return Math.max(1,p);
+}
+function packTitle(type){return type==="player"?"Player Pack":type==="coach"?"Coach Pack":type==="hex"?"Hex Pack":"Consumable Pack"}
+function packDisplayName(pack){return (pack.jumbo?"Jumbo ":"")+packTitle(pack.type)}
+function packTagline(pack){
+  const n=packRevealCount(pack);
+  if(pack.type==="hex")return `Reveal ${n} hexes. Broken power - at a price.`;
+  return `Reveal ${n} ${pack.type==="player"?"players. Sign":pack.type==="coach"?"coaches. Hire or swap":"tools. Keep"} 1.`;
+}
+function packTeaser(type){return type==="player"?"Batters & bowlers":type==="coach"?"Perks & tactics":type==="hex"?"Forbidden deals":"One-shot boosts"}
+function coachArt(coach){
+  if(!coach)return COACH_ART_POOL[0];
+  const h=Math.abs([...String(coach.id)].reduce((n,ch)=>n+ch.charCodeAt(0),0));
+  return COACH_ART_POOL[h%COACH_ART_POOL.length];
+}
+function packSilhouette(type){return type==="player"?"assets/packs/player.png":type==="coach"?"assets/packs/coach.png":"assets/packs/boost.png"}
+function packArt(type,price,opts={}){
+  const sparkle=opts.sparkle||type==="hex"?`<div class="pack-sparkles"><i></i><i></i><i></i><i></i></div>`:"";
+  return `<div class="pack-art pack-art-${type}">
+    <div class="pack-shine"></div><div class="pack-dots"></div><div class="pack-burst"></div><div class="pack-streak"></div>
+    ${sparkle}
+    <div class="pack-rip"><span>&#9668;</span><i></i><span>&#9658;</span></div>
+    <div class="pack-window"><img class="emboss" src="${packSilhouette(type)}" alt="" loading="lazy"></div>
+    <div class="pack-name">${packTitle(type)}</div>
+    <div class="pack-teaser">${packTeaser(type)}</div>
+    ${opts.jumbo?`<div class="pack-jumbo">JUMBO &middot; 5 CARDS</div>`:""}
+    ${price!=null?`<div class="pack-cost"><span class="coin"></span>${price===0?"FREE":price}</div>`:""}
+    <div class="pack-wrinkle-a"></div><div class="pack-wrinkle-b"></div>
+  </div>`;
+}
+function packRevealCount(pack){
+  if(pack.type==="hex")return 2;
+  let n=3+(pack.jumbo?2:0);
+  const cs=activeCoaches();
+  if(pack.type==="player"&&cs.some(co=>co.packBonus))n++;
+  if(pack.type==="coach"&&cs.some(co=>co.coachPackBonus))n++;
+  if(pack.type==="consumable"&&cs.some(co=>co.toolPackBonus))n++;
+  return n;
+}
+function bumpRarity(r){
+  const order=["common","uncommon","rare","epic","legendary"];
+  return order[Math.min(order.length-1,order.indexOf(r)+1)];
+}
+function packChoices(pack){
   const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
   const pool=def.shop||def.rarities||["common"];
-  const offerCard=(role,rarityKey=rarityFromPool(pool),forceTrait=false)=>{
-    const c=card(rarityKey,role,{forceTrait});
-    return {type:"card",card:c,price:cardPrice(c)};
-  };
-  const coachPool=COACHES.filter(c=>c.unlock<=run.match);
-  const offerCoach=()=>{
-    const coach=pick(coachPool.length?coachPool:COACHES.slice(0,2));
-    return {type:"coach",coach,price:coach.price};
-  };
-  const offers=[
-    offerCard(pick(["bat","bowl"])),
-    offerCard(pick(["bat","bowl","all"]),pool[pool.length-1],pool[pool.length-1]!=="common"),
-  ];
-  const third=pick([
-    offerCoach(),
-    {type:"util",util:"nets",title:"Better Nets",desc:"Training gives +8 instead of +6 for this run.",price:6},
-    {type:"util",util:"scout",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6},
-  ]);
-  run.shop=[offers[0],offers[1],third];
-}
-function rerollCost(){return run.match<=2?1:2}
-function buy(i){
-  const o=run.shop[i];if(!o||o.bought||run.coins<o.price)return;
-  run.coins-=o.price;o.bought=true;
-  if(o.type==="card"){roster().push(o.card)}
-  else if(o.type==="coach"){run.coach=o.coach}
-  else if(o.type==="util"){
-    if(o.util==="nets"){run.trainBoost=2}
-    if(o.util==="scout"){run.scout=(run.scout||0)+2}
+  const n=packRevealCount(pack);
+  const cs=activeCoaches();
+  if(pack.type==="player"){
+    const roles=[];
+    for(let i=0;i<n;i++)roles.push(i<3?["bat","bowl","all"][i]:pick(["bat","bowl","all"]));
+    const traitScout=cs.some(co=>co.traitScout),curator=cs.some(co=>co.curator);
+    return roles.map((role,i)=>{
+      let rarity=rarityFromPool(i===2?pool.concat(pool[pool.length-1]):pool);
+      if(curator&&Math.random()<.5)rarity=bumpRarity(rarity);
+      return {type:"player",card:card(rarity,role,{forceTrait:traitScout||(rarity!=="common"&&Math.random()<.45)})};
+    }).sort((a,b)=>cardPower(b.card)-cardPower(a.card));
   }
+  if(pack.type==="coach"){
+    const owned=new Set(cs.map(c=>c.id));
+    let avail=COACHES.filter(c=>c.unlock<=run.match&&!owned.has(c.id));
+    if(!avail.length)avail=COACHES.filter(c=>!owned.has(c.id));
+    if(!avail.length)avail=COACHES.slice();
+    const picks=[];
+    const workPool=avail.slice();
+    while(picks.length<n&&workPool.length){
+      const c=weightedCoachPick(workPool);
+      workPool.splice(workPool.indexOf(c),1);
+      picks.push(c);
+    }
+    while(picks.length<n)picks.push(pick(avail));
+    return picks.map(coach=>({type:"coach",coach,edition:rollEdition()}));
+  }
+  if(pack.type==="hex"){
+    return shuffle(HEXES.slice()).slice(0,n).map(hex=>({type:"hex",hex}));
+  }
+  return shuffle(CONSUMABLES.slice()).slice(0,n).map(consumable=>({type:"consumable",consumable}));
+}
+function rerollCost(){
+  if((run.freeReroll||0)>0)return 0;
+  if(activeCoaches().some(co=>co.freeRerollFlag))return 0;
+  return Math.max(1,(run.match<=2?1:2)-(run.rerollDiscount||0));
+}
+let packRevealTimer=null;
+function openPack(i){
+  const pack=run.shop?.packs?.[i];if(!pack||pack.picked)return;
+  if(pack.opened){
+    run.packOpen=i;
+    renderPackOverlay("reveal");
+    return;
+  }
+  const cost=packPrice(pack);
+  if(run.coins<cost){flashHint("Not enough coins.");return}
+  if(cost===0&&(run.freePacks||0)>0)run.freePacks--;
+  run.coins-=cost;
+  pack.opened=true;
+  pack.choices=packChoices(pack);
+  run.packOpen=i;
+  renderShop();
+  renderPackOverlay("rip");
+  clearTimeout(packRevealTimer);
+  packRevealTimer=setTimeout(()=>{if(run.packOpen===i)renderPackOverlay("reveal")},1000);
+}
+function closePackOverlay(){
+  clearTimeout(packRevealTimer);
+  run.packOpen=null;
+  const ov=$("#packOverlay");
+  if(ov){ov.classList.remove("show");ov.innerHTML=""}
+}
+function coachSellValue(coach){
+  let v=Math.max(2,Math.floor((coach?.price||5)*.45))+(coach?.edition?EDITIONS[coach.edition].sell:0);
+  if(activeCoaches().some(co=>co.sellBoost))v=Math.round(v*1.5);
+  return v;
+}
+function resolvePackChoice(pack,choice,replaceIndex=null){
+  if(choice.type==="player"){
+    roster().push(choice.card);
+  }else if(choice.type==="consumable"){
+    if(choice.consumable.kind==="instant")applyInstantConsumable(choice.consumable);
+    else{
+      run.consumables=run.consumables||[];
+      run.consumables.push({...choice.consumable,ownedId:uid()});
+    }
+  }else if(choice.type==="hex"){
+    const report=choice.hex.use();
+    flashHint(`${choice.hex.name}: ${report||"done."}`);
+  }else if(choice.type==="coach"){
+    const coaches=activeCoaches();
+    if(coaches.some(c=>c.id===choice.coach.id)){flashHint("That coach is already active.");return false}
+    const inst={...choice.coach,edition:choice.edition||null,instId:uid()};
+    if(inst.edition==="negative"||usedCoachSlots()<coachSlotLimit()){
+      coaches.push(inst);
+    }else{
+      const slot=Number(replaceIndex);
+      if(!Number.isInteger(slot)||slot<0||slot>=coaches.length||coaches[slot].edition==="negative"){flashHint("Choose a coach to replace.");return false}
+      run.coins+=coachSellValue(coaches[slot]);
+      coaches[slot]=inst;
+    }
+  }
+  return true;
+}
+function choosePackCard(packIndex,choiceIndex,replaceIndex=null){
+  const pack=run.shop?.packs?.[packIndex],choice=pack?.choices?.[choiceIndex];
+  if(!pack||!choice||pack.picked)return;
+  if(!resolvePackChoice(pack,choice,replaceIndex))return;
+  pack.picked=true;
+  closePackOverlay();
+  renderShop();
+}
+function skipPackReward(){
+  const pack=run.shop?.packs?.[run.packOpen];if(!pack)return;
+  pack.picked=true;
+  closePackOverlay();
+  renderShop();
+}
+function sellCoach(i){
+  const coaches=activeCoaches();
+  const coach=coaches[i];if(!coach)return;
+  run.coins+=coachSellValue(coach);
+  coaches.splice(i,1);
+  renderShop();
+}
+function buyVoucher(i){
+  const voucher=run.shop?.vouchers?.[i];if(!voucher||voucher.bought)return;
+  if(run.coins<voucher.price){flashHint("Not enough coins.");return}
+  run.coins-=voucher.price;
+  voucher.bought=true;
+  run.voucherIds=run.voucherIds||[];
+  run.voucherIds.push(voucher.id);
+  voucher.buy();
+  renderShop();
+}
+function buySingle(i){
+  const single=run.shop?.singles?.[i];if(!single||single.bought)return;
+  if(run.coins<single.price){flashHint("Not enough coins.");return}
+  if(single.kind==="coach"){
+    if(activeCoaches().some(c=>c.id===single.item.id)){flashHint("That coach is already active.");return}
+    if(usedCoachSlots()>=coachSlotLimit()){flashHint("Coach slots full — sell one first.");return}
+    run.coins-=single.price;
+    activeCoaches().push({...single.item,edition:null,instId:uid()});
+  }else{
+    run.coins-=single.price;
+    if(single.item.kind==="instant")applyInstantConsumable(single.item);
+    else{
+      run.consumables=run.consumables||[];
+      run.consumables.push({...single.item,ownedId:uid()});
+    }
+  }
+  single.bought=true;
   renderShop();
 }
 function startTrain(stat){
@@ -3461,12 +5428,14 @@ function startTrain(stat){
 function startRelease(){run.pending={type:"release"};renderManagementScreens()}
 function sellValue(c){return Math.max(2,Math.round((RARITIES[c.rarity]||RARITIES.common).price*0.6))}
 let hintTimer=null;
+function managementHintEl(){return $("#squadManageHint")||$("#shopSub")}
 function flashHint(t){
   const el=managementHintEl();if(!el)return;
   el.textContent=t;el.style.color="var(--red)";clearTimeout(hintTimer);
   hintTimer=setTimeout(()=>{
     el.style.color="";
-    el.textContent=$("#squad")?.classList.contains("active")?"Pick an action, then tap a card.":"Train players or sell surplus bench cards. You must always own at least 12 players.";
+    if($("#squad")?.classList.contains("active"))el.textContent="Pick an action, then tap a card.";
+    else renderShop();
   },1600);
 }
 function squadAct(id){
@@ -3536,7 +5505,7 @@ function currentOddsInfo(){
   const mine=m.phase==="bowl"?bowlVal(card):batVal(card);
   const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
   const margin=mine-theirs;
-  return {strip:applyCardStripTrait(m.phase,outcomeStrip(m.phase,margin),card),roll:null,margin,resolving:false};
+  return {strip:applyMatchModifiers(m.phase,outcomeStrip(m.phase,margin),card,false),roll:null,margin,resolving:false};
 }
 function renderCenterOdds(){
   const info=currentOddsInfo();
@@ -3585,13 +5554,33 @@ function renderOverStrip(){
 function ballToken(result){if(result==="WICKET")return "W";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
 function coachStripHTML(){
-  const active=run.coach?[run.coach]:[];
+  const active=activeCoaches();
   const slots=Array.from({length:3},(_,i)=>{
     const coach=active[i];
-    return `<div class="coach-arena-slot ${coach?'active':''}">${coach?`<b>${coach.name}</b><span>${coach.desc}</span>`:`<b>+</b><span>Coach ${i+1}</span>`}</div>`;
+    return `<div class="coach-arena-slot ${coach?'active':''}">${coach?`<div class="coach-arena-art"><img src="${coachArt(coach)}" alt="" loading="lazy"></div><div class="coach-arena-info"><b>${coach.name}</b><span>${coach.desc}</span></div>`:`<b>+</b><span>Coach ${i+1}</span>`}</div>`;
   }).join("");
   const state=m.innings===1?(m.phase==="bowl"?"Set target: keep rival low":"Set target: score freely"):(m.phase==="bat"?`Chase ${m.target+1}`:`Defend ${m.target}`);
-  return `<div class="coach-strip"><div class="coach-slots">${slots}</div><div class="match-effects"><b>Match effects</b><span>${state}</span><small>Stadium and boss modifiers will appear here.</small></div></div>`;
+  return `<div class="coach-strip"><div class="match-effects"><b>Match effects</b><span>${state}</span><small>Stadium and boss modifiers will appear here.</small></div><div class="coach-slots">${slots}</div></div>`;
+}
+function commentaryLines(result){
+  const token=ballToken(result.text);
+  if(token==="W")return ["The batter commits early.", "Late movement, cramped for room.", "Wicket. The bowler owns that exchange."];
+  if(token==="0")return ["The batter swings through the line.", "Beaten by control and pace.", "Dot ball. Pressure stays on."];
+  if(token==="1")return ["Soft hands into the gap.", "They steal the run before cover reacts.", "Single. One more on the board."];
+  if(token==="2")return ["Worked square with quick feet.", "They turn hard and come back.", "Two runs. Useful, but contained."];
+  if(token==="4")return ["The batter opens the shoulders.", "Chipped into space and racing away.", "Four. That finds the rope."];
+  if(token==="6")return ["Big swing as the ball sits up.", "That has cleared everyone.", "Six. No one is catching that."];
+  return ["The ball is in play.", "Both cards are fighting the odds.", `${result.text} recorded.`];
+}
+function commentaryHTML(){
+  if(m.result?.state==="resolving"){
+    const lines=commentaryLines(m.result);
+    return `<div class="commentary-strip live"><span class="c-line l1">${lines[0]}</span><span class="c-line l2">${lines[1]}</span><span class="c-line l3">${lines[2]}</span></div>`;
+  }
+  if(m.result)return `<div class="commentary-strip settled">${commentaryLines(m.result)[2]}</div>`;
+  if(m.selected)return `<div class="commentary-strip">Card locked. Read the curve, then play the ball.</div>`;
+  if(m.preview)return `<div class="commentary-strip">Previewing the matchup. The curve shows where this ball wants to go.</div>`;
+  return `<div class="commentary-strip muted">Hover a card to preview the odds.</div>`;
 }
 function resultWinner(result){
   const token=ballToken(result.text);
@@ -3656,8 +5645,8 @@ function renderCurveMarker(points,strip,hitToken,rolling,roll){
   const slowTokens=nearbyRollTokens(strip,roll);
   const sequence=[
     ...allTokens.map((token,i)=>({token,delay:i*130,slow:false})),
-    ...slowTokens.map((token,i)=>({token,delay:850+i*230,slow:true})),
-    {token:hitToken,delay:1850,slow:true,final:true}
+    ...slowTokens.map((token,i)=>({token,delay:1150+i*420,slow:true})),
+    {token:hitToken,delay:3300,slow:true,final:true}
   ];
   const flashes=sequence.map(item=>{
     const p=byToken[item.token];
@@ -3781,19 +5770,19 @@ function renderDuel(pop=false){
   if(m.result?.state==="resolving"){
     const left=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph);
     const right=duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,false,rivEmph);
-    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${right}</div>
+    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${right}</div>${commentaryHTML()}
       <div class="odds-stage resolving-stage"><div class="arena-odds resolving-odds"><div class="odds-kicker">Resolving</div>${renderResolvePayoff(m.result,m.phase)}<span class="skip-hint">tap to skip ▸</span></div></div>`;
   }else if(m.result){
     const winner=resultWinner(m.result),youClass=winner==="you"?"winner":"loser",rivalClass=winner==="rival"?"winner":"loser";
     const left=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,youClass);
     const right=duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,false,rivEmph,rivalClass);
-    d.innerHTML=`${coachStripHTML()}<div class="duel-stage settled-stage">${left}<div class="vs">vs</div>${right}</div>
+    d.innerHTML=`${coachStripHTML()}<div class="duel-stage settled-stage">${left}<div class="vs">vs</div>${right}</div>${commentaryHTML()}
       <div class="odds-stage result-stage"><div class="result-summary"><b>${ballToken(m.result.text)}</b><span>${m.result.text} recorded</span><small>${resultCalcText(m.result)}</small></div><div class="actions" id="actions"></div></div>`;
   }else if(m.challenge){
     const left=m.selected
       ?duelCardHTML(m.selected,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph)
       :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
-    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${renderOddsStage()}`;
+    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${commentaryHTML()}${renderOddsStage()}`;
   }else{
     d.innerHTML=`<div class="cleared-duel"><div><b>--</b><div>No rival card available</div><button class="btn" id="nextBall">Resolve Match</button></div></div>`;
   }
@@ -3863,35 +5852,182 @@ function closeRivalDeck(){$("#rivalDrawer").classList.remove("show")}
 /* ---------- RENDER: shop ---------- */
 
 
+function coachCardHTML(coach,compact=false){
+  const ed=coach.edition;
+  const rrWord=(ed?EDITIONS[ed].label.toUpperCase():(coach.tier||"COACH").toUpperCase());
+  const rr=(rrWord+" ★ ").repeat(8);
+  return `<div class="ccard ${compact?'compact':''} ${ed?'ccard--'+ed:''} tier-${coach.tier||'common'}">
+    <div class="ccard-frame">
+      <span class="ccard-rr rr-top">${rr}</span>
+      <span class="ccard-rr rr-bottom">${rr}</span>
+      <span class="ccard-rr rr-left">${rr}</span>
+      <span class="ccard-rr rr-right">${rr}</span>
+      <div class="ccard-scene">
+        <div class="ccard-sky"></div>
+        <div class="ccard-ad"></div>
+        <div class="ccard-rope"></div>
+        <div class="ccard-grass"></div>
+        <img class="ccard-art" src="${coachArt(coach)}" alt="" loading="lazy">
+        <span class="ccard-badge">${coach.tier||"coach"}</span>
+        ${ed?`<span class="ccard-edition ed-${ed}">${EDITIONS[ed].label}</span>`:""}
+        <div class="ccard-info">
+          <div class="ccard-name">${coach.name}</div>
+          <div class="ccard-effect">${coach.desc}${ed?`<em class="ed-note">${EDITIONS[ed].desc}</em>`:""}</div>
+        </div>
+        <div class="ccard-shine"></div>
+        <div class="ccard-fx"></div>
+      </div>
+    </div>
+  </div>`;
+}
 function renderShop(){
   run.refreshes=2+(run.refreshBonus||0);
+  if(!run.shop||Array.isArray(run.shop))rollShop();
   const next=MATCHES[run.match];
-  const offerMarkup=(o,i)=>{
-    if(o.type==="card"){
-      return `<div class="offer ${o.bought?'bought':''}">${cardSVG(o.card,o.card.bat,o.card.bowl)}<div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Signed':'Sign'}</button></div>`;
-    }
-    if(o.type==="coach"){
-      const current=run.coach?.id===o.coach.id;
-      return `<div class="offer coach ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--gold),var(--bat-l))">${ICON.train}</div><h4>${o.coach.name}</h4><p>${o.coach.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||current||run.coins<o.price?'disabled':''}>${current?'Active':o.bought?'Hired':'Hire'}</button></div>`;
-    }
-    return `<div class="offer util ${o.bought?'bought':''}"><div class="ic-lg" style="background:linear-gradient(135deg,var(--all-l),var(--all))">${ICON.train}</div><h4>${o.title}</h4><p>${o.desc}</p><div class="price"><span class="coin"></span>${o.price}</div><button class="btn sm" data-buy="${i}" ${o.bought||run.coins<o.price?'disabled':''}>${o.bought?'Done':'Buy'}</button></div>`;
+  const coaches=activeCoaches();
+  const packMarkup=(pack,i)=>{
+    const state=pack.picked?"picked":pack.opened?"opened":"sealed";
+    const cta=pack.picked?"Claimed":pack.opened?"Continue &#9658;":`Rip Open`;
+    const cost=packPrice(pack);
+    const disabled=pack.picked||(!pack.opened&&run.coins<cost);
+    return `<button class="packx ${state} ${pack.type==='hex'?'is-hex':''}" data-open-pack="${i}" ${disabled?'disabled':''} aria-label="${packDisplayName(pack)}">
+      <div class="packx-tilt">${packArt(pack.type,pack.opened?null:cost,{sparkle:pack.type!=="consumable"&&!pack.picked,jumbo:pack.jumbo})}</div>
+      <span class="packx-cta ${state}">${cta}</span>
+      ${pack.picked?'<span class="packx-stamp">CLAIMED</span>':''}
+    </button>`;
   };
-  $("#shopSub").innerHTML=`Next: <b>${matchLabel(next)}</b> (${run.match+1}/${MATCHES.length}). Spend coins, then scout before picking your 12.`;
+  const voucherMarkup=(v,i)=>`<div class="vcard ${v.bought?'bought':''}">
+    <div class="vcard-top"><b>${v.title}</b><span class="vcard-price"><span class="coin"></span>${v.price}</span></div>
+    <p>${v.desc}</p>
+    <button class="btn secondary sm" data-buy-voucher="${i}" ${v.bought||run.coins<v.price?'disabled':''}>${v.bought?'Sold Out':'Buy'}</button>
+  </div>`;
+  const singleMarkup=(s,i)=>{
+    const it=s.item;
+    const head=s.kind==="coach"
+      ?`<b>${it.name}</b><span class="singlex-tier tier-${it.tier}">${it.tier}</span>`
+      :`<b>${it.name}</b>${s.scouted?`<span class="singlex-scouted">Scouted</span>`:""}`;
+    const body=s.kind==="coach"?it.desc:it.desc;
+    const note=s.scouted?`<small class="singlex-note">Your scout picked this vs ${run.nextRival?.arch?.name||"the next rival"}.</small>`:"";
+    return `<div class="vcard singlex ${s.bought?'bought':''} ${s.scouted?'is-scouted':''}">
+      <div class="vcard-top">${head}<span class="vcard-price"><span class="coin"></span>${s.price}</span></div>
+      <p>${body}</p>${note}
+      <button class="btn secondary sm" data-buy-single="${i}" ${s.bought||run.coins<s.price?'disabled':''}>${s.bought?(s.kind==="coach"?"Hired":"Sold"):s.kind==="coach"?"Hire":"Buy"}</button>
+    </div>`;
+  };
+  const emptySlots=Math.max(0,coachSlotLimit()-usedCoachSlots());
+  const coachSlots=coaches.map((coach,i)=>
+    `<div class="staffx">${coachCardHTML(coach,true)}<button class="btn secondary sm" data-sell-coach="${i}">Sell +${coachSellValue(coach)}</button></div>`
+  ).concat(Array.from({length:emptySlots},()=>`<div class="staffx empty"><span>Empty slot</span><small>Rip a Coach Pack</small></div>`)).join("");
+  const consumables=(run.consumables||[]).map(c=>`<span class="chipx ${c.mode}"><b>${c.name}</b><small>${c.mode==="any"?"Any ball":c.mode==="bat"?"Batting":"Bowling"}</small></span>`).join("");
+  $("#shopSub").innerHTML=`Next: <b>${matchLabel(next)}</b> (${run.match+1}/${MATCHES.length}). Rip a pack, keep one pull, then scout.`;
   $("#nextBtn").textContent="Scout Next Rival";
+  $("#nextBtn").disabled=false;
   $("#coins").textContent=run.coins;
   $("#deckCount").textContent=roster().length;
-  $("#rerollBtn").textContent=`Reroll - ${rerollCost()}`;
-  $("#rerollBtn").disabled=run.coins<rerollCost();
-  $("#offers").className="shop-board";
-  $("#offers").innerHTML=`<div class="shop-columns">
-    <div><h3>Player signings</h3><div class="offers">${run.shop.map((o,i)=>o.type==="card"?offerMarkup(o,i):"").join("")}</div></div>
-    <div><h3>Coaches & upgrades</h3><div class="shop-tools">${run.shop.map((o,i)=>o.type!=="card"?offerMarkup(o,i):"").join("")}</div></div>
+  $("#rerollBtn").textContent=run.noReroll?"Reroll Sealed":rerollCost()?`Reroll Packs - ${rerollCost()}`:"Reroll Packs - Free";
+  $("#rerollBtn").disabled=run.noReroll||run.coins<rerollCost();
+  $("#offers").className="shopx-body";
+  $("#offers").innerHTML=`
+    <aside class="shopx-rail">
+      <div class="railx-head">Market Stall</div>
+      <div class="railx-scroll">
+        <div class="vcard-list">${(run.shop.singles||[]).map(singleMarkup).join("")}</div>
+        <div class="railx-head sub-head">Voucher</div>
+        <div class="vcard-list">${run.shop.vouchers.map(voucherMarkup).join("")||'<div class="railx-empty">No vouchers left this run.</div>'}</div>
+        <div class="railx-head sub-head">Your Consumables</div>
+        <div class="chipx-list">${consumables||'<div class="railx-empty">No one-use tools owned.</div>'}</div>
+      </div>
+    </aside>
+    <section class="shopx-stage">
+      <div class="stagex-head"><b>Pack Counter</b><span>Rip a pack &middot; keep one pull</span></div>
+      <div class="packx-row">${run.shop.packs.map(packMarkup).join("")}</div>
+    </section>
+    <aside class="shopx-rail">
+      <div class="railx-head">Coaching Staff <em>${usedCoachSlots()}/${coachSlotLimit()}${coaches.length>usedCoachSlots()?" +"+(coaches.length-usedCoachSlots())+" neg":""}</em></div>
+      <div class="railx-scroll"><div class="staffx-list">${coachSlots}</div></div>
+    </aside>`;
+  document.querySelectorAll("#offers [data-open-pack]").forEach(b=>b.onclick=()=>openPack(+b.dataset.openPack));
+  document.querySelectorAll("#offers [data-sell-coach]").forEach(b=>b.onclick=()=>sellCoach(+b.dataset.sellCoach));
+  document.querySelectorAll("#offers [data-buy-voucher]").forEach(b=>b.onclick=()=>buyVoucher(+b.dataset.buyVoucher));
+  document.querySelectorAll("#offers [data-buy-single]").forEach(b=>b.onclick=()=>buySingle(+b.dataset.buySingle));
+  bindPackTilt($("#offers"));
+  const sq=$("#shopSquadBtn");if(sq){sq.disabled=false;sq.onclick=openSquadRoom}
+}
+function bindPackTilt(root){
+  if(!root)return;
+  root.querySelectorAll(".packx:not(.picked) .packx-tilt").forEach(el=>{
+    const box=el.closest(".packx");
+    box.onpointermove=e=>{
+      const r=box.getBoundingClientRect();
+      const px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+      el.style.setProperty("--ry",((px-.5)*26).toFixed(1)+"deg");
+      el.style.setProperty("--rx",((.5-py)*20).toFixed(1)+"deg");
+    };
+    box.onpointerleave=()=>{el.style.setProperty("--ry","0deg");el.style.setProperty("--rx","0deg")};
+  });
+}
+
+function renderPackOverlay(phase){
+  const pack=run.shop?.packs?.[run.packOpen];
+  const ov=$("#packOverlay");
+  if(!pack||!ov){closePackOverlay();return}
+  const choices=(pack.choices||[]).map((choice,i)=>packChoiceMarkup(choice,run.packOpen,i,pack)).join("");
+  ov.innerHTML=`<div class="pov ${phase} ${pack.type==='hex'?'pov-hex':''}">
+    <div class="pov-pack">
+      <div class="pov-pack-body">${packArt(pack.type,null,{sparkle:true,jumbo:pack.jumbo})}</div>
+      <div class="pov-tear">${packArt(pack.type,null)}</div>
+    </div>
+    <div class="pov-head"><b>${packDisplayName(pack)}</b><span>${packTagline(pack)}</span></div>
+    <div class="pov-row">${choices}</div>
+    <div class="pov-actions"><button class="btn secondary" id="skipPackBtn">Skip Reward</button></div>
   </div>`;
-  document.querySelectorAll("#offers [data-buy]").forEach(b=>b.onclick=()=>buy(+b.dataset.buy));
-  $("#manageHint").textContent=`Roster ${roster().length}. Active squad ${activeSquad().length}/12. Sell only surplus bench cards.`;
-  $("#squadActions").innerHTML=`<button class="btn secondary sm" id="manageSquadBtn">Manage Squad</button>`;
-  $("#shopSquad").innerHTML=activeSquad().slice().sort(sortStrong).map(c=>cardHTML(c,{active:true,mini:true,emph:c.role==="bowl"?"bowl":"bat"})).join("");
-  const ms=$("#manageSquadBtn");if(ms)ms.onclick=openSquadRoom;
+  ov.classList.add("show");
+  ov.querySelectorAll("[data-pack-choice]").forEach(b=>b.onclick=e=>{e.stopPropagation();choosePackCard(+b.dataset.pack,+b.dataset.choice,b.dataset.replace)});
+  const skip=$("#skipPackBtn");if(skip)skip.onclick=skipPackReward;
+}
+
+function packChoiceMarkup(choice,packIndex,choiceIndex,pack){
+  const pickBtn=(label,disabled=false)=>`<button class="btn sm pchoice-pick" data-pack-choice data-pack="${packIndex}" data-choice="${choiceIndex}" ${disabled||pack.picked?'disabled':''}>${label}</button>`;
+  let front="",cls="";
+  if(choice.type==="player"){
+    cls="player";
+    const c=choice.card;
+    front=`<div class="pchoice-card">${cardSVG(c,batVal(c),bowlVal(c),c.role==="bowl"?"bowl":"bat")}</div>${pickBtn("Sign")}`;
+  }else if(choice.type==="consumable"){
+    cls="tool";
+    const c=choice.consumable;
+    const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:c.mode==="train"?ICON.train:"&#9889;";
+    front=`<div class="toolx ${c.mode}">
+      <span class="toolx-tag">${c.kind==="instant"?"Instant &middot; Permanent":c.mode==="any"?"Next ball":c.mode==="bat"?"Next bat ball":"Next bowl ball"}</span>
+      <div class="toolx-ico">${ico}</div>
+      <b>${c.name}</b><p>${c.desc}</p>
+    </div>${pickBtn("Keep")}`;
+  }else if(choice.type==="hex"){
+    cls="hexc";
+    const h=choice.hex;
+    front=`<div class="hexx">
+      <span class="hexx-tag">HEX</span>
+      <div class="hexx-sigil">&#10022;</div>
+      <b>${h.name}</b>
+      <p class="hexx-power">${h.desc}</p>
+      <p class="hexx-cost">${h.cost}</p>
+    </div>${pickBtn("Seal the Pact")}`;
+  }else{
+    cls="coach";
+    const coach=choice.coach,coaches=activeCoaches(),dup=coaches.some(c=>c.id===coach.id);
+    const coachView={...coach,edition:choice.edition||null};
+    const hasRoom=choice.edition==="negative"||usedCoachSlots()<coachSlotLimit();
+    const act=hasRoom
+      ?pickBtn(dup?"Already Hired":"Hire",dup)
+      :`<div class="swap-row"><span>Swap out:</span>${coaches.map((old,i)=>old.edition==="negative"?"":`<button class="btn secondary sm" data-pack-choice data-pack="${packIndex}" data-choice="${choiceIndex}" data-replace="${i}" ${pack.picked||dup?'disabled':''}>${old.name.split(" ")[0]}</button>`).join("")}</div>`;
+    front=`${coachCardHTML(coachView)}${act}`;
+  }
+  return `<div class="pchoice ${cls}" style="--d:${220+choiceIndex*160}ms">
+    <div class="pflip">
+      <div class="pface back"><div class="pback-rays"></div><span>POWERPLAY</span></div>
+      <div class="pface front">${front}</div>
+    </div>
+  </div>`;
 }
 
 function openSquadRoom(){
@@ -4034,7 +6170,7 @@ function prepNextRival(){
 function createMatchShell(def){
   run.deck.forEach(c=>c.used=false);
   const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
-  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],log:"Scout the rival and choose your innings."};
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,log:"Scout the rival and choose your innings."};
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
@@ -4121,8 +6257,10 @@ function completeMatchWin(){
   clearTimeout(settleTimer);
   const reward=m.def.reward+(run.scout||0);
   run.wins++;run.coins+=reward;save.best=Math.max(save.best,m.you.runs);persist();
+  const endBonus=activeCoaches().reduce((s,co)=>s+(co.onMatchEnd?co.onMatchEnd()||0:0),0);
+  if(endBonus>0)run.coins+=endBonus;
   if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You won both cups. Final: ${m.you.runs}/${m.you.wk} vs ${m.rival.runs}/${m.rival.wk}.`);return}
-  run.match++;run.pending=null;prepNextRival();rollShop();show("shop");renderShop();
+  run.match++;run.pending=null;run.noReroll=false;prepNextRival();rollShop();show("shop");renderShop();
 }
 function finish(){
   const won=m.firstChoice==="bat"?m.rival.runs<=m.target:m.you.runs>m.target;
@@ -4140,6 +6278,7 @@ function nextBall(){
     if(m.innings===1){
       if(m.phase==="bowl"){m.target=m.rival.runs;m.phase="bat";m.innings=2;m.ball=1;m.history=[];m.log=`Chase <b>${m.target+1}</b>. Bowling cards used this match are gone.`}
       else{m.target=m.you.runs;m.phase="bowl";m.innings=2;m.ball=1;m.history=[];m.log=`Defend <b>${m.target}</b>. Batting cards used this match are gone.`}
+      m.chain=0;m.hotHand=false;m.hotBat=false;
       if(!newChallenge(true)){finish();return}
       render();return;
     }
@@ -4153,12 +6292,21 @@ function renderTitle(){$("#titleStats").innerHTML=`<span class="stat-pill">Best 
 $("#startBtn").onclick=startRun;
 $("#restartBtn").onclick=()=>startRun();
 $("#homeMatchBtn").onclick=()=>{renderTitle();show("title")};
+$("#testWinBtn").onclick=()=>{if(m)completeMatchWin()};
 $("#draftRestartBtn").onclick=()=>startRun();
 $("#draftAutoBtn").onclick=autoSelectDraft;
 $("#draftConfirmBtn").onclick=confirmDraft;
 $("#tossRestartBtn").onclick=()=>startRun();
 $("#nextBtn").onclick=beginSquadSelection;
-$("#rerollBtn").onclick=()=>{const cost=rerollCost();if(run.coins>=cost){run.coins-=cost;rollShop();renderShop()}};
+$("#rerollBtn").onclick=()=>{
+  if(run.noReroll){flashHint("The spirits sealed this shop.");return}
+  const cost=rerollCost();
+  if(run.coins>=cost){
+    if(cost>0)run.coins-=cost;
+    else if((run.freeReroll||0)>0)run.freeReroll--;
+    rollShop(true);renderShop();
+  }
+};
 $("#squadBackBtn").onclick=()=>{run.pending=null;renderShop();show("shop")};
 $("#squadNextBtn").onclick=beginSquadSelection;
 $("#homeBtn").onclick=()=>{renderTitle();show("title")};
@@ -4187,6 +6335,7 @@ function pointerInHost(host,e,pad=26){
   return !!r&&e.clientX>=r.left-pad&&e.clientX<=r.right+pad&&e.clientY>=r.top-pad&&e.clientY<=r.bottom+pad;
 }
 document.addEventListener("pointermove",e=>{
+  if(document.querySelector("#match.screen.active .duel.resolving")){clearMatchParallax();return}
   const targetHost=matchParallaxTarget(e.target);
   const host=targetHost||(parallaxHost&&pointerInHost(parallaxHost,e)?parallaxHost:null);
   if(!host){clearMatchParallax();return}
