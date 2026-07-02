@@ -4910,6 +4910,45 @@
   #match .curve-flash,
   #match .curve-dot.hit{fill:var(--ui-gold) !important;stroke:#111 !important}
   #match .curve-area{fill:rgba(52,190,95,.14) !important;stroke:#2b8a52 !important}
+  /* 9. duel geometry: cards size to the COLUMN (never clip), stage owns
+        the middle, odds pinned at the bottom — no dead void */
+  #match .duel{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:6px;
+  }
+  #match .duel-stage{
+    flex:1 1 auto;
+    min-height:0;
+    width:100%;
+    grid-template-columns:minmax(0,300px) minmax(44px,60px) minmax(0,300px) !important;
+    gap:clamp(8px,1.6vw,26px) !important;
+    padding:8px 10px 0 !important;
+    align-content:center;
+  }
+  #match .duel .card--duel,
+  #match .duel .placeholder{
+    width:min(100%,calc(43vh * 5 / 7)) !important;
+    height:auto !important;
+    aspect-ratio:5/7;
+    margin:0 auto;
+  }
+  #match .duel .card--duel .cflip,
+  #match .duel .card--duel .cface,
+  #match .duel .dslot .tc{
+    width:100% !important;
+    height:100% !important;
+  }
+  #match .duel .dslot{min-width:0}
+  /* flip is a first-class affordance on the big cards — always visible */
+  #match .duel .card--duel .flipchip{
+    opacity:.92 !important;
+    right:8px !important;
+    top:8px !important;
+    bottom:auto !important;
+  }
+  #match .odds-stage{flex:0 0 auto}
+  #match .commentary-strip{flex:0 0 auto}
 </style>
 </head>
 <body>
