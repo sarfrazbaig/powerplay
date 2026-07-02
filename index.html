@@ -5154,11 +5154,9 @@
     grid-template-rows:auto auto minmax(0,1fr) auto auto !important;
     grid-template-areas:none !important;
     gap:8px !important;
-    padding:8px 18px 10px !important;
+    padding:8px clamp(18px,2vw,44px) 10px !important;
     height:100dvh !important;
-    max-width:1760px;
     width:100%;
-    margin-inline:auto !important;
     overflow:hidden;
   }
   #match>*{grid-area:auto !important;min-width:0}
@@ -5173,7 +5171,7 @@
   }
   .av-rivalmeta{font-size:11px;font-weight:800;color:var(--gold)}
   .av-rivalfan{display:flex;justify-content:center;align-items:flex-start;gap:0}
-  .rivhold{width:clamp(76px,5vw,100px);margin-left:max(-20px,-1.1vw);position:relative}
+  .rivhold{width:clamp(76px,5.6vw,120px);margin-left:max(-24px,-1.2vw);position:relative}
   .rivhold:first-child{margin-left:0}
   .rivhold .card{width:100%;pointer-events:none;transition:transform .16s ease;transform-origin:50% 0%}
   .rivhold:hover{z-index:30}
@@ -5188,8 +5186,8 @@
   }
   /* ---------- stage: dugout | pitch | kit bag ---------- */
   .av-stage{
-    display:grid;grid-template-columns:minmax(118px,146px) minmax(0,1fr) minmax(118px,146px);
-    gap:12px;min-height:0;
+    display:grid;grid-template-columns:minmax(140px,.55fr) minmax(0,3fr) minmax(140px,.55fr);
+    gap:clamp(12px,1.2vw,26px);min-height:0;
   }
   .av-dugout,.av-kitbag{
     display:flex;flex-direction:column;align-items:center;gap:10px;
@@ -5199,7 +5197,7 @@
   }
   .seats,.kits{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
   .seat{
-    width:min(104px,100%);aspect-ratio:5/6;border-radius:12px;position:relative;overflow:hidden;
+    width:min(150px,92%);aspect-ratio:5/6;border-radius:12px;position:relative;overflow:hidden;
     background:#16292c;border:2px solid #274046;
   }
   .seat img{width:100%;height:100%;object-fit:cover;object-position:top}
@@ -5220,7 +5218,7 @@
   .seat.ed-polychrome{box-shadow:0 0 12px rgba(91,225,136,.6)}
   .seat.ed-negative{filter:invert(1) hue-rotate(180deg)}
   .kit-card{
-    width:min(104px,100%);display:grid;justify-items:center;gap:4px;padding:9px 6px;
+    width:min(150px,92%);display:grid;justify-items:center;gap:4px;padding:9px 6px;
     background:#152621;border:2px solid #2c4a40;border-radius:12px;cursor:pointer;
     color:var(--chalk);font-family:inherit;position:relative;
     transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
@@ -5260,8 +5258,9 @@
       radial-gradient(420px 240px at 82% 0%, rgba(255,246,214,.09), transparent 70%);
   }
   .av-duelrow{
-    display:grid;grid-template-columns:minmax(140px,215px) minmax(260px,440px) minmax(140px,215px);
-    align-items:center;justify-content:center;gap:clamp(10px,2.5vw,34px);
+    display:grid;grid-template-columns:minmax(160px,340px) minmax(280px,540px) minmax(160px,340px);
+    align-items:center;justify-content:space-evenly;gap:clamp(10px,2vw,40px);
+    width:100%;
     min-height:0;position:relative;z-index:2;
   }
   .av-duelrow .dslot{display:grid;gap:6px;justify-items:center;min-width:0}
@@ -5302,7 +5301,22 @@
   }
   @keyframes fhBob{0%,100%{transform:translateX(-50%) rotate(-2deg)}50%{transform:translateX(-50%) rotate(2deg)}}
   /* ---------- the field ring ---------- */
-  .av-ringwrap{position:relative;width:min(100%,min(430px,46vh));aspect-ratio:1;margin:0 auto}
+  .av-ringwrap{position:relative;width:min(100%,min(500px,50vh));aspect-ratio:1;margin:0 auto}
+  .ring-svg.idle{opacity:.85;filter:saturate(.8)}
+  /* real CTAs: fixed dock, bottom-right of the pitch — never inside the wheel */
+  .av-cta{
+    position:absolute;right:clamp(18px,2vw,40px);bottom:clamp(14px,1.8vh,26px);z-index:6;
+    display:flex;gap:10px;align-items:center;
+  }
+  #match .av-cta .btn{
+    font-size:15px;padding:13px 30px;letter-spacing:.6px;
+  }
+  #match .av-cta .btn:not(.secondary){
+    background:var(--gold);color:#111;border-color:#0c1214;
+    box-shadow:0 4px 0 #0c1214,0 0 22px rgba(255,210,63,.25);
+  }
+  #match .av-cta .btn:not(.secondary):not(:disabled):hover{transform:translateY(-2px)}
+  #match .av-cta .btn:disabled{opacity:.45}
   .ring-svg{width:100%;height:100%;display:block}
   .ring-svg.ghost{opacity:.30;filter:saturate(.25)}
   .ring-sec path{transition:filter .18s ease}
@@ -5353,14 +5367,14 @@
   /* ---------- your hand: the fan (tucks over the pitch edge) ----------
      The HOLDER never transforms on hover — only the card inside zooms.
      A stable hitbox means no enter/leave flicker (the jitter bug). */
-  .av-fanwrap{position:relative;height:clamp(150px,17vh,215px);z-index:8;overflow:visible;margin-top:-42px}
+  .av-fanwrap{position:relative;height:clamp(150px,19vh,250px);z-index:8;overflow:visible;margin-top:-42px}
   .av-fan{
     position:relative;height:100%;display:flex;justify-content:center;align-items:flex-end;
     padding-bottom:2px;
   }
   .av-scanmine{position:absolute;right:14px;bottom:10px;z-index:40}
   .fanhold{
-    width:clamp(118px,8vw,168px);flex:0 0 auto;margin-left:max(-46px,-2.4vw);position:relative;
+    width:clamp(118px,8.6vw,196px);flex:0 0 auto;margin-left:max(-52px,-2.6vw);position:relative;
     transform:rotate(var(--rot)) translateY(calc(14px + var(--lift,0px)));
     transform-origin:50% 130%;
     z-index:var(--z);
@@ -7097,7 +7111,6 @@ function fieldRingSVG(strip,opts={}){
   </svg>`;
 }
 const GHOST_FRACS=["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}));
-function ghostRingSVG(){return fieldRingSVG(null,{fracs:GHOST_FRACS}).replace('class="ring-svg"','class="ring-svg ghost"')}
 /* Smooth morph: zones grow/shrink into their new share, then flash. */
 let morphRAF=null;
 function animateRing(prevMap,data){
@@ -7119,10 +7132,12 @@ function animateRing(prevMap,data){
   };
   morphRAF=requestAnimationFrame(step);
 }
-function ringCenterRead(info){
-  if(!info)return `<div class="ring-read wait"><b>PICK A CARD</b><span>the field takes shape</span></div>`;
-  const cls=bandClass(info.margin);
-  return `<div class="ring-read ${cls}"><b>${outcomeBand(info.margin).toUpperCase()}</b><span>${info.margin>0?"+":""}${info.margin}</span></div>`;
+/* Design lock: NO exact odds before the ball is played. The player reads
+   cards (OVR, flip, danger ribbon) and commits — the field's true shape
+   reveals only in the staged battle. That's the spark. */
+function ringCenterRead(){
+  if(m.selected)return `<div class="ring-read"><b>LOCKED IN</b><span>play the ball</span></div>`;
+  return `<div class="ring-read wait"><b>PICK A CARD</b><span>the field reveals on play</span></div>`;
 }
 function ringResultHTML(){
   const token=ballToken(m.result.text);
@@ -7207,22 +7222,17 @@ function dangerRead(){
 }
 function pitchStripInfo(){
   if(m.result)return {strip:m.result.strip,roll:m.result.roll,margin:m.result.mine-m.result.theirs};
-  const card=m.selected||m.preview;
-  if(!card||!m.challenge)return null;
-  const mine=m.phase==="bowl"?bowlVal(card):batVal(card);
-  const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
-  return {strip:getStripFor(m.phase,card),roll:null,margin:mine-theirs};
+  return null; // no pre-play odds — see ringCenterRead
 }
-let lastRingFracs=null;
 function renderDuel(pop=false){
   const d=$("#duel");
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
   const deal=challengeAnim;challengeAnim=false;
   const info=pitchStripInfo();
   const danger=!m.result&&dangerRead()==="danger";
-  const answered=!m.result&&info&&info.margin>=3;
   const data=info?ringFracs(info.strip):null;
-  const ring=data?fieldRingSVG(null,{fracs:data}):ghostRingSVG();
+  // pre-play the wheel sits on the even field — the contest, unresolved
+  const ring=data?fieldRingSVG(null,{fracs:data}):fieldRingSVG(null,{fracs:GHOST_FRACS}).replace('class="ring-svg"','class="ring-svg idle"');
   const fh=m.freeHit&&!m.result?`<div class="av-freehit">FREE HIT</div>`:"";
   const youCard=m.result?m.result.you:(m.selected||null);
   const youSlot=youCard
@@ -7241,15 +7251,16 @@ function renderDuel(pop=false){
   const centerBits=resolving
     ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE DUEL</b><span>even field</span></div></div>`
     :m.result
-      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"></div></div>`
-      :`<div class="ring-center" id="ringCenter">${ringCenterRead(info)}<div class="actions" id="actions"></div></div>`;
+      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}</div>`
+      :`<div class="ring-center" id="ringCenter">${ringCenterRead()}</div>`;
   d.innerHTML=`${fh}
-    <div class="av-duelrow ${danger?'threat':''} ${answered?'answered':''}">
+    <div class="av-duelrow ${danger?'threat':''}">
       ${youSlot}
       <div class="av-ringwrap">${ringHTML}${centerBits}</div>
       ${rivSlot}
     </div>
-    ${commentaryHTML()}`;
+    ${commentaryHTML()}
+    <div class="av-cta" id="actions"></div>`;
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
@@ -7259,10 +7270,7 @@ function renderDuel(pop=false){
   }else if(m.result?.state==="settled"){
     const el=d.querySelector(`.ring-sec[data-tk="${m.result.strip[m.result.roll]}"]`);
     if(el)el.classList.add("landed");
-  }else if(data&&lastRingFracs){
-    animateRing(lastRingFracs,data); // zones grow into their new share
   }
-  lastRingFracs=data&&!m.result?fracMap(data):null;
   renderActions();
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
 }
@@ -7330,10 +7338,10 @@ function renderHand(){
     }).join("")}`;
   // events live on the HOLDER: its hitbox never moves, so the zoomed card
   // can't slide out from under the cursor (the hover-jitter bug)
+  // hover zooms the card visually (CSS only) — it does NOT reveal odds
   document.querySelectorAll("#hand .fanhold:not(.is-used)").forEach(h=>{
     const card=()=>activeSquad().find(c=>c.id===h.dataset.id);
     h.onclick=e=>{e.stopPropagation();lockCard(card())};
-    h.onmouseenter=()=>previewCard(card());
   });
   const scan=$("#scanMineBtn");if(scan)scan.onclick=openPlayerDeck;
 }
