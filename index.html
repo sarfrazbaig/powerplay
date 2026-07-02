@@ -6,8 +6,7 @@
 <title>Powerplay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Narrow:wght@400;700&family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --table:#0c8f86;--felt:#0a7b73;--panel:#fffdf6;--ink:#13313f;--muted:#6a8587;
@@ -5069,6 +5068,21 @@
   .scout-grid .scout-card .card .cflip,
   .scout-grid .scout-card .card .cface{height:auto}
   .scout-grid .scout-card .card .cface.cback{height:100%}
+  /* 13. finishing details */
+  .sliver{position:relative}
+  .sliver-trait{
+    position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;
+    background:var(--ui-gold);border:2px solid #050505;
+  }
+  #draft .draft-status{
+    cursor:pointer;
+    border:3px solid #050505 !important;
+    box-shadow:2px 2px 0 #050505 !important;
+    transition:transform .1s ease;
+  }
+  #draft .draft-status:hover{transform:translateY(-2px) scale(1.06)}
+  #draft .draft-card.benched .draft-status:after{content:" +"}
+  #match.screen.active{gap:7px !important}
 </style>
 </head>
 <body>
@@ -5079,6 +5093,7 @@
       <div class="logo">Power<span>play</span></div>
       <div class="tag">A roguelike cricket card duel. Bowl an over, then chase one. Build your squad between matches and lift the cup.</div>
       <button class="btn" id="startBtn">Start Run</button>
+      <button class="btn secondary" id="continueBtn" style="display:none">Continue Run</button>
       <div class="pill-row" id="titleStats"></div>
     </div>
   </section>
@@ -5815,8 +5830,51 @@ function selectedDraftCards(){
 }
 function rivalCard(kind){const pool=m.rivalDeck.filter(c=>!c.used);let best=pool[0],val=-1;pool.forEach(c=>{const v=kind==="bat"?batVal(c):bowlVal(c);if(v>val){best=c;val=v}});return best}
 
+/* ---------- RUN PERSISTENCE (between-match checkpoints) ----------
+   Coaches/traits/consumables hold functions, so we store ids and
+   rehydrate from the catalogues. Mid-match state is not saved: a
+   reload resumes the run at squad selection for the next match. */
+const RUN_KEY="powerplay_run_v1";
+function serializeCard(c){return {...c,trait:c.trait?c.trait.name:null}}
+function rehydrateCard(c){return {...c,used:false,trait:c.trait?(TRAITS.find(t=>t.name===c.trait)||null):null}}
+function persistRun(){
+  if(!run||!roster().length)return;
+  try{
+    localStorage.setItem(RUN_KEY,JSON.stringify({
+      coins:run.coins,match:run.match,wins:run.wins,
+      voucherIds:run.voucherIds||[],packTax:run.packTax||0,freePacks:run.freePacks||0,
+      noReroll:!!run.noReroll,scout:run.scout||0,trainBoost:run.trainBoost||0,
+      rerollDiscount:run.rerollDiscount||0,freeReroll:run.freeReroll||0,
+      roster:roster().map(serializeCard),
+      deckIds:activeSquad().map(c=>c.id),
+      coaches:activeCoaches().map(co=>({id:co.id,edition:co.edition||null,instId:co.instId||null})),
+      consumables:(run.consumables||[]).map(c=>({id:c.id,ownedId:c.ownedId})),
+      nextRival:run.nextRival?{defIndex:MATCHES.indexOf(run.nextRival.def),archKey:run.nextRival.arch.key,deck:run.nextRival.deck.map(serializeCard)}:null
+    }));
+  }catch(e){}
+}
+function savedRun(){try{return JSON.parse(localStorage.getItem(RUN_KEY)||"null")}catch(e){return null}}
+function clearSavedRun(){localStorage.removeItem(RUN_KEY)}
+function continueRun(){
+  const d=savedRun();if(!d)return startRun();
+  flippedCards.clear();
+  const cards=d.roster.map(rehydrateCard);
+  const byId=Object.fromEntries(cards.map(c=>[c.id,c]));
+  run={roster:cards,deck:d.deckIds.map(id=>byId[id]).filter(Boolean),
+    draftPool:cards.slice(),draftSelected:new Set(d.deckIds.filter(id=>byId[id])),
+    match:d.match,coins:d.coins,refreshes:2,wins:d.wins,pending:null,
+    coaches:d.coaches.map(sc=>{const def=COACHES.find(x=>x.id===sc.id);return def?{...def,edition:sc.edition,instId:sc.instId||uid()}:null}).filter(Boolean),
+    consumables:d.consumables.map(sc=>{const def=CONSUMABLES.find(x=>x.id===sc.id);return def?{...def,ownedId:sc.ownedId}:null}).filter(Boolean),
+    voucherIds:d.voucherIds,packTax:d.packTax,freePacks:d.freePacks,noReroll:d.noReroll,
+    scout:d.scout,trainBoost:d.trainBoost,rerollDiscount:d.rerollDiscount,freeReroll:d.freeReroll};
+  if(d.nextRival&&d.nextRival.defIndex>=0){
+    run.nextRival={def:MATCHES[d.nextRival.defIndex],arch:ARCHS.find(a=>a.key===d.nextRival.archKey)||ARCHS[3],deck:d.nextRival.deck.map(rehydrateCard)};
+  }
+  beginSquadSelection();
+}
 function startRun(){
   flippedCards.clear();
+  clearSavedRun();
   const startingRoster=starterDraft();
   run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
   beginSquadSelection();
@@ -6041,6 +6099,7 @@ function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(
 function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-9)}
 function end(title,text){
   clearTimeout(settleTimer);
+  clearSavedRun();
   $("#overTitle").textContent=title;$("#overText").textContent=text;show("over");
 }
 
@@ -6664,20 +6723,27 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
 function radialSVG(c){
   const stats=[["PWR",c.batting.power],["TIM",c.batting.timing],["TEC",c.batting.technique],["NRV",c.batting.nerve],
                ["PAC",c.bowling.pace],["ACC",c.bowling.accuracy],["MOV",c.bowling.movement],["DEC",c.bowling.deception]];
-  const cx=125,cy=196,R=84;
+  const rc=roleColor(c);
+  const cx=125,cy=192,R=80;
   const pt=(i,val)=>{const a=-Math.PI/2+i*Math.PI/4,r=R*val/100;return [cx+Math.cos(a)*r,cy+Math.sin(a)*r]};
-  const ring=f=>`<polygon points="${stats.map((s,i)=>pt(i,100*f).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#d8cfae" stroke-width="1"/>`;
-  const axes=stats.map((s,i)=>{const [x,y]=pt(i,100);return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#d8cfae" stroke-width="1"/>`}).join("");
+  const ring=f=>`<polygon points="${stats.map((s,i)=>pt(i,100*f).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#c9bd9c" stroke-width="1.2"/>`;
+  const axes=stats.map((s,i)=>{const [x,y]=pt(i,100);return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#c9bd9c" stroke-width="1.2"/>`}).join("");
   const poly=stats.map((s,i)=>pt(i,s[1]).map(v=>v.toFixed(1)).join(",")).join(" ");
-  const labels=stats.map((s,i)=>{const [x,y]=pt(i,117);return `<text x="${x.toFixed(1)}" y="${(y+2).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="${i<4?'#1f9b53':'#c0303f'}">${s[0]}</text><text x="${x.toFixed(1)}" y="${(y+13).toFixed(1)}" text-anchor="middle" font-size="9" fill="#5a6b7a">${s[1]}</text>`}).join("");
+  const dots=stats.map((s,i)=>{const [x,y]=pt(i,s[1]);return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${rc}" stroke="#111" stroke-width="1.5"/>`}).join("");
+  const labels=stats.map((s,i)=>{const [x,y]=pt(i,118);return `<text x="${x.toFixed(1)}" y="${(y+2).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="${i<4?'#0d6b36':'#a01326'}">${s[0]}</text><text x="${x.toFixed(1)}" y="${(y+15).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="700" fill="#111">${s[1]}</text>`}).join("");
+  const trait=c.trait
+    ?`<rect x="35" y="312" width="180" height="24" rx="12" fill="#ffe23f" stroke="#111" stroke-width="2.5"/>
+      <text x="125" y="328" text-anchor="middle" font-size="11" font-weight="700" fill="#111">${escSVG(c.trait.name.toUpperCase())}</text>`
+    :`<text x="125" y="328" text-anchor="middle" font-size="10" font-weight="700" fill="#8a8064">NO TRAIT</text>`;
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     <rect x="6" y="5" width="238" height="340" rx="16" fill="#f3ecdc" stroke="#111" stroke-width="3"/>
-    <text x="125" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#111">${escSVG(c.name.toUpperCase())}</text>
-    <text x="125" y="56" text-anchor="middle" font-size="10" font-weight="700" fill="#5a6b7a" letter-spacing="1">${roleName(c).toUpperCase()} &middot; OVR ${ovrVal(c)}</text>
+    <text x="125" y="36" text-anchor="middle" font-size="15" font-weight="700" fill="#111">${escSVG(c.name.toUpperCase())}</text>
+    <text x="125" y="54" text-anchor="middle" font-size="11" font-weight="700" fill="${rc}" letter-spacing="1">${roleName(c).toUpperCase()} &middot; OVR ${ovrVal(c)} &middot; BAT ${batVal(c)} / BOWL ${bowlVal(c)}</text>
     ${ring(1/3)}${ring(2/3)}${ring(1)}${axes}
-    <polygon points="${poly}" fill="rgba(13,107,70,.35)" stroke="#0d6b46" stroke-width="2"/>
+    <polygon points="${poly}" fill="${rc}" fill-opacity=".38" stroke="${rc}" stroke-width="2.5"/>
+    ${dots}
     ${labels}
-    <text x="125" y="332" text-anchor="middle" font-size="9" font-weight="700" fill="#8a8064">BAT ${batVal(c)} &middot; BOWL ${bowlVal(c)}${c.trait?` &middot; ${escSVG(c.trait.name.toUpperCase())}`:""}</text>
+    ${trait}
   </svg>`;
 }
 function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,as="button"}={}){
@@ -6744,8 +6810,8 @@ function railTiers(cards,disc){
 }
 function sliverHTML(c,disc,inert){
   const used=c.used?"used":"";
-  return `<button class="sliver ${used}" data-id="${c.id}" ${inert||c.used?'disabled':''} title="${c.name} — ${disc.toUpperCase()} ${baseStat(c,disc)}${c.trait?' · '+c.trait.name:''}">
-    <b>${baseStat(c,disc)}</b><span>${c.name.split(" ").pop()}</span></button>`;
+  return `<button class="sliver ${used}" data-id="${c.id}" ${inert||c.used?'disabled':''} title="${c.name} — ${disc.toUpperCase()} ${baseStat(c,disc)}${c.trait?' · '+c.trait.name+': '+c.trait.text:''}">
+    ${c.trait?'<i class="sliver-trait"></i>':''}<b>${baseStat(c,disc)}</b><span>${c.name.split(" ").pop()}</span></button>`;
 }
 function renderHand(){
   const disc=m.phase==="bowl"?"bowl":"bat";
@@ -6909,6 +6975,7 @@ function renderShop(){
   document.querySelectorAll("#offers .singlex-cardface .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
   bindPackTilt($("#offers"));
   const sq=$("#shopSquadBtn");if(sq){sq.disabled=false;sq.onclick=openSquadRoom}
+  persistRun();
 }
 function bindPackTilt(root){
   if(!root)return;
@@ -7106,6 +7173,7 @@ function renderDraft(){
   $("#draftConfirmBtn").disabled=run.draftSelected.size!==12;
   document.querySelectorAll("#draftGrid .draft-card").forEach(b=>b.onclick=()=>toggleFlip(b.dataset.id));
   document.querySelectorAll("#draftGrid .draft-status").forEach(t=>t.onclick=e=>{e.stopPropagation();toggleDraft(t.dataset.toggle)});
+  persistRun();
 }
 function autoSelectDraft(){
   run.draftSelected=new Set(roster().slice().sort(sortStrong).slice(0,12).map(c=>c.id));
@@ -7266,8 +7334,13 @@ function nextBall(){
   if(!newChallenge()){finish();return}
   render();
 }
-function renderTitle(){$("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`}
+function renderTitle(){
+  $("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`;
+  const cb=$("#continueBtn"),sv=savedRun();
+  if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run · Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
+}
 $("#startBtn").onclick=startRun;
+$("#continueBtn").onclick=continueRun;
 $("#restartBtn").onclick=()=>startRun();
 $("#homeMatchBtn").onclick=()=>{renderTitle();show("title")};
 $("#testWinBtn").onclick=()=>{if(m)completeMatchWin()};
