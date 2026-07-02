@@ -4352,11 +4352,11 @@
       linear-gradient(135deg,#171123 0%,#241b36 50%,#191227 100%)}
   /* ---------- card flip (radial sub-stat back) ---------- */
   .card,.draft-card{perspective:900px}
-  .cflip{position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.3,1)}
+  .cflip{position:relative;height:100%;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.3,1)}
   .card.flipped .cflip,.draft-card.flipped .cflip{transform:rotateY(180deg)}
-  .cface{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .cface{height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .cface .tc{display:block;width:100%;height:100%}
   .cface.cback{position:absolute;inset:0;transform:rotateY(180deg)}
-  .cface.cback .tc{width:100%;height:100%}
   .flipchip{
     position:absolute;right:5px;bottom:5px;z-index:9;width:22px;height:22px;
     display:grid;place-items:center;border:2px solid #050505;border-radius:50%;
@@ -5168,9 +5168,10 @@ function cancelSelected(){m.selected=null;m.preview=null;m.selectionLocked=false
    never becomes an infinite faucet.
    ============================================================ */
 const CURVE={
-  k:13,                                   // logistic sensitivity per stat point
-  base:{W:.06,"0":.11,"1":.15,"2":.09,"4":.06,"6":.03},
-  wkt:.34,dot:.24,run:.14,two:.10,four:.24,six:.17,
+  k:11,                                   // logistic sensitivity per stat point
+  base:{W:.05,"0":.10,"1":.12,"2":.08,"4":.06,"6":.03},
+  wkt:.34,dot:.22,run:.13,two:.10,four:.27,six:.20,
+  tiltAmp:.9,                             // how hard the visible OVR gap tilts the whole curve
   nerveAmp:.10,upsetW:1,upsetBoundary:1,  // irreducible upset slots
   extraBase:.065,extraPivot:50,extraDecay:.4,extraMax:3
 };
@@ -5193,15 +5194,21 @@ function outcomeWeights(mode,myCard,theirCard){
   const pWkt=edge(L.movement*.6+L.pace*.4,B.technique);
   const pBound=edge(B.power,L.deception);
   const pRun=edge(B.timing,L.accuracy);
+  // the number on the card front must matter: overall rating gap tilts
+  // the whole curve on top of the sub-stat texture
+  const batRating=batVal(batC),bowlRating=bowlVal(bowlC);
+  const tilt=edge(batRating,bowlRating);            // .5 = even matchup
+  const batSide=1+CURVE.tiltAmp*(tilt-.5);          // >1 favours the batter
+  const bowlSide=1+CURVE.tiltAmp*(.5-tilt);         // >1 favours the bowler
   const pressure=(x.left<=2?1:0)+((batterMine?x.yourWk:x.rivalWk)>=1?1:0);
   const nerve=pressure*CURVE.nerveAmp*((B.nerve-55)/45); // + resists, - crumbles
   const w={
-    W:Math.max(.01,CURVE.base.W+CURVE.wkt*pWkt-nerve),
-    "0":Math.max(.01,CURVE.base["0"]+CURVE.dot*(1-pRun)-nerve*.5),
+    W:Math.max(.01,(CURVE.base.W+CURVE.wkt*pWkt)*bowlSide-nerve),
+    "0":Math.max(.01,(CURVE.base["0"]+CURVE.dot*(1-pRun))*bowlSide-nerve*.5),
     "1":CURVE.base["1"]+CURVE.run*pRun*(1-pBound*.5),
     "2":CURVE.base["2"]+CURVE.two*pRun*(1-pBound*.4),
-    "4":CURVE.base["4"]+CURVE.four*pBound*(1-pWkt*.3)+Math.max(0,nerve*.5),
-    "6":CURVE.base["6"]+CURVE.six*pBound*edge(B.power,L.deception+8)*(1-pWkt*.3)+Math.max(0,nerve*.5)
+    "4":(CURVE.base["4"]+CURVE.four*pBound*(1-pWkt*.3))*batSide+Math.max(0,nerve*.5),
+    "6":(CURVE.base["6"]+CURVE.six*pBound*edge(B.power,L.deception+8)*(1-pWkt*.3))*batSide+Math.max(0,nerve*.5)
   };
   // free hit: the batter cannot get out
   if(m?.freeHit){w["1"]+=w.W*.4;w["4"]+=w.W*.35;w["6"]+=w.W*.25;w.W=0}
@@ -5891,36 +5898,42 @@ function cardShell(g,dim,rarityKey="common",role="all"){
       <g opacity=".85">${Array.from({length:11},(_,i)=>`<circle cx="${34+i*17}" cy="${159+(i%2)*13}" r="2.1" fill="${i%3===0?'#ffd23f':i%3===1?'#ff5c5c':'#4ad1ff'}"/>`).join("")}</g>
       <rect x="26" y="192" width="198" height="132" fill="${dusk?'#5f9328':'#74b932'}"/>`;
 }
+function roleColor(c){return c.role==="bat"?"#1f9b53":c.role==="bowl"?"#c0303f":"#7245c9"}
 function cardSVG(c,batNum,bowlNum,emph,dim,compact){
   const g="g"+(svgSeq++);
-  const hg=headGrad(c.role),img=draftArtForCard(c);
-  const name=escSVG((compact?c.name.split(" ").pop():(c.name.length>13?c.name.slice(0,12)+"…":c.name)).toUpperCase());
+  const hg=headGrad(c.role),img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
+  if(compact){
+    const nm=escSVG(c.name.split(" ").pop().toUpperCase());
+    return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
+    ${cardShell(g,dim,c.rarity,c.role)}
+      <image href="${img}" x="30" y="168" width="190" height="156" preserveAspectRatio="xMidYMax meet" opacity="${dim?.9:1}"/>
+    </g>
+    <defs><linearGradient id="${g}head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${hg[0]}"/><stop offset="1" stop-color="${hg[1]}"/></linearGradient></defs>
+    <rect x="33" y="30" width="184" height="30" rx="9" fill="url(#${g}head)" stroke="#111" stroke-width="3"/>
+    <text x="125" y="51" text-anchor="middle" fill="#fff" font-size="${nm.length>9?13:16}" font-weight="700" letter-spacing=".5">${nm}</text>
+    <text x="125" y="146" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="7" paint-order="stroke" font-size="76" font-weight="700">${ovr}</text>
+    <text x="125" y="166" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="3" paint-order="stroke" font-size="12" font-weight="700" letter-spacing="3">OVR</text>
+  </svg>`;
+  }
+  const name=escSVG((c.name.length>14?c.name.slice(0,13)+"…":c.name).toUpperCase());
   const trait=escSVG((c.trait?c.trait.name:roleName(c)).toUpperCase());
-  const pillW=Math.min(80,trait.length*5.4+14), pillX=214-pillW;
-  const batHi=emph==="bat", bowlHi=emph==="bowl";
+  const pillW=Math.min(84,trait.length*5.4+14), pillX=214-pillW;
+  const roleShort=c.role==="bat"?"BAT":c.role==="bowl"?"BOWL":"AR";
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     ${cardShell(g,dim,c.rarity,c.role)}
-      <image href="${img}" x="30" y="116" width="190" height="208" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}"/>
+      <image href="${img}" x="30" y="70" width="190" height="254" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}"/>
     </g>
-    <defs>
-      <linearGradient id="${g}head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${hg[0]}"/><stop offset="1" stop-color="${hg[1]}"/></linearGradient>
-      <clipPath id="${g}pan"><rect x="33" y="30" width="184" height="86" rx="10"/></clipPath>
-    </defs>
-    <g clip-path="url(#${g}pan)">
-      <rect x="33" y="30" width="184" height="86" fill="#f1f5f8"/>
-      <rect x="33" y="30" width="184" height="30" fill="url(#${g}head)"/>
-      ${batHi?'<rect x="35" y="61" width="89" height="53" fill="#fff3d6"/>':''}
-      ${bowlHi?'<rect x="126" y="61" width="89" height="53" fill="#fff3d6"/>':''}
-    </g>
-    <rect x="33" y="30" width="184" height="86" rx="10" fill="none" stroke="#111" stroke-width="3"/>
-    <line x1="33" y1="60" x2="217" y2="60" stroke="#111" stroke-width="3"/>
-    <text x="41" y="51" fill="#fff" font-size="14" font-weight="700" letter-spacing=".4">${name}</text>
-    <rect x="${pillX}" y="36" width="${pillW}" height="18" rx="9" fill="#ffe23f" stroke="#111" stroke-width="2"/>
-    <text x="${(pillX+pillW/2).toFixed(1)}" y="49" text-anchor="middle" fill="#111" font-size="9.5" font-weight="700">${trait}</text>
-    <text x="41" y="108" fill="#5a6b7a" font-size="10" font-weight="700" letter-spacing="1">${roleName(c).toUpperCase()}</text>
-    <text x="125" y="76" text-anchor="middle" fill="#5a6b7a" font-size="9" font-weight="700" letter-spacing="2">OVERALL</text>
-    <text x="125" y="111" text-anchor="middle" fill="#111" font-size="36" font-weight="700">${ovrVal(c)}</text>
-    <text x="209" y="108" text-anchor="end" fill="#9aa8ad" font-size="10" font-weight="700">#${c.num}</text>
+    <defs><linearGradient id="${g}head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${hg[0]}"/><stop offset="1" stop-color="${hg[1]}"/></linearGradient></defs>
+    <rect x="33" y="30" width="184" height="32" rx="9" fill="url(#${g}head)" stroke="#111" stroke-width="3"/>
+    <text x="41" y="52" fill="#fff" font-size="${name.length>11?12:14}" font-weight="700" letter-spacing=".4">${name}</text>
+    <rect x="${pillX}" y="37" width="${pillW}" height="18" rx="9" fill="#ffe23f" stroke="#111" stroke-width="2"/>
+    <text x="${(pillX+pillW/2).toFixed(1)}" y="50" text-anchor="middle" fill="#111" font-size="9.5" font-weight="700">${trait}</text>
+    <circle cx="60" cy="284" r="33" fill="#fffdf2" stroke="#111" stroke-width="3"/>
+    <circle cx="60" cy="284" r="27" fill="none" stroke="${rc}" stroke-width="3"/>
+    <text x="60" y="294" text-anchor="middle" fill="#111" font-size="30" font-weight="700">${ovr}</text>
+    <text x="60" y="307" text-anchor="middle" fill="#5a6b7a" font-size="8" font-weight="700" letter-spacing="2">OVR</text>
+    <rect x="146" y="298" width="70" height="21" rx="10" fill="#fffdf2" stroke="#111" stroke-width="2.5"/>
+    <text x="181" y="312" text-anchor="middle" fill="${rc}" font-size="10.5" font-weight="700">${roleShort} &middot; #${c.num}</text>
   </svg>`;
 }
 function radialSVG(c){
