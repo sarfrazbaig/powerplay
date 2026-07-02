@@ -736,7 +736,22 @@
 
   /* --- cards: shared wrapper + tiers --- */
   .card{cursor:pointer}
-  .card--mini{cursor:default}
+  .card--mini{cursor:pointer}
+  .card--mini:disabled{cursor:default}
+  .card--tactical{
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    animation:none;
+  }
+  .card--tactical .tc{
+    border-radius:12px;
+  }
+  .card--tactical:hover{
+    box-shadow:none;
+    border-color:transparent;
+  }
   .card{border-radius:14px}
   .tc{border-radius:14px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.22))}
   .card.selected .tc,.card.next .tc{filter:drop-shadow(0 0 12px rgba(9,193,139,.65))}
@@ -2513,6 +2528,38 @@
   #match .duel .dslot:hover .tc,
   #match .duel .dslot:focus-within .tc{
     filter:none;
+  }
+  #match .duel .card--duel{
+    width:auto;
+    height:clamp(246px,40vh,370px);
+    aspect-ratio:5/7;
+    margin:0 auto;
+    padding:0;
+    background:transparent;
+    border:0;
+    box-shadow:none;
+    cursor:default;
+    animation:none;
+  }
+  #match .duel .card--duel:hover{
+    transform:none !important;
+    box-shadow:none !important;
+    border-color:transparent !important;
+  }
+  #match .duel .card--duel .cflip,
+  #match .duel .card--duel .cface,
+  #match .duel .card--duel .tc{
+    width:100%;
+    height:100%;
+  }
+  #match .duel .card--duel .flipchip{
+    right:6px;
+    top:6px;
+  }
+  @media(max-width:1180px){
+    #match .duel .card--duel{
+      height:clamp(190px,30vh,290px);
+    }
   }
 
   .top-actions{
@@ -4379,6 +4426,490 @@
     .pov.reveal .pflip{animation:none}
     .ccard-fx,.hexx-sigil,.packx.is-hex .packx-tilt,.freehit-tag{animation:none !important}
   }
+
+  /* ============================================================
+     UX CONTRACT LAYER
+     Last-pass hierarchy rules for the current prototype. These are
+     intentionally scoped to screen IDs so older experiment CSS cannot
+     fight the current flow.
+     ============================================================ */
+  :root{
+    --ui-black:#090c09;
+    --ui-ink:#141914;
+    --ui-felt:#39ad4d;
+    --ui-felt-dark:#1e7d3d;
+    --ui-paper:#fffdf1;
+    --ui-gold:#ffd91f;
+    --ui-cyan:#0aa6bf;
+    --ui-red:#c51627;
+    --ui-blue:#1c75d8;
+  }
+  .screen:not(.title).active{
+    width:min(100%,1920px);
+    margin:0 auto;
+  }
+  .screen:not(.title) .top{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.04),transparent 44%),
+      linear-gradient(90deg,#1b211d,#0e120f) !important;
+    box-shadow:4px 4px 0 #050505 !important;
+    color:#fffdf1;
+  }
+  .screen:not(.title) .match-title,
+  .screen:not(.title) .logo{
+    color:var(--ui-gold) !important;
+    text-shadow:3px 3px 0 #050505 !important;
+  }
+  .screen:not(.title) .sub{
+    color:#dce8d9 !important;
+  }
+  .screen:not(.title) .btn{
+    border-radius:0 !important;
+    border:3px solid #050505 !important;
+    box-shadow:3px 3px 0 #050505 !important;
+  }
+
+  /* Draft: three horizontal lanes, scout panel useful but subordinate. */
+  #draft.squad-prep-screen .draft-layout{
+    grid-template-columns:minmax(250px,315px) minmax(0,1fr) !important;
+    gap:12px !important;
+  }
+  #draft.squad-prep-screen .setup-panel{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:#151817 !important;
+    color:#fffdf1;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #draft.squad-prep-screen .setup-box{
+    border:2px solid rgba(255,253,241,.18) !important;
+    background:rgba(255,253,241,.07) !important;
+  }
+  #draft.squad-prep-screen .prep-panel.full{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:
+      radial-gradient(#132616 1.15px,transparent 1.15px),
+      linear-gradient(180deg,#42b957,#2f963f) !important;
+    background-size:12px 12px,auto !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #draft.squad-prep-screen .draft-lane{
+    min-height:0;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #draft.squad-prep-screen .draft-lane-head{
+    width:max-content;
+    min-width:185px;
+    margin:0 0 6px;
+    padding:6px 12px;
+    border:3px solid #050505;
+    background:#151817;
+    color:var(--ui-gold);
+    box-shadow:3px 3px 0 #050505;
+  }
+  #draft.squad-prep-screen .draft-lane-scroll{
+    border:3px solid rgba(5,5,5,.75);
+    background:rgba(255,253,241,.14);
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.09);
+    overflow-x:auto !important;
+    overflow-y:visible !important;
+  }
+  #draft.squad-prep-screen .draft-card{
+    flex:0 0 clamp(162px,12vw,214px) !important;
+  }
+
+  /* Toss: the coin is the event; comparison is decision support. */
+  #toss .toss-layout{
+    grid-template-columns:minmax(270px,340px) minmax(0,1fr) !important;
+  }
+  #toss .coin-flip{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:
+      radial-gradient(circle at 50% 22%,rgba(255,217,31,.2),transparent 38%),
+      #fffdf1 !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #toss .coin-face{
+    border:4px solid #050505 !important;
+    background:var(--ui-gold) !important;
+    color:#111 !important;
+    box-shadow:4px 4px 0 rgba(0,0,0,.4) !important;
+  }
+  #toss .toss-summary{
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    align-items:stretch;
+  }
+  #toss .toss-card{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    box-shadow:3px 3px 0 #050505 !important;
+  }
+  #toss .toss-card.rec{
+    background:var(--ui-gold) !important;
+    color:#111 !important;
+  }
+
+  /* Match: keep both decks visible, but stop them competing after lock. */
+  #match.screen.active{
+    gap:8px !important;
+  }
+  #match .top{
+    background:
+      linear-gradient(90deg,#161a17 0,#101410 62%,#0a0d0a 100%) !important;
+    box-shadow:4px 4px 0 #050505, inset 0 -4px 0 var(--ui-gold) !important;
+  }
+  #match .board{
+    min-height:70px;
+  }
+  #match .side,
+  #match .target{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:#fffdf1 !important;
+    color:#111 !important;
+    box-shadow:3px 3px 0 rgba(0,0,0,.45) !important;
+  }
+  #match .arena{
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #match .hand,
+  #match .rival-strip{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:
+      radial-gradient(#132616 1.1px,transparent 1.1px),
+      linear-gradient(180deg,#42b957,#2f963f) !important;
+    background-size:12px 12px,auto !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #match .hand:before,
+  #match .rival-strip-head{
+    width:100% !important;
+    min-height:58px !important;
+    border:3px solid #050505 !important;
+    background:#151817 !important;
+    color:var(--ui-gold) !important;
+    box-shadow:3px 3px 0 #050505 !important;
+  }
+  #match .deck-view-btn{
+    background:var(--ui-gold) !important;
+    color:#111 !important;
+  }
+  #match .duel{
+    position:relative;
+    border:4px solid #050505 !important;
+    border-radius:0 !important;
+    background:
+      radial-gradient(ellipse at 50% 45%,rgba(255,217,31,.16),transparent 42%),
+      radial-gradient(ellipse at 50% 40%,rgba(31,125,61,.10),transparent 58%),
+      linear-gradient(90deg,rgba(255,255,255,.18),transparent 18%,transparent 82%,rgba(0,0,0,.10)),
+      var(--ui-paper) !important;
+    box-shadow:5px 5px 0 #050505 !important;
+    overflow:hidden;
+  }
+  #match .duel-stage{
+    position:relative;
+    z-index:2;
+  }
+  #match .duel-stage:before{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:min(58vw,780px);
+    height:min(31vh,300px);
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:radial-gradient(ellipse,rgba(58,173,77,.17),rgba(58,173,77,.06) 48%,transparent 70%);
+    pointer-events:none;
+  }
+  #match .duel-stage>*{
+    position:relative;
+    z-index:1;
+  }
+  #match .vs{
+    letter-spacing:.02em !important;
+  }
+  #match .coach-strip{
+    z-index:3;
+  }
+  #match .coach-strip,
+  #match .commentary-strip,
+  #match .odds-stage{
+    position:relative;
+    z-index:3;
+  }
+  #match .odds-stage{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:#fffdf1 !important;
+    box-shadow:4px 4px 0 rgba(0,0,0,.45) !important;
+  }
+  #match .curve-area{
+    fill:rgba(52,190,95,.18) !important;
+    stroke:#139447 !important;
+  }
+  #match .curve-dot,
+  #match .curve-marker,
+  #match .curve-flash,
+  #match .curve-dot.hit{
+    fill:var(--ui-red) !important;
+    stroke:#fffdf1 !important;
+  }
+  #match.is-card-locked .player-fan .card:not(.selected),
+  #match.is-card-locked .rival-fan .card:not(.next){
+    opacity:.34 !important;
+    filter:grayscale(.85) saturate(.65) contrast(.86) !important;
+  }
+  #match.is-card-locked .hand,
+  #match.is-card-locked .rival-strip,
+  #match.is-resolving .hand,
+  #match.is-resolving .rival-strip,
+  #match.is-settled .hand,
+  #match.is-settled .rival-strip{
+    filter:saturate(.82) contrast(.94);
+  }
+  #match.is-resolving .player-fan .card,
+  #match.is-resolving .rival-fan .card,
+  #match.is-settled .player-fan .card,
+  #match.is-settled .rival-fan .card{
+    pointer-events:none !important;
+  }
+  #match.is-resolving .scorebug,
+  #match.is-settled .scorebug{
+    opacity:.92;
+  }
+  #match .card--duel{
+    height:clamp(270px,43vh,405px) !important;
+  }
+  #match .duel .dslot .tc,
+  #match .duel .placeholder{
+    height:clamp(270px,43vh,405px) !important;
+  }
+  #match .commentary-strip{
+    border-radius:0 !important;
+  }
+  #match .scorebug{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #match .bug-balls .ball-chip{
+    width:42px !important;
+    height:42px !important;
+  }
+
+  /* Shop: pack counter first, quick buys clearly secondary. */
+  #shop .shopx-body{
+    grid-template-columns:minmax(210px,275px) minmax(520px,1fr) minmax(230px,300px) !important;
+    gap:12px !important;
+  }
+  #shop .shopx-stage,
+  #shop .shopx-rail,
+  #shop .shopx-foot{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #shop .shopx-stage{
+    background:
+      radial-gradient(ellipse at 50% 42%,rgba(255,217,31,.18),transparent 46%),
+      linear-gradient(90deg,rgba(255,255,255,.16),transparent 18%,transparent 82%,rgba(0,0,0,.1)),
+      var(--ui-paper) !important;
+  }
+  #shop .stagex-head{
+    padding-bottom:8px;
+    border-bottom:3px solid #050505;
+  }
+  #shop .packx-row{
+    align-content:center;
+  }
+  #shop .shopx-rail{
+    background:
+      radial-gradient(#132616 1.1px,transparent 1.1px),
+      linear-gradient(180deg,#42b957,#2f963f) !important;
+    background-size:12px 12px,auto !important;
+  }
+  #shop .railx-head{
+    border-radius:0 !important;
+  }
+  #shop .vcard{
+    border-radius:0 !important;
+  }
+
+  /* Squad room: same clubhouse surface as the shop, no white island. */
+  #squad .squad-room{
+    grid-template-columns:minmax(245px,300px) minmax(0,1fr) !important;
+    gap:12px !important;
+  }
+  #squad .squad-rail,
+  #squad .prep-panel.full{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  #squad .squad-rail{
+    background:#151817 !important;
+    color:#fffdf1;
+  }
+  #squad .prep-panel.full{
+    background:
+      radial-gradient(#132616 1.1px,transparent 1.1px),
+      linear-gradient(180deg,#42b957,#2f963f) !important;
+    background-size:12px 12px,auto !important;
+  }
+  #squad .roster-group{
+    background:rgba(255,253,241,.12);
+    border:3px solid rgba(5,5,5,.72);
+    padding:8px 10px 10px;
+  }
+  #squad .roster-row{
+    overflow-x:auto !important;
+    overflow-y:visible !important;
+    padding:10px 6px 8px !important;
+  }
+
+  @media(max-width:1180px){
+    #toss .toss-summary{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+    #match .card--duel,
+    #match .duel .dslot .tc,
+    #match .duel .placeholder{height:clamp(205px,32vh,310px) !important}
+    #match .bug-balls .ball-chip{width:34px !important;height:34px !important}
+    #shop .shopx-body{grid-template-columns:1fr !important}
+    #squad .squad-room,
+    #draft.squad-prep-screen .draft-layout,
+    #toss .toss-layout{grid-template-columns:1fr !important}
+  }
+
+  /* ============================================================
+     ARENA CALM — the match screen is where players live; the duel
+     is the hero, everything else recedes. Audit P0 fixes included.
+     ============================================================ */
+  /* 1. rails recede: flat darker felt, no dot texture, slim headers */
+  #match .hand,
+  #match .rival-strip{
+    background:linear-gradient(180deg,#2e8743,#256e38) !important;
+    box-shadow:3px 3px 0 #050505 !important;
+  }
+  #match .hand:before,
+  #match .rival-strip-head{
+    min-height:40px !important;
+    padding:5px 10px !important;
+    font-size:15px !important;
+    box-shadow:none !important;
+  }
+  /* 2. fan cards: never letterbox — 5:7 boxes sized by row height */
+  #match .player-fan .card,
+  #match .rival-fan .card{
+    width:auto !important;
+    height:100% !important;
+    aspect-ratio:5/7;
+    justify-self:center;
+    max-width:100%;
+  }
+  #match .player-fan .card .cflip,
+  #match .rival-fan .card .cflip,
+  #match .player-fan .card .cface,
+  #match .rival-fan .card .cface,
+  #match .player-fan .card .tc,
+  #match .rival-fan .card .tc{
+    width:100%;height:100%;
+  }
+  /* used cards shrink toward slivers instead of graying at full size */
+  #match .player-fan .card.used,
+  #match .rival-fan .card.used{
+    opacity:.28 !important;
+    transform:scale(.82) !important;
+    filter:grayscale(1) !important;
+  }
+  /* 3. lock state: quiet focus, not a disabled wall */
+  #match.is-card-locked .player-fan .card:not(.selected),
+  #match.is-card-locked .rival-fan .card:not(.next){
+    opacity:.62 !important;
+    filter:saturate(.65) !important;
+  }
+  /* 4. the duel is the only hero panel */
+  #match .duel{
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.16),transparent 16%,transparent 84%,rgba(0,0,0,.07)),
+      var(--ui-paper) !important;
+  }
+  #match .duel-stage:before{display:none !important}
+  #match .odds-stage{
+    border-width:2px !important;
+    box-shadow:none !important;
+    background:#fbf8ea !important;
+  }
+  /* 5. commentary: one quiet line, boxed only while the ball is live */
+  #match .commentary-strip.quiet{
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+    color:#5d6f60 !important;
+    font-size:12px !important;
+    font-weight:700;
+    text-align:center;
+    padding:2px 0 !important;
+  }
+  #match .commentary-strip.quiet.muted{color:#8a978c !important}
+  /* 6. coach chips: slim, only when hired */
+  #match .coach-strip.slim{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    align-items:center;
+    padding:0 0 4px;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .coach-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:2px 10px 2px 4px;
+    border:2px solid #050505;
+    border-radius:999px;
+    background:#fffdf1;
+    font-size:11px;
+    font-weight:800;
+    color:#111;
+  }
+  .coach-chip img{width:20px;height:20px;object-fit:contain}
+  /* 7. scorebug: neutral band, the EQUATION is the only loud cell */
+  #match .scorebug{
+    background:#151817 !important;
+  }
+  #match .scorebug .bug-cell{
+    background:transparent !important;
+    color:#e8f0e6 !important;
+    border-color:rgba(255,253,241,.16) !important;
+  }
+  #match .scorebug .bug-cell span,
+  #match .scorebug .bug-cell small{color:#9fb0a2 !important}
+  #match .scorebug .bug-cell b{color:#fffdf1 !important}
+  #match .scorebug .bug-cell.bug-target{
+    background:var(--ui-gold) !important;
+  }
+  #match .scorebug .bug-cell.bug-target span,
+  #match .scorebug .bug-cell.bug-target small{color:#4a3d00 !important}
+  #match .scorebug .bug-cell.bug-target b{color:#111 !important}
+  /* 8. odds curve: outcome quality colours restored; gold = the roll */
+  #match .curve-dot{fill:#b9c4b6 !important;stroke:#7d8a7f !important}
+  #match .curve-dot.good{fill:#1f9b53 !important;stroke:#0d6b36 !important}
+  #match .curve-dot.danger{fill:var(--ui-red) !important;stroke:#7d0e1b !important}
+  #match .curve-marker,
+  #match .curve-flash,
+  #match .curve-dot.hit{fill:var(--ui-gold) !important;stroke:#111 !important}
+  #match .curve-area{fill:rgba(52,190,95,.14) !important;stroke:#2b8a52 !important}
 </style>
 </head>
 <body>
@@ -4898,7 +5429,12 @@ let run,m;
 let dealAnim=true,challengeAnim=false,anim=false;
 
 function show(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
+  document.querySelectorAll(".screen").forEach(s=>{
+    const active=s.id===id;
+    s.classList.toggle("active",active);
+    s.toggleAttribute("inert",!active);
+    s.setAttribute("aria-hidden",active?"false":"true");
+  });
   if(id!=="match"){
     $("#rivalDrawer")?.classList.remove("show");
     const actions=$("#actions");if(actions)actions.innerHTML="";
@@ -5132,6 +5668,7 @@ function use(c){c.used=true;m.challenge.used=true}
 function play(c){if(!c||!m.challenge||m.result||c.used)return;if(m.phase==="bowl")resolveBowl(c);else resolveBat(c)}
 function previewCard(c){
   if(!c||!m.challenge||anim||m.result||c.used)return;
+  if(m.selectionLocked||m.selected)return;
   if(m.preview===c)return;
   m.preview=c;
   renderDuel(false);
@@ -5141,7 +5678,7 @@ function selectCard(c,lock=false){
   if(!c||!m.challenge||anim||m.result||c.used)return;
   if(m.selected===c&&(!lock||m.selectionLocked))return;
   m.selected=c;
-  m.preview=c;
+  m.preview=null;
   if(lock)m.selectionLocked=true;
   render();
 }
@@ -5627,6 +6164,13 @@ function phaseLabelText(){
   return fh+(m.phase==="bowl"?`<b>You bowl</b> — keep them low · ball ${m.ball}/${m.def.balls}`:`<b>You bat</b> — set a target · ball ${m.ball}/${m.def.balls}`);
 }
 function render(pop=false){
+  const matchScreen=$("#match");
+  if(matchScreen){
+    matchScreen.classList.toggle("is-previewing",!!m.preview&&!m.selected&&!m.result);
+    matchScreen.classList.toggle("is-card-locked",!!m.selected&&!m.result);
+    matchScreen.classList.toggle("is-resolving",m.result?.state==="resolving");
+    matchScreen.classList.toggle("is-settled",m.result?.state==="settled");
+  }
   $("#matchName").textContent=matchLabel(m.def);
   $("#phaseLabel").innerHTML=phaseLabelText();
   $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
@@ -5664,7 +6208,7 @@ function renderExplainers(){
 }
 function currentOddsInfo(){
   if(m.result)return {strip:m.result.strip,roll:m.result.roll,margin:m.result.mine-m.result.theirs,resolving:m.result.state==="resolving"};
-  const card=m.preview||m.selected;
+  const card=m.selected||m.preview;
   if(!card||!m.challenge)return null;
   const mine=m.phase==="bowl"?bowlVal(card):batVal(card);
   const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
@@ -5718,13 +6262,12 @@ function renderOverStrip(){
 function ballToken(result){if(result==="WICKET")return "W";if(result==="WIDE")return "wd";if(result==="NO BALL")return "nb";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
 function coachStripHTML(){
+  // Quiet by default: no placeholder boxes. Coaches appear as slim chips
+  // only when hired; an empty staff renders nothing at all.
   const active=activeCoaches();
-  const slots=Array.from({length:3},(_,i)=>{
-    const coach=active[i];
-    return `<div class="coach-arena-slot ${coach?'active':''}">${coach?`<div class="coach-arena-art"><img src="${coachArt(coach)}" alt="" loading="lazy"></div><div class="coach-arena-info"><b>${coach.name}</b><span>${coach.desc}</span></div>`:`<b>+</b><span>Coach ${i+1}</span>`}</div>`;
-  }).join("");
-  const state=m.innings===1?(m.phase==="bowl"?"Set target: keep rival low":"Set target: score freely"):(m.phase==="bat"?`Chase ${m.target+1}`:`Defend ${m.target}`);
-  return `<div class="coach-strip"><div class="match-effects"><b>Match effects</b><span>${state}</span><small>Stadium and boss modifiers will appear here.</small></div><div class="coach-slots">${slots}</div></div>`;
+  if(!active.length)return "";
+  const chips=active.map(coach=>`<span class="coach-chip" title="${coach.desc}"><img src="${coachArt(coach)}" alt="" loading="lazy">${coach.name}</span>`).join("");
+  return `<div class="coach-strip slim">${chips}</div>`;
 }
 function commentaryLines(result){
   const token=ballToken(result.text);
@@ -5739,14 +6282,15 @@ function commentaryLines(result){
   return ["The ball is in play.", "Both cards are fighting the odds.", `${result.text} recorded.`];
 }
 function commentaryHTML(){
+  // The animated call stays for the resolve moment; every other state is a
+  // single quiet line — no box, no competing band.
   if(m.result?.state==="resolving"){
     const lines=commentaryLines(m.result);
     return `<div class="commentary-strip live"><span class="c-line l1">${lines[0]}</span><span class="c-line l2">${lines[1]}</span><span class="c-line l3">${lines[2]}</span></div>`;
   }
-  if(m.result)return `<div class="commentary-strip settled">${commentaryLines(m.result)[2]}</div>`;
-  if(m.selected)return `<div class="commentary-strip">Card locked. Read the curve, then play the ball.</div>`;
-  if(m.preview)return `<div class="commentary-strip">Previewing the matchup. The curve shows where this ball wants to go.</div>`;
-  return `<div class="commentary-strip muted">Hover a card to preview the odds.</div>`;
+  if(m.result)return `<div class="commentary-strip quiet">${commentaryLines(m.result)[2]}</div>`;
+  if(m.selected)return `<div class="commentary-strip quiet">Locked in. Play the ball when ready.</div>`;
+  return `<div class="commentary-strip quiet muted">Hover a card to preview the odds.</div>`;
 }
 function resultWinner(result){
   const token=ballToken(result.text);
@@ -5850,7 +6394,7 @@ function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t
 function selectedColor(role){return role==="bat"?"#09c18b":role==="bowl"?"#ff5b2c":"#d943ff"}
 function escSVG(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[ch]))}
 function headGrad(role){return role==="bowl"?["#8a1414","#d83636"]:role==="all"?["#5a2c9a","#8f68ef"]:["#12589a","#2f8fd6"]}
-function cardShell(g,dim,rarityKey="common",role="all"){
+function cardShell(g,dim,rarityKey="common",role="all",plain=false){
   const metals={
     common:["#53636b","#aebbc0","#f4f0df"],
     uncommon:["#176b39","#5be188","#f5ffe4"],
@@ -5864,6 +6408,20 @@ function cardShell(g,dim,rarityKey="common",role="all"){
     : `<stop offset="0" stop-color="#4aa8e0"/><stop offset=".4" stop-color="#7fc4ea"/><stop offset=".56" stop-color="#cfeaf6"/><stop offset=".58" stop-color="#8cc852"/><stop offset="1" stop-color="#5f9f28"/>`;
   const rr=escSVG((RARITIES[rarityKey]?.label||"Common").toUpperCase()), band=(rr+" ★ ").repeat(9);
   const flood=cx=>`<rect x="${cx-13}" y="122" width="26" height="14" rx="2" fill="#ece2b0" stroke="#111" stroke-width="2"/><rect x="${cx-2}" y="136" width="4" height="16" fill="#333"/>`;
+  const bandText=plain?"":`<g font-family="Oswald,Arial,sans-serif" font-size="6.4" font-weight="600" letter-spacing="1.5" fill="${metals[0]}" opacity=".9">
+      <g clip-path="url(#${g}bt)"><text x="18" y="21">${band}</text></g>
+      <g clip-path="url(#${g}bb)"><text x="18" y="333">${band}</text></g>
+      <g clip-path="url(#${g}bl)"><text x="18" y="21" transform="rotate(90 18 20)">${band}</text></g>
+      <g clip-path="url(#${g}br)"><text x="232" y="21" transform="rotate(90 232 20)">${band}</text></g>
+    </g>
+    <g class="edge-shine" opacity="0">
+      <rect x="-80" y="12" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bt)"/>
+      <rect x="-80" y="323" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bb)"/>
+      <rect x="12" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}bl)" transform="rotate(90 19.5 19.5)"/>
+      <rect x="223" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}br)" transform="rotate(90 230.5 19.5)"/>
+    </g>`;
+  const floods=plain?"":`${flood(66)}${flood(184)}`;
+  const crowd=plain?"":`<g opacity=".85">${Array.from({length:11},(_,i)=>`<circle cx="${34+i*17}" cy="${159+(i%2)*13}" r="2.1" fill="${i%3===0?'#ffd23f':i%3===1?'#ff5c5c':'#4ad1ff'}"/>`).join("")}</g>`;
   return `<defs>
       <linearGradient id="${g}paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f0de"/><stop offset=".55" stop-color="#eee4ce"/><stop offset="1" stop-color="#f7f1e2"/></linearGradient>
       <linearGradient id="${g}metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metals[0]}"/><stop offset=".26" stop-color="${metals[1]}"/><stop offset=".47" stop-color="${metals[2]}"/><stop offset=".7" stop-color="${metals[1]}"/><stop offset="1" stop-color="${metals[0]}"/></linearGradient>
@@ -5878,24 +6436,13 @@ function cardShell(g,dim,rarityKey="common",role="all"){
     </defs>
     <rect x="6" y="5" width="238" height="340" rx="16" fill="url(#${g}paper)" filter="url(#${g}shadow)"/>
     <rect x="12" y="12" width="226" height="326" rx="11" fill="url(#${g}metal)" stroke="#111" stroke-width="2.5"/>
-    <g font-family="Oswald,Arial,sans-serif" font-size="6.4" font-weight="600" letter-spacing="1.5" fill="${metals[0]}" opacity=".9">
-      <g clip-path="url(#${g}bt)"><text x="18" y="21">${band}</text></g>
-      <g clip-path="url(#${g}bb)"><text x="18" y="333">${band}</text></g>
-      <g clip-path="url(#${g}bl)"><text x="18" y="21" transform="rotate(90 18 20)">${band}</text></g>
-      <g clip-path="url(#${g}br)"><text x="232" y="21" transform="rotate(90 232 20)">${band}</text></g>
-    </g>
-    <g class="edge-shine" opacity="0">
-      <rect x="-80" y="12" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bt)"/>
-      <rect x="-80" y="323" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bb)"/>
-      <rect x="12" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}bl)" transform="rotate(90 19.5 19.5)"/>
-      <rect x="223" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}br)" transform="rotate(90 230.5 19.5)"/>
-    </g>
+    ${bandText}
     <rect x="24" y="24" width="202" height="302" rx="7" fill="#111"/>
     <g clip-path="url(#${g}scene)">
       <rect x="26" y="26" width="198" height="298" fill="url(#${g}sky)"/>
-      ${flood(66)}${flood(184)}
+      ${floods}
       <rect x="26" y="150" width="198" height="42" fill="${dusk?'#3a2c55':'#6b4e96'}"/>
-      <g opacity=".85">${Array.from({length:11},(_,i)=>`<circle cx="${34+i*17}" cy="${159+(i%2)*13}" r="2.1" fill="${i%3===0?'#ffd23f':i%3===1?'#ff5c5c':'#4ad1ff'}"/>`).join("")}</g>
+      ${crowd}
       <rect x="26" y="192" width="198" height="132" fill="${dusk?'#5f9328':'#74b932'}"/>`;
 }
 function roleColor(c){return c.role==="bat"?"#1f9b53":c.role==="bowl"?"#c0303f":"#7245c9"}
@@ -5903,16 +6450,20 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
   const g="g"+(svgSeq++);
   const hg=headGrad(c.role),img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
   if(compact){
+    // Mini info budget: the decision stat + the surname. Nothing else.
     const nm=escSVG(c.name.split(" ").pop().toUpperCase());
+    const statKind=emph==="bowl"?"bowl":"bat";
+    const statNum=statKind==="bowl"?bowlNum:batNum;
+    const statColor=statKind==="bowl"?"#c0303f":"#1f9b53";
     return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
-    ${cardShell(g,dim,c.rarity,c.role)}
-      <image href="${img}" x="30" y="168" width="190" height="156" preserveAspectRatio="xMidYMax meet" opacity="${dim?.9:1}"/>
+    ${cardShell(g,dim,c.rarity,c.role,true)}
+      <image href="${img}" x="30" y="130" width="190" height="194" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}"/>
     </g>
-    <defs><linearGradient id="${g}head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${hg[0]}"/><stop offset="1" stop-color="${hg[1]}"/></linearGradient></defs>
-    <rect x="33" y="30" width="184" height="30" rx="9" fill="url(#${g}head)" stroke="#111" stroke-width="3"/>
-    <text x="125" y="51" text-anchor="middle" fill="#fff" font-size="${nm.length>9?13:16}" font-weight="700" letter-spacing=".5">${nm}</text>
-    <text x="125" y="146" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="7" paint-order="stroke" font-size="76" font-weight="700">${ovr}</text>
-    <text x="125" y="166" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="3" paint-order="stroke" font-size="12" font-weight="700" letter-spacing="3">OVR</text>
+    <rect x="58" y="38" width="134" height="76" rx="10" fill="#fffdf2" stroke="#111" stroke-width="4"/>
+    <rect x="58" y="38" width="134" height="76" rx="10" fill="none" stroke="${statColor}" stroke-width="0"/>
+    <text x="125" y="60" text-anchor="middle" fill="${statColor}" font-size="13" font-weight="700" letter-spacing="2">${statKind.toUpperCase()}</text>
+    <text x="125" y="104" text-anchor="middle" fill="#111" font-size="46" font-weight="700">${statNum}</text>
+    <text x="125" y="318" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="4" paint-order="stroke" font-size="${nm.length>9?13:16}" font-weight="700" letter-spacing=".6">${nm}</text>
   </svg>`;
   }
   const name=escSVG((c.name.length>14?c.name.slice(0,13)+"…":c.name).toUpperCase());
@@ -5955,15 +6506,17 @@ function radialSVG(c){
     <text x="125" y="332" text-anchor="middle" font-size="9" font-weight="700" fill="#8a8064">BAT ${batVal(c)} &middot; BOWL ${bowlVal(c)}${c.trait?` &middot; ${escSVG(c.trait.name.toUpperCase())}`:""}</text>
   </svg>`;
 }
-function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini}={}){
+function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,as="button"}={}){
   const flip=mini?"":`<div class="cface cback">${radialSVG(c)}</div>`;
   const chip=mini?"":`<span class="flipchip" onclick="event.stopPropagation();event.preventDefault();this.closest('.card').classList.toggle('flipped')" title="Flip for sub-stats">&#8635;</span>`;
-  return `<button class="card ${mini?'card--mini':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''}" ${disabled?'disabled':''}
+  const tag=as==="div"?"div":"button";
+  const roleAttr=tag==="div"?'role="group"':(disabled?'disabled':'');
+  return `<${tag} class="card ${mini?'card--mini card--tactical':''} ${duel?'card--duel':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''}" ${roleAttr}
     style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
     <span class="selbadge">✓</span><span class="sheen"></span>
-    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</div>${flip}</div>${chip}</button>`;
+    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</div>${flip}</div>${chip}</${tag}>`;
 }
-function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`}
+function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardHTML(c,{emph,as:"div",duel:true,active:true})}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div><div class="placeholder">+</div></div>`}
 function renderDuel(pop=false){
   const d=$("#duel");
@@ -6004,7 +6557,7 @@ function renderActions(){
   for(const id in map){const el=$("#"+id);if(el)el.onclick=map[id]}
 }
 function renderHand(){
-  const cards=fanSort(activeSquad()),animate=dealAnim;dealAnim=false;
+  const cards=matchDeckSort(activeSquad(),true),animate=dealAnim;dealAnim=false;
   const emph=m.phase==="bowl"?"bowl":"bat";
   $("#hand").innerHTML=`<button class="btn secondary sm deck-view-btn own-scan-btn" id="scanMineBtn" title="View your full squad">View ▸</button><div class="fan-row player-fan">${cards.map((c,i)=>fanCard(c,i,cards.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph,animate})).join("")}</div>`;
   document.querySelectorAll("#hand .card").forEach(b=>{
@@ -6019,12 +6572,19 @@ function fanSort(cards){
   const roleOrder={bat:0,all:1,bowl:2};
   return cards.slice().sort((a,b)=>roleOrder[a.role]-roleOrder[b.role]||sortStrong(a,b));
 }
+function matchDeckSort(cards,player=true){
+  if(!m?.phase)return fanSort(cards);
+  const relevant=player
+    ?(c=>m.phase==="bowl"?bowlVal(c):batVal(c))
+    :(c=>m.phase==="bowl"?batVal(c):bowlVal(c));
+  return cards.slice().sort((a,b)=>(a.used?1:0)-(b.used?1:0)||relevant(b)-relevant(a)||sortStrong(a,b));
+}
 function fanStyle(i,total,spread=1.05){
   const mid=(total-1)/2,offset=i-mid;
   return `--rot:${(offset*spread).toFixed(2)}deg;--z:${i+1};--d:${i*24}ms`;
 }
-function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,animate=false,rival=false}={}){
-  return cardHTML(c,{selected,used,disabled,emph,dealin:animate,mini:rival,fan:fanStyle(i,total,rival ? .78 : 1.05)});
+function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,animate=false,rival=false,tactical=true}={}){
+  return cardHTML(c,{selected,used,disabled,emph,dealin:animate,mini:tactical||rival,fan:fanStyle(i,total,rival ? .78 : 1.05)});
 }
 
 /* ---------- SCOUT: decks ---------- */
@@ -6403,6 +6963,13 @@ function deckLean(cards){
   if(counts.all>counts.bat&&counts.all>counts.bowl)return "all-rounder heavy";
   return "balanced";
 }
+function tossRecommendationHTML(yBat,yBowl,rBat,rBowl){
+  const batEdge=yBat-rBowl,bowlEdge=yBowl-rBat;
+  const batFirst=batEdge>=bowlEdge;
+  const edge=batFirst?batEdge:bowlEdge;
+  const matchup=batFirst?`BAT ${yBat} vs rival BOWL ${rBowl}`:`BOWL ${yBowl} vs rival BAT ${rBat}`;
+  return `<div class="toss-card rec"><span>Suggested call</span><b>${batFirst?"Bat first":"Bowl first"}</b><small>${matchup} (${edge>=0?"+":""}${edge})</small></div>`;
+}
 function tossSummaryHTML(){
   const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
   const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
@@ -6410,6 +6977,7 @@ function tossSummaryHTML(){
     <div class="toss-card"><span>Your 12</span><b>${activeSquad().length}/12</b><small>BAT ${yBat} / BOWL ${yBowl}</small></div>
     <div class="toss-card"><span>Rival read</span><b>${deckLean(m.rivalDeck)}</b><small>BAT ${rBat} / BOWL ${rBowl}</small></div>
     <div class="toss-card"><span>Decision</span><b>${m.tossCall?m.tossWon?"Your call":"Rival call":"Call toss"}</b><small>${m.tossCall?"Choose innings after the flip.":"Heads or tails."}</small></div>
+    ${tossRecommendationHTML(yBat,yBowl,rBat,rBowl)}
   </div>`;
 }
 function renderToss(){
@@ -6450,7 +7018,7 @@ function renderRivalStrip(){
   const emph=m.phase==="bowl"?"bat":"bowl";
   const head=$("#rivalStripMeta")?.parentElement;if(head?.firstElementChild)head.firstElementChild.textContent="Rival cards";
   $("#rivalStripMeta").textContent=`${m.rivalDeck.filter(c=>!c.used).length} left`;
-  const cards=fanSort(m.rivalDeck);
+  const cards=matchDeckSort(m.rivalDeck,false);
   $("#rivalStrip").className="rival-mini-row table-bench fan-row rival-fan";
   $("#rivalStrip").innerHTML=cards.map((c,i)=>fanCard(c,i,cards.length,{used:c.used,disabled:true,emph,rival:true})).join("");
   const next=$("#rivalStrip .card[data-id='"+m.challenge?.id+"']");
@@ -6575,6 +7143,7 @@ document.addEventListener("pointerout",e=>{
   if(parallaxHost&&!pointerInHost(parallaxHost,e,18)&&(!e.relatedTarget||!parallaxHost.contains(e.relatedTarget)))clearMatchParallax();
 });
 renderTitle();
+show("title");
 </script>
 </body>
 </html>
