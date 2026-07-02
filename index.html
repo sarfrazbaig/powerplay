@@ -4861,10 +4861,14 @@
   #match .commentary-strip.quiet.muted{color:#8a978c !important}
   /* 6. coach chips: slim, only when hired */
   #match .coach-strip.slim{
-    display:flex;
-    gap:8px;
+    display:flex !important;
+    flex-wrap:wrap;
+    gap:8px !important;
     justify-content:center;
     align-items:center;
+    width:auto !important;
+    min-height:0 !important;
+    margin:0 auto !important;
     padding:0 0 4px;
     border:0 !important;
     background:transparent !important;
@@ -4883,6 +4887,33 @@
     color:#111;
   }
   .coach-chip img{width:20px;height:20px;object-fit:contain}
+  .coach-chip.empty{
+    background:transparent;
+    border:2px dashed rgba(255,253,241,.3);
+    color:#8a978c;
+    padding:2px 10px;
+    font-weight:700;
+  }
+  /* 6b. match tools: owned consumables, click to arm for the next ball */
+  .tool-tray{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;padding:0 0 6px}
+  .tool-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:3px 12px;
+    border:2px solid #050505;
+    border-radius:999px;
+    background:#ffe9a8;
+    font-size:11px;
+    font-weight:800;
+    color:#111;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .tool-chip em{font-style:normal;font-size:9px;opacity:.6;letter-spacing:.4px}
+  .tool-chip i{font-style:normal;font-size:9px;color:#7a5b00;letter-spacing:.6px}
+  .tool-chip.armed{background:#ffd34d;box-shadow:0 0 0 2px #ffd34d,0 0 12px rgba(255,211,77,.45)}
+  .tool-chip.offmode{opacity:.62}
   /* 7. scorebug: neutral band, the EQUATION is the only loud cell */
   #match .scorebug{
     background:#151817 !important;
@@ -5872,7 +5903,10 @@ function applyCoachStrips(mode,strip,card){
   return s;
 }
 function nextConsumable(mode){
-  return (run?.consumables||[]).find(c=>!c.kind&&(c.mode==="any"||c.mode===mode));
+  // Manual arming: a tool only fires if the player armed it from the match tray
+  // and the delivery mode matches. Nothing auto-burns invisibly.
+  if(!m||!m.armedId)return null;
+  return (run?.consumables||[]).find(c=>c.ownedId===m.armedId&&!c.kind&&(c.mode==="any"||c.mode===mode))||null;
 }
 function applyOwnedConsumableStrip(mode,strip){
   const owned=nextConsumable(mode);
@@ -6142,8 +6176,11 @@ function getStripFor(mode,card){
 function consumeArmed(mode){
   const owned=nextConsumable(mode);
   if(!owned)return;
-  if(activeCoaches().some(co=>co.archivist)&&Math.random()<.3){m.log+=` <b>Archivist saves ${owned.name}!</b>`;return}
+  // note is appended AFTER the resolvers assign m.log, or it gets overwritten
+  if(activeCoaches().some(co=>co.archivist)&&Math.random()<.3){m.toolNote=`Archivist saves ${owned.name}!`;return}
   run.consumables=(run.consumables||[]).filter(c=>c.ownedId!==owned.ownedId);
+  m.armedId=null;
+  m.toolNote=`${owned.name} used.`;
 }
 function applyExtras(out,mode){
   m.extrasCount=(m.extrasCount||0)+1;
@@ -6169,6 +6206,7 @@ function resolveBowl(c){
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
   m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
     :`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
+  if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
   coachOutcome(out,"bowl");
   addHistory(out.text,`Bowl ${mine} v Bat ${theirs}`);
   render(true);
@@ -6193,6 +6231,7 @@ function resolveBat(c){
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
   m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
     :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
+  if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
   coachOutcome(out,"bat");
   addHistory(out.text,`Bat ${mine} v Bowl ${theirs}`);
   render(true);
@@ -6604,12 +6643,30 @@ function renderOverStrip(){
 function ballToken(result){if(result==="WICKET")return "W";if(result==="WIDE")return "wd";if(result==="NO BALL")return "nb";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
 function coachStripHTML(){
-  // Quiet by default: no placeholder boxes. Coaches appear as slim chips
-  // only when hired; an empty staff renders nothing at all.
+  // Always visible so players learn coaches live here: hired coaches as chips,
+  // remaining slots as quiet dashed placeholders.
   const active=activeCoaches();
-  if(!active.length)return "";
-  const chips=active.map(coach=>`<span class="coach-chip" title="${coach.desc}"><img src="${coachArt(coach)}" alt="" loading="lazy">${coach.name}</span>`).join("");
-  return `<div class="coach-strip slim">${chips}</div>`;
+  const chips=active.map(coach=>`<span class="coach-chip" title="${coach.desc}"><img src="${coachArt(coach)}" alt="" loading="lazy">${coach.name}</span>`);
+  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
+  for(let i=0;i<open;i++)chips.push(`<span class="coach-chip empty" title="Hire coaches in the shop — they work every ball">Coach slot</span>`);
+  return `<div class="coach-strip slim">${chips.join("")}</div>`;
+}
+function consumableTrayHTML(){
+  const tools=(run?.consumables||[]).filter(c=>!c.kind);
+  if(!tools.length)return "";
+  const chips=tools.map(c=>{
+    const armed=m.armedId===c.ownedId;
+    const onMode=c.mode==="any"||c.mode===m.phase;
+    const hint=onMode?"":` — fires when you ${c.mode==="bat"?"bat":"bowl"}`;
+    return `<button class="tool-chip ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}" title="${c.desc||""}${hint}">${c.name}<em>${c.mode==="any"?"ANY":c.mode.toUpperCase()}</em>${armed?'<i>ARMED</i>':''}</button>`;
+  }).join("");
+  return `<div class="tool-tray">${chips}</div>`;
+}
+function armTool(ownedId){
+  if(m.result)return;
+  m.armedId=m.armedId===ownedId?null:ownedId;
+  m.stripCache={};
+  renderDuel();
 }
 function commentaryLines(result){
   const token=ballToken(result.text);
@@ -6883,12 +6940,13 @@ function renderDuel(pop=false){
     const left=m.selected
       ?duelCardHTML(m.selected,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph)
       :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
-    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${commentaryHTML()}${renderOddsStage()}`;
+    d.innerHTML=`${coachStripHTML()}${consumableTrayHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${commentaryHTML()}${renderOddsStage()}`;
   }else{
     d.innerHTML=`<div class="cleared-duel"><div><b>--</b><div>No rival card available</div><button class="btn" id="nextBall">Resolve Match</button></div></div>`;
   }
   d.classList.toggle("resolving",m.result?.state==="resolving");
   d.classList.toggle("settled",m.result?.state==="settled");
+  d.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
   renderActions();
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
 }
