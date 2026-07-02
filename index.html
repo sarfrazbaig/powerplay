@@ -4955,6 +4955,120 @@
   }
   #match .odds-stage{flex:0 0 auto}
   #match .commentary-strip{flex:0 0 auto}
+  /* 10. two-tier rails: 6 ready cards at speaking size, the rest as
+        slivers — everything visible, nothing shouting */
+  #match .hand,
+  #match .rival-strip{
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    gap:8px;
+  }
+  #match .rival-strip .rival-mini-row{
+    display:contents;
+  }
+  #match .player-fan.tier-ready,
+  #match .rival-fan.tier-ready{
+    grid-template-rows:repeat(2,minmax(0,1fr)) !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    min-height:0;
+  }
+  #match .tier-reserve{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    align-content:flex-start;
+    justify-content:center;
+    padding:6px 4px 2px;
+    border-top:2px solid rgba(5,5,5,.35);
+    min-height:52px;
+  }
+  .sliver{
+    display:grid;
+    justify-items:center;
+    gap:0;
+    width:47px;
+    padding:3px 2px 4px;
+    border:2px solid #050505;
+    border-radius:6px;
+    background:#fffdf1;
+    cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .sliver b{font-family:Oswald,Inter,sans-serif;font-size:17px;line-height:1;color:#111}
+  .sliver span{font-size:8px;font-weight:800;letter-spacing:.02em;color:#5d6f60;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sliver:not(:disabled):hover{transform:translateY(-3px) scale(1.12)}
+  .sliver.used{opacity:.35;filter:grayscale(1);cursor:default}
+  .sliver:disabled{cursor:default}
+  .sliver.next{outline:3px solid var(--ui-gold);outline-offset:1px}
+  #match.is-card-locked .sliver:not(.next){opacity:.62}
+  /* 11. market stall: singles are the real cards, face-up */
+  .singlex{
+    position:relative;
+    display:grid;
+    justify-items:center;
+    gap:6px;
+    padding:8px;
+    border:3px solid #050505;
+    background:#f8f6e8;
+    box-shadow:3px 3px 0 rgba(0,0,0,.45);
+  }
+  .singlex.bought{opacity:.5;filter:grayscale(.5)}
+  .singlex.is-scouted{border-color:#0d6b46;background:#eafaf0}
+  .singlex-cardface{width:min(150px,100%)}
+  .singlex-cardface .card{width:100%;padding:0;background:none;border:0;box-shadow:none;cursor:pointer}
+  .singlex-cardface .card .tc{width:100%;height:auto}
+  .singlex-cardface .ccard{width:100%}
+  .toolx.tool-single{
+    width:100%;
+    aspect-ratio:auto;
+    min-height:120px;
+    padding:26px 10px 12px;
+    gap:5px;
+  }
+  .toolx.tool-single b{font-size:16px}
+  .toolx.tool-single p{font-size:11px}
+  .singlex .singlex-scouted{position:absolute;top:-10px;left:8px;z-index:3}
+  .vcard-list .singlex+.singlex{margin-top:2px}
+  /* 12. stragglers join the contract: title + scout overlay */
+  #title .btn,#over .btn{
+    border-radius:0 !important;
+    border:3px solid #050505 !important;
+    box-shadow:4px 4px 0 #050505 !important;
+  }
+  .title-inner{box-shadow:8px 8px 0 #050505 !important}
+  .scout-panel{
+    border:3px solid #050505 !important;
+    border-radius:0 !important;
+    background:#f8f6e8 !important;
+    box-shadow:6px 6px 0 #050505 !important;
+  }
+  .scout-head{
+    background:#151817 !important;
+    border:3px solid #050505;
+    padding:8px 12px !important;
+    margin:-16px -20px 12px !important;
+  }
+  .scout-head h3{
+    color:var(--ui-gold) !important;
+    font-family:Anton,Impact,sans-serif;
+    font-style:italic;
+    text-transform:uppercase;
+    text-shadow:2px 2px 0 #000;
+  }
+  .scout-head h3 span{color:#c9d4cd !important;font-family:"Work Sans",Inter,sans-serif;font-style:normal;text-transform:none}
+  .scout-grid .scout-card .card{
+    width:100%;
+    padding:0;
+    border:0;
+    background:none;
+    box-shadow:none;
+    cursor:pointer;
+    display:block;
+  }
+  .scout-grid .scout-card .card .tc{width:100%;height:auto}
+  .scout-grid .scout-card .card .cflip,
+  .scout-grid .scout-card .card .cface{height:auto}
+  .scout-grid .scout-card .card .cface.cback{height:100%}
 </style>
 </head>
 <body>
@@ -5472,6 +5586,17 @@ let save={};try{save=JSON.parse(localStorage.getItem("powerplay_rogue")||"{}")}c
 save.best=save.best||0;save.cups=save.cups||0;
 let run,m;
 let dealAnim=true,challengeAnim=false,anim=false;
+/* Universal card-flip contract: clicking anywhere on a full-size card flips
+   it to the radial back; flip state survives re-renders. Screens where a
+   click performs a game action (match hand select, draft toggle via tag,
+   squad pick-mode) route around it explicitly. */
+const flippedCards=new Set();
+function toggleFlip(id){
+  if(flippedCards.has(id))flippedCards.delete(id);else flippedCards.add(id);
+  document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>{
+    if(el.querySelector(".cback"))el.classList.toggle("flipped",flippedCards.has(id));
+  });
+}
 
 function show(id){
   document.querySelectorAll(".screen").forEach(s=>{
@@ -5691,6 +5816,7 @@ function selectedDraftCards(){
 function rivalCard(kind){const pool=m.rivalDeck.filter(c=>!c.used);let best=pool[0],val=-1;pool.forEach(c=>{const v=kind==="bat"?batVal(c):bowlVal(c);if(v>val){best=c;val=v}});return best}
 
 function startRun(){
+  flippedCards.clear();
   const startingRoster=starterDraft();
   run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
   beginSquadSelection();
@@ -5928,6 +6054,7 @@ function scoutedMode(){
   return pick(["bat","bowl"]);
 }
 function rollSingles(){
+  const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
   const mode=scoutedMode();
   const tools=CONSUMABLES.filter(c=>c.mode===mode);
   const scoutedItem=pick(tools.length?tools:CONSUMABLES);
@@ -5936,7 +6063,10 @@ function rollSingles(){
   let pool=COACHES.filter(c=>c.unlock<=run.match&&!owned.has(c.id));
   if(!pool.length)pool=COACHES.filter(c=>!owned.has(c.id));
   const coach=weightedCoachPick(pool.length?pool:COACHES);
+  // face-up player card: certainty costs +2 over the pack gamble
+  const playerCard=card(rarityFromPool(def.shop||def.rarities||["common"]),pick(["bat","bowl","all"]));
   return [
+    {kind:"player",item:playerCard,price:cardPrice(playerCard)+2,scouted:false,bought:false},
     {kind:"consumable",item:scoutedItem,price:scoutedPrice,scouted:true,mode,bought:false},
     {kind:"coach",item:coach,price:coach.price,scouted:false,bought:false}
   ];
@@ -6149,7 +6279,10 @@ function buyVoucher(i){
 function buySingle(i){
   const single=run.shop?.singles?.[i];if(!single||single.bought)return;
   if(run.coins<single.price){flashHint("Not enough coins.");return}
-  if(single.kind==="coach"){
+  if(single.kind==="player"){
+    run.coins-=single.price;
+    roster().push(single.item);
+  }else if(single.kind==="coach"){
     if(activeCoaches().some(c=>c.id===single.item.id)){flashHint("That coach is already active.");return}
     if(usedCoachSlots()>=coachSlotLimit()){flashHint("Coach slots full — sell one first.");return}
     run.coins-=single.price;
@@ -6495,19 +6628,18 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
   const g="g"+(svgSeq++);
   const hg=headGrad(c.role),img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
   if(compact){
-    // Mini info budget: the decision stat + the surname. Nothing else.
+    // Mini info budget: the decision stat + the surname, straight on the
+    // art — no boxes. Same numeral language as the full card.
     const nm=escSVG(c.name.split(" ").pop().toUpperCase());
     const statKind=emph==="bowl"?"bowl":"bat";
     const statNum=statKind==="bowl"?bowlNum:batNum;
-    const statColor=statKind==="bowl"?"#c0303f":"#1f9b53";
+    const statColor=statKind==="bowl"?"#ff8a95":"#8af0b4";
     return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     ${cardShell(g,dim,c.rarity,c.role,true)}
-      <image href="${img}" x="30" y="130" width="190" height="194" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}"/>
+      <image href="${img}" x="30" y="128" width="190" height="196" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}"/>
     </g>
-    <rect x="58" y="38" width="134" height="76" rx="10" fill="#fffdf2" stroke="#111" stroke-width="4"/>
-    <rect x="58" y="38" width="134" height="76" rx="10" fill="none" stroke="${statColor}" stroke-width="0"/>
-    <text x="125" y="60" text-anchor="middle" fill="${statColor}" font-size="13" font-weight="700" letter-spacing="2">${statKind.toUpperCase()}</text>
-    <text x="125" y="104" text-anchor="middle" fill="#111" font-size="46" font-weight="700">${statNum}</text>
+    <text x="125" y="112" text-anchor="middle" fill="${statColor}" stroke="#111" stroke-width="10" paint-order="stroke" font-size="86" font-weight="700">${statNum}</text>
+    <text x="125" y="136" text-anchor="middle" fill="#fffdf2" stroke="#111" stroke-width="4" paint-order="stroke" font-size="14" font-weight="700" letter-spacing="3">${statKind.toUpperCase()}</text>
     <text x="125" y="318" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="4" paint-order="stroke" font-size="${nm.length>9?13:16}" font-weight="700" letter-spacing=".6">${nm}</text>
   </svg>`;
   }
@@ -6524,12 +6656,9 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
     <text x="41" y="52" fill="#fff" font-size="${name.length>11?12:14}" font-weight="700" letter-spacing=".4">${name}</text>
     <rect x="${pillX}" y="37" width="${pillW}" height="18" rx="9" fill="#ffe23f" stroke="#111" stroke-width="2"/>
     <text x="${(pillX+pillW/2).toFixed(1)}" y="50" text-anchor="middle" fill="#111" font-size="9.5" font-weight="700">${trait}</text>
-    <circle cx="60" cy="284" r="33" fill="#fffdf2" stroke="#111" stroke-width="3"/>
-    <circle cx="60" cy="284" r="27" fill="none" stroke="${rc}" stroke-width="3"/>
-    <text x="60" y="294" text-anchor="middle" fill="#111" font-size="30" font-weight="700">${ovr}</text>
-    <text x="60" y="307" text-anchor="middle" fill="#5a6b7a" font-size="8" font-weight="700" letter-spacing="2">OVR</text>
-    <rect x="146" y="298" width="70" height="21" rx="10" fill="#fffdf2" stroke="#111" stroke-width="2.5"/>
-    <text x="181" y="312" text-anchor="middle" fill="${rc}" font-size="10.5" font-weight="700">${roleShort} &middot; #${c.num}</text>
+    <text x="58" y="302" text-anchor="middle" fill="#fffdf2" stroke="#111" stroke-width="9" paint-order="stroke" font-size="52" font-weight="700">${ovr}</text>
+    <text x="58" y="318" text-anchor="middle" fill="#fffdf2" stroke="#111" stroke-width="3.5" paint-order="stroke" font-size="11" font-weight="700" letter-spacing="3">OVR</text>
+    <text x="196" y="314" text-anchor="end" fill="${rc==="#c0303f"?"#ff8a95":rc==="#1f9b53"?"#8af0b4":"#d3b8ff"}" stroke="#111" stroke-width="3.5" paint-order="stroke" font-size="13" font-weight="700" letter-spacing="1">${roleShort} #${c.num}</text>
   </svg>`;
 }
 function radialSVG(c){
@@ -6553,10 +6682,11 @@ function radialSVG(c){
 }
 function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,as="button"}={}){
   const flip=mini?"":`<div class="cface cback">${radialSVG(c)}</div>`;
-  const chip=mini?"":`<span class="flipchip" onclick="event.stopPropagation();event.preventDefault();this.closest('.card').classList.toggle('flipped')" title="Flip for sub-stats">&#8635;</span>`;
+  const chip=mini?"":`<span class="flipchip" title="Click card to flip">&#8635;</span>`;
+  const isFlipped=!mini&&flippedCards.has(dataId||c.id);
   const tag=as==="div"?"div":"button";
   const roleAttr=tag==="div"?'role="group"':(disabled?'disabled':'');
-  return `<${tag} class="card ${mini?'card--mini card--tactical':''} ${duel?'card--duel':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''}" ${roleAttr}
+  return `<${tag} class="card ${mini?'card--mini card--tactical':''} ${duel?'card--duel':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''} ${isFlipped?'flipped':''}" ${roleAttr}
     style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
     <span class="selbadge">✓</span><span class="sheen"></span>
     <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</div>${flip}</div>${chip}</${tag}>`;
@@ -6601,11 +6731,30 @@ function renderActions(){
   const map={nextBall:nextBall,confirmBtn:confirmSelected,cancelBtn:cancelSelected};
   for(const id in map){const el=$("#"+id);if(el)el.onclick=map[id]}
 }
+/* Two-tier rails: the top 6 phase-relevant cards sit ready at full mini
+   size; the rest stay visible as slivers (number + surname) one click away.
+   Partition uses BASE ratings so cards never shuffle mid-innings. */
+function baseStat(c,disc){return disc==="bowl"?c.bowl:c.bat}
+function railTiers(cards,disc){
+  const sorted=cards.slice().sort((a,b)=>(a.used?1:0)-(b.used?1:0)||baseStat(b,disc)-baseStat(a,disc)||sortStrong(a,b));
+  const unused=sorted.filter(c=>!c.used);
+  const ready=unused.slice(0,6);
+  const reserve=sorted.filter(c=>!ready.includes(c));
+  return {ready,reserve};
+}
+function sliverHTML(c,disc,inert){
+  const used=c.used?"used":"";
+  return `<button class="sliver ${used}" data-id="${c.id}" ${inert||c.used?'disabled':''} title="${c.name} — ${disc.toUpperCase()} ${baseStat(c,disc)}${c.trait?' · '+c.trait.name:''}">
+    <b>${baseStat(c,disc)}</b><span>${c.name.split(" ").pop()}</span></button>`;
+}
 function renderHand(){
-  const cards=matchDeckSort(activeSquad(),true),animate=dealAnim;dealAnim=false;
-  const emph=m.phase==="bowl"?"bowl":"bat";
-  $("#hand").innerHTML=`<button class="btn secondary sm deck-view-btn own-scan-btn" id="scanMineBtn" title="View your full squad">View ▸</button><div class="fan-row player-fan">${cards.map((c,i)=>fanCard(c,i,cards.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph,animate})).join("")}</div>`;
-  document.querySelectorAll("#hand .card").forEach(b=>{
+  const disc=m.phase==="bowl"?"bowl":"bat";
+  const {ready,reserve}=railTiers(activeSquad(),disc);
+  const animate=dealAnim;dealAnim=false;
+  $("#hand").innerHTML=`<button class="btn secondary sm deck-view-btn own-scan-btn" id="scanMineBtn" title="View your full squad">View ▸</button>
+    <div class="fan-row player-fan tier-ready">${ready.map((c,i)=>fanCard(c,i,ready.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph:disc,animate})).join("")}</div>
+    <div class="tier-reserve">${reserve.map(c=>sliverHTML(c,disc,false)).join("")}</div>`;
+  document.querySelectorAll("#hand .card, #hand .sliver:not(:disabled)").forEach(b=>{
     const card=()=>activeSquad().find(c=>c.id===b.dataset.id);
     b.onclick=()=>lockCard(card());
     b.onmouseenter=()=>previewCard(card());
@@ -6616,13 +6765,6 @@ function renderHand(){
 function fanSort(cards){
   const roleOrder={bat:0,all:1,bowl:2};
   return cards.slice().sort((a,b)=>roleOrder[a.role]-roleOrder[b.role]||sortStrong(a,b));
-}
-function matchDeckSort(cards,player=true){
-  if(!m?.phase)return fanSort(cards);
-  const relevant=player
-    ?(c=>m.phase==="bowl"?bowlVal(c):batVal(c))
-    :(c=>m.phase==="bowl"?batVal(c):bowlVal(c));
-  return cards.slice().sort((a,b)=>(a.used?1:0)-(b.used?1:0)||relevant(b)-relevant(a)||sortStrong(a,b));
 }
 function fanStyle(i,total,spread=1.05){
   const mid=(total-1)/2,offset=i-mid;
@@ -6635,7 +6777,7 @@ function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,a
 /* ---------- SCOUT: decks ---------- */
 function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
 function deckScoutCell(c,o={},emph){
-  return `<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`;
+  return `<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardHTML(c,{emph,as:"div"})}</div>`;
 }
 function renderDeckScout(kind){
   const player=kind==="player";
@@ -6648,9 +6790,10 @@ function renderDeckScout(kind){
   $("#scoutTitle").textContent=player?"Your squad":"Rival squad";
   $("#scoutSub").textContent=player?`— your available ${statLbl} options`:`— they ${m.phase==="bowl"?"bat":"bowl"} their best ${statLbl} card first`;
   $("#rivalDeckGrid").innerHTML=
-    `<div class="scout-group"><h4>${player?"Available":"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value)</em></h4>
+    `<div class="scout-group"><h4>${player?"Available":"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value — click a card to flip)</em></h4>
        <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
     + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
+  document.querySelectorAll("#rivalDeckGrid .scout-card .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
 }
 function openRivalDeck(){if(!m)return;renderDeckScout("rival");$("#rivalDrawer").classList.add("show")}
 function openPlayerDeck(){if(!m)return;renderDeckScout("player");$("#rivalDrawer").classList.add("show")}
@@ -6708,17 +6851,23 @@ function renderShop(){
     <p>${v.desc}</p>
     <button class="btn secondary sm" data-buy-voucher="${i}" ${v.bought||run.coins<v.price?'disabled':''}>${v.bought?'Sold Out':'Buy'}</button>
   </div>`;
+  // Singles render as the real cards — always face-up, price tag on top.
   const singleMarkup=(s,i)=>{
     const it=s.item;
-    const head=s.kind==="coach"
-      ?`<b>${it.name}</b><span class="singlex-tier tier-${it.tier}">${it.tier}</span>`
-      :`<b>${it.name}</b>${s.scouted?`<span class="singlex-scouted">Scouted</span>`:""}`;
-    const body=s.kind==="coach"?it.desc:it.desc;
-    const note=s.scouted?`<small class="singlex-note">Your scout picked this vs ${run.nextRival?.arch?.name||"the next rival"}.</small>`:"";
-    return `<div class="vcard singlex ${s.bought?'bought':''} ${s.scouted?'is-scouted':''}">
-      <div class="vcard-top">${head}<span class="vcard-price"><span class="coin"></span>${s.price}</span></div>
-      <p>${body}</p>${note}
-      <button class="btn secondary sm" data-buy-single="${i}" ${s.bought||run.coins<s.price?'disabled':''}>${s.bought?(s.kind==="coach"?"Hired":"Sold"):s.kind==="coach"?"Hire":"Buy"}</button>
+    let face="";
+    if(s.kind==="player")face=`<div class="singlex-cardface">${cardHTML(it,{as:"div"})}</div>`;
+    else if(s.kind==="coach")face=`<div class="singlex-cardface">${coachCardHTML(it,true)}</div>`;
+    else face=`<div class="singlex-cardface"><div class="toolx tool-single ${it.mode}">
+        <span class="toolx-tag">${it.kind==="instant"?"Instant":"Next ball"}</span>
+        <b>${it.name}</b><p>${it.desc}</p>
+      </div></div>`;
+    const note=s.scouted?`<small class="singlex-note">Scouted vs ${run.nextRival?.arch?.name||"the next rival"}</small>`:"";
+    const cta=s.bought?(s.kind==="coach"?"Hired":s.kind==="player"?"Signed":"Sold")
+      :(s.kind==="coach"?"Hire":s.kind==="player"?"Sign":"Buy");
+    return `<div class="singlex ${s.bought?'bought':''} ${s.scouted?'is-scouted':''}">
+      ${s.scouted?'<span class="singlex-scouted">Scouted</span>':''}
+      ${face}${note}
+      <button class="btn secondary sm" data-buy-single="${i}" ${s.bought||run.coins<s.price?'disabled':''}>${cta} &middot; ${s.price}</button>
     </div>`;
   };
   const emptySlots=Math.max(0,coachSlotLimit()-usedCoachSlots());
@@ -6757,6 +6906,7 @@ function renderShop(){
   document.querySelectorAll("#offers [data-sell-coach]").forEach(b=>b.onclick=()=>sellCoach(+b.dataset.sellCoach));
   document.querySelectorAll("#offers [data-buy-voucher]").forEach(b=>b.onclick=()=>buyVoucher(+b.dataset.buyVoucher));
   document.querySelectorAll("#offers [data-buy-single]").forEach(b=>b.onclick=()=>buySingle(+b.dataset.buySingle));
+  document.querySelectorAll("#offers .singlex-cardface .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
   bindPackTilt($("#offers"));
   const sq=$("#shopSquadBtn");if(sq){sq.disabled=false;sq.onclick=openSquadRoom}
 }
@@ -6790,6 +6940,7 @@ function renderPackOverlay(phase){
   </div>`;
   ov.classList.add("show");
   ov.querySelectorAll("[data-pack-choice]").forEach(b=>b.onclick=e=>{e.stopPropagation();choosePackCard(+b.dataset.pack,+b.dataset.choice,b.dataset.replace)});
+  ov.querySelectorAll(".pchoice-card .card").forEach(el=>el.onclick=e=>{e.stopPropagation();toggleFlip(el.dataset.id)});
   const skip=$("#skipPackBtn");if(skip)skip.onclick=skipPackReward;
 }
 
@@ -6799,7 +6950,7 @@ function packChoiceMarkup(choice,packIndex,choiceIndex,pack){
   if(choice.type==="player"){
     cls="player";
     const c=choice.card;
-    front=`<div class="pchoice-card">${cardSVG(c,batVal(c),bowlVal(c),c.role==="bowl"?"bowl":"bat")}</div>${pickBtn("Sign")}`;
+    front=`<div class="pchoice-card">${cardHTML(c,{emph:c.role==="bowl"?"bowl":"bat",as:"div"})}</div>${pickBtn("Sign")}`;
   }else if(choice.type==="consumable"){
     cls="tool";
     const c=choice.consumable;
@@ -6872,7 +7023,7 @@ function renderSquadManager(){
     const body=cards.map((c,i)=>cardHTML(c,{pickable:!!p,active:ids.has(c.id),emph:p?.type==="train"?p.stat:null,dealin:false,fan:`--d:${i*12}ms`})).join("");
     return `<section class="roster-group"><h3>${label} (${cards.length})</h3><div class="roster-row">${body||'<div class="scout-empty">No cards</div>'}</div></section>`;
   }).join("");
-  if(p)document.querySelectorAll("#squadGrid .card").forEach(b=>b.onclick=()=>squadAct(b.dataset.id));
+  document.querySelectorAll("#squadGrid .card").forEach(b=>b.onclick=p?()=>squadAct(b.dataset.id):()=>toggleFlip(b.dataset.id));
 }
 
 function starterDraft(){
@@ -6908,10 +7059,10 @@ function draftArtForCard(c){
 function draftCardHTML(c,selected){
   const role=c.role==="bat"?"bat":c.role==="bowl"?"bowl":"all";
   const titleTrait=c.trait?`${c.trait.name}: ${c.trait.text}`:"No trait";
-  return `<button class="draft-card ${role} ${c.rarity} ${selected?'selected':'benched'}" data-id="${c.id}" title="${c.name} - ${roleName(c)} - ${titleTrait}">
+  return `<button class="draft-card ${role} ${c.rarity} ${selected?'selected':'benched'} ${flippedCards.has(c.id)?'flipped':''}" data-id="${c.id}" title="${c.name} - ${roleName(c)} - ${titleTrait} (click card to flip)">
     <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c))}</div><div class="cface cback">${radialSVG(c)}</div></div>
-    <span class="flipchip" onclick="event.stopPropagation();event.preventDefault();this.closest('.draft-card').classList.toggle('flipped')" title="Flip for sub-stats">&#8635;</span>
-    <span class="draft-status">${selected?'Active':'Bench'}</span>
+    <span class="flipchip" title="Click card to flip">&#8635;</span>
+    <span class="draft-status" data-toggle="${c.id}" title="${selected?'Move to bench':'Move to active 12'}">${selected?'Active':'Bench'}</span>
   </button>`;
 }
 function draftLaneHTML(role,label,cards,ids){
@@ -6953,7 +7104,8 @@ function renderDraft(){
     }
   }
   $("#draftConfirmBtn").disabled=run.draftSelected.size!==12;
-  document.querySelectorAll("#draftGrid .draft-card").forEach(b=>b.onclick=()=>toggleDraft(b.dataset.id));
+  document.querySelectorAll("#draftGrid .draft-card").forEach(b=>b.onclick=()=>toggleFlip(b.dataset.id));
+  document.querySelectorAll("#draftGrid .draft-status").forEach(t=>t.onclick=e=>{e.stopPropagation();toggleDraft(t.dataset.toggle)});
 }
 function autoSelectDraft(){
   run.draftSelected=new Set(roster().slice().sort(sortStrong).slice(0,12).map(c=>c.id));
@@ -7060,13 +7212,14 @@ function chooseInnings(choice){
 }
 function renderRivalStrip(){
   if(!m?.rivalDeck)return;
-  const emph=m.phase==="bowl"?"bat":"bowl";
+  const disc=m.phase==="bowl"?"bat":"bowl"; // their relevant discipline
   const head=$("#rivalStripMeta")?.parentElement;if(head?.firstElementChild)head.firstElementChild.textContent="Rival cards";
   $("#rivalStripMeta").textContent=`${m.rivalDeck.filter(c=>!c.used).length} left`;
-  const cards=matchDeckSort(m.rivalDeck,false);
-  $("#rivalStrip").className="rival-mini-row table-bench fan-row rival-fan";
-  $("#rivalStrip").innerHTML=cards.map((c,i)=>fanCard(c,i,cards.length,{used:c.used,disabled:true,emph,rival:true})).join("");
-  const next=$("#rivalStrip .card[data-id='"+m.challenge?.id+"']");
+  const {ready,reserve}=railTiers(m.rivalDeck,disc);
+  $("#rivalStrip").className="rival-mini-row table-bench";
+  $("#rivalStrip").innerHTML=`<div class="fan-row rival-fan tier-ready">${ready.map((c,i)=>fanCard(c,i,ready.length,{used:c.used,disabled:true,emph:disc,rival:true})).join("")}</div>
+    <div class="tier-reserve">${reserve.map(c=>sliverHTML(c,disc,true)).join("")}</div>`;
+  const next=$("#rivalStrip .card[data-id='"+m.challenge?.id+"'], #rivalStrip .sliver[data-id='"+m.challenge?.id+"']");
   if(next)next.classList.add("next");
 }
 function completeMatchWin(){
@@ -7137,7 +7290,9 @@ $("#squadNextBtn").onclick=beginSquadSelection;
 $("#homeBtn").onclick=()=>{renderTitle();show("title")};
 $("#duel").onclick=e=>{
   if(e.target.closest("button,.actions"))return;
-  skipResolve();
+  if(m?.result?.state==="resolving"){skipResolve();return}
+  const card=e.target.closest(".card--duel");
+  if(card)toggleFlip(card.dataset.id);
 };
 $("#scanBtn").onclick=openRivalDeck;
 $("#closeScout").onclick=closeRivalDeck;
