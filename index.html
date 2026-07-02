@@ -4043,10 +4043,17 @@
   .pov-row{
     display:flex;
     align-items:stretch;
-    justify-content:center;
     gap:clamp(14px,2vw,30px);
     min-height:0;
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:visible;
+    padding-bottom:6px;
   }
+  /* safe centering: auto margins center when there's room but never clip
+     the first card off-screen the way justify-content:center does */
+  .pov-row>*:first-child{margin-left:auto}
+  .pov-row>*:last-child{margin-right:auto}
   .pov-actions{display:flex;justify-content:center}
   /* choice flip cards */
   .pchoice{perspective:1200px;display:grid}
@@ -6190,6 +6197,7 @@ function applyExtras(out,mode){
 function resolveBowl(c){
   const mine=bowlVal(c),theirs=batVal(m.challenge);
   const wasFreeHit=m.freeHit;
+  const snap=scoreSnap();
   const strip=getStripFor("bowl",c),out=rollOutcome(strip);
   m.rival.runs+=out.runs;if(out.wicket)m.rival.wk++;
   if(out.extra){applyExtras(out,"bowl")}
@@ -6203,7 +6211,7 @@ function resolveBowl(c){
     use(c);
   }
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap};
   m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
     :`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -6215,6 +6223,7 @@ function resolveBowl(c){
 function resolveBat(c){
   const mine=batVal(c),theirs=bowlVal(m.challenge);
   const wasFreeHit=m.freeHit;
+  const snap=scoreSnap();
   const strip=getStripFor("bat",c),out=rollOutcome(strip);
   if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
   m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
@@ -6228,7 +6237,7 @@ function resolveBat(c){
     use(c);
   }
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap};
   m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
     :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -6556,23 +6565,24 @@ function render(pop=false){
   $("#phaseLabel").innerHTML=phaseLabelText();
   $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
   const left=m.def.balls-m.ball+1;
+  const v=bugView();
   // target panel
   if(m.phase==="bowl"){
     const defending=m.innings===2&&m.firstChoice==="bat";
-    $("#target").innerHTML=`<div class="lbl">${defending?"Defend":"Bowling"}</div><div class="big">${defending?Math.max(0,m.target+1-m.rival.runs):`Ball ${m.ball}`}<span style="font-size:18px;color:var(--muted)">${defending?"":"/"+m.def.balls}</span></div><div class="note">${defending?`from ${left} ball${left===1?'':'s'}`:"keep them low"}</div>`;
+    $("#target").innerHTML=`<div class="lbl">${defending?"Defend":"Bowling"}</div><div class="big">${defending?Math.max(0,m.target+1-v.rival.runs):`Ball ${m.ball}`}<span style="font-size:18px;color:var(--muted)">${defending?"":"/"+m.def.balls}</span></div><div class="note">${defending?`from ${left} ball${left===1?'':'s'}`:"keep them low"}</div>`;
   }else if(m.target==null){
     $("#target").innerHTML=`<div class="lbl">Batting</div><div class="big">Ball ${m.ball}<span style="font-size:18px;color:var(--muted)">/${m.def.balls}</span></div><div class="note">set a target</div>`;
   }else{
-    $("#target").innerHTML=`<div class="lbl">Need</div><div class="big"><b>${Math.max(0,m.target+1-m.you.runs)}</b></div><div class="note">from ${left} ball${left===1?'':'s'}</div>`;
+    $("#target").innerHTML=`<div class="lbl">Need</div><div class="big"><b>${Math.max(0,m.target+1-v.you.runs)}</b></div><div class="note">from ${left} ball${left===1?'':'s'}</div>`;
   }
-  $("#youRuns").textContent=m.you.runs;$("#youWk").textContent=m.you.wk;
-  $("#rivalRuns").textContent=m.rival.runs;$("#rivalWk").textContent=m.rival.wk;
-  $("#youWkts").innerHTML=wktDots(m.def.wickets,m.you.wk);
-  $("#rivalWkts").innerHTML=wktDots(m.def.wickets,m.rival.wk);
-  $("#youMeta").textContent=m.phase==="bat"?`Chasing · ${m.def.wickets-m.you.wk} wkts left`:"Bowling now";
-  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:`Set ${m.target}`;
-  $("#youMeta").textContent=m.phase==="bat"?`${m.def.wickets-m.you.wk} wkts left`:(m.innings===2?"Defending":"On attack");
-  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-m.rival.wk} wkts left`:(m.target==null?"Bowling first":`Target ${m.target+1}`);
+  $("#youRuns").textContent=v.you.runs;$("#youWk").textContent=v.you.wk;
+  $("#rivalRuns").textContent=v.rival.runs;$("#rivalWk").textContent=v.rival.wk;
+  $("#youWkts").innerHTML=wktDots(m.def.wickets,v.you.wk);
+  $("#rivalWkts").innerHTML=wktDots(m.def.wickets,v.rival.wk);
+  $("#youMeta").textContent=m.phase==="bat"?`Chasing · ${m.def.wickets-v.you.wk} wkts left`:"Bowling now";
+  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-v.rival.wk} wkts left`:`Set ${m.target}`;
+  $("#youMeta").textContent=m.phase==="bat"?`${m.def.wickets-v.you.wk} wkts left`:(m.innings===2?"Defending":"On attack");
+  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-v.rival.wk} wkts left`:(m.target==null?"Bowling first":`Target ${m.target+1}`);
   const yb=m.phase==="bat";
   $("#youRole").className="roletag "+(yb?"bat":"bowl");$("#youRole").innerHTML=(yb?ICON.bat:ICON.ball)+(yb?"BATTING":"BOWLING");
   $("#rivalRole").className="roletag "+(yb?"bowl":"bat");$("#rivalRole").innerHTML=(yb?ICON.ball:ICON.bat)+(yb?"BOWLING":"BATTING");
@@ -6582,6 +6592,15 @@ function render(pop=false){
   renderDuel(pop);renderHand();renderExplainers();renderRivalStrip();
 }
 function wktDots(total,out){let s="";for(let i=0;i<total;i++)s+=`<span class="stump ${i<out?'out':''}"></span>`;return s}
+// Scores mutate the moment a ball is rolled, but the board/equation/over-strip
+// must not spoil the resolve animation: they render this view instead, which
+// serves the pre-ball snapshot until the result settles.
+function scoreSnap(){return {youRuns:m.you.runs,youWk:m.you.wk,rivalRuns:m.rival.runs,rivalWk:m.rival.wk,histLen:m.history.length}}
+function bugView(){
+  const s=m.result?.state==="resolving"?m.result.snap:null;
+  if(!s)return {you:m.you,rival:m.rival,hist:m.history};
+  return {you:{runs:s.youRuns,wk:s.youWk},rival:{runs:s.rivalRuns,wk:s.rivalWk},hist:m.history.slice(0,s.histLen)};
+}
 function renderExplainers(){
   $("#ladder").innerHTML="";
   $("#feed").innerHTML="";
@@ -6612,16 +6631,18 @@ function renderOddsStage(){
 }
 function targetText(){
   const left=m.def.balls-m.ball+1;
+  const v=bugView();
   if(m.innings===1)return m.phase==="bowl"?`Keep them low · ball ${m.ball}/${m.def.balls}`:`Set target · ball ${m.ball}/${m.def.balls}`;
-  if(m.phase==="bat")return `Need ${Math.max(0,m.target+1-m.you.runs)} from ${left}`;
-  return `Defend ${m.target} · rival needs ${Math.max(0,m.target+1-m.rival.runs)} from ${left}`;
+  if(m.phase==="bat")return `Need ${Math.max(0,m.target+1-v.you.runs)} from ${left}`;
+  return `Defend ${m.target} · rival needs ${Math.max(0,m.target+1-v.rival.runs)} from ${left}`;
 }
 function renderScorebug(){
   const left=m.def.balls-m.ball+1;
   const phase=m.phase==="bat"?"Batting":"Bowling";
+  const v=bugView();
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
-    <div class="bug-cell"><span>You</span><b>${m.you.runs}/${m.you.wk}</b><small>${m.def.wickets-m.you.wk} wkts left</small></div>
-    <div class="bug-cell"><span>Rival</span><b>${m.rival.runs}/${m.rival.wk}</b><small>${m.def.wickets-m.rival.wk} wkts left</small></div>
+    <div class="bug-cell"><span>You</span><b>${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
+    <div class="bug-cell"><span>Rival</span><b>${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
     <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>
     <div class="bug-cell bug-balls"><span>Last ${m.def.balls}</span>${renderOverStrip()}</div>`;
 }
@@ -6633,11 +6654,12 @@ function oddsSummary(strip){
   return ["W","0","1","2","4","6"].filter(t=>counts[t]).map(t=>`${t}:${Math.round(counts[t]/strip.length*100)}%`).join(" ");
 }
 function renderOverStrip(){
-  const balls=Array.from({length:Math.max(m.def.balls,m.history.length)},(_,i)=>m.history[i]);
+  const hist=bugView().hist;
+  const balls=Array.from({length:Math.max(m.def.balls,hist.length)},(_,i)=>hist[i]);
   return `<div class="over-strip">${balls.map((h,i)=>{
     if(!h)return `<span class="ball-chip">•</span>`;
     const token=ballToken(h.result),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":(token==="wd"||token==="nb"?"extra":"filled"));
-    return `<span class="ball-chip ${cls} ${i===m.history.length-1?'current':''}" title="${h.calc}">${token}</span>`;
+    return `<span class="ball-chip ${cls} ${i===hist.length-1?'current':''}" title="${h.calc}">${token}</span>`;
   }).join("")}</div>`;
 }
 function ballToken(result){if(result==="WICKET")return "W";if(result==="WIDE")return "wd";if(result==="NO BALL")return "nb";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
