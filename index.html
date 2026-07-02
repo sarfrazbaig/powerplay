@@ -5121,6 +5121,271 @@
   #draft .draft-status:hover{transform:translateY(-2px) scale(1.06)}
   #draft .draft-card.benched .draft-status:after{content:" +"}
   #match.screen.active{gap:7px !important}
+
+  /* ================================================================
+     GAMEBOARD REDESIGN — a night match under floodlights.
+     The match screen is a board: rival dugout up top, the floodlit
+     pitch with the FIELD RING in the middle, your hand fanned at the
+     bottom, coaches in a dugout, tools in a kit bag. No number boxes,
+     no graphs, no essay panels.
+     ================================================================ */
+  :root{
+    --nite:#0b1417;
+    --nite2:#101d22;
+    --turf:#153428;
+    --chalk:#eef6ec;
+    --mutn:#8fa9a0;
+    --gold:#ffd23f;
+    --dangerc:#ff4155;
+    --goodc:#2fd9a0;
+  }
+  body{
+    background:
+      radial-gradient(900px 480px at 10% -8%, rgba(255,244,200,.11), transparent 62%),
+      radial-gradient(900px 480px at 90% -8%, rgba(255,244,200,.11), transparent 62%),
+      radial-gradient(1300px 860px at 50% 120%, #143028 0%, transparent 64%),
+      linear-gradient(#0c1518,#090f12) !important;
+  }
+  .screen, .screen.active{background:transparent !important}
+  /* ---------- match board grid ---------- */
+  #match.screen.active{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto auto minmax(0,1fr) auto auto !important;
+    grid-template-areas:none !important;
+    gap:8px !important;
+    padding:8px 18px 10px !important;
+    height:100dvh;
+    overflow:hidden;
+  }
+  #match>*{grid-area:auto !important;min-width:0}
+  #match .top{background:transparent !important;border:0 !important;box-shadow:none !important;padding:2px 6px !important}
+  #match .top .sub{color:var(--mutn) !important}
+  /* ---------- rival dugout row ---------- */
+  .av-rivalrow{display:grid;gap:4px;justify-items:center}
+  .av-rivalhead{display:flex;align-items:center;gap:12px}
+  .av-zonetag{
+    font-family:Oswald,Arial,sans-serif;font-size:10px;font-weight:700;
+    letter-spacing:2.6px;color:var(--mutn);text-transform:uppercase;
+  }
+  .av-rivalmeta{font-size:11px;font-weight:800;color:var(--gold)}
+  .av-rivalfan{display:flex;justify-content:center;align-items:flex-start;gap:0}
+  .rivhold{width:76px;margin-left:-16px;position:relative;transition:transform .16s ease,filter .16s ease}
+  .rivhold:first-child{margin-left:0}
+  .rivhold:hover{transform:translateY(6px) scale(1.5);z-index:30}
+  .rivhold .card{width:100%;pointer-events:none}
+  .rivhold.is-used{filter:grayscale(.95) brightness(.55)}
+  .rivhold.on-pitch{transform:translateY(5px);z-index:20}
+  .rivhold.on-pitch .card{outline:3px solid var(--gold);outline-offset:-2px;border-radius:10px}
+  .pitch-flag{
+    position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+    background:var(--gold);color:#111;font-size:8px;font-weight:900;letter-spacing:1px;
+    padding:2px 7px;border-radius:99px;border:2px solid #0c1214;white-space:nowrap;z-index:3;
+  }
+  /* ---------- stage: dugout | pitch | kit bag ---------- */
+  .av-stage{
+    display:grid;grid-template-columns:minmax(118px,146px) minmax(0,1fr) minmax(118px,146px);
+    gap:12px;min-height:0;
+  }
+  .av-dugout,.av-kitbag{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    padding:12px 8px;border-radius:16px;min-height:0;overflow:hidden auto;
+    background:linear-gradient(rgba(16,29,34,.85),rgba(11,20,23,.9));
+    border:1px solid rgba(255,255,255,.07);
+  }
+  .seats,.kits{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
+  .seat{
+    width:min(104px,100%);aspect-ratio:5/6;border-radius:12px;position:relative;overflow:hidden;
+    background:#16292c;border:2px solid #274046;
+  }
+  .seat img{width:100%;height:100%;object-fit:cover;object-position:top}
+  .seat-name{
+    position:absolute;left:0;right:0;bottom:0;padding:3px 4px;
+    background:rgba(8,14,12,.85);color:var(--chalk);
+    font-size:9.5px;font-weight:800;text-align:center;line-height:1.15;
+  }
+  .seat-ball{
+    position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;
+    background:var(--gold);color:#111;font-style:normal;font-size:11px;font-weight:900;
+    display:grid;place-items:center;border:2px solid #0c1214;
+  }
+  .seat.open{border-style:dashed;border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.02);display:grid;place-items:center}
+  .seat.open svg{width:54%;color:rgba(255,255,255,.10)}
+  .seat.ed-foil{box-shadow:0 0 10px rgba(155,193,255,.5)}
+  .seat.ed-holographic{box-shadow:0 0 10px rgba(216,145,255,.5)}
+  .seat.ed-polychrome{box-shadow:0 0 12px rgba(91,225,136,.6)}
+  .seat.ed-negative{filter:invert(1) hue-rotate(180deg)}
+  .kit-card{
+    width:min(104px,100%);display:grid;justify-items:center;gap:4px;padding:9px 6px;
+    background:#152621;border:2px solid #2c4a40;border-radius:12px;cursor:pointer;
+    color:var(--chalk);font-family:inherit;position:relative;
+    transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+  }
+  .kit-card:hover{transform:translateY(-2px);border-color:#3f6b5b}
+  .kit-ico{width:26px;height:26px;display:grid;place-items:center}
+  .kit-ico svg{width:24px;height:24px}
+  .kit-name{font-size:10.5px;font-weight:800;text-align:center;line-height:1.15}
+  .kit-flag{
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+    background:var(--gold);color:#111;font-size:8px;font-weight:900;letter-spacing:.8px;
+    padding:2px 7px;border-radius:99px;border:2px solid #0c1214;white-space:nowrap;
+  }
+  .kit-card.armed{
+    border-color:var(--gold);
+    box-shadow:0 0 0 1px var(--gold),0 0 16px rgba(255,210,63,.4);
+    transform:translateX(-6px);
+  }
+  .kit-card.offmode{opacity:.5}
+  .kit-empty{display:grid;place-items:center;padding:14px 0}
+  .bag-ill{width:56px;color:rgba(255,255,255,.10)}
+  /* ---------- the pitch ---------- */
+  #match .av-pitch{
+    position:relative;border-radius:20px;min-height:0;min-width:0;
+    display:grid;grid-template-rows:minmax(0,1fr) auto auto;gap:4px;
+    padding:10px 16px 10px;overflow:hidden;
+    background:
+      radial-gradient(58% 74% at 50% 46%, #1d4a35 0%, #16382a 52%, rgba(13,26,22,.9) 100%),
+      linear-gradient(#0e1a16,#0c1512);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 0 90px rgba(0,0,0,.55), 0 10px 40px rgba(0,0,0,.5);
+  }
+  #match .av-pitch::before{ /* floodlight cones */
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(420px 240px at 18% 0%, rgba(255,246,214,.09), transparent 70%),
+      radial-gradient(420px 240px at 82% 0%, rgba(255,246,214,.09), transparent 70%);
+  }
+  .av-duelrow{
+    display:grid;grid-template-columns:minmax(140px,215px) minmax(240px,340px) minmax(140px,215px);
+    align-items:center;justify-content:center;gap:clamp(10px,2.5vw,34px);
+    min-height:0;position:relative;z-index:2;
+  }
+  .av-duelrow .dslot{display:grid;gap:6px;justify-items:center;min-width:0}
+  .av-duelrow .dslot .card{width:100%;aspect-ratio:5/7;max-height:40vh;height:auto !important}
+  .av-duelrow .dslot .card .cflip,.av-duelrow .dslot .card .cface,.av-duelrow .dslot .card .tc{height:100%}
+  .av-duelrow .dslot .dlabel{
+    display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:99px;
+    font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+    background:rgba(8,14,12,.7);color:var(--chalk);border:1px solid rgba(255,255,255,.14);
+  }
+  .av-duelrow .dslot .dlabel svg{width:13px;height:13px}
+  .av-duelrow .placeholder{
+    width:100%;aspect-ratio:5/7;max-height:38vh;border-radius:14px;
+    border:2px dashed rgba(255,255,255,.16);display:grid;place-items:center;
+    color:rgba(255,255,255,.25);font-size:34px;background:rgba(255,255,255,.02);
+  }
+  .av-duelrow .dslot.danger .card{animation:threatPulse 1.5s ease-in-out infinite}
+  .av-duelrow .dslot.danger::after{
+    content:"DANGER";position:absolute;top:-6px;left:50%;transform:translateX(-50%) rotate(-3deg);
+    background:var(--dangerc);color:#fff;font-size:9px;font-weight:900;letter-spacing:1.6px;
+    padding:2px 9px;border-radius:4px;border:2px solid #0c1214;z-index:5;
+  }
+  .av-duelrow .dslot{position:relative}
+  @keyframes threatPulse{
+    0%,100%{filter:drop-shadow(0 0 4px rgba(255,65,85,.25))}
+    50%{filter:drop-shadow(0 0 16px rgba(255,65,85,.65))}
+  }
+  .av-duelrow.answered .av-ringwrap{filter:drop-shadow(0 0 20px rgba(47,217,160,.30))}
+  .av-duelrow .dslot.winner .card{filter:drop-shadow(0 0 14px rgba(255,210,63,.55))}
+  .av-freehit{
+    position:absolute;top:8px;left:50%;transform:translateX(-50%) rotate(-2deg);z-index:6;
+    background:var(--gold);color:#111;border:2px solid #0c1214;border-radius:6px;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;letter-spacing:1.5px;
+    padding:3px 14px;animation:fhBob 1.2s ease-in-out infinite;
+  }
+  @keyframes fhBob{0%,100%{transform:translateX(-50%) rotate(-2deg)}50%{transform:translateX(-50%) rotate(2deg)}}
+  /* ---------- the field ring ---------- */
+  .av-ringwrap{position:relative;width:min(100%,min(340px,34vh));aspect-ratio:1;margin:0 auto}
+  .ring-svg{width:100%;height:100%;display:block}
+  .ring-svg.ghost{opacity:.30;filter:saturate(.25)}
+  .ring-sec path{transition:filter .18s ease}
+  .ring-sec.lit path{filter:brightness(1.9) saturate(1.2)}
+  .ring-sec.landed path{
+    stroke:#fff;stroke-width:4;
+    filter:brightness(1.4) drop-shadow(0 0 12px rgba(255,255,255,.35));
+  }
+  .ring-sec.flash path{animation:secFlash .9s ease}
+  @keyframes secFlash{0%{filter:brightness(2.6)}100%{filter:brightness(1)}}
+  .ring-center{
+    position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;
+  }
+  .ring-read{
+    width:56%;aspect-ratio:1;border-radius:50%;display:grid;place-content:center;gap:2px;
+    text-align:center;padding:8px;
+  }
+  .ring-read b{
+    font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.8px;
+    font-size:clamp(14px,1.6vw,20px);color:var(--chalk);line-height:1.05;
+  }
+  .ring-read span{font-size:11px;font-weight:800;color:var(--mutn);letter-spacing:1px;text-transform:uppercase}
+  .ring-read.favored b{color:var(--goodc)}
+  .ring-read.danger b{color:var(--dangerc)}
+  .ring-read.wait b{color:rgba(255,255,255,.5)}
+  .ring-read.spin b{color:var(--gold)}
+  .ring-read.result b.ring-token{font-size:clamp(38px,4.6vw,58px)}
+  .ring-read.result.wicket b{color:var(--dangerc)}
+  .ring-read.result.boundary b{color:var(--gold)}
+  .ring-read.result.run b{color:var(--goodc)}
+  .ring-read.result.extra b{color:#b98cff}
+  .ring-center.slam .ring-read{animation:ringSlam .5s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes ringSlam{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+  #match .av-pitch.resolving{cursor:pointer}
+  /* commentary + foot inside pitch */
+  #match .av-pitch .commentary-strip{position:relative;z-index:2}
+  #match .commentary-strip.quiet,#match .commentary-strip.quiet.muted{color:#a9c0b1 !important}
+  #match .commentary-strip.live .c-line{color:#dcebdc !important}
+  .av-pitchfoot{display:flex;justify-content:center;position:relative;z-index:2;min-height:42px}
+  .av-pitchfoot .actions{display:flex;gap:10px}
+  /* ---------- your hand: the fan ---------- */
+  .av-fanwrap{position:relative;height:172px;z-index:8;overflow:visible}
+  .av-fan{
+    position:relative;height:100%;display:flex;justify-content:center;align-items:flex-end;
+    padding-bottom:2px;
+  }
+  .av-scanmine{position:absolute;right:14px;bottom:10px;z-index:40}
+  .fanhold{
+    width:118px;flex:0 0 auto;margin-left:-30px;position:relative;
+    transform:rotate(var(--rot)) translateY(calc(14px + var(--lift,0px)));
+    transform-origin:50% 130%;
+    transition:transform .18s ease,filter .18s ease;
+    z-index:var(--z);
+  }
+  .fanhold:first-child{margin-left:0}
+  .fanhold .card{width:100%;display:block}
+  .fanhold:hover:not(.is-used){
+    transform:rotate(0deg) translateY(-64px) scale(1.55);
+    z-index:60;
+  }
+  .fanhold.is-used{filter:grayscale(.92) brightness(.62);--lift:18px}
+  .fanhold.is-sel{display:none}
+  .used-stamp{
+    position:absolute;top:42%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:19px;letter-spacing:2px;
+    color:var(--dangerc);border:3px solid var(--dangerc);border-radius:6px;padding:1px 8px;
+    background:rgba(10,14,13,.55);pointer-events:none;z-index:4;
+  }
+  /* fan cards drop old grid sizing */
+  .av-fan .card,.av-rivalfan .card{height:auto !important;min-height:0 !important}
+  /* ---------- scorebug stays broadcast, gains rail badges ---------- */
+  #match .scorebug{border-radius:12px;overflow:visible}
+  .ball-chip{position:relative;overflow:visible}
+  .rail-badge{
+    position:absolute;top:-7px;right:-5px;width:15px;height:15px;border-radius:50%;
+    background:var(--gold);color:#111;font-style:normal;font-size:9px;font-weight:900;
+    display:grid;place-items:center;border:2px solid #0c1214;z-index:3;
+  }
+  /* ---------- night skin for the between-match screens ---------- */
+  #shop .shopx-body,#shop .shopx-body>*{background-color:transparent}
+  .screen .top{background:transparent !important;box-shadow:none !important}
+  /* pack counter void -> table under lights */
+  #shop .shopx-body{
+    border-radius:18px;
+  }
+  /* text diet: effects read in two lines max, full text lives on hover */
+  .pchoice p,.toolx p,.hexx p,.staffx p{
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;line-height:1.25;
+  }
 </style>
 </head>
 <body>
@@ -5213,43 +5478,20 @@
       </div>
     </div>
 
-    <div class="board">
-      <div class="side you">
-        <div class="who">You <span class="roletag" id="youRole"></span></div>
-        <div class="sc"><span id="youRuns">0</span><small>/<span id="youWk">0</span></small></div>
-        <div class="wkts" id="youWkts"></div>
-        <div class="mini" id="youMeta"></div>
-      </div>
-      <div class="target" id="target"></div>
-      <div class="side rival">
-        <div class="who">Rival <span class="roletag" id="rivalRole"></span></div>
-        <div class="sc"><span id="rivalRuns">0</span><small>/<span id="rivalWk">0</span></small></div>
-        <div class="wkts" id="rivalWkts"></div>
-        <div class="mini" id="rivalMeta"></div>
-      </div>
+    <div class="av-rivalrow">
+      <div class="av-rivalhead"><span class="av-zonetag">RIVAL DUGOUT</span><span class="av-rivalmeta" id="rivalStripMeta"></span><button class="btn secondary sm" id="scanBtn" title="Scout the rival's full squad">Scout ▸</button></div>
+      <div class="av-rivalfan" id="rivalStrip"></div>
     </div>
 
-    <div class="arena">
-      <div class="duel" id="duel"></div>
-      <div class="log" id="log"></div>
-      <div class="explain">
-        <div class="ladder" id="ladder"></div>
-        <div class="feed"><h3>Last balls</h3><div class="feed-list" id="feed"></div></div>
-      </div>
+    <div class="av-stage">
+      <aside class="av-dugout" id="dugout"></aside>
+      <div class="av-pitch" id="duel"></div>
+      <aside class="av-kitbag" id="kitbag"></aside>
     </div>
+
+    <div class="av-fanwrap"><div class="av-fan" id="hand"></div></div>
 
     <div class="scorebug" id="scorebug"></div>
-
-    <div class="rival-strip">
-      <div class="rival-strip-head"><span>Rival cards</span><span class="rs-right"><span id="rivalStripMeta"></span><button class="btn secondary sm deck-view-btn" id="scanBtn" title="View the rival's full deck">View ▸</button></span></div>
-      <div class="rival-mini-row" id="rivalStrip"></div>
-    </div>
-
-    <div class="hand-bar">
-      <span id="handPrompt"></span>
-      <span class="r">Bench</span>
-    </div>
-    <div class="hand" id="hand"></div>
 
     <div class="scout-overlay" id="rivalDrawer">
       <div class="scout-panel">
@@ -5551,8 +5793,26 @@ COACHES.push(
   statCoach("high_roller","High Roller","rare",4,9,"Luck swings harder: +12 when hot, -6 when cold.",(stat,c,x)=>x.luckyTick?12:-6),
   statCoach("clutch_gene","Clutch Gene","rare",4,8,"+8 BAT and +8 BOWL under pressure (last 2 balls, or a wicket down).",(stat,c,x)=>(x.left<=2||x.yourWk>=1)?8:0),
   /* ---- P. death-overs spice ---- */
-  stripCoach("death_rattle","Death Rattle","rare",5,8,"Bowling the last 2 balls: one run slot becomes a WICKET.",(mode,s,x)=>mode==="bowl"&&x.left<=2?replaceWorstRun(s,"W"):s)
+  stripCoach("death_rattle","Death Rattle","rare",5,8,"Bowling the last 2 balls: one run slot becomes a WICKET.",(mode,s,x)=>mode==="bowl"&&x.left<=2?replaceWorstRun(s,"W"):s),
+  /* ---- Q. ball-owned coaches: the over is a timeline your build writes onto ---- */
+  stripCoach("launch_day","Launch Day","uncommon",3,7,"Batting ball 1: one Single slot becomes a SIX.",(mode,s,x)=>{
+    if(mode!=="bat"||x.ball!==1)return s;
+    const i=s.indexOf("1");if(i>=0)s[i]="6";return s;
+  }),
+  stripCoach("final_flourish","Final Flourish","rare",5,8,"Batting the last ball: every FOUR slot becomes a SIX.",(mode,s,x)=>mode==="bat"&&x.left===1?s.map(t=>t==="4"?"6":t):s),
+  stripCoach("new_ball_devil","New Ball Devil","uncommon",3,7,"Bowling ball 1: one run slot becomes a WICKET.",(mode,s,x)=>mode==="bowl"&&x.ball===1?replaceWorstRun(s,"W"):s)
 );
+/* Ball-scoped coaches mark the balls they own on the over rail. */
+const BALL_TAGS={
+  middle_overs:{balls:[3,4],icon:"+"},
+  powerplay_pro:{balls:[1,2],icon:"+"},
+  clutch_gene:{balls:[5,6],icon:"+"},
+  death_rattle:{balls:[5,6],phase:"bowl",icon:"W"},
+  launch_day:{balls:[1],phase:"bat",icon:"6"},
+  final_flourish:{balls:[6],phase:"bat",icon:"6"},
+  new_ball_devil:{balls:[1],phase:"bowl",icon:"W"}
+};
+COACHES.forEach(co=>{if(BALL_TAGS[co.id])co.ballTag=BALL_TAGS[co.id]});
 /* ---- Coach EDITIONS (rolled at pack reveal; hexes can grant them) ---- */
 const EDITIONS={
   foil:{label:"Foil",sell:2,desc:"+3 BAT & +3 BOWL to every card."},
@@ -6247,8 +6507,9 @@ function resolveBat(c){
   settleResult(m.result);
 }
 let settleTimer=null;
-function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},5600)}
-function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(settleTimer);m.result.state="settled";render()}}
+// the ring spin sets result.spinDur; scores/equation update right when it lands
+function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},(result.spinDur||3200)+900)}
+function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(settleTimer);clearSpin();m.result.state="settled";render()}}
 function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-9)}
 function end(title,text){
   clearTimeout(settleTimer);
@@ -6564,32 +6825,7 @@ function render(pop=false){
   $("#matchName").textContent=matchLabel(m.def);
   $("#phaseLabel").innerHTML=phaseLabelText();
   $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
-  const left=m.def.balls-m.ball+1;
-  const v=bugView();
-  // target panel
-  if(m.phase==="bowl"){
-    const defending=m.innings===2&&m.firstChoice==="bat";
-    $("#target").innerHTML=`<div class="lbl">${defending?"Defend":"Bowling"}</div><div class="big">${defending?Math.max(0,m.target+1-v.rival.runs):`Ball ${m.ball}`}<span style="font-size:18px;color:var(--muted)">${defending?"":"/"+m.def.balls}</span></div><div class="note">${defending?`from ${left} ball${left===1?'':'s'}`:"keep them low"}</div>`;
-  }else if(m.target==null){
-    $("#target").innerHTML=`<div class="lbl">Batting</div><div class="big">Ball ${m.ball}<span style="font-size:18px;color:var(--muted)">/${m.def.balls}</span></div><div class="note">set a target</div>`;
-  }else{
-    $("#target").innerHTML=`<div class="lbl">Need</div><div class="big"><b>${Math.max(0,m.target+1-v.you.runs)}</b></div><div class="note">from ${left} ball${left===1?'':'s'}</div>`;
-  }
-  $("#youRuns").textContent=v.you.runs;$("#youWk").textContent=v.you.wk;
-  $("#rivalRuns").textContent=v.rival.runs;$("#rivalWk").textContent=v.rival.wk;
-  $("#youWkts").innerHTML=wktDots(m.def.wickets,v.you.wk);
-  $("#rivalWkts").innerHTML=wktDots(m.def.wickets,v.rival.wk);
-  $("#youMeta").textContent=m.phase==="bat"?`Chasing · ${m.def.wickets-v.you.wk} wkts left`:"Bowling now";
-  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-v.rival.wk} wkts left`:`Set ${m.target}`;
-  $("#youMeta").textContent=m.phase==="bat"?`${m.def.wickets-v.you.wk} wkts left`:(m.innings===2?"Defending":"On attack");
-  $("#rivalMeta").textContent=m.phase==="bowl"?`${m.def.wickets-v.rival.wk} wkts left`:(m.target==null?"Bowling first":`Target ${m.target+1}`);
-  const yb=m.phase==="bat";
-  $("#youRole").className="roletag "+(yb?"bat":"bowl");$("#youRole").innerHTML=(yb?ICON.bat:ICON.ball)+(yb?"BATTING":"BOWLING");
-  $("#rivalRole").className="roletag "+(yb?"bowl":"bat");$("#rivalRole").innerHTML=(yb?ICON.ball:ICON.bat)+(yb?"BOWLING":"BATTING");
-  $("#handPrompt").textContent=m.result?"Ball recorded":m.selected?"Ready":m.phase==="bowl"?"Choose bowler":"Choose batter";
-  $("#handPrompt").textContent=m.result?"Resolved":m.selected?"Locked":m.phase==="bowl"?"Pick a bowler":"Pick a batter";
-  $("#log").innerHTML=m.result?"":m.log;
-  renderDuel(pop);renderHand();renderExplainers();renderRivalStrip();
+  renderDuel(pop);renderHand();renderDugout();renderKitbag();renderScorebug();renderRivalStrip();
 }
 function wktDots(total,out){let s="";for(let i=0;i<total;i++)s+=`<span class="stump ${i<out?'out':''}"></span>`;return s}
 // Scores mutate the moment a ball is rolled, but the board/equation/over-strip
@@ -6601,11 +6837,6 @@ function bugView(){
   if(!s)return {you:m.you,rival:m.rival,hist:m.history};
   return {you:{runs:s.youRuns,wk:s.youWk},rival:{runs:s.rivalRuns,wk:s.rivalWk},hist:m.history.slice(0,s.histLen)};
 }
-function renderExplainers(){
-  $("#ladder").innerHTML="";
-  $("#feed").innerHTML="";
-  renderScorebug();
-}
 function currentOddsInfo(){
   if(m.result)return {strip:m.result.strip,roll:m.result.roll,margin:m.result.mine-m.result.theirs,resolving:m.result.state==="resolving"};
   const card=m.selected||m.preview;
@@ -6614,20 +6845,6 @@ function currentOddsInfo(){
   const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
   const margin=mine-theirs;
   return {strip:getStripFor(m.phase,card),roll:null,margin,resolving:false};
-}
-function renderCenterOdds(){
-  const info=currentOddsInfo();
-  if(!info)return "";
-  return `<div class="arena-odds">
-    <div class="odds-kicker">Odds</div>
-    ${renderMatchupRead(info.margin,info.strip)}
-    ${renderCurve(info.strip,info.roll,m.phase,info.resolving)}
-  </div>`;
-}
-function renderOddsStage(){
-  const odds=renderCenterOdds();
-  if(!odds)return `<div class="odds-stage empty">Hover a card to preview odds</div>`;
-  return `<div class="odds-stage">${odds}<div class="actions" id="actions"></div></div>`;
 }
 function targetText(){
   const left=m.def.balls-m.ball+1;
@@ -6646,49 +6863,33 @@ function renderScorebug(){
     <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>
     <div class="bug-cell bug-balls"><span>Last ${m.def.balls}</span>${renderOverStrip()}</div>`;
 }
-function renderMatchupRead(margin,strip){
-  return `<div class="matchup-read ${bandClass(margin)}"><b>${outcomeBand(margin)}</b><span>${margin>0?"+":""}${margin} · ${oddsSummary(strip)}</span></div>`;
-}
 function oddsSummary(strip){
   const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
   return ["W","0","1","2","4","6"].filter(t=>counts[t]).map(t=>`${t}:${Math.round(counts[t]/strip.length*100)}%`).join(" ");
+}
+/* Coaches with a ballTag mark the balls they own on the over rail —
+   the over is a timeline your build is written onto. */
+function ballBadges(ballNo){
+  return activeCoaches()
+    .filter(co=>co.ballTag&&co.ballTag.balls.includes(ballNo)&&(!co.ballTag.phase||co.ballTag.phase===m.phase))
+    .map(co=>`<i class="rail-badge" title="${co.name}: ${co.desc}">${co.ballTag.icon}</i>`).join("");
 }
 function renderOverStrip(){
   const hist=bugView().hist;
   const balls=Array.from({length:Math.max(m.def.balls,hist.length)},(_,i)=>hist[i]);
   return `<div class="over-strip">${balls.map((h,i)=>{
-    if(!h)return `<span class="ball-chip">•</span>`;
+    if(!h)return `<span class="ball-chip">•${ballBadges(i+1)}</span>`;
     const token=ballToken(h.result),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":(token==="wd"||token==="nb"?"extra":"filled"));
     return `<span class="ball-chip ${cls} ${i===hist.length-1?'current':''}" title="${h.calc}">${token}</span>`;
   }).join("")}</div>`;
 }
 function ballToken(result){if(result==="WICKET")return "W";if(result==="WIDE")return "wd";if(result==="NO BALL")return "nb";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
-function coachStripHTML(){
-  // Always visible so players learn coaches live here: hired coaches as chips,
-  // remaining slots as quiet dashed placeholders.
-  const active=activeCoaches();
-  const chips=active.map(coach=>`<span class="coach-chip" title="${coach.desc}"><img src="${coachArt(coach)}" alt="" loading="lazy">${coach.name}</span>`);
-  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
-  for(let i=0;i<open;i++)chips.push(`<span class="coach-chip empty" title="Hire coaches in the shop — they work every ball">Coach slot</span>`);
-  return `<div class="coach-strip slim">${chips.join("")}</div>`;
-}
-function consumableTrayHTML(){
-  const tools=(run?.consumables||[]).filter(c=>!c.kind);
-  if(!tools.length)return "";
-  const chips=tools.map(c=>{
-    const armed=m.armedId===c.ownedId;
-    const onMode=c.mode==="any"||c.mode===m.phase;
-    const hint=onMode?"":` — fires when you ${c.mode==="bat"?"bat":"bowl"}`;
-    return `<button class="tool-chip ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}" title="${c.desc||""}${hint}">${c.name}<em>${c.mode==="any"?"ANY":c.mode.toUpperCase()}</em>${armed?'<i>ARMED</i>':''}</button>`;
-  }).join("");
-  return `<div class="tool-tray">${chips}</div>`;
-}
 function armTool(ownedId){
   if(m.result)return;
   m.armedId=m.armedId===ownedId?null:ownedId;
   m.stripCache={};
-  renderDuel();
+  render();
 }
 function commentaryLines(result){
   const token=ballToken(result.text);
@@ -6721,97 +6922,6 @@ function resultWinner(result){
 }
 function shouldCelebrate(result){return m.phase==="bowl"?(result.text==="WICKET"||result.text==="DOT"):(result.text==="FOUR"||result.text==="SIX")}
 function confettiHTML(){return `<span class="confetti">${Array.from({length:10},()=>"<i></i>").join("")}</span>`}
-function curvePointData(strip){
-  const order=["W","0","1","2","4","6"];
-  if(strip.includes("WD"))order.push("WD");
-  if(strip.includes("NB"))order.push("NB");
-  const counts=order.map(t=>strip.filter(x=>x===t).length);
-  const sigma=.82;
-  const smoothed=counts.map((_,i)=>counts.reduce((sum,count,j)=>{
-    const d=i-j;
-    return sum+count*Math.exp(-(d*d)/(2*sigma*sigma));
-  },0));
-  const max=Math.max(...smoothed,1);
-  const x0=30,step=236/(order.length-1);
-  return counts.map((count,i)=>({token:order[i],count,x:x0+i*step,y:61-(smoothed[i]/max)*43,r:count?Math.min(7,3.5+count*.35):2.5}));
-}
-function renderCurve(strip,roll,mode,rolling=false){
-  const points=curvePointData(strip);
-  const area=smoothArea(points);
-  const hitToken=roll!=null?strip[roll]:null;
-  const left=mode==="bowl"?"Control":"Collapse",right=mode==="bowl"?"Leaks runs":"Boundaries";
-  return `<div class="curve-box">
-    <svg class="curve-svg" viewBox="0 0 300 92" aria-hidden="true">
-      <line class="curve-axis" x1="30" y1="61" x2="266" y2="61"></line>
-      ${points.map(p=>`<line class="curve-tick" x1="${p.x}" y1="61" x2="${p.x}" y2="66"></line>`).join("")}
-      <path class="curve-area" d="${area}"></path>
-      ${points.map(p=>`<circle class="curve-dot ${curveClass(p.token,mode)} ${hitToken===p.token&&!rolling?"hit":""}" cx="${p.x}" cy="${p.y}" r="${hitToken===p.token&&!rolling?7:p.r}"></circle>`).join("")}
-      ${hitToken?renderCurveMarker(points,strip,hitToken,rolling,roll):""}
-      ${points.map(p=>`<text class="curve-svg-label ${curveClass(p.token,mode)}" x="${p.x}" y="82">${p.token}</text>`).join("")}
-    </svg>
-    <div class="curve-scale"><span>${left}</span><span>${right}</span></div>
-  </div>`;
-}
-function payoffWord(result){
-  const t=result.text;
-  if(t==="WIDE")return "WIDE +1";
-  if(t==="NO BALL")return "NO BALL — FREE HIT!";
-  return t==="SIX"?"SIX!":t==="FOUR"?"FOUR!":t==="WICKET"?"WICKET!":t==="DOT"?"DOT BALL":t==="Single"?"1 RUN":t==="Two runs"?"2 RUNS":t.toUpperCase();
-}
-function renderResolvePayoff(result,mode){
-  const strip=result.strip,roll=result.roll,hitToken=strip[roll],points=curvePointData(strip),area=smoothArea(points);
-  const token=ballToken(result.text),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":"run");
-  return `<div class="payoff-stage ${cls}">
-    <svg class="curve-svg payoff-svg" viewBox="0 0 300 92" aria-hidden="true">
-      <line class="curve-axis" x1="30" y1="61" x2="266" y2="61"></line>
-      ${points.map(p=>`<line class="curve-tick" x1="${p.x}" y1="61" x2="${p.x}" y2="66"></line>`).join("")}
-      <path class="curve-area" d="${area}"></path>
-      ${points.map(p=>`<circle class="curve-dot ${curveClass(p.token,mode)}" cx="${p.x}" cy="${p.y}" r="${p.r}"></circle>`).join("")}
-      ${renderCurveMarker(points,strip,hitToken,true,roll)}
-      ${points.map(p=>`<text class="curve-svg-label ${curveClass(p.token,mode)}" x="${p.x}" y="82">${p.token}</text>`).join("")}
-    </svg>
-    <div class="payoff-burst ${cls}"><span class="payoff-num">${token}</span><span class="payoff-word">${payoffWord(result)}</span></div>
-    ${shouldCelebrate(result)?confettiHTML():""}
-  </div>`;
-}
-function renderCurveMarker(points,strip,hitToken,rolling,roll){
-  const target=hitToken;
-  const hit=points.find(p=>p.token===target);
-  if(!hit)return "";
-  if(!rolling)return `<circle class="curve-marker" cx="${hit.x}" cy="${hit.y}" r="7"></circle>`;
-  const byToken=Object.fromEntries(points.map(p=>[p.token,p]));
-  const allTokens=points.map(p=>p.token);
-  const slowTokens=nearbyRollTokens(strip,roll);
-  const sequence=[
-    ...allTokens.map((token,i)=>({token,delay:i*130,slow:false})),
-    ...slowTokens.map((token,i)=>({token,delay:1150+i*420,slow:true})),
-    {token:target,delay:3300,slow:true,final:true}
-  ];
-  const flashes=sequence.map(item=>{
-    const p=byToken[item.token];
-    if(!p)return "";
-    return `<circle class="curve-flash ${item.slow?"slow":""}" style="animation-delay:${item.delay}ms" cx="${p.x}" cy="${p.y}" r="${item.final?10:item.slow?8:7}"></circle>`;
-  }).join("");
-  return `${flashes}<circle class="curve-marker rolling" cx="${hit.x}" cy="${hit.y}" r="9"></circle>`;
-}
-function nearbyRollTokens(strip,roll){
-  const seen=new Set(),tokens=[];
-  const add=i=>{
-    if(i<0||i>=strip.length)return;
-    const token=strip[i];
-    if(!seen.has(token)){seen.add(token);tokens.push(token)}
-  };
-  add(roll-1);add(roll);add(roll+1);
-  if(tokens[tokens.length-1]!==strip[roll])tokens.push(strip[roll]);
-  return tokens;
-}
-function smoothArea(points){
-  let d=`M ${points[0].x} 61 L ${points[0].x} ${points[0].y}`;
-  for(let i=1;i<points.length;i++){const prev=points[i-1],cur=points[i],mx=(prev.x+cur.x)/2,my=(prev.y+cur.y)/2;d+=` Q ${prev.x} ${prev.y} ${mx} ${my}`}
-  const last=points[points.length-1];d+=` T ${last.x} ${last.y} L ${last.x} 61 Z`;return d;
-}
-function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t==="4"||t==="6")return mode==="bat"?"good":"danger";if(t==="WD"||t==="NB")return mode==="bat"?"good":"danger";return ""}
-
 function selectedColor(role){return role==="bat"?"#09c18b":role==="bowl"?"#ff5b2c":"#d943ff"}
 function escSVG(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[ch]))}
 function headGrad(role){return role==="bowl"?["#8a1414","#d83636"]:role==="all"?["#5a2c9a","#8f68ef"]:["#12589a","#2f8fd6"]}
@@ -6827,81 +6937,60 @@ function cardShell(g,dim,rarityKey="common",role="all",plain=false){
   const sky=dusk
     ? `<stop offset="0" stop-color="#2b3f7a"/><stop offset=".16" stop-color="#6a5aa0"/><stop offset=".33" stop-color="#c06a8e"/><stop offset=".45" stop-color="#ef8a5a"/><stop offset=".53" stop-color="#ffc879"/><stop offset=".6" stop-color="#7fb53f"/><stop offset="1" stop-color="#4f8a1e"/>`
     : `<stop offset="0" stop-color="#4aa8e0"/><stop offset=".4" stop-color="#7fc4ea"/><stop offset=".56" stop-color="#cfeaf6"/><stop offset=".58" stop-color="#8cc852"/><stop offset="1" stop-color="#5f9f28"/>`;
-  const rr=escSVG((RARITIES[rarityKey]?.label||"Common").toUpperCase()), band=(rr+" ★ ").repeat(9);
-  const flood=cx=>`<rect x="${cx-13}" y="122" width="26" height="14" rx="2" fill="#ece2b0" stroke="#111" stroke-width="2"/><rect x="${cx-2}" y="136" width="4" height="16" fill="#333"/>`;
-  const bandText=plain?"":`<g font-family="Oswald,Arial,sans-serif" font-size="6.4" font-weight="600" letter-spacing="1.5" fill="${metals[0]}" opacity=".9">
-      <g clip-path="url(#${g}bt)"><text x="18" y="21">${band}</text></g>
-      <g clip-path="url(#${g}bb)"><text x="18" y="333">${band}</text></g>
-      <g clip-path="url(#${g}bl)"><text x="18" y="21" transform="rotate(90 18 20)">${band}</text></g>
-      <g clip-path="url(#${g}br)"><text x="232" y="21" transform="rotate(90 232 20)">${band}</text></g>
-    </g>
-    <g class="edge-shine" opacity="0">
-      <rect x="-80" y="12" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bt)"/>
-      <rect x="-80" y="323" width="110" height="15" fill="url(#${g}edgeShine)" clip-path="url(#${g}bb)"/>
-      <rect x="12" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}bl)" transform="rotate(90 19.5 19.5)"/>
-      <rect x="223" y="-80" width="15" height="110" fill="url(#${g}edgeShine)" clip-path="url(#${g}br)" transform="rotate(90 230.5 19.5)"/>
-    </g>`;
-  const floods=plain?"":`${flood(66)}${flood(184)}`;
-  const crowd=plain?"":`<g opacity=".85">${Array.from({length:11},(_,i)=>`<circle cx="${34+i*17}" cy="${159+(i%2)*13}" r="2.1" fill="${i%3===0?'#ffd23f':i%3===1?'#ff5c5c':'#4ad1ff'}"/>`).join("")}</g>`;
+  // Art-first shell: one clean metal frame (rarity = frame material, no text
+  // bands), a simple sky+turf scene, nothing competing with the character.
   return `<defs>
-      <linearGradient id="${g}paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f0de"/><stop offset=".55" stop-color="#eee4ce"/><stop offset="1" stop-color="#f7f1e2"/></linearGradient>
       <linearGradient id="${g}metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metals[0]}"/><stop offset=".26" stop-color="${metals[1]}"/><stop offset=".47" stop-color="${metals[2]}"/><stop offset=".7" stop-color="${metals[1]}"/><stop offset="1" stop-color="${metals[0]}"/></linearGradient>
-      <linearGradient id="${g}edgeShine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="transparent"/><stop offset=".42" stop-color="transparent"/><stop offset=".5" stop-color="#fff"/><stop offset=".58" stop-color="transparent"/><stop offset="1" stop-color="transparent"/></linearGradient>
       <linearGradient id="${g}sky" x1="0" y1="0" x2="0" y2="1">${sky}</linearGradient>
-      <clipPath id="${g}scene"><rect x="26" y="26" width="198" height="298" rx="5"/></clipPath>
-      <clipPath id="${g}bt"><rect x="12" y="12" width="226" height="15"/></clipPath>
-      <clipPath id="${g}bb"><rect x="12" y="323" width="226" height="15"/></clipPath>
-      <clipPath id="${g}bl"><rect x="12" y="12" width="15" height="326"/></clipPath>
-      <clipPath id="${g}br"><rect x="223" y="12" width="15" height="326"/></clipPath>
+      <linearGradient id="${g}scrim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(8,14,12,0)"/><stop offset=".55" stop-color="rgba(8,14,12,.78)"/><stop offset="1" stop-color="rgba(8,14,12,.92)"/></linearGradient>
+      <clipPath id="${g}scene"><rect x="20" y="20" width="210" height="310" rx="8"/></clipPath>
       <filter id="${g}shadow"><feDropShadow dx="0" dy="5" stdDeviation="3" flood-color="#000" flood-opacity=".45"/></filter>
     </defs>
-    <rect x="6" y="5" width="238" height="340" rx="16" fill="url(#${g}paper)" filter="url(#${g}shadow)"/>
-    <rect x="12" y="12" width="226" height="326" rx="11" fill="url(#${g}metal)" stroke="#111" stroke-width="2.5"/>
-    ${bandText}
-    <rect x="24" y="24" width="202" height="302" rx="7" fill="#111"/>
+    <rect x="8" y="7" width="234" height="336" rx="16" fill="url(#${g}metal)" filter="url(#${g}shadow)"/>
+    <rect x="12" y="11" width="226" height="328" rx="13" fill="none" stroke="#0c1214" stroke-width="3"/>
+    <rect x="18" y="18" width="214" height="314" rx="9" fill="#0c1214"/>
     <g clip-path="url(#${g}scene)">
-      <rect x="26" y="26" width="198" height="298" fill="url(#${g}sky)"/>
-      ${floods}
-      <rect x="26" y="150" width="198" height="42" fill="${dusk?'#3a2c55':'#6b4e96'}"/>
-      ${crowd}
-      <rect x="26" y="192" width="198" height="132" fill="${dusk?'#5f9328':'#74b932'}"/>`;
+      <rect x="20" y="20" width="210" height="310" fill="url(#${g}sky)"/>
+      <rect x="20" y="196" width="210" height="134" fill="${dusk?'#4f8322':'#67a92c'}"/>
+      <rect x="20" y="252" width="210" height="78" fill="url(#${g}scrim)"/>`;
 }
 function roleColor(c){return c.role==="bat"?"#1f9b53":c.role==="bowl"?"#c0303f":"#7245c9"}
 function cardSVG(c,batNum,bowlNum,emph,dim,compact){
   const g="g"+(svgSeq++);
-  const hg=headGrad(c.role),img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
+  const img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
+  const roleShort=c.role==="bat"?"BAT":c.role==="bowl"?"BOWL":"AR";
+  const gem=c.trait
+    ?`<g class="trait-gem"><path d="M215 30 l13 15 -13 15 -13 -15 Z" fill="#ffd23f" stroke="#0c1214" stroke-width="2.5"/><path d="M215 36 l7 9 -7 9 -7 -9 Z" fill="#fff3bd"/></g>`
+    :"";
   if(compact){
-    // Mini info budget: the decision stat + the surname, straight on the
-    // art — no boxes. Same numeral language as the full card.
+    // Mini info budget: art + the decision stat. Nothing else.
     const nm=escSVG(c.name.split(" ").pop().toUpperCase());
     const statKind=emph==="bowl"?"bowl":"bat";
     const statNum=statKind==="bowl"?bowlNum:batNum;
     const statColor=statKind==="bowl"?"#ff8a95":"#8af0b4";
     return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     ${cardShell(g,dim,c.rarity,c.role,true)}
-      <image href="${img}" x="30" y="128" width="190" height="196" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}"/>
+      <image href="${img}" x="30" y="110" width="190" height="214" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}"/>
     </g>
-    <text x="125" y="112" text-anchor="middle" fill="${statColor}" stroke="#111" stroke-width="10" paint-order="stroke" font-size="86" font-weight="700">${statNum}</text>
-    <text x="125" y="136" text-anchor="middle" fill="#fffdf2" stroke="#111" stroke-width="4" paint-order="stroke" font-size="14" font-weight="700" letter-spacing="3">${statKind.toUpperCase()}</text>
-    <text x="125" y="318" text-anchor="middle" fill="#fff" stroke="#111" stroke-width="4" paint-order="stroke" font-size="${nm.length>9?13:16}" font-weight="700" letter-spacing=".6">${nm}</text>
+    ${gem}
+    <text x="125" y="100" text-anchor="middle" fill="${statColor}" stroke="#0c1214" stroke-width="10" paint-order="stroke" font-size="88" font-weight="700">${statNum}</text>
+    <text x="125" y="318" text-anchor="middle" fill="#fff" stroke="#0c1214" stroke-width="4" paint-order="stroke" font-size="${nm.length>9?14:17}" font-weight="700" letter-spacing=".6">${nm}</text>
   </svg>`;
   }
-  const name=escSVG((c.name.length>14?c.name.slice(0,13)+"…":c.name).toUpperCase());
-  const trait=escSVG((c.trait?c.trait.name:roleName(c)).toUpperCase());
-  const pillW=Math.min(84,trait.length*5.4+14), pillX=214-pillW;
-  const roleShort=c.role==="bat"?"BAT":c.role==="bowl"?"BOWL":"AR";
+  const name=escSVG((c.name.length>16?c.name.slice(0,15)+"…":c.name).toUpperCase());
+  const roleFill=rc==="#c0303f"?"#ff8a95":rc==="#1f9b53"?"#8af0b4":"#d3b8ff";
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     ${cardShell(g,dim,c.rarity,c.role)}
-      <image href="${img}" x="30" y="70" width="190" height="254" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}"/>
+      <image href="${img}" x="28" y="52" width="194" height="266" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}"/>
+      <rect x="20" y="266" width="210" height="64" fill="url(#${g}scrim)"/>
     </g>
-    <defs><linearGradient id="${g}head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${hg[0]}"/><stop offset="1" stop-color="${hg[1]}"/></linearGradient></defs>
-    <rect x="33" y="30" width="184" height="32" rx="9" fill="url(#${g}head)" stroke="#111" stroke-width="3"/>
-    <text x="41" y="52" fill="#fff" font-size="${name.length>11?12:14}" font-weight="700" letter-spacing=".4">${name}</text>
-    <rect x="${pillX}" y="37" width="${pillW}" height="18" rx="9" fill="#ffe23f" stroke="#111" stroke-width="2"/>
-    <text x="${(pillX+pillW/2).toFixed(1)}" y="50" text-anchor="middle" fill="#111" font-size="9.5" font-weight="700">${trait}</text>
-    <text x="58" y="302" text-anchor="middle" fill="#fffdf2" stroke="#111" stroke-width="9" paint-order="stroke" font-size="52" font-weight="700">${ovr}</text>
-    <text x="58" y="318" text-anchor="middle" fill="#fffdf2" stroke="#111" stroke-width="3.5" paint-order="stroke" font-size="11" font-weight="700" letter-spacing="3">OVR</text>
-    <text x="196" y="314" text-anchor="end" fill="${rc==="#c0303f"?"#ff8a95":rc==="#1f9b53"?"#8af0b4":"#d3b8ff"}" stroke="#111" stroke-width="3.5" paint-order="stroke" font-size="13" font-weight="700" letter-spacing="1">${roleShort} #${c.num}</text>
+    <rect x="26" y="27" width="${roleShort.length===2?36:52}" height="20" rx="6" fill="${rc}" stroke="#0c1214" stroke-width="2.5"/>
+    <text x="${roleShort.length===2?44:52}" y="42" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" letter-spacing="1">${roleShort}</text>
+    ${gem}
+    <text x="60" y="304" text-anchor="middle" fill="#fffdf2" stroke="#0c1214" stroke-width="9" paint-order="stroke" font-size="56" font-weight="700">${ovr}</text>
+    <text x="60" y="321" text-anchor="middle" fill="#fffdf2" stroke="#0c1214" stroke-width="3.5" paint-order="stroke" font-size="11" font-weight="700" letter-spacing="3">OVR</text>
+    <text x="222" y="300" text-anchor="end" fill="#fff" stroke="#0c1214" stroke-width="3.5" paint-order="stroke" font-size="${name.length>13?13:15}" font-weight="700" letter-spacing=".4">${name}</text>
+    <text x="222" y="318" text-anchor="end" fill="${roleFill}" stroke="#0c1214" stroke-width="3" paint-order="stroke" font-size="11" font-weight="700" letter-spacing="1">${roleName(c).toUpperCase()} #${c.num}</text>
   </svg>`;
 }
 function radialSVG(c){
@@ -6943,34 +7032,168 @@ function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,acti
 }
 function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardHTML(c,{emph,as:"div",duel:true,active:true})}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div><div class="placeholder">+</div></div>`}
+/* ---------- THE FIELD RING: 12 sectors of a cricket ground.
+   The strip IS the field — the ball lands in a sector. Build changes
+   visibly reshape it; the roll is a decelerating sweep, not a graph. */
+const RING_COLORS={W:"#ff4155","0":"#46605a","1":"#2fb98b","2":"#25d3a0","4":"#ffd23f","6":"#ff9430",WD:"#b98cff",NB:"#b98cff"};
+function ringSectorPath(i,n,cx,cy,r0,r1,gapDeg=2.4){
+  const a0=(-90+i*(360/n)+gapDeg/2)*Math.PI/180, a1=(-90+(i+1)*(360/n)-gapDeg/2)*Math.PI/180;
+  const p=(a,r)=>`${(cx+Math.cos(a)*r).toFixed(1)} ${(cy+Math.sin(a)*r).toFixed(1)}`;
+  return `M ${p(a0,r0)} A ${r0} ${r0} 0 0 1 ${p(a1,r0)} L ${p(a1,r1)} A ${r1} ${r1} 0 0 0 ${p(a0,r1)} Z`;
+}
+function fieldRingSVG(strip,opts={}){
+  const n=strip.length,cx=170,cy=170,r0=158,r1=104;
+  const prev=opts.prev||null;
+  const secs=strip.map((tk,i)=>{
+    const col=RING_COLORS[tk]||"#46605a";
+    const changed=prev&&prev[i]!==tk;
+    const mid=(-90+(i+.5)*(360/n))*Math.PI/180, lr=(r0+r1)/2;
+    const lx=(cx+Math.cos(mid)*lr).toFixed(1), ly=(cy+Math.sin(mid)*lr+6).toFixed(1);
+    return `<g class="ring-sec ${changed?'flash':''} ${opts.landed===i?'landed':''}" data-i="${i}">
+      <path d="${ringSectorPath(i,n,cx,cy,r0,r1)}" fill="${col}" stroke="#0a1214" stroke-width="2.5"/>
+      <text x="${lx}" y="${ly}" text-anchor="middle" font-size="19" font-weight="700" fill="#fff" stroke="#0a1214" stroke-width="3.5" paint-order="stroke">${tk==="0"?"·":tk}</text>
+    </g>`;
+  }).join("");
+  return `<svg class="ring-svg" viewBox="0 0 340 340" aria-hidden="true">
+    <circle cx="${cx}" cy="${cy}" r="${r0+6}" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="2" stroke-dasharray="3 7"/>
+    <circle cx="${cx}" cy="${cy}" r="${r1-6}" fill="#0e1a16"/>
+    <rect x="${cx-13}" y="${cy-40}" width="26" height="80" rx="6" fill="#c9ad6f" opacity=".28"/>
+    ${secs}
+  </svg>`;
+}
+function ghostRingSVG(){return fieldRingSVG(Array(12).fill("0")).replace('class="ring-svg"','class="ring-svg ghost"')}
+function ringCenterRead(info){
+  if(!info)return `<div class="ring-read wait"><b>PICK A CARD</b><span>the field takes shape</span></div>`;
+  const cls=bandClass(info.margin);
+  return `<div class="ring-read ${cls}"><b>${outcomeBand(info.margin).toUpperCase()}</b><span>${info.margin>0?"+":""}${info.margin}</span></div>`;
+}
+function ringResultHTML(){
+  const token=ballToken(m.result.text);
+  const cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":(token==="wd"||token==="nb"?"extra":"run"));
+  return `<div class="ring-read result ${cls}"><b class="ring-token">${token.toUpperCase()}</b><span>${m.result.text}</span>${shouldCelebrate(m.result)?confettiHTML():""}</div>`;
+}
+let spinTimers=[];
+function clearSpin(){spinTimers.forEach(clearTimeout);spinTimers=[]}
+function startRingSpin(target,n){
+  clearSpin();
+  const total=n+((target-0)%n+n)%n; // one full lap, land on target
+  let t=280;
+  for(let k=0;k<=total;k++){
+    const p=k/total,delay=t;
+    t+=42+300*p*p;
+    spinTimers.push(setTimeout(()=>{
+      document.querySelectorAll(".ring-sec.lit").forEach(el=>el.classList.remove("lit"));
+      const el=document.querySelector(`.ring-sec[data-i="${k%n}"]`);
+      if(el)el.classList.add("lit");
+      if(k===total){
+        if(el)el.classList.add("landed");
+        const c=$("#ringCenter");
+        if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
+        const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
+      }
+    },delay));
+  }
+  return t;
+}
+/* Danger / answer telegraphs: the rival card menaces when it outguns your
+   best available answer; your pick calms the board when it answers back. */
+function dangerRead(){
+  if(!m.challenge)return null;
+  const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
+  const pool=activeSquad().filter(c=>!c.used);
+  if(!pool.length)return "danger";
+  const best=Math.max(...pool.map(c=>m.phase==="bowl"?bowlVal(c):batVal(c)));
+  return theirs-best>=4?"danger":null;
+}
+function pitchStripInfo(){
+  if(m.result)return {strip:m.result.strip,roll:m.result.roll,margin:m.result.mine-m.result.theirs};
+  const card=m.selected||m.preview;
+  if(!card||!m.challenge)return null;
+  const mine=m.phase==="bowl"?bowlVal(card):batVal(card);
+  const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
+  return {strip:getStripFor(m.phase,card),roll:null,margin:mine-theirs};
+}
+let lastRingStrip=null;
 function renderDuel(pop=false){
   const d=$("#duel");
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
   const deal=challengeAnim;challengeAnim=false;
-  if(m.result?.state==="resolving"){
-    const left=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph);
-    const right=duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,false,rivEmph);
-    d.innerHTML=`${coachStripHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${right}</div>${commentaryHTML()}
-      <div class="odds-stage resolving-stage"><div class="arena-odds resolving-odds"><div class="odds-kicker">Resolving</div>${renderResolvePayoff(m.result,m.phase)}<span class="skip-hint">tap to skip ▸</span></div></div>`;
-  }else if(m.result){
-    const winner=resultWinner(m.result),youClass=winner==="you"?"winner":"loser",rivalClass=winner==="rival"?"winner":"loser";
-    const left=duelCardHTML(m.result.you,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,youClass);
-    const right=duelCardHTML(m.result.rival,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,false,rivEmph,rivalClass);
-    d.innerHTML=`${coachStripHTML()}<div class="duel-stage settled-stage">${left}<div class="vs">vs</div>${right}</div>${commentaryHTML()}
-      <div class="odds-stage result-stage"><div class="result-summary"><b>${ballToken(m.result.text)}</b><span>${m.result.text} recorded</span><small>${resultCalcText(m.result)}</small></div><div class="actions" id="actions"></div></div>`;
-  }else if(m.challenge){
-    const left=m.selected
-      ?duelCardHTML(m.selected,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph)
-      :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
-    d.innerHTML=`${coachStripHTML()}${consumableTrayHTML()}<div class="duel-stage">${left}<div class="vs">vs</div>${duelCardHTML(m.challenge,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph)}</div>${commentaryHTML()}${renderOddsStage()}`;
-  }else{
+  const info=pitchStripInfo();
+  const danger=!m.result&&dangerRead()==="danger";
+  const answered=!m.result&&info&&info.margin>=3;
+  const prevStrip=lastRingStrip;lastRingStrip=info?info.strip.slice():null;
+  const ring=info?fieldRingSVG(info.strip,{prev:prevStrip&&prevStrip.length===info.strip.length?prevStrip:null}):ghostRingSVG();
+  const fh=m.freeHit&&!m.result?`<div class="av-freehit">FREE HIT</div>`:"";
+  const youCard=m.result?m.result.you:(m.selected||null);
+  const youSlot=youCard
+    ?duelCardHTML(youCard,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,(m.result?.state==="settled"&&resultWinner(m.result)==="you")?"winner":"")
+    :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
+  const rivCard=m.result?m.result.rival:m.challenge;
+  const rivSlot=rivCard
+    ?duelCardHTML(rivCard,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph,`${danger?"danger":""} ${(m.result?.state==="settled"&&resultWinner(m.result)==="rival")?"winner":""}`)
+    :`<div class="dslot empty-slot"><div class="placeholder">–</div></div>`;
+  if(!m.challenge&&!m.result){
     d.innerHTML=`<div class="cleared-duel"><div><b>--</b><div>No rival card available</div><button class="btn" id="nextBall">Resolve Match</button></div></div>`;
+    renderActions();return;
   }
-  d.classList.toggle("resolving",m.result?.state==="resolving");
+  const resolving=m.result?.state==="resolving";
+  const centerBits=resolving
+    ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>LIVE</b><span>tap to skip ▸</span></div></div>`
+    :m.result
+      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}</div>`
+      :`<div class="ring-center" id="ringCenter">${ringCenterRead(info)}</div>`;
+  d.innerHTML=`${fh}
+    <div class="av-duelrow ${danger?'threat':''} ${answered?'answered':''}">
+      ${youSlot}
+      <div class="av-ringwrap">${ring}${centerBits}</div>
+      ${rivSlot}
+    </div>
+    ${commentaryHTML()}
+    <div class="av-pitchfoot"><div class="actions" id="actions"></div></div>`;
+  d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
-  d.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
+  d.classList.remove("ball-landed");
+  if(resolving&&!m.result.spinStarted){
+    m.result.spinStarted=true;
+    m.result.spinDur=startRingSpin(m.result.roll,m.result.strip.length);
+  }else if(m.result?.state==="settled"){
+    const el=d.querySelector(`.ring-sec[data-i="${m.result.roll}"]`);
+    if(el)el.classList.add("landed");
+  }
   renderActions();
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
+}
+/* ---------- DUGOUT (coach art, not text) + KIT BAG (armable tools) */
+function renderDugout(){
+  const el=$("#dugout");if(!el)return;
+  const active=activeCoaches();
+  const seats=[];
+  active.forEach(coach=>{
+    seats.push(`<div class="seat filled ${coach.edition?'ed-'+coach.edition:''}" title="${coach.name} — ${coach.desc}">
+      <img src="${coachArt(coach)}" alt="" loading="lazy"><span class="seat-name">${coach.name}</span>
+      ${coach.ballTag?`<i class="seat-ball" title="works balls ${coach.ballTag.balls.join(" & ")}">${coach.ballTag.icon}</i>`:""}
+    </div>`);
+  });
+  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
+  for(let i=0;i<open;i++)seats.push(`<div class="seat open" title="An empty dugout seat — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 60 60"><circle cx="30" cy="22" r="11" fill="currentColor"/><path d="M10 56 Q30 34 50 56 Z" fill="currentColor"/></svg></div>`);
+  el.innerHTML=`<div class="av-zonetag">DUGOUT</div><div class="seats">${seats.join("")}</div>`;
+}
+function renderKitbag(){
+  const el=$("#kitbag");if(!el)return;
+  const tools=(run?.consumables||[]).filter(c=>!c.kind);
+  const items=tools.map(c=>{
+    const armed=m.armedId===c.ownedId;
+    const onMode=c.mode==="any"||c.mode===m.phase;
+    const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:"&#9889;";
+    return `<button class="kit-card ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}"
+      title="${c.desc||""}${onMode?"":" — fires when you "+(c.mode==="bat"?"bat":"bowl")}">
+      <span class="kit-ico">${ico}</span><span class="kit-name">${c.name}</span>
+      ${armed?'<span class="kit-flag">NEXT BALL</span>':''}
+    </button>`;
+  });
+  const bag=`<svg class="bag-ill" viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg>`;
+  el.innerHTML=`<div class="av-zonetag">KIT BAG</div><div class="kits">${items.join("")||`<div class="kit-empty">${bag}</div>`}</div>`;
+  el.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
 }
 function renderActions(){
   const a=$("#actions");
@@ -6986,28 +7209,25 @@ function renderActions(){
    size; the rest stay visible as slivers (number + surname) one click away.
    Partition uses BASE ratings so cards never shuffle mid-innings. */
 function baseStat(c,disc){return disc==="bowl"?c.bowl:c.bat}
-function railTiers(cards,disc){
-  const sorted=cards.slice().sort((a,b)=>(a.used?1:0)-(b.used?1:0)||baseStat(b,disc)-baseStat(a,disc)||sortStrong(a,b));
-  const unused=sorted.filter(c=>!c.used);
-  const ready=unused.slice(0,6);
-  const reserve=sorted.filter(c=>!ready.includes(c));
-  return {ready,reserve};
-}
-function sliverHTML(c,disc,inert){
-  const used=c.used?"used":"";
-  return `<button class="sliver ${used}" data-id="${c.id}" ${inert||c.used?'disabled':''} title="${c.name} — ${disc.toUpperCase()} ${baseStat(c,disc)}${c.trait?' · '+c.trait.name+': '+c.trait.text:''}">
-    ${c.trait?'<i class="sliver-trait"></i>':''}<b>${baseStat(c,disc)}</b><span>${c.name.split(" ").pop()}</span></button>`;
-}
+/* ---------- YOUR HAND: every card, one fan, no number boxes.
+   Used cards stay in the fan face-up with a stamp — you always see
+   what you have left AND what you've spent. */
 function renderHand(){
   const disc=m.phase==="bowl"?"bowl":"bat";
-  const {ready,reserve}=railTiers(activeSquad(),disc);
+  const cards=fanSort(activeSquad());
   const animate=dealAnim;dealAnim=false;
-  $("#hand").innerHTML=`<button class="btn secondary sm deck-view-btn own-scan-btn" id="scanMineBtn" title="View your full squad">View ▸</button>
-    <div class="fan-row player-fan tier-ready">${ready.map((c,i)=>fanCard(c,i,ready.length,{selected:m.selected===c,used:c.used,disabled:!!m.result||c.used,emph:disc,animate})).join("")}</div>
-    <div class="tier-reserve">${reserve.map(c=>sliverHTML(c,disc,false)).join("")}</div>`;
-  document.querySelectorAll("#hand .card, #hand .sliver:not(:disabled)").forEach(b=>{
+  const n=cards.length;
+  $("#hand").innerHTML=`<button class="btn secondary sm av-scanmine" id="scanMineBtn" title="View your full squad">Squad ▸</button>
+    ${cards.map((c,i)=>{
+      const sel=m.selected===c;
+      return `<div class="fanhold ${sel?'is-sel':''} ${c.used?'is-used':''}" style="${fanStyle(i,n,3.2)}">
+        ${cardHTML(c,{selected:sel,used:c.used,disabled:!!m.result||c.used,emph:disc,dealin:animate,mini:false})}
+        ${c.used?'<span class="used-stamp">USED</span>':''}
+      </div>`;
+    }).join("")}`;
+  document.querySelectorAll("#hand .card:not(.used)").forEach(b=>{
     const card=()=>activeSquad().find(c=>c.id===b.dataset.id);
-    b.onclick=()=>lockCard(card());
+    b.onclick=e=>{e.stopPropagation();lockCard(card())};
     b.onmouseenter=()=>previewCard(card());
     b.onfocus=()=>previewCard(card());
   });
@@ -7466,14 +7686,12 @@ function chooseInnings(choice){
 function renderRivalStrip(){
   if(!m?.rivalDeck)return;
   const disc=m.phase==="bowl"?"bat":"bowl"; // their relevant discipline
-  const head=$("#rivalStripMeta")?.parentElement;if(head?.firstElementChild)head.firstElementChild.textContent="Rival cards";
   $("#rivalStripMeta").textContent=`${m.rivalDeck.filter(c=>!c.used).length} left`;
-  const {ready,reserve}=railTiers(m.rivalDeck,disc);
-  $("#rivalStrip").className="rival-mini-row table-bench";
-  $("#rivalStrip").innerHTML=`<div class="fan-row rival-fan tier-ready">${ready.map((c,i)=>fanCard(c,i,ready.length,{used:c.used,disabled:true,emph:disc,rival:true})).join("")}</div>
-    <div class="tier-reserve">${reserve.map(c=>sliverHTML(c,disc,true)).join("")}</div>`;
-  const next=$("#rivalStrip .card[data-id='"+m.challenge?.id+"'], #rivalStrip .sliver[data-id='"+m.challenge?.id+"']");
-  if(next)next.classList.add("next");
+  const cards=fanSort(m.rivalDeck);
+  $("#rivalStrip").innerHTML=cards.map(c=>`<div class="rivhold ${c.used?'is-used':''} ${m.challenge?.id===c.id?'on-pitch':''}">
+      ${cardHTML(c,{used:c.used,disabled:true,emph:disc,mini:true,as:"div"})}
+      ${m.challenge?.id===c.id?'<span class="pitch-flag">ON PITCH</span>':''}
+    </div>`).join("");
 }
 function completeMatchWin(){
   clearTimeout(settleTimer);
