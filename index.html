@@ -5716,7 +5716,6 @@ function renderOverStrip(){
   }).join("")}</div>`;
 }
 function ballToken(result){if(result==="WICKET")return "W";if(result==="WIDE")return "wd";if(result==="NO BALL")return "nb";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
-function normToken(t){return t==="WD"||t==="NB"?"EX":t}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
 function coachStripHTML(){
   const active=activeCoaches();
@@ -5758,16 +5757,17 @@ function resultWinner(result){
 function shouldCelebrate(result){return m.phase==="bowl"?(result.text==="WICKET"||result.text==="DOT"):(result.text==="FOUR"||result.text==="SIX")}
 function confettiHTML(){return `<span class="confetti">${Array.from({length:10},()=>"<i></i>").join("")}</span>`}
 function curvePointData(strip){
-  const hasExtras=strip.some(t=>t==="WD"||t==="NB");
-  const order=hasExtras?["W","0","1","2","4","6","EX"]:["W","0","1","2","4","6"];
-  const counts=order.map(t=>strip.filter(x=>normToken(x)===t).length);
+  const order=["W","0","1","2","4","6"];
+  if(strip.includes("WD"))order.push("WD");
+  if(strip.includes("NB"))order.push("NB");
+  const counts=order.map(t=>strip.filter(x=>x===t).length);
   const sigma=.82;
   const smoothed=counts.map((_,i)=>counts.reduce((sum,count,j)=>{
     const d=i-j;
     return sum+count*Math.exp(-(d*d)/(2*sigma*sigma));
   },0));
   const max=Math.max(...smoothed,1);
-  const step=hasExtras?40:47,x0=hasExtras?27:30;
+  const x0=30,step=236/(order.length-1);
   return counts.map((count,i)=>({token:order[i],count,x:x0+i*step,y:61-(smoothed[i]/max)*43,r:count?Math.min(7,3.5+count*.35):2.5}));
 }
 function renderCurve(strip,roll,mode,rolling=false){
@@ -5810,7 +5810,7 @@ function renderResolvePayoff(result,mode){
   </div>`;
 }
 function renderCurveMarker(points,strip,hitToken,rolling,roll){
-  const target=normToken(hitToken);
+  const target=hitToken;
   const hit=points.find(p=>p.token===target);
   if(!hit)return "";
   if(!rolling)return `<circle class="curve-marker" cx="${hit.x}" cy="${hit.y}" r="7"></circle>`;
@@ -5833,11 +5833,11 @@ function nearbyRollTokens(strip,roll){
   const seen=new Set(),tokens=[];
   const add=i=>{
     if(i<0||i>=strip.length)return;
-    const token=normToken(strip[i]);
+    const token=strip[i];
     if(!seen.has(token)){seen.add(token);tokens.push(token)}
   };
   add(roll-1);add(roll);add(roll+1);
-  if(tokens[tokens.length-1]!==normToken(strip[roll]))tokens.push(normToken(strip[roll]));
+  if(tokens[tokens.length-1]!==strip[roll])tokens.push(strip[roll]);
   return tokens;
 }
 function smoothArea(points){
@@ -5845,7 +5845,7 @@ function smoothArea(points){
   for(let i=1;i<points.length;i++){const prev=points[i-1],cur=points[i],mx=(prev.x+cur.x)/2,my=(prev.y+cur.y)/2;d+=` Q ${prev.x} ${prev.y} ${mx} ${my}`}
   const last=points[points.length-1];d+=` T ${last.x} ${last.y} L ${last.x} 61 Z`;return d;
 }
-function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t==="4"||t==="6")return mode==="bat"?"good":"danger";if(t==="EX")return mode==="bat"?"good":"danger";return ""}
+function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t==="4"||t==="6")return mode==="bat"?"good":"danger";if(t==="WD"||t==="NB")return mode==="bat"?"good":"danger";return ""}
 
 function selectedColor(role){return role==="bat"?"#09c18b":role==="bowl"?"#ff5b2c":"#d943ff"}
 function escSVG(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[ch]))}
