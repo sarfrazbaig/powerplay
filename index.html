@@ -4350,11 +4350,34 @@
   .ccard--negative .ccard-frame{background:
       repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 2px,transparent 2px 4px),
       linear-gradient(135deg,#171123 0%,#241b36 50%,#191227 100%)}
+  /* ---------- card flip (radial sub-stat back) ---------- */
+  .card,.draft-card{perspective:900px}
+  .cflip{position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.2,.7,.3,1)}
+  .card.flipped .cflip,.draft-card.flipped .cflip{transform:rotateY(180deg)}
+  .cface{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .cface.cback{position:absolute;inset:0;transform:rotateY(180deg)}
+  .cface.cback .tc{width:100%;height:100%}
+  .flipchip{
+    position:absolute;right:5px;bottom:5px;z-index:9;width:22px;height:22px;
+    display:grid;place-items:center;border:2px solid #050505;border-radius:50%;
+    background:#f8f6e8;color:#111;font-size:12px;font-weight:900;
+    opacity:0;transition:opacity .15s;cursor:pointer;
+  }
+  .card:hover .flipchip,.draft-card:hover .flipchip{opacity:1}
+  .card--mini .flipchip{display:none}
+  /* ---------- extras + free hit ---------- */
+  .ball-chip.extra{background:#f3e8ff;color:#7c3aed;border-color:#c9a9f2;font-size:9px;text-transform:uppercase}
+  .freehit-tag{
+    display:inline-block;padding:1px 8px;border:2px solid #050505;background:#ffd91f;color:#111;
+    font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.04em;
+    animation:freehitPulse 1s ease-in-out infinite;
+  }
+  @keyframes freehitPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);box-shadow:0 0 12px rgba(255,217,31,.9)}}
   @media(prefers-reduced-motion:reduce){
     .packx-tilt,.pack-shine,.pack-sparkles i,.pov.rip .pov-pack-body,.pov.rip .pov-tear{animation:none !important}
     .pflip{transform:none;opacity:1}
     .pov.reveal .pflip{animation:none}
-    .ccard-fx,.hexx-sigil,.packx.is-hex .packx-tilt{animation:none !important}
+    .ccard-fx,.hexx-sigil,.packx.is-hex .packx-tilt,.freehit-tag{animation:none !important}
   }
 </style>
 </head>
@@ -4780,7 +4803,7 @@ const HEXES=[
   {id:"hex_ectoplasm",name:"Ectoplasm",desc:"A random active coach becomes NEGATIVE (frees its slot).",cost:"Your weakest card is destroyed.",
     use(){const cs=activeCoaches();if(!cs.length)return "No coach to transmute.";const t=pick(cs);t.edition="negative";destroyWeakest(1);return `${t.name} went Negative.`}},
   {id:"hex_cryptid",name:"Cryptid",desc:"Add TWO clones of your best card to the roster.",cost:"Lose ALL your coins.",
-    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";for(let i=0;i<2;i++)roster().push({...b,id:uid(),used:false,name:b.name.split(" ")[0]+" "+(i?"III":"II")});run.coins=0;return `${b.name} duplicated twice.`}},
+    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";for(let i=0;i<2;i++){const cl=cloneCard(b);cl.name=b.name.split(" ")[0]+" "+(i?"III":"II");roster().push(cl)}run.coins=0;return `${b.name} duplicated twice.`}},
   {id:"hex_immolate",name:"Immolate",desc:"Gain +15 coins.",cost:"Your 3 weakest cards are destroyed.",
     use(){const n=destroyWeakest(3);run.coins+=15;return `${n} cards burned. +15 coins.`}},
   {id:"hex_ankh",name:"Ankh",desc:"Duplicate a random active coach (effects STACK).",cost:"Another random coach is destroyed.",
@@ -4793,9 +4816,9 @@ const HEXES=[
     use(){const sorted=roster().slice().sort(sortStrong);const b=sorted[0];if(!b)return "No cards.";
       const second=sorted[1];
       if(second&&roster().length>12){run.roster=roster().filter(c=>c.id!==second.id);run.deck=activeSquad().filter(c=>c.id!==second.id);if(run.draftSelected)run.draftSelected.delete(second.id)}
-      b.bat=clamp(b.bat+20,20,99);b.bowl=clamp(b.bowl+20,20,99);return `${b.name} +20/+20.`}},
+      boostCard(b,20,20);return `${b.name} +20/+20.`}},
   {id:"hex_void",name:"Void Contract",desc:"EVERY Common card becomes Uncommon with rerolled stats.",cost:"Lose 6 coins.",
-    use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>{c.rarity="uncommon";const r=RARITIES.uncommon;c.bat=clamp(rarityStat(r,c.role,"bat"),20,99);c.bowl=clamp(rarityStat(r,c.role,"bowl"),20,99)});run.coins=Math.max(0,run.coins-6);return `${cs.length} commons ascended.`}},
+    use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>{c.rarity="uncommon";rerollStats(c)});run.coins=Math.max(0,run.coins-6);return `${cs.length} commons ascended.`}},
   {id:"hex_phantom",name:"Phantom Coach",desc:"Gain a random RARE+ coach with a guaranteed edition.",cost:"If your slots are full, a random coach is destroyed first.",
     use(){const owned=new Set(activeCoaches().map(c=>c.id));const pool=COACHES.filter(c=>(c.tier==="rare"||c.tier==="legendary")&&!owned.has(c.id));
       if(!pool.length)return "No phantom answered.";
@@ -4806,9 +4829,9 @@ const HEXES=[
     use(){run.coins*=2;run.packTax=(run.packTax||0)+1;return `Coins doubled to ${run.coins}.`}},
   {id:"hex_soul_trade",name:"Soul Trade",desc:"Your best card gains +3 BAT and +3 BOWL per card consumed.",cost:"Up to 5 of your weakest cards are destroyed.",
     use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";const n=destroyWeakest(5,b.id);
-      b.bat=clamp(b.bat+3*n,20,99);b.bowl=clamp(b.bowl+3*n,20,99);return `${n} souls traded. ${b.name} +${3*n}/+${3*n}.`}},
+      boostCard(b,3*n,3*n);return `${n} souls traded. ${b.name} +${3*n}/+${3*n}.`}},
   {id:"hex_poltergeist",name:"Poltergeist",desc:"EVERY card in your active 12 gains +4 BAT and +4 BOWL.",cost:"2 random bench cards are destroyed.",
-    use(){activeSquad().forEach(c=>{c.bat=clamp(c.bat+4,20,99);c.bowl=clamp(c.bowl+4,20,99)});
+    use(){activeSquad().forEach(c=>boostCard(c,4,4));
       let killed=0;const ids=activeIds();
       for(let i=0;i<2;i++){const bench=roster().filter(c=>!ids.has(c.id));if(!bench.length||roster().length<=12)break;
         const v=pick(bench);run.roster=roster().filter(c=>c.id!==v.id);killed++}
@@ -4836,23 +4859,23 @@ const CONSUMABLES=[
   {id:"guardian_ball",name:"Guardian Angel",mode:"bat",desc:"Next batting ball: EVERY wicket slot becomes a Single.",apply:s=>replaceAll(s,"W","1")},
   // --- instant, permanent (build-makers) ---
   {id:"star_session",name:"Star Session",mode:"train",kind:"instant",desc:"Your best card gains +6 BAT and +6 BOWL forever.",
-    use(){const t=roster().slice().sort(sortStrong)[0];if(!t)return "No cards.";t.bat=clamp(t.bat+6,20,99);t.bowl=clamp(t.bowl+6,20,99);return `${t.name} +6/+6.`}},
+    use(){const t=roster().slice().sort(sortStrong)[0];if(!t)return "No cards.";boostCard(t,6,6);return `${t.name} +6/+6.`}},
   {id:"rookie_camp",name:"Rookie Camp",mode:"train",kind:"instant",desc:"EVERY Common card gains +4 BAT and +4 BOWL forever.",
-    use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>{c.bat=clamp(c.bat+4,20,99);c.bowl=clamp(c.bowl+4,20,99)});return `${cs.length} commons trained.`}},
+    use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>boostCard(c,4,4));return `${cs.length} commons trained.`}},
   {id:"specialist_course",name:"Specialist Course",mode:"train",kind:"instant",desc:"Teach a TRAIT to a random card that has none.",
     use(){const pool=roster().filter(c=>!c.trait);if(!pool.length)return "Everyone already has a trait.";const t=pick(pool);t.trait=pickTrait(t.role);return `${t.name} learns ${t.trait.name}.`}},
   {id:"mirror_drill",name:"Mirror Drill",mode:"train",kind:"instant",desc:"Add a CLONE of your best card to the roster.",
-    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";roster().push({...b,id:uid(),used:false,name:b.name.split(" ")[0]+" Jr."});return `${b.name} cloned.`}},
+    use(){const b=roster().slice().sort(sortStrong)[0];if(!b)return "No cards.";const cl=cloneCard(b);cl.name=b.name.split(" ")[0]+" Jr.";roster().push(cl);return `${b.name} cloned.`}},
   {id:"talent_scout",name:"Talent Scout",mode:"train",kind:"instant",desc:"Your weakest card jumps a rarity tier and rerolls stats.",
     use(){const order=["common","uncommon","rare","epic","legendary"];const w=roster().slice().sort(sortStrong).pop();if(!w)return "No cards.";
       const ni=Math.min(order.length-1,order.indexOf(w.rarity)+1);w.rarity=order[ni];
-      const r=RARITIES[w.rarity];w.bat=clamp(rarityStat(r,w.role,"bat"),20,99);w.bowl=clamp(rarityStat(r,w.role,"bowl"),20,99);
+      const r=RARITIES[w.rarity];rerollStats(w);
       if(!w.trait&&Math.random()<r.trait)w.trait=pickTrait(w.role);
       return `${w.name} is now ${r.label}.`}},
   {id:"sponsor_cheque",name:"Sponsor Cheque",mode:"train",kind:"instant",desc:"Collect 6 coins immediately.",
     use(){run.coins+=6;return "+6 coins."}},
   {id:"captains_talk",name:"Captain's Talk",mode:"train",kind:"instant",desc:"Every card in your active 12 gains +2 BAT and +2 BOWL.",
-    use(){activeSquad().forEach(c=>{c.bat=clamp(c.bat+2,20,99);c.bowl=clamp(c.bowl+2,20,99)});return "Active squad +2/+2."}}
+    use(){activeSquad().forEach(c=>boostCard(c,2,2));return "Active squad +2/+2."}}
 ];
 const VOUCHERS=[
   {id:"local_sponsor",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6,buy:()=>{run.scout=(run.scout||0)+2}},
@@ -4890,13 +4913,50 @@ function roleIcon(c){return c.role==="bat"?ICON.bat:c.role==="bowl"?ICON.ball:IC
 function initials(c){const p=c.name.split(" ");return ((p[0]||"")[0]||"")+((p[1]||"")[0]||"")}
 function matchLabel(def){return `${def.cup}: ${def.name}`}
 
+/* 8 sub-stats per card. Batting: power/timing/technique/nerve.
+   Bowling: pace/accuracy/movement/deception. c.bat / c.bowl are the
+   derived discipline RATINGS (mean of 4 + training boost) so every
+   existing consumer keeps working; OVR is the role-weighted front number. */
+const BAT_KEYS=["power","timing","technique","nerve"];
+const BOWL_KEYS=["pace","accuracy","movement","deception"];
+function rollSubs(anchor,cap,keys){
+  const o={};
+  keys.forEach(k=>o[k]=clamp(anchor+rng(-9,9),12,cap));
+  return o;
+}
+function syncRatings(c){
+  const avg=o=>Math.round(Object.values(o).reduce((s,v)=>s+v,0)/Object.values(o).length);
+  c.bat=clamp(avg(c.batting)+(c.batBoost||0),10,99);
+  c.bowl=clamp(avg(c.bowling)+(c.bowlBoost||0),10,99);
+  return c;
+}
+function ovrVal(c){
+  const wBat=c.role==="bat"?.9:c.role==="bowl"?.1:.5;
+  return Math.round(batVal(c)*wBat+bowlVal(c)*(1-wBat));
+}
+function boostCard(c,batGain,bowlGain){
+  c.batBoost=(c.batBoost||0)+batGain;
+  c.bowlBoost=(c.bowlBoost||0)+bowlGain;
+  syncRatings(c);
+}
+function rerollStats(c){
+  const rarity=RARITIES[c.rarity]||RARITIES.common;
+  c.batting=rollSubs(rarityStat(rarity,c.role,"bat"),99,BAT_KEYS);
+  c.bowling=rollSubs(rarityStat(rarity,c.role,"bowl"),99,BOWL_KEYS);
+  syncRatings(c);
+}
+function cloneCard(b){
+  return {...b,batting:{...b.batting},bowling:{...b.bowling},id:uid(),used:false};
+}
 function card(rarityKey="common",roleForce,opts={}){
   const role=roleForce||pick(["bat","bowl","all"]);
   const key=RARITIES[rarityKey]?rarityKey:"common";
   const rarity=RARITIES[key];
   const shift=opts.shift||0,cap=opts.cap||99;
-  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,rarity:key,bat:rarityStat(rarity,role,"bat")+shift,bowl:rarityStat(rarity,role,"bowl")+shift,trait:null,used:false};
-  c.bat=clamp(c.bat,20,cap);c.bowl=clamp(c.bowl,20,cap);
+  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,rarity:key,trait:null,used:false,batBoost:0,bowlBoost:0};
+  c.batting=rollSubs(clamp(rarityStat(rarity,role,"bat")+shift,12,cap),cap,BAT_KEYS);
+  c.bowling=rollSubs(clamp(rarityStat(rarity,role,"bowl")+shift,12,cap),cap,BOWL_KEYS);
+  syncRatings(c);
   if(opts.forceTrait||Math.random()<rarity.trait)c.trait=pickTrait(role);
   return c;
 }
@@ -4926,8 +4986,8 @@ function enemy(def){
   const opts={shift:def.enemyShift||0,cap:def.enemyCap||99};
   const deck=roles.map(role=>{
     const c=card(rarityFromPool(def.rarities),role,opts);
-    if(arch.tiltBat&&(role==="bat"||role==="all"))c.bat=clamp(c.bat+arch.tiltBat,20,opts.cap);
-    if(arch.tiltBowl&&(role==="bowl"||role==="all"))c.bowl=clamp(c.bowl+arch.tiltBowl,20,opts.cap);
+    if(arch.tiltBat&&(role==="bat"||role==="all"))boostCard(c,arch.tiltBat,0);
+    if(arch.tiltBowl&&(role==="bowl"||role==="all"))boostCard(c,0,arch.tiltBowl);
     if(def.enemyTraitRate!=null&&c.trait&&Math.random()>def.enemyTraitRate)c.trait=null;
     return c;
   });
@@ -4959,6 +5019,7 @@ function activeCoaches(){
   return run.coaches;
 }
 function coachBonus(stat,c){
+  if(isRivalCard(c))return 0; // your coaches don't coach the opposition
   const x=ctx();
   return activeCoaches().reduce((sum,coach)=>{
     let v=coach.bonus(stat,c,x);
@@ -5002,21 +5063,16 @@ function applyCoachStrips(mode,strip,card){
 function nextConsumable(mode){
   return (run?.consumables||[]).find(c=>!c.kind&&(c.mode==="any"||c.mode===mode));
 }
-function applyOwnedConsumableStrip(mode,strip,consume=false){
+function applyOwnedConsumableStrip(mode,strip){
   const owned=nextConsumable(mode);
   if(!owned)return strip;
   const def=CONSUMABLES.find(c=>c.id===owned.id);
   if(!def)return strip;
-  const next=def.apply(strip.slice(),mode);
-  if(consume){
-    const saved=activeCoaches().some(co=>co.archivist)&&Math.random()<.3;
-    if(saved)m.log+=` <b>Archivist saves ${def.name}!</b>`;
-    else run.consumables=(run.consumables||[]).filter(c=>c.ownedId!==owned.ownedId);
-  }
-  return next;
+  return def.apply(strip.slice(),mode);
 }
-function applyMatchModifiers(mode,strip,card,consume=false){
-  return applyOwnedConsumableStrip(mode,applyCoachStrips(mode,applyCardStripTrait(mode,strip,card),card),consume);
+// consumption happens post-roll in consumeArmed() — extras don't burn tools
+function applyMatchModifiers(mode,strip,card){
+  return applyOwnedConsumableStrip(mode,applyCoachStrips(mode,applyCardStripTrait(mode,strip,card),card));
 }
 function applyInstantConsumable(def){
   const report=def.use?def.use():"";
@@ -5061,6 +5117,7 @@ function startRun(){
 function newChallenge(keepLog=false){
   m.result=null;m.selected=null;m.preview=null;m.selectionLocked=false;challengeAnim=true;
   m.luckyTick=Math.random()<.5;
+  m.stripCache={};
   m.challenge=m.phase==="bowl"?rivalCard("bat"):rivalCard("bowl");
   if(!m.challenge){
     challengeAnim=false;dealAnim=false;
@@ -5093,32 +5150,171 @@ function confirmSelected(){
   play(m.selected);
 }
 function cancelSelected(){m.selected=null;m.preview=null;m.selectionLocked=false;render()}
+/* ============================================================
+   CONTINUOUS PROBABILITY ENGINE
+   Four sub-stat pairings shape the outcome weights via logistic
+   edges — no bands, no thresholds, no caps. The 12-slot strip is
+   kept as the sample space so every trait/coach/consumable slot
+   editor works unchanged on top.
+   Pairings (batter vs bowler):
+     technique vs movement+pace  -> wicket mass
+     timing    vs accuracy       -> rotation (dots vs runs)
+     power     vs deception      -> boundary mass (and 4->6 split)
+     nerve                       -> pressure resistance (late overs,
+                                    wickets down)
+   Extras: low bowler accuracy leaks WD/NB. NB arms a FREE HIT
+   (wicket mass melts) for the next delivery. Extras decay hard per
+   extra already conceded — an extras build stretches the over, it
+   never becomes an infinite faucet.
+   ============================================================ */
+const CURVE={
+  k:13,                                   // logistic sensitivity per stat point
+  base:{W:.06,"0":.11,"1":.15,"2":.09,"4":.06,"6":.03},
+  wkt:.34,dot:.24,run:.14,two:.10,four:.24,six:.17,
+  nerveAmp:.10,upsetW:1,upsetBoundary:1,  // irreducible upset slots
+  extraBase:.065,extraPivot:50,extraDecay:.4,extraMax:3
+};
+function edge(a,b){return 1/(1+Math.exp(-(a-b)/CURVE.k))}
+function traitStatDelta(c,disc){return c.trait?c.trait[disc](ctx(),0):0}
+function isRivalCard(c){return !!(m&&m.rivalDeck&&m.rivalDeck.includes(c))}
+function effSubs(c,disc){
+  const src=disc==="bat"?c.batting:c.bowling;
+  let bonus=(disc==="bat"?c.batBoost:c.bowlBoost)||0;
+  bonus+=coachBonus(disc,c)+traitStatDelta(c,disc);
+  const o={};
+  for(const key in src)o[key]=src[key]+bonus;
+  return o;
+}
+function outcomeWeights(mode,myCard,theirCard){
+  const batterMine=mode==="bat";
+  const batC=batterMine?myCard:theirCard,bowlC=batterMine?theirCard:myCard;
+  const B=effSubs(batC,"bat"),L=effSubs(bowlC,"bowl");
+  const x=ctx();
+  const pWkt=edge(L.movement*.6+L.pace*.4,B.technique);
+  const pBound=edge(B.power,L.deception);
+  const pRun=edge(B.timing,L.accuracy);
+  const pressure=(x.left<=2?1:0)+((batterMine?x.yourWk:x.rivalWk)>=1?1:0);
+  const nerve=pressure*CURVE.nerveAmp*((B.nerve-55)/45); // + resists, - crumbles
+  const w={
+    W:Math.max(.01,CURVE.base.W+CURVE.wkt*pWkt-nerve),
+    "0":Math.max(.01,CURVE.base["0"]+CURVE.dot*(1-pRun)-nerve*.5),
+    "1":CURVE.base["1"]+CURVE.run*pRun*(1-pBound*.5),
+    "2":CURVE.base["2"]+CURVE.two*pRun*(1-pBound*.4),
+    "4":CURVE.base["4"]+CURVE.four*pBound*(1-pWkt*.3)+Math.max(0,nerve*.5),
+    "6":CURVE.base["6"]+CURVE.six*pBound*edge(B.power,L.deception+8)*(1-pWkt*.3)+Math.max(0,nerve*.5)
+  };
+  // free hit: the batter cannot get out
+  if(m?.freeHit){w["1"]+=w.W*.4;w["4"]+=w.W*.35;w["6"]+=w.W*.25;w.W=0}
+  // extras leak from a wayward bowler, decaying per extra already bowled
+  let extras=0;
+  if((m?.extrasCount||0)<CURVE.extraMax){
+    extras=CURVE.extraBase*2*(1-edge(L.accuracy,CURVE.extraPivot))*Math.pow(CURVE.extraDecay,m?.extrasCount||0);
+  }
+  return {w,extras};
+}
+function outcomeStrip(mode,myCard,theirCard){
+  const {w,extras}=outcomeWeights(mode,myCard,theirCard);
+  const tokens=Object.keys(w);
+  const total=tokens.reduce((s,t)=>s+w[t],0);
+  const SLOTS=12;
+  const extraSlots=extras>0&&Math.random()<extras*SLOTS-Math.floor(extras*SLOTS)?Math.ceil(extras*SLOTS):Math.floor(extras*SLOTS);
+  const coreSlots=SLOTS-Math.min(2,extraSlots);
+  // largest-remainder fill
+  const quota=tokens.map(t=>({t,q:w[t]/total*coreSlots}));
+  const strip=[];
+  quota.forEach(({t,q})=>{for(let i=0;i<Math.floor(q);i++)strip.push(t)});
+  quota.sort((a,b)=>(b.q-Math.floor(b.q))-(a.q-Math.floor(a.q)));
+  let qi=0;
+  while(strip.length<coreSlots){strip.push(quota[qi%quota.length].t);qi++}
+  for(let i=0;i<Math.min(2,extraSlots);i++)strip.push(Math.random()<.6?"WD":"NB");
+  // upset floor: any ball can be a wicket, any ball can clear the rope
+  const bumpiest=()=>{const counts={};strip.forEach(t=>counts[t]=(counts[t]||0)+1);return strip.lastIndexOf(Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0])};
+  if(!m?.freeHit&&!strip.includes("W"))strip[bumpiest()]="W";
+  if(!strip.includes("4")&&!strip.includes("6"))strip[bumpiest()]="6";
+  return shuffle(strip);
+}
+function outcomeBand(margin){
+  if(margin>=14)return "Strong advantage";
+  if(margin>=7)return "Advantage";
+  if(margin>=3)return "Favored";
+  if(margin>=1)return "Slight edge";
+  if(margin===0)return "Even";
+  if(margin>=-3)return "Slight danger";
+  if(margin>=-8)return "Danger";
+  if(margin>=-14)return "Big danger";
+  return "Collapse risk";
+}
+function bandClass(margin){return margin>=1?"favored":margin<0?"danger":"even"}
+function rollOutcome(strip){
+  const index=rng(0,strip.length-1),token=strip[index];
+  if(token==="W")return {index,runs:0,wicket:true,text:"WICKET"};
+  if(token==="WD")return {index,runs:1,wicket:false,extra:"wide",text:"WIDE"};
+  if(token==="NB")return {index,runs:1,wicket:false,extra:"noball",text:"NO BALL"};
+  const runs=Number(token);
+  return {index,runs,wicket:false,text:runs===0?"DOT":runs===1?"Single":runs===2?"Two runs":runs===4?"FOUR":"SIX"};
+}
+// The strip for a delivery is built ONCE per (card, delivery) and cached,
+// so the odds preview and the actual roll always see the same slots.
+function getStripFor(mode,card){
+  m.stripCache=m.stripCache||{};
+  const key=mode+":"+card.id;
+  if(!m.stripCache[key])m.stripCache[key]=applyMatchModifiers(mode,outcomeStrip(mode,card,m.challenge),card);
+  return m.stripCache[key];
+}
+// armed strip consumables burn only on a legal delivery
+function consumeArmed(mode){
+  const owned=nextConsumable(mode);
+  if(!owned)return;
+  if(activeCoaches().some(co=>co.archivist)&&Math.random()<.3){m.log+=` <b>Archivist saves ${owned.name}!</b>`;return}
+  run.consumables=(run.consumables||[]).filter(c=>c.ownedId!==owned.ownedId);
+}
+function applyExtras(out,mode){
+  m.extrasCount=(m.extrasCount||0)+1;
+  m.freeHit=out.extra==="noball";
+  m.chain=0;
+}
 function resolveBowl(c){
-  const mine=bowlVal(c),theirs=batVal(m.challenge),strip=applyMatchModifiers("bowl",outcomeStrip("bowl",mine-theirs),c,true),out=rollOutcome(strip);
+  const mine=bowlVal(c),theirs=batVal(m.challenge);
+  const wasFreeHit=m.freeHit;
+  const strip=getStripFor("bowl",c),out=rollOutcome(strip);
   m.rival.runs+=out.runs;if(out.wicket)m.rival.wk++;
-  m.chain=out.runs===0?(m.chain||0)+1:0;
-  m.hotHand=out.wicket;
-  if(out.wicket)m.wicketsTaken=(m.wicketsTaken||0)+1;
-  else if(out.runs===0)m.dotsBowled=(m.dotsBowled||0)+1;
-  use(c);
+  if(out.extra){applyExtras(out,"bowl")}
+  else{
+    if(wasFreeHit)m.freeHit=false;
+    consumeArmed("bowl");
+    m.chain=out.runs===0?(m.chain||0)+1:0;
+    m.hotHand=out.wicket;
+    if(out.wicket)m.wicketsTaken=(m.wicketsTaken||0)+1;
+    else if(out.runs===0)m.dotsBowled=(m.dotsBowled||0)+1;
+    use(c);
+  }
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving"};
-  m.log=`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
+  m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
+    :`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
   coachOutcome(out,"bowl");
   addHistory(out.text,`Bowl ${mine} v Bat ${theirs}`);
   render(true);
   settleResult(m.result);
 }
 function resolveBat(c){
-  const mine=batVal(c),theirs=bowlVal(m.challenge),strip=applyMatchModifiers("bat",outcomeStrip("bat",mine-theirs),c,true),out=rollOutcome(strip);
+  const mine=batVal(c),theirs=bowlVal(m.challenge);
+  const wasFreeHit=m.freeHit;
+  const strip=getStripFor("bat",c),out=rollOutcome(strip);
   if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
   m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
-  if(out.runs>=4)m.boundaries=(m.boundaries||0)+1;
-  m.hotBat=out.runs>=4;
-  use(c);
+  if(out.extra){applyExtras(out,"bat")}
+  else{
+    if(wasFreeHit)m.freeHit=false;
+    consumeArmed("bat");
+    if(out.runs>=4)m.boundaries=(m.boundaries||0)+1;
+    m.hotBat=out.runs>=4;
+    use(c);
+  }
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving"};
-  m.log=`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
+  m.log=out.extra?`<b>${out.text}!</b> +1 run free — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
+    :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
   coachOutcome(out,"bat");
   addHistory(out.text,`Bat ${mine} v Bowl ${theirs}`);
   render(true);
@@ -5127,47 +5323,7 @@ function resolveBat(c){
 let settleTimer=null;
 function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},5600)}
 function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(settleTimer);m.result.state="settled";render()}}
-function outcomeStrip(mode,margin){
-  if(mode==="bowl"){
-    if(margin>=16)return ["W","W","W","W","W","W","0","0","0","0","0","1"];
-    if(margin>=8)return ["W","W","W","W","0","0","0","0","0","1","1","1"];
-    if(margin>=3)return ["W","W","W","0","0","0","0","1","1","1","2","2"];
-    if(margin>=1)return ["W","W","0","0","0","1","1","1","2","2","2","4"];
-    if(margin===0)return ["W","0","0","1","1","2","2","2","4","4","6","6"];
-    if(margin>=-2)return ["0","1","1","2","2","2","4","4","4","6","6","6"];
-    if(margin>=-7)return ["1","1","2","2","4","4","4","4","6","6","6","6"];
-    if(margin>=-15)return ["2","2","4","4","4","6","6","6","6","6","6","6"];
-    return ["4","4","4","6","6","6","6","6","6","6","6","6"];
-  }
-  if(margin>=16)return ["4","4","6","6","6","6","6","6","6","6","6","6"];
-  if(margin>=8)return ["2","4","4","4","4","6","6","6","6","6","6","6"];
-  if(margin>=3)return ["2","2","2","2","4","4","4","4","4","6","6","6"];
-  if(margin>=1)return ["1","1","2","2","2","2","4","4","4","4","6","6"];
-  if(margin===0)return ["W","0","1","1","2","2","2","4","4","4","6","6"];
-  if(margin>=-2)return ["W","0","0","1","1","2","2","2","4","4","4","6"];
-  if(margin>=-7)return ["W","W","0","0","1","1","2","2","2","4","4","6"];
-  if(margin>=-15)return ["W","W","W","0","0","0","1","1","2","2","4","4"];
-  return ["W","W","W","W","W","0","0","0","1","1","2","2"];
-}
-function outcomeBand(margin){
-  if(margin>=16)return "Strong advantage";
-  if(margin>=8)return "Advantage";
-  if(margin>=3)return "Favored";
-  if(margin>=1)return "Slight edge";
-  if(margin===0)return "Even";
-  if(margin>=-2)return "Slight danger";
-  if(margin>=-7)return "Danger";
-  if(margin>=-15)return "Big danger";
-  return "Collapse risk";
-}
-function bandClass(margin){return margin>=1?"favored":margin<0?"danger":"even"}
-function rollOutcome(strip){
-  const index=rng(0,strip.length-1),token=strip[index];
-  if(token==="W")return {index,runs:0,wicket:true,text:"WICKET"};
-  const runs=Number(token);
-  return {index,runs,wicket:false,text:runs===0?"DOT":runs===1?"Single":runs===2?"Two runs":runs===4?"FOUR":"SIX"};
-}
-function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-6)}
+function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-9)}
 function end(title,text){
   clearTimeout(settleTimer);
   $("#overTitle").textContent=title;$("#overText").textContent=text;show("over");
@@ -5441,7 +5597,7 @@ function flashHint(t){
 function squadAct(id){
   const c=roster().find(x=>x.id===id);if(!c||!run.pending)return;
   if(run.pending.type==="train"){
-    run.coins-=run.pending.cost;c[run.pending.stat]=clamp(c[run.pending.stat]+6+(run.trainBoost||0),20,99);
+    run.coins-=run.pending.cost;const g=6+(run.trainBoost||0);boostCard(c,run.pending.stat==="bat"?g:0,run.pending.stat==="bowl"?g:0);
   }else if(run.pending.type==="release"){
     if(roster().length<=12){flashHint("Keep at least 12 players for every match.");return}
     if(activeIds().has(id)){flashHint("Only bench cards can be sold.");return}
@@ -5456,11 +5612,12 @@ function squadAct(id){
 /* ---------- RENDER: match ---------- */
 function phaseLabelText(){
   const left=m.def.balls-m.ball+1;
+  const fh=m.freeHit&&!m.result?`<b class="freehit-tag">FREE HIT</b> · `:"";
   if(m.innings===2){
-    if(m.phase==="bat"){const need=Math.max(0,m.target+1-m.you.runs);return `<b>Chasing</b> — need <b>${need}</b> from <b>${left}</b> ball${left===1?'':'s'}`}
-    const need=Math.max(0,m.target+1-m.rival.runs);return `<b>Defending ${m.target}</b> — rival needs <b>${need}</b> from <b>${left}</b>`;
+    if(m.phase==="bat"){const need=Math.max(0,m.target+1-m.you.runs);return `${fh}<b>Chasing</b> — need <b>${need}</b> from <b>${left}</b> ball${left===1?'':'s'}`}
+    const need=Math.max(0,m.target+1-m.rival.runs);return `${fh}<b>Defending ${m.target}</b> — rival needs <b>${need}</b> from <b>${left}</b>`;
   }
-  return m.phase==="bowl"?`<b>You bowl</b> — keep them low · ball ${m.ball}/${m.def.balls}`:`<b>You bat</b> — set a target · ball ${m.ball}/${m.def.balls}`;
+  return fh+(m.phase==="bowl"?`<b>You bowl</b> — keep them low · ball ${m.ball}/${m.def.balls}`:`<b>You bat</b> — set a target · ball ${m.ball}/${m.def.balls}`);
 }
 function render(pop=false){
   $("#matchName").textContent=matchLabel(m.def);
@@ -5505,7 +5662,7 @@ function currentOddsInfo(){
   const mine=m.phase==="bowl"?bowlVal(card):batVal(card);
   const theirs=m.phase==="bowl"?batVal(m.challenge):bowlVal(m.challenge);
   const margin=mine-theirs;
-  return {strip:applyMatchModifiers(m.phase,outcomeStrip(m.phase,margin),card,false),roll:null,margin,resolving:false};
+  return {strip:getStripFor(m.phase,card),roll:null,margin,resolving:false};
 }
 function renderCenterOdds(){
   const info=currentOddsInfo();
@@ -5544,14 +5701,15 @@ function oddsSummary(strip){
   return ["W","0","1","2","4","6"].filter(t=>counts[t]).map(t=>`${t}:${Math.round(counts[t]/strip.length*100)}%`).join(" ");
 }
 function renderOverStrip(){
-  const balls=Array.from({length:m.def.balls},(_,i)=>m.history[i]);
+  const balls=Array.from({length:Math.max(m.def.balls,m.history.length)},(_,i)=>m.history[i]);
   return `<div class="over-strip">${balls.map((h,i)=>{
     if(!h)return `<span class="ball-chip">•</span>`;
-    const token=ballToken(h.result),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":"filled");
+    const token=ballToken(h.result),cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":(token==="wd"||token==="nb"?"extra":"filled"));
     return `<span class="ball-chip ${cls} ${i===m.history.length-1?'current':''}" title="${h.calc}">${token}</span>`;
   }).join("")}</div>`;
 }
-function ballToken(result){if(result==="WICKET")return "W";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
+function ballToken(result){if(result==="WICKET")return "W";if(result==="WIDE")return "wd";if(result==="NO BALL")return "nb";if(result==="DOT"||result.includes("DOT"))return "0";if(result==="Single")return "1";if(result==="Two runs")return "2";if(result==="FOUR")return "4";if(result==="SIX")return "6";return result[0]||""}
+function normToken(t){return t==="WD"||t==="NB"?"EX":t}
 function resultCalcText(result){return m.phase==="bowl"?`Your BOWL ${result.mine} vs rival BAT ${result.theirs}`:`Your BAT ${result.mine} vs rival BOWL ${result.theirs}`}
 function coachStripHTML(){
   const active=activeCoaches();
@@ -5570,6 +5728,8 @@ function commentaryLines(result){
   if(token==="2")return ["Worked square with quick feet.", "They turn hard and come back.", "Two runs. Useful, but contained."];
   if(token==="4")return ["The batter opens the shoulders.", "Chipped into space and racing away.", "Four. That finds the rope."];
   if(token==="6")return ["Big swing as the ball sits up.", "That has cleared everyone.", "Six. No one is catching that."];
+  if(token==="wd")return ["That one slips down the leg side.", "The umpire's arms go out.", "Wide. Free run, ball re-bowled."];
+  if(token==="nb")return ["The front foot lands well over!", "The umpire's arm goes straight out.", "NO BALL — free hit coming up!"];
   return ["The ball is in play.", "Both cards are fighting the odds.", `${result.text} recorded.`];
 }
 function commentaryHTML(){
@@ -5584,21 +5744,24 @@ function commentaryHTML(){
 }
 function resultWinner(result){
   const token=ballToken(result.text);
+  if(token==="wd"||token==="nb")return m.phase==="bat"?"you":"rival"; // extras favour the batter
   if(m.phase==="bat")return (token==="W"||token==="0")?"rival":"you";
   return (token==="4"||token==="6")?"rival":"you";
 }
 function shouldCelebrate(result){return m.phase==="bowl"?(result.text==="WICKET"||result.text==="DOT"):(result.text==="FOUR"||result.text==="SIX")}
 function confettiHTML(){return `<span class="confetti">${Array.from({length:10},()=>"<i></i>").join("")}</span>`}
 function curvePointData(strip){
-  const order=["W","0","1","2","4","6"];
-  const counts=order.map(t=>strip.filter(x=>x===t).length);
+  const hasExtras=strip.some(t=>t==="WD"||t==="NB");
+  const order=hasExtras?["W","0","1","2","4","6","EX"]:["W","0","1","2","4","6"];
+  const counts=order.map(t=>strip.filter(x=>normToken(x)===t).length);
   const sigma=.82;
   const smoothed=counts.map((_,i)=>counts.reduce((sum,count,j)=>{
     const d=i-j;
     return sum+count*Math.exp(-(d*d)/(2*sigma*sigma));
   },0));
   const max=Math.max(...smoothed,1);
-  return counts.map((count,i)=>({token:order[i],count,x:30+i*47,y:61-(smoothed[i]/max)*43,r:count?Math.min(7,3.5+count*.35):2.5}));
+  const step=hasExtras?40:47,x0=hasExtras?27:30;
+  return counts.map((count,i)=>({token:order[i],count,x:x0+i*step,y:61-(smoothed[i]/max)*43,r:count?Math.min(7,3.5+count*.35):2.5}));
 }
 function renderCurve(strip,roll,mode,rolling=false){
   const points=curvePointData(strip);
@@ -5619,6 +5782,8 @@ function renderCurve(strip,roll,mode,rolling=false){
 }
 function payoffWord(result){
   const t=result.text;
+  if(t==="WIDE")return "WIDE +1";
+  if(t==="NO BALL")return "NO BALL — FREE HIT!";
   return t==="SIX"?"SIX!":t==="FOUR"?"FOUR!":t==="WICKET"?"WICKET!":t==="DOT"?"DOT BALL":t==="Single"?"1 RUN":t==="Two runs"?"2 RUNS":t.toUpperCase();
 }
 function renderResolvePayoff(result,mode){
@@ -5638,18 +5803,21 @@ function renderResolvePayoff(result,mode){
   </div>`;
 }
 function renderCurveMarker(points,strip,hitToken,rolling,roll){
-  const hit=points.find(p=>p.token===hitToken);
+  const target=normToken(hitToken);
+  const hit=points.find(p=>p.token===target);
+  if(!hit)return "";
   if(!rolling)return `<circle class="curve-marker" cx="${hit.x}" cy="${hit.y}" r="7"></circle>`;
   const byToken=Object.fromEntries(points.map(p=>[p.token,p]));
-  const allTokens=["W","0","1","2","4","6"];
+  const allTokens=points.map(p=>p.token);
   const slowTokens=nearbyRollTokens(strip,roll);
   const sequence=[
     ...allTokens.map((token,i)=>({token,delay:i*130,slow:false})),
     ...slowTokens.map((token,i)=>({token,delay:1150+i*420,slow:true})),
-    {token:hitToken,delay:3300,slow:true,final:true}
+    {token:target,delay:3300,slow:true,final:true}
   ];
   const flashes=sequence.map(item=>{
     const p=byToken[item.token];
+    if(!p)return "";
     return `<circle class="curve-flash ${item.slow?"slow":""}" style="animation-delay:${item.delay}ms" cx="${p.x}" cy="${p.y}" r="${item.final?10:item.slow?8:7}"></circle>`;
   }).join("");
   return `${flashes}<circle class="curve-marker rolling" cx="${hit.x}" cy="${hit.y}" r="9"></circle>`;
@@ -5658,11 +5826,11 @@ function nearbyRollTokens(strip,roll){
   const seen=new Set(),tokens=[];
   const add=i=>{
     if(i<0||i>=strip.length)return;
-    const token=strip[i];
+    const token=normToken(strip[i]);
     if(!seen.has(token)){seen.add(token);tokens.push(token)}
   };
   add(roll-1);add(roll);add(roll+1);
-  if(tokens[tokens.length-1]!==strip[roll])tokens.push(strip[roll]);
+  if(tokens[tokens.length-1]!==normToken(strip[roll]))tokens.push(normToken(strip[roll]));
   return tokens;
 }
 function smoothArea(points){
@@ -5670,7 +5838,7 @@ function smoothArea(points){
   for(let i=1;i<points.length;i++){const prev=points[i-1],cur=points[i],mx=(prev.x+cur.x)/2,my=(prev.y+cur.y)/2;d+=` Q ${prev.x} ${prev.y} ${mx} ${my}`}
   const last=points[points.length-1];d+=` T ${last.x} ${last.y} L ${last.x} 61 Z`;return d;
 }
-function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t==="4"||t==="6")return mode==="bat"?"good":"danger";return ""}
+function curveClass(t,mode){if(t==="W")return mode==="bowl"?"good":"danger";if(t==="4"||t==="6")return mode==="bat"?"good":"danger";if(t==="EX")return mode==="bat"?"good":"danger";return ""}
 
 function selectedColor(role){return role==="bat"?"#09c18b":role==="bowl"?"#ff5b2c":"#d943ff"}
 function escSVG(s){return String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&apos;"}[ch]))}
@@ -5749,17 +5917,38 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
     <text x="41" y="51" fill="#fff" font-size="14" font-weight="700" letter-spacing=".4">${name}</text>
     <rect x="${pillX}" y="36" width="${pillW}" height="18" rx="9" fill="#ffe23f" stroke="#111" stroke-width="2"/>
     <text x="${(pillX+pillW/2).toFixed(1)}" y="49" text-anchor="middle" fill="#111" font-size="9.5" font-weight="700">${trait}</text>
-    <line x1="125" y1="61" x2="125" y2="115" stroke="#111" stroke-width="3"/>
-    <text x="79" y="78" text-anchor="middle" fill="#5a6b7a" font-size="10" font-weight="700" letter-spacing="1">BAT</text>
-    <text x="79" y="108" text-anchor="middle" fill="#e02424" font-size="30" font-weight="700">${batNum}</text>
-    <text x="171" y="78" text-anchor="middle" fill="#5a6b7a" font-size="10" font-weight="700" letter-spacing="1">BOWL</text>
-    <text x="171" y="108" text-anchor="middle" fill="#1f7fc4" font-size="30" font-weight="700">${bowlNum}</text>
+    <text x="41" y="108" fill="#5a6b7a" font-size="10" font-weight="700" letter-spacing="1">${roleName(c).toUpperCase()}</text>
+    <text x="125" y="76" text-anchor="middle" fill="#5a6b7a" font-size="9" font-weight="700" letter-spacing="2">OVERALL</text>
+    <text x="125" y="111" text-anchor="middle" fill="#111" font-size="36" font-weight="700">${ovrVal(c)}</text>
+    <text x="209" y="108" text-anchor="end" fill="#9aa8ad" font-size="10" font-weight="700">#${c.num}</text>
+  </svg>`;
+}
+function radialSVG(c){
+  const stats=[["PWR",c.batting.power],["TIM",c.batting.timing],["TEC",c.batting.technique],["NRV",c.batting.nerve],
+               ["PAC",c.bowling.pace],["ACC",c.bowling.accuracy],["MOV",c.bowling.movement],["DEC",c.bowling.deception]];
+  const cx=125,cy=196,R=84;
+  const pt=(i,val)=>{const a=-Math.PI/2+i*Math.PI/4,r=R*val/100;return [cx+Math.cos(a)*r,cy+Math.sin(a)*r]};
+  const ring=f=>`<polygon points="${stats.map((s,i)=>pt(i,100*f).map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="#d8cfae" stroke-width="1"/>`;
+  const axes=stats.map((s,i)=>{const [x,y]=pt(i,100);return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="#d8cfae" stroke-width="1"/>`}).join("");
+  const poly=stats.map((s,i)=>pt(i,s[1]).map(v=>v.toFixed(1)).join(",")).join(" ");
+  const labels=stats.map((s,i)=>{const [x,y]=pt(i,117);return `<text x="${x.toFixed(1)}" y="${(y+2).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="${i<4?'#1f9b53':'#c0303f'}">${s[0]}</text><text x="${x.toFixed(1)}" y="${(y+13).toFixed(1)}" text-anchor="middle" font-size="9" fill="#5a6b7a">${s[1]}</text>`}).join("");
+  return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
+    <rect x="6" y="5" width="238" height="340" rx="16" fill="#f3ecdc" stroke="#111" stroke-width="3"/>
+    <text x="125" y="38" text-anchor="middle" font-size="14" font-weight="700" fill="#111">${escSVG(c.name.toUpperCase())}</text>
+    <text x="125" y="56" text-anchor="middle" font-size="10" font-weight="700" fill="#5a6b7a" letter-spacing="1">${roleName(c).toUpperCase()} &middot; OVR ${ovrVal(c)}</text>
+    ${ring(1/3)}${ring(2/3)}${ring(1)}${axes}
+    <polygon points="${poly}" fill="rgba(13,107,70,.35)" stroke="#0d6b46" stroke-width="2"/>
+    ${labels}
+    <text x="125" y="332" text-anchor="middle" font-size="9" font-weight="700" fill="#8a8064">BAT ${batVal(c)} &middot; BOWL ${bowlVal(c)}${c.trait?` &middot; ${escSVG(c.trait.name.toUpperCase())}`:""}</text>
   </svg>`;
 }
 function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini}={}){
+  const flip=mini?"":`<div class="cface cback">${radialSVG(c)}</div>`;
+  const chip=mini?"":`<span class="flipchip" onclick="event.stopPropagation();event.preventDefault();this.closest('.card').classList.toggle('flipped')" title="Flip for sub-stats">&#8635;</span>`;
   return `<button class="card ${mini?'card--mini':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''}" ${disabled?'disabled':''}
     style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
-    <span class="selbadge">✓</span><span class="sheen"></span>${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</button>`;
+    <span class="selbadge">✓</span><span class="sheen"></span>
+    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</div>${flip}</div>${chip}</button>`;
 }
 function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardSVG(c,batVal(c),bowlVal(c),emph,true)}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div><div class="placeholder">+</div></div>`}
@@ -6102,7 +6291,8 @@ function draftCardHTML(c,selected){
   const role=c.role==="bat"?"bat":c.role==="bowl"?"bowl":"all";
   const titleTrait=c.trait?`${c.trait.name}: ${c.trait.text}`:"No trait";
   return `<button class="draft-card ${role} ${c.rarity} ${selected?'selected':'benched'}" data-id="${c.id}" title="${c.name} - ${roleName(c)} - ${titleTrait}">
-    ${cardSVG(c,batVal(c),bowlVal(c))}
+    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c))}</div><div class="cface cback">${radialSVG(c)}</div></div>
+    <span class="flipchip" onclick="event.stopPropagation();event.preventDefault();this.closest('.draft-card').classList.toggle('flipped')" title="Flip for sub-stats">&#8635;</span>
     <span class="draft-status">${selected?'Active':'Bench'}</span>
   </button>`;
 }
@@ -6170,7 +6360,7 @@ function prepNextRival(){
 function createMatchShell(def){
   run.deck.forEach(c=>c.used=false);
   const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
-  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,log:"Scout the rival and choose your innings."};
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,stripCache:{},log:"Scout the rival and choose your innings."};
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
@@ -6273,12 +6463,21 @@ function nextBall(){
     if(m.phase==="bat"&&m.you.runs>m.target)return finish();
     if(m.phase==="bowl"&&m.rival.runs>m.target)return finish();
   }
+  // extras: the ball is re-bowled — same delivery number, same rival card,
+  // your card back in hand; you may pick a different one.
+  if(m.result.extra){
+    m.result=null;m.selected=null;m.preview=null;m.selectionLocked=false;
+    m.stripCache={};
+    m.luckyTick=Math.random()<.5;
+    m.log=m.freeHit?`<b>FREE HIT!</b> No wicket can fall this ball. Swing hard.`:`Re-bowled. Ball ${m.ball} again.`;
+    render();return;
+  }
   const inningsDone=m.ball>=m.def.balls||(m.phase==="bowl"?m.rival.wk>=m.def.wickets:m.you.wk>=m.def.wickets);
   if(inningsDone){
     if(m.innings===1){
       if(m.phase==="bowl"){m.target=m.rival.runs;m.phase="bat";m.innings=2;m.ball=1;m.history=[];m.log=`Chase <b>${m.target+1}</b>. Bowling cards used this match are gone.`}
       else{m.target=m.you.runs;m.phase="bowl";m.innings=2;m.ball=1;m.history=[];m.log=`Defend <b>${m.target}</b>. Batting cards used this match are gone.`}
-      m.chain=0;m.hotHand=false;m.hotBat=false;
+      m.chain=0;m.hotHand=false;m.hotBat=false;m.extrasCount=0;m.freeHit=false;
       if(!newChallenge(true)){finish();return}
       render();return;
     }
