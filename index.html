@@ -5318,15 +5318,30 @@ const RARITIES={
   epic:{label:"Epic",short:"EPIC",min:72,max:88,trait:1,price:9,fill:"#8a55e6"},
   legendary:{label:"Legendary",short:"LEG",min:84,max:99,trait:.85,price:12,fill:"#f5c84b"}
 };
+/* TRAITS v2 — card personalities. `sub` shapes the pairing engine
+   directly (Power->boundaries, Technique->survival, Accuracy->dots,
+   Deception->boundary denial...), so two cards with the same rating
+   play differently. Strip traits keep editing slots. */
 const TRAITS=[
+  // situational rating spikes
   {name:"Finisher",role:"bat",text:"+8 BAT late in the chase",bat:(c,v)=>c.phase==="bat"&&c.left<=3?v+8:v,bowl:(c,v)=>v},
   {name:"Strike Bowler",role:"bowl",text:"+8 BOWL while bowling",bat:(c,v)=>v,bowl:(c,v)=>c.phase==="bowl"?v+8:v},
-  {name:"Anchor",role:"bat",text:"first batting wicket becomes a dot",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bat"&&!m?.you?.anchor?replaceOne(strip,"W","0"):strip},
   {name:"All-rounder",role:"all",text:"+4 BAT and +4 BOWL",bat:(c,v)=>v+4,bowl:(c,v)=>v+4},
+  {name:"Wildcard",role:"all",text:"coin-flip form: +6 or -3 each ball",bat:(c,v)=>c.luckyTick?v+6:v-3,bowl:(c,v)=>c.luckyTick?v+6:v-3},
+  {name:"Crowd Pleaser",role:"bat",text:"+2 BAT per boundary hit this match (max +8)",bat:(c,v)=>v+Math.min(8,2*c.boundaries),bowl:(c,v)=>v},
+  // strip editors
+  {name:"Anchor",role:"bat",text:"first batting wicket becomes a dot",bat:(c,v)=>v,bowl:(c,v)=>v,sub:{technique:6},strip:(mode,strip)=>mode==="bat"&&!m?.you?.anchor?replaceOne(strip,"W","0"):strip},
   {name:"Yorker",role:"bowl",text:"while bowling, one scoring slot becomes W",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bowl"?replaceWorstRun(strip,"W"):strip},
   {name:"Economy",role:"bowl",text:"while bowling, one boundary slot becomes 0",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bowl"?replaceBoundary(strip,"0"):strip},
-  {name:"Power Hitter",role:"bat",text:"while batting, one dot slot becomes 4",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip)=>mode==="bat"?replaceOne(strip,"0","4"):strip},
-  {name:"Toss Tempo",role:"all",text:"if used first after toss, one bad slot becomes 2",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip,c)=>c.tossLive?replaceBadSlot(strip,mode,"2"):strip}
+  {name:"Power Hitter",role:"bat",text:"one dot becomes 4; +4 Power",bat:(c,v)=>v,bowl:(c,v)=>v,sub:{power:4},strip:(mode,strip)=>mode==="bat"?replaceOne(strip,"0","4"):strip},
+  {name:"Toss Tempo",role:"all",text:"if used first after toss, one bad slot becomes 2",bat:(c,v)=>v,bowl:(c,v)=>v,strip:(mode,strip,c)=>c.tossLive?replaceBadSlot(strip,mode,"2"):strip},
+  // sub-stat personalities (the curve bends, not just the number)
+  {name:"Slogger",role:"bat",text:"+14 Power, -6 Technique — lives for the rope",bat:(c,v)=>v+2,bowl:(c,v)=>v,sub:{power:14,technique:-6}},
+  {name:"Technician",role:"bat",text:"+12 Technique, -4 Power — hard to remove",bat:(c,v)=>v+2,bowl:(c,v)=>v,sub:{technique:12,power:-4}},
+  {name:"Express Pace",role:"bowl",text:"+14 Pace, -6 Accuracy — terror with a spray",bat:(c,v)=>v,bowl:(c,v)=>v+2,sub:{pace:14,accuracy:-6}},
+  {name:"Metronome",role:"bowl",text:"+12 Accuracy, -4 Pace — nothing loose, ever",bat:(c,v)=>v,bowl:(c,v)=>v+2,sub:{accuracy:12,pace:-4}},
+  {name:"Mystery Spin",role:"bowl",text:"+12 Deception, +6 Movement, -8 Pace",bat:(c,v)=>v,bowl:(c,v)=>v+2,sub:{deception:12,movement:6,pace:-8}},
+  {name:"Ice Veins",role:"all",text:"+16 Nerve — pressure means nothing",bat:(c,v)=>v,bowl:(c,v)=>v,sub:{nerve:16}}
 ];
 /* ============================================================
    COACHES — persistent build engines. Levers:
@@ -5465,6 +5480,22 @@ const COACHES=[
 ];
 // All-In Al's drawback rides the strip pipeline:
 COACHES.find(c=>c.id==="all_in").strip=(mode,s)=>mode==="bat"?replaceOne(s,"0","W"):s;
+/* ---- K. sub-stat specialists: bend ONE pairing hard (10) ---- */
+COACHES.push(
+  Object.assign(flagCoach("slog_lab","Slog Lab","rare",3,8,"+8 Power for batters and all-rounders — the rope gets closer.",{}),{sub:{power:8},subGate:c=>c.role!=="bowl"}),
+  Object.assign(flagCoach("length_lab","Line & Length Lab","rare",3,8,"+8 Accuracy for bowlers and all-rounders — nothing loose.",{}),{sub:{accuracy:8},subGate:c=>c.role!=="bat"}),
+  Object.assign(flagCoach("spin_whisperer","Spin Whisperer","rare",4,8,"+10 Deception for every card — batters can't read you.",{}),{sub:{deception:10}}),
+  Object.assign(flagCoach("psychologist","Sports Psychologist","uncommon",2,7,"+12 Nerve for every card — pressure slides off.",{}),{sub:{nerve:12}}),
+  Object.assign(flagCoach("swing_clinic","Swing Clinic","rare",4,8,"+8 Movement for every card — the ball talks.",{}),{sub:{movement:8}}),
+  Object.assign(flagCoach("timing_academy","Timing Academy","uncommon",2,7,"+8 Timing for every card — strike rotation on tap.",{}),{sub:{timing:8}}),
+  Object.assign(flagCoach("pace_gym","Pace Gym","rare",4,8,"+8 Pace for bowlers — pure intimidation.",{}),{sub:{pace:8},subGate:c=>c.role!=="bat"}),
+  Object.assign(flagCoach("technique_temple","Technique Temple","uncommon",2,7,"+8 Technique for batters — the gate stays shut.",{}),{sub:{technique:8},subGate:c=>c.role!=="bowl"}),
+  /* ---- L. extras & free-hit builds (the tempo game) ---- */
+  flagCoach("umpires_nightmare","Umpire's Nightmare","rare",3,8,"Rival bowlers leak wides and no-balls TWICE as often.",{extrasBoost:true}),
+  flagCoach("front_foot_police","Front-Foot Police","uncommon",2,6,"Your bowlers never bowl a wide or no-ball.",{noExtras:true}),
+  flagCoach("freehit_franchise","Free-Hit Franchise","legendary",5,10,"On free hits your boundary chances surge (+50%).",{freeHitAmp:true}),
+  flagCoach("wide_boy","Wide Boy","rare",4,8,"Every rival wide gifts you +1 extra run.",{wideRuns:true})
+);
 /* ---- Coach EDITIONS (rolled at pack reveal; hexes can grant them) ---- */
 const EDITIONS={
   foil:{label:"Foil",sell:2,desc:"+3 BAT & +3 BOWL to every card."},
@@ -5542,7 +5573,18 @@ const HEXES=[
         const v=pick(bench);run.roster=roster().filter(c=>c.id!==v.id);killed++}
       return `Active 12 blessed. ${killed} bench souls taken.`}},
   {id:"hex_seance",name:"Séance",desc:"Your next 2 packs are FREE.",cost:"You cannot reroll this shop again.",
-    use(){run.freePacks=(run.freePacks||0)+2;run.noReroll=true;return "The spirits stock the counter."}}
+    use(){run.freePacks=(run.freePacks||0)+2;run.noReroll=true;return "The spirits stock the counter."}},
+  {id:"hex_blood_moon",name:"Blood Moon",desc:"EVERY card: +8 Power and +8 Pace.",cost:"Every card: -8 Technique and -8 Accuracy. All aggression, no control.",
+    use(){roster().forEach(c=>{c.batting.power=clamp(c.batting.power+8,12,99);c.bowling.pace=clamp(c.bowling.pace+8,12,99);
+      c.batting.technique=clamp(c.batting.technique-8,12,99);c.bowling.accuracy=clamp(c.bowling.accuracy-8,12,99);syncRatings(c)});
+      return "The moon rises. Everything swings harder."}},
+  {id:"hex_echo",name:"Echo Chamber",desc:"Your best coach is DUPLICATED as a Negative copy (no slot, effects stack).",cost:"All your consumables vanish.",
+    use(){const cs=activeCoaches();if(!cs.length)return "No coach to echo.";
+      const tiers={legendary:3,rare:2,uncommon:1,common:0};
+      const best=cs.slice().sort((a,b)=>(tiers[b.tier]||0)-(tiers[a.tier]||0))[0];
+      run.coaches.push({...best,edition:"negative",instId:uid()});
+      run.consumables=[];
+      return `${best.name} echoes from the void.`}}
 ];
 /* ============================================================
    CONSUMABLES — two kinds:
@@ -5580,7 +5622,15 @@ const CONSUMABLES=[
   {id:"sponsor_cheque",name:"Sponsor Cheque",mode:"train",kind:"instant",desc:"Collect 6 coins immediately.",
     use(){run.coins+=6;return "+6 coins."}},
   {id:"captains_talk",name:"Captain's Talk",mode:"train",kind:"instant",desc:"Every card in your active 12 gains +2 BAT and +2 BOWL.",
-    use(){activeSquad().forEach(c=>boostCard(c,2,2));return "Active squad +2/+2."}}
+    use(){activeSquad().forEach(c=>boostCard(c,2,2));return "Active squad +2/+2."}},
+  // --- extras & sub-stat plays ---
+  {id:"chin_music",name:"Chin Music",mode:"bat",desc:"Next batting ball: one DOT slot becomes a NO-BALL — go fishing for a free hit.",apply:s=>replaceOne(s,"0","NB")},
+  {id:"ice_bath",name:"Ice Bath",mode:"train",kind:"instant",desc:"Your best batter gains +10 Nerve forever.",
+    use(){const t=roster().slice().sort((a,b)=>b.bat-a.bat)[0];if(!t)return "No cards.";t.batting.nerve=clamp(t.batting.nerve+10,12,99);syncRatings(t);return `${t.name} +10 Nerve.`}},
+  {id:"slog_clinic",name:"Slog Clinic",mode:"train",kind:"instant",desc:"Your 3 best batters gain +6 Power forever.",
+    use(){const ts=roster().slice().sort((a,b)=>b.bat-a.bat).slice(0,3);ts.forEach(t=>{t.batting.power=clamp(t.batting.power+6,12,99);syncRatings(t)});return `${ts.length} batters +6 Power.`}},
+  {id:"bowling_camp",name:"Bowling Camp",mode:"train",kind:"instant",desc:"Every bowler gains +5 Accuracy forever.",
+    use(){const ts=roster().filter(c=>c.role!=="bat");ts.forEach(t=>{t.bowling.accuracy=clamp(t.bowling.accuracy+5,12,99);syncRatings(t)});return `${ts.length} bowlers +5 Accuracy.`}}
 ];
 const VOUCHERS=[
   {id:"local_sponsor",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6,buy:()=>{run.scout=(run.scout||0)+2}},
@@ -5946,10 +5996,16 @@ function traitStatDelta(c,disc){return c.trait?c.trait[disc](ctx(),0):0}
 function isRivalCard(c){return !!(m&&m.rivalDeck&&m.rivalDeck.includes(c))}
 function effSubs(c,disc){
   const src=disc==="bat"?c.batting:c.bowling;
-  let bonus=(disc==="bat"?c.batBoost:c.bowlBoost)||0;
-  bonus+=coachBonus(disc,c)+traitStatDelta(c,disc);
+  let flat=(disc==="bat"?c.batBoost:c.bowlBoost)||0;
+  flat+=coachBonus(disc,c)+traitStatDelta(c,disc);
+  const mine=!isRivalCard(c);
   const o={};
-  for(const key in src)o[key]=src[key]+bonus;
+  for(const key in src){
+    let v=src[key]+flat;
+    if(c.trait?.sub?.[key])v+=c.trait.sub[key];               // trait personality (both sides)
+    if(mine)activeCoaches().forEach(co=>{if(co.sub?.[key]&&(!co.subGate||co.subGate(c)))v+=co.sub[key]});
+    o[key]=v;
+  }
   return o;
 }
 function outcomeWeights(mode,myCard,theirCard){
@@ -5977,11 +6033,16 @@ function outcomeWeights(mode,myCard,theirCard){
     "6":(CURVE.base["6"]+CURVE.six*pBound*edge(B.power,L.deception+8)*(1-pWkt*.3))*batSide+Math.max(0,nerve*.5)
   };
   // free hit: the batter cannot get out
-  if(m?.freeHit){w["1"]+=w.W*.4;w["4"]+=w.W*.35;w["6"]+=w.W*.25;w.W=0}
+  if(m?.freeHit){
+    w["1"]+=w.W*.4;w["4"]+=w.W*.35;w["6"]+=w.W*.25;w.W=0;
+    if(batterMine&&activeCoaches().some(co=>co.freeHitAmp)){w["4"]*=1.5;w["6"]*=1.5} // Free-Hit Franchise
+  }
   // extras leak from a wayward bowler, decaying per extra already bowled
   let extras=0;
   if((m?.extrasCount||0)<CURVE.extraMax){
     extras=CURVE.extraBase*2*(1-edge(L.accuracy,CURVE.extraPivot))*Math.pow(CURVE.extraDecay,m?.extrasCount||0);
+    if(batterMine&&activeCoaches().some(co=>co.extrasBoost))extras*=2;   // Umpire's Nightmare
+    if(!batterMine&&activeCoaches().some(co=>co.noExtras))extras=0;      // Front-Foot Police
   }
   return {w,extras};
 }
@@ -6076,6 +6137,7 @@ function resolveBat(c){
   const strip=getStripFor("bat",c),out=rollOutcome(strip);
   if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
   m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
+  if(out.extra==="wide"&&activeCoaches().some(co=>co.wideRuns)){m.you.runs+=1;out.bonusRun=true} // Wide Boy
   if(out.extra){applyExtras(out,"bat")}
   else{
     if(wasFreeHit)m.freeHit=false;
@@ -6086,7 +6148,7 @@ function resolveBat(c){
   }
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null};
-  m.log=out.extra?`<b>${out.text}!</b> +1 run free — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
+  m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
     :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
   coachOutcome(out,"bat");
   addHistory(out.text,`Bat ${mine} v Bowl ${theirs}`);
