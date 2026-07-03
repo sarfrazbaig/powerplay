@@ -7141,15 +7141,15 @@ function commentaryLines(result){
   return ["The ball is in play.", "Both cards are fighting the odds.", `${result.text} recorded.`];
 }
 function commentaryHTML(){
-  // The animated call stays for the resolve moment; every other state is a
-  // single quiet line — no box, no competing band.
+  // While the ball is LIVE the commentary only builds tension (lines 1-2) —
+  // the reveal line is spoken ONLY after the needle lands. No spoilers.
   if(m.result?.state==="resolving"){
     const lines=commentaryLines(m.result);
-    return `<div class="commentary-strip live"><span class="c-line l1">${lines[0]}</span><span class="c-line l2">${lines[1]}</span><span class="c-line l3">${lines[2]}</span></div>`;
+    return `<div class="commentary-strip live"><span class="c-line l1">${lines[0]}</span><span class="c-line l2">${lines[1]}</span></div>`;
   }
   if(m.result)return `<div class="commentary-strip quiet">${commentaryLines(m.result)[2]}</div>`;
   if(m.selected)return `<div class="commentary-strip quiet">Locked in. Play the ball when ready.</div>`;
-  return `<div class="commentary-strip quiet muted">Hover a card to preview the odds.</div>`;
+  return `<div class="commentary-strip quiet muted">Pick a card from your hand.</div>`;
 }
 function resultWinner(result){
   const token=ballToken(result.text);
@@ -7312,12 +7312,12 @@ function fieldRingSVG(strip,opts={}){
     const mid=(a0+a1)/2*Math.PI/180,lr=(r0+r1)/2;
     const lx=(cx+Math.cos(mid)*lr).toFixed(1),ly=cy+Math.sin(mid)*lr;
     const fs=Math.max(15,Math.min(27,sweep*.5));
-    const wide=sweep>34;
     const label=d.tk==="0"?"&#9679;":d.tk;
-    const pct=wide?`<text x="${lx}" y="${(ly+17).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="rgba(255,255,255,.85)" stroke="#0a1214" stroke-width="2.5" paint-order="stroke">${Math.round(d.frac*100)}%</text>`:"";
-    return `<g class="ring-sec ${opts.changed&&opts.changed.has(d.tk)?'flash':''}" data-tk="${d.tk}" data-mid="${(((a0+a1)/2)+90).toFixed(1)}">
+    // no percentages: AREA is the language (playtest feedback) — printing
+    // numbers re-solves the equation we deliberately keep as a gamble
+    return `<g class="ring-sec ${opts.changed&&opts.changed.has(d.tk)?'flash':''}" data-tk="${d.tk}" data-mid="${(((a0+a1)/2)+90).toFixed(1)}" data-a0="${(a0+90).toFixed(1)}" data-sweep="${sweep.toFixed(1)}">
       <path d="${ringArcPath(cx,cy,r0,r1,a0,a1)}" fill="${RING_COLORS[d.tk]||"#46605a"}" stroke="#fff6e3" stroke-width="3"/>
-      <text x="${lx}" y="${(ly+(wide?2:6)).toFixed(1)}" text-anchor="middle" font-size="${d.tk==="0"?fs*.72:fs.toFixed(0)}" font-weight="700" fill="#fff" stroke="#17211f" stroke-width="3.5" paint-order="stroke">${label}</text>${pct}
+      <text x="${lx}" y="${(ly+6).toFixed(1)}" text-anchor="middle" font-size="${(d.tk==="0"?fs*.72:fs).toFixed(0)}" font-weight="700" fill="#fff" stroke="#17211f" stroke-width="3.5" paint-order="stroke">${label}</text>
     </g>`;
   }).join("");
   return `<svg class="ring-svg" viewBox="0 0 340 340" aria-hidden="true">
@@ -7430,7 +7430,11 @@ function startRingSpin(rollToken){
   clearSpin();
   const target=document.querySelector(`.ring-sec[data-tk="${rollToken}"]`);
   const needle=$("#ringNeedle");
-  const mid=target?parseFloat(target.dataset.mid):0;
+  // land ANYWHERE inside the zone — sometimes a whisker from the line
+  const a0=target?parseFloat(target.dataset.a0):0;
+  const sweep=target?parseFloat(target.dataset.sweep):0;
+  const mid=a0+sweep*(0.08+0.84*Math.random());
+  if(m?.result)m.result.needleAt=mid; // settle re-render keeps this exact spot
   const dur=2500;
   if(needle){
     needle.style.transition="none";
@@ -7516,7 +7520,7 @@ function renderDuel(pop=false){
     if(el){
       el.classList.add("landed");
       const n=$("#ringNeedle");
-      if(n)n.style.transform=`rotate(${el.dataset.mid}deg)`; // needle rests on the outcome
+      if(n)n.style.transform=`rotate(${m.result.needleAt??el.dataset.mid}deg)`; // needle rests where it landed
     }
   }
   renderActions();
