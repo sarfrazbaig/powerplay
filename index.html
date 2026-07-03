@@ -5971,10 +5971,14 @@ const UNLOCKS=[
    need:s=>s.furthest>=2,progress:s=>`Reach the 3rd match (best: ${s.furthest+1})`,apply:r=>{r.coins+=5}},
   {id:"scout",name:"Assistant Coach",icon:"📋",desc:"Start every run with a free Batting Coach.",
    need:s=>s.furthest>=4,progress:s=>`Reach the 5th match (best: ${s.furthest+1})`,apply:r=>{const c=COACHES.find(x=>x.id==="bat_mentor");if(c)(r.coaches=r.coaches||[]).push({...c,instId:uid()})}},
+  {id:"tactician",name:"Tactician",icon:"🎒",desc:"Start every run with a free one-use tool armed and ready.",
+   need:s=>s.furthest>=7,progress:s=>`Reach the 8th match (best: ${s.furthest+1})`,apply:r=>{const t=pick(CONSUMABLES.filter(c=>!c.kind));if(t)(r.consumables=r.consumables||[]).push({...t,ownedId:uid()})}},
   {id:"veteran",name:"Star Signing",icon:"⭐",desc:"Your best card starts each run +6 BAT / +6 BOWL.",
    need:s=>s.cups>=1,progress:s=>`Win a cup (${s.cups}/1)`,apply:r=>{const b=r.roster.slice().sort(sortStrong)[0];if(b)boostCard(b,6,6)}},
   {id:"legend",name:"Dynasty",icon:"🏆",desc:"Start every run with +10 coins and a free Bowling Coach.",
-   need:s=>s.cups>=3,progress:s=>`Win 3 cups (${s.cups}/3)`,apply:r=>{r.coins+=10;const c=COACHES.find(x=>x.id==="bowling_mentor");if(c)(r.coaches=r.coaches||[]).push({...c,instId:uid()})}}
+   need:s=>s.cups>=3,progress:s=>`Win 3 cups (${s.cups}/3)`,apply:r=>{r.coins+=10;const c=COACHES.find(x=>x.id==="bowling_mentor");if(c)(r.coaches=r.coaches||[]).push({...c,instId:uid()})}},
+  {id:"hof",name:"Hall of Fame",icon:"👑",desc:"Every card in your starting XI begins +2 BAT / +2 BOWL.",
+   need:s=>s.cups>=5,progress:s=>`Win 5 cups (${s.cups}/5)`,apply:r=>{r.roster.forEach(c=>boostCard(c,2,2))}}
 ];
 function unlockedPerks(){return UNLOCKS.filter(u=>u.need(save))}
 function nextLockedPerk(){return UNLOCKS.find(u=>!u.need(save))}
