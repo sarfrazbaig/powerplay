@@ -4621,35 +4621,40 @@
   }
   .ring-center{gap:6px}
   .ring-center .actions{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:9px}
-  /* stance chips: the second verb, one glance each — big enough to read */
+  /* stance chips: the second verb — the per-ball skill choice, made legible */
+  .stance-lead{font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:10px;letter-spacing:1.2px;
+    text-transform:uppercase;color:#7a6a4a;text-align:center;margin-bottom:2px}
   .stance-row{display:flex;gap:8px;justify-content:center}
   .stance-chip{
-    width:clamp(72px,6.2vw,92px);border-radius:13px;padding:8px 4px 7px;
+    width:clamp(74px,6.4vw,94px);border-radius:13px;padding:8px 4px 6px;
     display:grid;justify-items:center;gap:2px;cursor:pointer;
     background:#fff6e3;border:3px solid rgba(23,33,31,.5);color:var(--ink);
     font-family:Oswald,Arial,sans-serif;
     box-shadow:0 3px 0 rgba(23,33,31,.28);
     transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;
   }
-  .stance-chip i{font-style:normal;font-size:21px;line-height:1}
+  .stance-chip i{font-style:normal;font-size:20px;line-height:1}
   .stance-chip b{font-size:12px;font-weight:700;letter-spacing:.6px}
-  .stance-chip span{font-size:9.5px;font-weight:800;color:#7a6a4a;letter-spacing:.3px}
+  .stance-chip .stance-risk{font-size:8.5px;font-weight:900;letter-spacing:.5px;padding:1px 7px;border-radius:6px;margin-top:1px}
+  .stance-chip.risk-safe .stance-risk{background:#cfeecd;color:#1e5e2a}
+  .stance-chip.risk-steady .stance-risk{background:#e7dcc0;color:#5a4a2a}
+  .stance-chip.risk-risky .stance-risk{background:#ffd0c4;color:#8a2a18}
+  .stance-chip.risk-trap .stance-risk{background:#e6d4ff;color:#4a2a7a}
   .stance-chip:hover{transform:translateY(-2px)}
   .stance-chip.on{
     border-color:var(--ink);background:var(--gold);
     box-shadow:0 4px 0 var(--ink),0 0 16px rgba(255,201,60,.4);
   }
-  .stance-chip.on span{color:#4a3d00}
-  /* stance dock overlays the bottom of YOUR card — strategy right at the
-     crease, zero layout cost so the card stays full size and symmetric */
-  .you-col{display:flex;align-items:center;justify-content:center;min-width:0;position:relative}
-  .you-col .dslot{height:100%}
+  .stance-explain{font-family:"Work Sans",Inter,sans-serif;font-weight:700;font-size:11px;color:#3a3326;
+    text-align:center;margin-top:6px;max-width:300px;line-height:1.32;min-height:14px}
+  /* stance dock sits under YOUR card — the strategy step, right at the crease */
+  .you-col{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;position:relative;gap:8px}
+  .you-col .dslot{height:auto}
   .you-col .stance-dock{
-    position:absolute;left:50%;bottom:2px;transform:translateX(-50%);z-index:7;
-    display:flex;justify-content:center;
-    padding:5px 7px;border-radius:14px;
-    background:rgba(255,246,227,.86);border:2.5px solid var(--ink);
-    box-shadow:0 4px 0 rgba(23,33,31,.4);backdrop-filter:blur(1px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:8px 12px 9px;border-radius:15px;
+    background:rgba(255,246,227,.94);border:3px solid var(--ink);
+    box-shadow:0 4px 0 rgba(23,33,31,.4);
   }
   /* the ball whipping round the field before it lands */
   .ring-needle.spinning{animation:needleSpin .42s linear infinite}
@@ -6537,6 +6542,7 @@ function setStance(st){
   // no preview means the wheel doesn't change — just move the highlight,
   // no rebuild (no flash) on the board
   document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
+  const ex=document.getElementById("stanceExplain");if(ex)ex.textContent=STANCE_PLAIN[st]||"";
   if(typeof TUT!=="undefined")TUT.notify("stance");
 }
 /* The full modifier chain, captured as BEATS at roll time — the resolve
@@ -7770,14 +7776,24 @@ function renderKitbag(){
 }
 /* The cockpit: stance chips + PLAY, in the middle of the wheel, where
    the eyes already are. No RESET — re-picking a card swaps selection. */
+const STANCE_RISK={def:"SAFE",push:"STEADY",atk:"RISKY",line:"STEADY",bait:"TRAP"};
+const STANCE_PLAIN={
+  def:"Protect your wicket — the W zone melts, boundaries dampen.",
+  push:"Balanced — the natural matchup, nothing risked.",
+  atk:"Swing for the fences — boundary zones swell, but so does the W.",
+  line:"Bowl the natural line — the pure matchup.",
+  bait:"Toss up bait — gift a big-shot slot to buy wicket slots.",
+  "":""
+};
 function stanceChipsHTML(){
   const set=STANCES[m.phase],cur=currentStance();
-  return `<div class="stance-row">${Object.keys(set).map(k=>{
-    const s=set[k];
-    return `<button class="stance-chip ${cur===k?'on':''}" data-stance="${k}" title="${s.desc}">
-      <i>${s.icon}</i><b>${s.label}</b><span>${s.rule}</span>
+  const chips=Object.keys(set).map(k=>{
+    const s=set[k],risk=STANCE_RISK[k]||"";
+    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" title="${s.desc}">
+      <i>${s.icon}</i><b>${s.label}</b><small class="stance-risk">${risk}</small>
     </button>`;
-  }).join("")}</div>`;
+  }).join("");
+  return `<div class="stance-lead">Choose HOW to play it</div><div class="stance-row">${chips}</div><div class="stance-explain" id="stanceExplain">${STANCE_PLAIN[cur]||""}</div>`;
 }
 function renderActions(){
   const a=$("#actions");
