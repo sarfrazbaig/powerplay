@@ -4893,8 +4893,20 @@ const SFX=(()=>{
   const noiseBuf=d=>{const n=Math.max(1,ctx.sampleRate*d),b=ctx.createBuffer(1,n,ctx.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;return b};
   const tone=(f,t,dur,type,peak)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+dur+.03);return o};
   const noise=(dur,type,f,peak,t,q)=>{const s=ctx.createBufferSource();s.buffer=noiseBuf(dur);const bi=ctx.createBiquadFilter();bi.type=type;bi.frequency.value=f;if(q)bi.Q.value=q;const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(bi).connect(g).connect(ctx.destination);s.start(t);s.stop(t+dur+.03)};
-  const cheer=(big)=>{const t=ctx.currentTime,dur=big?1.15:.7,s=ctx.createBufferSource();s.buffer=noiseBuf(dur);const bi=ctx.createBiquadFilter();bi.type="bandpass";bi.frequency.value=bybig(big);bi.Q.value=.7;const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(big?.26:.15,t+.22);g.gain.setValueAtTime(big?.26:.15,t+dur*.5);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(bi).connect(g).connect(ctx.destination);s.start(t);s.stop(t+dur+.05)};
-  const bybig=b=>b?820:960;
+  // a real crowd ROAR: broadband noise swelling with a rising bandpass
+  // (the "wheyyy") plus a couple of detuned voices — bold enough to land
+  const cheer=(big)=>{
+    const t=ctx.currentTime,dur=big?1.35:.85,peak=big?.5:.34,off=.05;
+    const s=ctx.createBufferSource();s.buffer=noiseBuf(dur);
+    const bi=ctx.createBiquadFilter();bi.type="bandpass";bi.Q.value=.9;
+    bi.frequency.setValueAtTime(500,t);bi.frequency.linearRampToValueAtTime(big?1400:1100,t+dur*.5);bi.frequency.linearRampToValueAtTime(700,t+dur);
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(.0001,t+off);g.gain.exponentialRampToValueAtTime(peak,t+off+.09);
+    g.gain.setValueAtTime(peak,t+dur*.55);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(bi).connect(g).connect(ctx.destination);s.start(t);s.stop(t+dur+.05);
+    // voices
+    [big?300:340,big?452:410].forEach((f,i)=>{const o=ctx.createOscillator(),vg=ctx.createGain();o.type="sawtooth";o.frequency.setValueAtTime(f,t+off);o.frequency.linearRampToValueAtTime(f*1.12,t+dur*.5);vg.gain.setValueAtTime(.0001,t+off);vg.gain.exponentialRampToValueAtTime(big?.09:.06,t+off+.12);vg.gain.exponentialRampToValueAtTime(.0001,t+dur*.9);o.connect(vg).connect(ctx.destination);o.start(t+off);o.stop(t+dur)});
+  };
   const S={
     click(){const t=ctx.currentTime;tone(760,t,.05,"triangle",.08)},
     tick(){const t=ctx.currentTime;tone(1300,t,.03,"square",.03)},
@@ -4903,6 +4915,8 @@ const SFX=(()=>{
     coach(){const t=ctx.currentTime;tone(1180,t,.16,"triangle",.14);tone(1760,t+.04,.18,"sine",.09)},
     four(){const t=ctx.currentTime;noise(.03,"bandpass",2200,.42,t,2);tone(180,t,.09,"sine",.28);cheer(false)},
     six(){const t=ctx.currentTime;noise(.035,"bandpass",2500,.55,t,2.2);noise(.05,"highpass",3200,.3,t+.004);tone(150,t,.11,"sine",.34);cheer(true)},
+    clack(){const t=ctx.currentTime;noise(.02,"bandpass",2600,.13,t,5);tone(1900,t,.02,"square",.045)},
+    clunk(){const t=ctx.currentTime;noise(.05,"lowpass",520,.3,t);tone(120,t,.12,"sine",.22)},
     run(){const t=ctx.currentTime;noise(.03,"bandpass",1800,.28,t,2);tone(200,t,.06,"sine",.16)},
     dot(){const t=ctx.currentTime;noise(.06,"lowpass",320,.26,t);tone(95,t,.1,"sine",.18)},
     wicket(){const t0=ctx.currentTime;[0,.05,.1,.15].forEach((dt,i)=>{noise(.045,"bandpass",1500-i*200,.4,t0+dt,3);tone(150-i*12,t0+dt,.07,"sine",.2)})},
@@ -6721,6 +6735,8 @@ function startResolveSequence(){
     prev=shape;
   });
   const landAt=t+260;
+  // casino whir: steady clacks while the wheel is racing round
+  for(let ct=560;ct<landAt-40;ct+=92)spinTimers.push(setTimeout(()=>SFX.play("clack"),ct));
   spinTimers.push(setTimeout(()=>{setRingRead("&#8230;","the ball is in the air");landNeedle(res)},landAt));
   return landAt+1900;
 }
@@ -6746,6 +6762,10 @@ function landNeedle(res){
   const delta=((land-cur)%360+360)%360;      // shortest forward path
   needle.style.transition="transform 1750ms cubic-bezier(.09,.62,.11,1)";
   needle.style.transform=`rotate(${cur+720+delta}deg)`; // two more laps, then settle
+  // decelerating ratchet — the wheel clicking slower and slower, then it drops
+  let tt=0,gap=46;
+  while(tt<1600){const at=tt;spinTimers.push(setTimeout(()=>SFX.play("clack"),at));gap=Math.min(200,gap*1.14+3);tt+=gap}
+  spinTimers.push(setTimeout(()=>SFX.play("clunk"),1720));
   spinTimers.push(setTimeout(()=>finishLanding(res,target),1780));
 }
 function finishLanding(res,target){
