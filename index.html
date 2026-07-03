@@ -4790,6 +4790,7 @@
         <div class="stepper" id="stepper"></div>
       </div>
       <div class="top-actions">
+        <button class="btn secondary sm" id="muteBtn" title="Toggle sound">&#128266;</button>
         <button class="btn secondary sm test-win-btn" id="testWinBtn" title="Testing shortcut: mark this match as won and open the shop">Test Win</button>
         <button class="btn secondary sm" id="homeMatchBtn">Main Menu</button>
         <button class="btn secondary sm" id="restartBtn">Restart Run</button>
@@ -4883,6 +4884,38 @@
 <script>
 "use strict";
 const $=s=>document.querySelector(s);
+/* ---------- CRICKET SOUND: synthesised via Web Audio, no asset files so
+   the single HTML stays self-contained and works offline. Lazily started
+   on the first user gesture (autoplay policy); a speaker toggle persists. */
+const SFX=(()=>{
+  let ctx=null,muted=localStorage.getItem("pp_muted")==="1";
+  const ready=()=>{try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}if(ctx&&ctx.state==="suspended")ctx.resume();return ctx};
+  const noiseBuf=d=>{const n=Math.max(1,ctx.sampleRate*d),b=ctx.createBuffer(1,n,ctx.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;return b};
+  const tone=(f,t,dur,type,peak)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+dur+.03);return o};
+  const noise=(dur,type,f,peak,t,q)=>{const s=ctx.createBufferSource();s.buffer=noiseBuf(dur);const bi=ctx.createBiquadFilter();bi.type=type;bi.frequency.value=f;if(q)bi.Q.value=q;const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(bi).connect(g).connect(ctx.destination);s.start(t);s.stop(t+dur+.03)};
+  const cheer=(big)=>{const t=ctx.currentTime,dur=big?1.15:.7,s=ctx.createBufferSource();s.buffer=noiseBuf(dur);const bi=ctx.createBiquadFilter();bi.type="bandpass";bi.frequency.value=bybig(big);bi.Q.value=.7;const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(big?.26:.15,t+.22);g.gain.setValueAtTime(big?.26:.15,t+dur*.5);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(bi).connect(g).connect(ctx.destination);s.start(t);s.stop(t+dur+.05)};
+  const bybig=b=>b?820:960;
+  const S={
+    click(){const t=ctx.currentTime;tone(760,t,.05,"triangle",.08)},
+    tick(){const t=ctx.currentTime;tone(1300,t,.03,"square",.03)},
+    swish(){const t=ctx.currentTime;noise(.16,"bandpass",1400,.05,t,1.4)},
+    whoosh(){const t=ctx.currentTime,dur=.34,s=ctx.createBufferSource();s.buffer=noiseBuf(dur);const bi=ctx.createBiquadFilter();bi.type="bandpass";bi.frequency.setValueAtTime(320,t);bi.frequency.exponentialRampToValueAtTime(1700,t+dur);bi.Q.value=1.1;const g=ctx.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.11,t+.1);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(bi).connect(g).connect(ctx.destination);s.start(t);s.stop(t+dur+.05)},
+    coach(){const t=ctx.currentTime;tone(1180,t,.16,"triangle",.14);tone(1760,t+.04,.18,"sine",.09)},
+    four(){const t=ctx.currentTime;noise(.03,"bandpass",2200,.42,t,2);tone(180,t,.09,"sine",.28);cheer(false)},
+    six(){const t=ctx.currentTime;noise(.035,"bandpass",2500,.55,t,2.2);noise(.05,"highpass",3200,.3,t+.004);tone(150,t,.11,"sine",.34);cheer(true)},
+    run(){const t=ctx.currentTime;noise(.03,"bandpass",1800,.28,t,2);tone(200,t,.06,"sine",.16)},
+    dot(){const t=ctx.currentTime;noise(.06,"lowpass",320,.26,t);tone(95,t,.1,"sine",.18)},
+    wicket(){const t0=ctx.currentTime;[0,.05,.1,.15].forEach((dt,i)=>{noise(.045,"bandpass",1500-i*200,.4,t0+dt,3);tone(150-i*12,t0+dt,.07,"sine",.2)})},
+    extra(){const t=ctx.currentTime;tone(560,t,.1,"square",.1);tone(720,t+.08,.12,"square",.08)},
+    win(){const t=ctx.currentTime;[523,659,784,1047].forEach((f,i)=>tone(f,t+i*.09,.22,"triangle",.13))}
+  };
+  return {
+    play(n){if(muted||!ready())return;try{(S[n]||(()=>{}))()}catch(e){}},
+    toggle(){muted=!muted;localStorage.setItem("pp_muted",muted?"1":"0");if(!muted)ready();return muted},
+    muted(){return muted}
+  };
+})();
+function outcomeSfx(token){SFX.play(token==="W"?"wicket":token==="6"?"six":token==="4"?"four":(token==="wd"||token==="nb")?"extra":(token==="1"||token==="2")?"run":"dot")}
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const rng=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -5687,6 +5720,7 @@ function selectCard(c,lock=false){
   m.selected=c;
   m.preview=null;
   if(lock)m.selectionLocked=true;
+  SFX.play("click");
   render();
 }
 function confirmSelected(){
@@ -5830,6 +5864,7 @@ function setStance(st){
   if(m.result)return;
   m.stance=st;
   m.stripCache={};
+  SFX.play("tick");
   // no preview means the wheel doesn't change — just move the highlight,
   // no rebuild (no flash) on the board
   document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
@@ -6659,6 +6694,7 @@ function enterResolve(){
   d.classList.remove("settled");d.classList.add("resolving");
   const ms=$("#match");if(ms){ms.classList.add("is-resolving");ms.classList.remove("is-settled","is-card-locked","is-previewing")}
   renderHand();               // the played card leaves the hand for the crease
+  SFX.play("whoosh");         // the ball is released
   m.result.spinStarted=true;
   m.result.spinDur=startResolveSequence();
 }
@@ -6677,6 +6713,7 @@ function startResolveSequence(){
     spinTimers.push(setTimeout(()=>{
       setRingRead(b.label,b.note);
       animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
+      SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":"swish");
       if(b.kind==="coach"){const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
     },t));
@@ -6713,6 +6750,7 @@ function landNeedle(res){
 }
 function finishLanding(res,target){
   m.result.state="settled";
+  outcomeSfx(res.strip[res.roll]);   // bat crack / stumps / cheer / thud
   if(target)target.classList.add("landed");
   paintRing(ringSvgEl(),ringFracs(res.strip));
   if(target){const n=$("#ringNeedle");if(n&&res.needleAt!=null){n.style.transition="none";n.style.transform=`rotate(${res.needleAt}deg)`}}
@@ -6773,7 +6811,7 @@ function renderDuel(pop=false){
   const resolving=m.result?.state==="resolving";
   // small arrow riding the inner rim, pointing outward — orbits the centre,
   // never covers the commentary that sits in the middle
-  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 62 L179 88 L170 82 L161 88 Z" fill="#ff2f14" stroke="#17211f" stroke-width="2.5"/></svg></div>`;
+  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 72 L175.5 87 L170 83.5 L164.5 87 Z" fill="#ff2f14" stroke="#17211f" stroke-width="2"/></svg></div>`;
   const centerBits=resolving
     ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE BALL</b><span>tap to skip &#9654;</span></div></div>`
     :m.result
@@ -6852,6 +6890,9 @@ function playBallIntro(){
   // the bowler ARRIVES first (deliberate pause), THEN shapes the field,
   // one attribute at a time — not an instant automatic snap
   setRingRead(name,role);
+  SFX.play("whoosh");         // the bowler runs in
+  spinTimers.push(setTimeout(()=>SFX.play("swish"),1000));
+  spinTimers.push(setTimeout(()=>SFX.play("swish"),2300));
   spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half,{stagger:180,dur:480,flash:true})},1000));
   spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their,{stagger:180,dur:480,flash:true})},2300));
   spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your answer")},3500));
@@ -7424,6 +7465,7 @@ function renderRivalStrip(){
 }
 function completeMatchWin(){
   clearTimeout(settleTimer);
+  SFX.play("win");
   const reward=m.def.reward+(run.scout||0);
   run.wins++;run.coins+=reward;save.best=Math.max(save.best,m.you.runs);persist();
   const endBonus=activeCoaches().reduce((s,co)=>s+(co.onMatchEnd?co.onMatchEnd()||0:0),0);
@@ -7502,39 +7544,46 @@ $("#duel").onclick=e=>{
 /* ---------- card physics: pick a card UP and carry it to the crease.
    A ghost follows the pointer with momentum tilt; dropping it on the
    field plays it, dropping it back returns it to the hand. ---------- */
-let dragGhost=null,dragId=null,dragMoved=false,dragOX=0,dragOY=0,dragLastX=0,dragEndedAt=0;
+/* Movement is a single translate3d on the ghost (GPU-composited, no layout
+   per frame), updated inside rAF — so the carry is butter smooth. */
+let dragGhost=null,dragId=null,dragMoved=false,dragBaseX=0,dragBaseY=0,dragGrabX=0,dragGrabY=0,dragCurX=0,dragCurY=0,dragVX=0,dragLastX=0,dragRAF=0,dragEndedAt=0;
+function dragTick(){
+  if(!dragGhost){dragRAF=0;return}
+  dragGhost.style.transform=`translate3d(${(dragCurX-dragBaseX).toFixed(1)}px,${(dragCurY-dragBaseY).toFixed(1)}px,0) rotate(${clamp(dragVX*1.3,-10,10).toFixed(1)}deg) scale(1.05)`;
+  dragVX*=.7;
+  dragRAF=requestAnimationFrame(dragTick);
+}
 document.addEventListener("pointerdown",e=>{
+  if(e.button!=null&&e.button!==0)return;
   const h=e.target.closest("#hand .fanhold");
   if(!h||m?.result||anim)return;
-  dragId=h.dataset.id;dragMoved=false;dragLastX=e.clientX;
-  const r=h.getBoundingClientRect();
-  dragOX=e.clientX-r.left;dragOY=e.clientY-r.top;
   const src=h.querySelector(".card");
   if(!src)return;
   const cr=src.getBoundingClientRect();
-  dragOX=e.clientX-cr.left;dragOY=e.clientY-cr.top;
+  dragId=h.dataset.id;dragMoved=false;
+  dragBaseX=cr.left;dragBaseY=cr.top;dragGrabX=e.clientX;dragGrabY=e.clientY;
+  dragCurX=cr.left;dragCurY=cr.top;dragVX=0;dragLastX=e.clientX;
   dragGhost=src.cloneNode(true);
   dragGhost.className="card drag-ghost";
-  Object.assign(dragGhost.style,{position:"fixed",left:cr.left+"px",top:cr.top+"px",width:cr.width+"px",height:cr.height+"px",zIndex:999,pointerEvents:"none",opacity:0,margin:0,transition:"none"});
+  Object.assign(dragGhost.style,{position:"fixed",left:cr.left+"px",top:cr.top+"px",width:cr.width+"px",height:cr.height+"px",zIndex:999,pointerEvents:"none",opacity:"0",margin:"0",transition:"none",willChange:"transform"});
   document.body.appendChild(dragGhost);
 });
 document.addEventListener("pointermove",e=>{
   if(!dragGhost)return;
   if(!dragMoved){
-    const sx=parseFloat(dragGhost.style.left)+dragOX,sy=parseFloat(dragGhost.style.top)+dragOY;
-    if(Math.hypot(e.clientX-sx,e.clientY-sy)>8){dragMoved=true;dragGhost.style.opacity=1;document.body.classList.add("dragging-card")}
+    if(Math.hypot(e.clientX-dragGrabX,e.clientY-dragGrabY)<7)return;
+    dragMoved=true;dragGhost.style.opacity="1";document.body.classList.add("dragging-card");
+    if(!dragRAF)dragRAF=requestAnimationFrame(dragTick);
   }
-  if(dragMoved){
-    const vx=e.clientX-dragLastX;dragLastX=e.clientX;
-    dragGhost.style.left=(e.clientX-dragOX)+"px";
-    dragGhost.style.top=(e.clientY-dragOY)+"px";
-    dragGhost.style.transform=`rotate(${Math.max(-11,Math.min(11,vx*1.6))}deg)`;
-  }
-});
+  dragVX=e.clientX-dragLastX;dragLastX=e.clientX;
+  dragCurX=e.clientX-(dragGrabX-dragBaseX);
+  dragCurY=e.clientY-(dragGrabY-dragBaseY);
+},{passive:true});
 document.addEventListener("pointerup",e=>{
   if(!dragGhost)return;
   const id=dragId,moved=dragMoved;
   const gr=dragGhost.getBoundingClientRect();
+  cancelAnimationFrame(dragRAF);dragRAF=0;
   dragGhost.remove();dragGhost=null;dragId=null;dragMoved=false;
   document.body.classList.remove("dragging-card");
   if(!moved)return; // plain click — the holder's click handler selects
@@ -7545,6 +7594,7 @@ document.addEventListener("pointerup",e=>{
     if(c){m.__dealFrom=gr;lockCard(c)}
   }
 });
+(function(){const mb=$("#muteBtn");if(mb){const sync=()=>mb.innerHTML=SFX.muted()?"&#128263;":"&#128266;";sync();mb.onclick=()=>{SFX.toggle();SFX.play("click");sync()}}})();
 $("#scanBtn").onclick=openRivalDeck;
 $("#closeScout").onclick=closeRivalDeck;
 $("#rivalDrawer").onclick=(e)=>{if(e.target.id==="rivalDrawer")closeRivalDeck()};
