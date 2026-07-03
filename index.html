@@ -5481,6 +5481,34 @@
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
     overflow:hidden;line-height:1.25;
   }
+  /* ---------- summer skin: the between-match screens ----------
+     Same paper-cream + ink language as the ground's docks. */
+  #draft .setup-panel,#squad .setup-panel,#toss .setup-panel,
+  .setup-panel,.title-inner,.toss-layout,.toss-summary,.squad-room,
+  #toss .prep-panel,#squad .prep-panel,
+  .squad-actions,.setup-actions,.prep-panel,.roster-groups,.roster-row{
+    background:var(--nite) !important;
+    border-color:var(--ink) !important;
+    color:var(--ink) !important;
+    box-shadow:5px 5px 0 rgba(23,33,31,.45) !important;
+  }
+  .rival-strip-head{background:var(--ink) !important;color:#fff6e3 !important}
+  .rival-strip-head *{color:#fff6e3 !important}
+  .setup-box,#draft.squad-prep-screen .setup-box{background:rgba(23,33,31,.06) !important;border-color:rgba(23,33,31,.25) !important;color:var(--ink) !important}
+  .setup-box *,#draft.squad-prep-screen .setup-box *{color:var(--ink) !important}
+  .setup-box .sub,.setup-box small,#draft.squad-prep-screen .setup-box .sub{color:#5a4a2a !important}
+  #draft.squad-prep-screen .setup-panel{background:var(--nite) !important;color:var(--ink) !important}
+  #draft.squad-prep-screen .setup-panel .sub{color:#5a4a2a !important}
+  #shop .singlex,#shop .singlex p,#shop .singlex b,#shop .singlex span:not(.coin),#shop .shopx-stage{color:var(--ink) !important}
+  #shop .toolx-tag{background:var(--ink) !important;color:#fff6e3 !important}
+  #squad .deck-title,#squad .deck-title *{color:var(--ink) !important}
+  .roster-row,.roster-groups,.squad-actions,.setup-actions,.toss-summary{box-shadow:none !important}
+  .setup-panel *:not(.btn):not(button):not(.coin),.title-inner *:not(.btn):not(button),
+  .toss-layout *:not(.btn):not(button):not(.coin),.squad-room *:not(.btn):not(button):not(.coin){
+    color:inherit;
+  }
+  .setup-panel h1,.setup-panel h2,.setup-panel h3,.title-inner h1{color:var(--punch) !important;text-shadow:2px 2px 0 var(--ink) !important}
+  .setup-panel .sub,.setup-panel small,.toss-layout small,.squad-room small{color:#5a4a2a !important}
 </style>
 </head>
 <body>
