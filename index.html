@@ -5670,6 +5670,12 @@ const COACHES=[
   statCoach("street_smart","Street Smart","uncommon",1,6,"+8 BAT and +8 BOWL during Street Cup matches only.",(stat,c)=>run&&run.match<5?8:0),
   stripCoach("tempo_thief","Tempo Thief","rare",4,8,"Ball 1 of each innings: the rival's best run slot becomes a Single.",(mode,s,x)=>x.ball===1&&mode==="bowl"?replaceWorstRun(s,"1"):s),
   statCoach("thin_squad","Skeleton Crew","legendary",4,10,"+8 BAT and +8 BOWL while you own 13 or fewer cards.",(stat,c)=>roster().length<=13?8:0),
+  /* ---- H2. HEAT engines: build a run around momentum (the 5th lever) ---- */
+  flagCoach("furnace","The Furnace","rare",3,8,"You catch fire SOONER — ON FIRE triggers at 3 heat instead of 4.",{fireEarly:true}),
+  flagCoach("slow_burn","Slow Burn","rare",4,8,"A wicket (or boundary conceded) only HALVES your heat instead of wiping it.",{heatBank:true}),
+  flagCoach("pyromaniac","Pyromaniac","legendary",5,10,"While ON FIRE, the heat grows an EXTRA zone (+1 more boundary/wicket slot).",{fireBoost:true}),
+  coinCoach("heat_merchant","Heat Merchant","uncommon",3,7,"Earn +1 coin every ball you play while ON FIRE.",(out,mode)=>momentumState()==="fire"?1:0),
+  statCoach("momentum_rider","Momentum Rider","uncommon",2,7,"+6 BAT and +6 BOWL while your heat is WARM or hotter.",(stat,c)=>momentumState()?6:0),
   /* ---- I. trait gurus (8) ---- */
   traitGuru("Finisher","finisher",false),
   traitGuru("Strike Bowler","strike_bowler",false),
@@ -5863,6 +5869,8 @@ const CONSUMABLES=[
   {id:"tailwind",name:"Tailwind",mode:"bat",desc:"Next batting ball: every TWO slot becomes a FOUR.",apply:s=>replaceAll(s,"2","4")},
   {id:"slower_ball",name:"Slower Ball",mode:"bowl",desc:"Next bowling ball: every FOUR slot becomes a DOT.",apply:s=>replaceAll(s,"4","0")},
   {id:"guardian_ball",name:"Guardian Angel",mode:"bat",desc:"Next batting ball: EVERY wicket slot becomes a Single.",apply:s=>replaceAll(s,"W","1")},
+  {id:"adrenaline_rush",name:"Adrenaline Rush",mode:"bat",desc:"Next batting ball: play it white-hot — a DOT becomes SIX and a Single becomes FOUR.",apply:s=>replaceOne(replaceOne(s,"0","6"),"1","4")},
+  {id:"killer_instinct",name:"Killer Instinct",mode:"bowl",desc:"Next bowling ball: go for the kill — the two best run slots become WICKETS.",apply:s=>replaceWorstRun(replaceWorstRun(s,"W"),"W")},
   // --- instant, permanent (build-makers) ---
   {id:"star_session",name:"Star Session",mode:"train",kind:"instant",desc:"Your best card gains +6 BAT and +6 BOWL forever.",
     use(){const t=roster().slice().sort(sortStrong)[0];if(!t)return "No cards.";boostCard(t,6,6);return `${t.name} +6/+6.`}},
@@ -6174,8 +6182,9 @@ function applyMatchModifiers(mode,strip,card){
    (batting) or a boundary conceded (bowling) resets it to zero. That's the
    real per-ball decision: cash in the heat, or protect it. ---------------- */
 const MOM_WARM=2, MOM_FIRE=4, MOM_CAP=6;
-function momentumSlots(){const n=m?.momentum||0;return n>=MOM_FIRE?2:n>=MOM_WARM?1:0}
-function momentumState(){const n=m?.momentum||0;return n>=MOM_FIRE?"fire":n>=MOM_WARM?"warm":null}
+function fireThreshold(){return activeCoaches().some(c=>c.fireEarly)?MOM_FIRE-1:MOM_FIRE}  // Furnace: catch fire sooner
+function momentumSlots(){const n=m?.momentum||0;return n>=fireThreshold()?2+(activeCoaches().some(c=>c.fireBoost)?1:0):n>=MOM_WARM?1:0}
+function momentumState(){const n=m?.momentum||0;return n>=fireThreshold()?"fire":n>=MOM_WARM?"warm":null}
 function applyMomentum(mode,strip){
   const n=momentumSlots();if(n<=0)return strip;
   let s=strip.slice();
@@ -6198,12 +6207,14 @@ function applyMomentum(mode,strip){
 // after a ball settles, the heat rises or breaks (the meter conveys it)
 function updateMomentum(mode,out){
   if(out.extra)return;               // extras don't move the heat
+  const bank=activeCoaches().some(c=>c.heatBank);     // Slow Burn: a break only HALVES the heat
+  const brk=()=>{m.momentum=bank?Math.floor((m.momentum||0)/2):0};
   if(mode==="bat"){
-    if(out.wicket)m.momentum=0;                     // out — partnership broken
+    if(out.wicket)brk();                              // out — partnership broken
     else if(out.runs>=4)m.momentum=Math.min(MOM_CAP,(m.momentum||0)+1);
     else if(out.runs===0)m.momentum=Math.max(0,(m.momentum||0)-1);
   }else{
-    if(out.runs>=4)m.momentum=0;                    // smashed for four/six — pressure released
+    if(out.runs>=4)brk();                             // smashed for four/six — pressure released
     else if(out.wicket||out.runs===0)m.momentum=Math.min(MOM_CAP,(m.momentum||0)+1);
   }
 }
