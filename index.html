@@ -4499,6 +4499,19 @@
   @keyframes boardShake{0%,100%{transform:translate(0,0)}15%{transform:translate(-7px,3px)}
     30%{transform:translate(6px,-4px)}45%{transform:translate(-5px,-2px)}
     60%{transform:translate(5px,3px)}75%{transform:translate(-3px,-1px)}}
+  /* build FIRES: a flashy pill above the wheel when a coach/trait/tool triggers */
+  .build-trigger{position:absolute;top:6%;left:50%;transform:translateX(-50%);z-index:30;pointer-events:none;
+    display:flex;align-items:center;gap:6px;padding:5px 15px;border:3px solid #17211f;border-radius:999px;
+    background:#ffc93c;color:#17211f;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:16px;
+    letter-spacing:.4px;white-space:nowrap;box-shadow:0 4px 0 #17211f;
+    animation:btPop 1s cubic-bezier(.2,1.5,.3,1) forwards}
+  .bt-trait{background:#d3b8ff}.bt-tool{background:#8bcb52}.bt-coach{background:#ffc93c}
+  .bt-spark{font-style:normal;filter:drop-shadow(0 1px 0 rgba(23,33,31,.3))}
+  @keyframes btPop{0%{opacity:0;transform:translateX(-50%) scale(.5) translateY(8px)}
+    20%{opacity:1;transform:translateX(-50%) scale(1.12) translateY(0)}
+    35%{transform:translateX(-50%) scale(1)}
+    80%{opacity:1;transform:translateX(-50%) scale(1) translateY(0)}
+    100%{opacity:0;transform:translateX(-50%) scale(.96) translateY(-12px)}}
   /* ---------- end-of-run card: the "play again?" payoff ---------- */
   .over-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
     padding:34px 40px !important;max-width:540px}
@@ -7377,6 +7390,7 @@ function startResolveSequence(){
       SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
       if(b.kind==="coach"){const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
+      if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
     t+=760+170*Math.max(0,changes-1); // slow enough to read each beat's cascade
     prev=shape;
@@ -7462,6 +7476,16 @@ function showOutcomePop(res){
   host.appendChild(el);
   setTimeout(()=>el.remove(),1150);
   if(tk==="6"||tk==="W"){host.classList.remove("shake");void host.offsetWidth;host.classList.add("shake");setTimeout(()=>host.classList.remove("shake"),480)}
+}
+/* Balatro's spark: when a coach / trait / tool reshapes the field, it pops a
+   flashy pill above the wheel so the player SEES their build pay off. */
+function showBuildTrigger(label,kind){
+  const host=document.querySelector("#match .av-ringwrap");if(!host)return;
+  const el=document.createElement("div");
+  el.className="build-trigger bt-"+kind;
+  el.innerHTML=`<span class="bt-spark">⚡</span><b>${label}</b>`;
+  host.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
 }
 /* Danger / answer telegraphs: the rival card menaces when it outguns your
    best available answer; your pick calms the board when it answers back. */
