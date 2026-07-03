@@ -4488,6 +4488,30 @@
     box-shadow:0 3px 0 var(--ink);
   }
   .stance-chip.on span{color:#4a3d00}
+  /* stance dock lives under YOUR card — strategy at the crease */
+  .you-col{display:grid;gap:8px;justify-items:center;min-width:0;position:relative}
+  .you-col .stance-dock{display:flex;justify-content:center}
+  /* the compass spinner */
+  .ring-needle.spinning{animation:needleSpin .3s linear infinite}
+  @keyframes needleSpin{to{transform:rotate(360deg)}}
+  /* a coach FIRING is an event — the seat erupts */
+  .seat.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes seatFire{
+    0%{transform:scale(1)}
+    25%{transform:scale(1.14) rotate(-2deg);box-shadow:0 0 0 4px var(--gold),0 0 34px rgba(255,201,60,.9)}
+    60%{transform:scale(1.06) rotate(1.5deg);box-shadow:0 0 0 3px var(--gold),0 0 22px rgba(255,201,60,.7)}
+    100%{transform:scale(1)}
+  }
+  .kit-card.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
+  /* the bowler ARRIVES — cricket is sequential */
+  .dslot.frompile .card{animation:dealArrive .5s cubic-bezier(.2,.9,.3,1)}
+  @keyframes dealArrive{
+    from{transform:translate(70px,-150px) rotate(8deg);opacity:.15}
+    to{transform:none;opacity:1}
+  }
+  body.dragging-card{cursor:grabbing}
+  body.dragging-card .av-ground{outline:3px dashed rgba(255,255,255,.5);outline-offset:-10px}
+  .fanhold{touch-action:none}
   /* the over rail lives ON the ground, above the wheel — the timeline
      of the innings right where the eyes already are */
   .av-overarc{display:flex;justify-content:center;position:relative;z-index:3;padding-top:2px}
@@ -5604,6 +5628,7 @@ function newChallenge(keepLog=false){
   m.luckyTick=Math.random()<.5;
   m.stance=null; // fresh ball, back to the natural stance
   m.stripCache={};
+  if(typeof clearSpin==="function")clearSpin();
   m.challenge=m.phase==="bowl"?rivalCard("bat"):rivalCard("bowl");
   if(!m.challenge){
     challengeAnim=false;dealAnim=false;
@@ -5611,6 +5636,10 @@ function newChallenge(keepLog=false){
     return false;
   }
   dealAnim=true;
+  // THEIR shape is public — their card is face-up. Precomputed once so
+  // the intro morph and the resolve start from the same truth.
+  m.theirShape=ringFracs(outcomeStrip(m.phase,NEUTRAL_CARD,m.challenge));
+  m.introPending=true;
   if(!keepLog)m.log=m.phase==="bowl"?`Ball ${m.ball}: choose a bowler.`:`Ball ${m.ball}: choose a batter.`;
   return true;
 }
@@ -5627,6 +5656,10 @@ function lockCard(c){selectCard(c,true)}
 function selectCard(c,lock=false){
   if(!c||!m.challenge||anim||m.result||c.used)return;
   if(m.selected===c&&(!lock||m.selectionLocked))return;
+  if(!m.__dealFrom){ // card physics: remember where it left the hand
+    const h=document.querySelector(`#hand .fanhold[data-id="${c.id}"]`);
+    if(h)m.__dealFrom=h.getBoundingClientRect();
+  }
   m.selected=c;
   m.preview=null;
   if(lock)m.selectionLocked=true;
@@ -5774,6 +5807,41 @@ function setStance(st){
   m.stance=st;
   renderDuel();
 }
+/* The full modifier chain, captured as BEATS at roll time — the resolve
+   replays these exact strips one by one, so the theater IS the truth.
+   Order mirrors applyMatchModifiers: stance -> trait -> coaches -> tool. */
+function stripChain(mode,card){
+  const beats=[];
+  let s=outcomeStrip(mode,card,m.challenge);
+  beats.push({label:card.name.split(" ").pop().toUpperCase(),note:"takes the crease",strip:s.slice(),kind:"card"});
+  const st=currentStance();
+  const s2=applyStance(mode,s,card);
+  if(s2.join("|")!==s.join("|")){
+    const sd=STANCES[mode][st];
+    beats.push({label:sd.label,note:sd.note,strip:s2.slice(),kind:"stance"});
+  }
+  s=s2;
+  const s3=applyCardStripTrait(mode,s,card);
+  if(s3.join("|")!==s.join("|")&&card.trait){
+    beats.push({label:card.trait.name.toUpperCase(),note:"the trait kicks in",strip:s3.slice(),kind:"trait"});
+  }
+  s=s3;
+  const x=ctx();
+  activeCoaches().forEach(co=>{
+    let cs=co.strip?co.strip(mode,s.slice(),x,card):s.slice();
+    if(co.edition==="holographic"||co.edition==="polychrome")cs=replaceBadSlot(cs,mode,"0");
+    if(cs.join("|")!==s.join("|")){
+      beats.push({label:co.name.toUpperCase(),note:"coach call!",strip:cs.slice(),kind:"coach",coachId:co.instId||co.id});
+    }
+    s=cs;
+  });
+  const s4=applyOwnedConsumableStrip(mode,s);
+  if(s4.join("|")!==s.join("|")){
+    const owned=nextConsumable(mode);
+    beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
+  }
+  return {final:s4,beats};
+}
 // armed strip consumables burn only on a legal delivery
 function consumeArmed(mode){
   const owned=nextConsumable(mode);
@@ -5793,7 +5861,8 @@ function resolveBowl(c){
   const mine=bowlVal(c),theirs=batVal(m.challenge);
   const wasFreeHit=m.freeHit;
   const snap=scoreSnap();
-  const strip=getStripFor("bowl",c),out=rollOutcome(strip);
+  const chain=stripChain("bowl",c);
+  const strip=chain.final,out=rollOutcome(strip);
   m.rival.runs+=out.runs;if(out.wicket)m.rival.wk++;
   if(out.extra){applyExtras(out,"bowl")}
   else{
@@ -5806,7 +5875,7 @@ function resolveBowl(c){
     use(c);
   }
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
   m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
     :`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -5819,7 +5888,8 @@ function resolveBat(c){
   const mine=batVal(c),theirs=bowlVal(m.challenge);
   const wasFreeHit=m.freeHit;
   const snap=scoreSnap();
-  const strip=getStripFor("bat",c),out=rollOutcome(strip);
+  const chain=stripChain("bat",c);
+  const strip=chain.final,out=rollOutcome(strip);
   if(out.wicket&&c.trait?.name==="Anchor"&&!m.you.anchor){out.runs=0;out.wicket=false;out.text="Anchor survives: DOT";m.you.anchor=true}
   m.you.runs+=out.runs;if(out.wicket)m.you.wk++;
   if(out.extra==="wide"&&activeCoaches().some(co=>co.wideRuns)){m.you.runs+=1;out.bonusRun=true} // Wide Boy
@@ -5832,7 +5902,7 @@ function resolveBat(c){
     use(c);
   }
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
   m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
     :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -6332,6 +6402,16 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
     <text x="62" y="163" text-anchor="middle" fill="${spineCol}" stroke="#0c1214" stroke-width="6" paint-order="stroke" font-size="34" font-weight="700">${spineStat}</text>
     <text x="62" y="180" text-anchor="middle" fill="${spineCol}" stroke="#0c1214" stroke-width="3" paint-order="stroke" font-size="9.5" font-weight="700" letter-spacing="2">${spineKind}</text>
     ${c.trait?`<path d="M62 200 l10 12 -10 12 -10 -12 Z" fill="#ffd23f" stroke="#0c1214" stroke-width="2.5"/>`:""}
+    ${(()=>{ // the four sub-stats that power stances — readable at a glance
+      const bowlSide=emph==="bowl";
+      const src=bowlSide?c.bowling:c.batting;
+      const cols=bowlSide?[["PAC","pace"],["ACC","accuracy"],["MOV","movement"],["DEC","deception"]]
+                          :[["PWR","power"],["TIM","timing"],["TEC","technique"],["NRV","nerve"]];
+      return cols.map((L,i)=>{const x=56+i*46;
+        return `<text x="${x}" y="256" text-anchor="middle" font-size="9" font-weight="700" letter-spacing="1" fill="#ffe9b0" stroke="#0c1214" stroke-width="2.5" paint-order="stroke">${L[0]}</text>
+                <text x="${x}" y="273" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" stroke="#0c1214" stroke-width="3" paint-order="stroke">${src[L[1]]}</text>`;
+      }).join("");
+    })()}
     <text x="222" y="300" text-anchor="end" fill="#fff" stroke="#0c1214" stroke-width="3.5" paint-order="stroke" font-size="${name.length>13?13:15}" font-weight="700" letter-spacing=".4">${name}</text>
     <text x="222" y="318" text-anchor="end" fill="${roleFill}" stroke="#0c1214" stroke-width="3" paint-order="stroke" font-size="11" font-weight="700" letter-spacing="1">${roleName(c).toUpperCase()} #${c.num}</text>
   </svg>`;
@@ -6450,7 +6530,8 @@ function animateRing(prevMap,data){
    reveals only in the staged battle. That's the spark. */
 function ringCenterRead(){
   if(m.selected)return ""; // the big PLAY button IS the message
-  return `<div class="ring-read wait"><b>PICK A CARD</b><span>bigger zone = more likely</span></div>`;
+  const nm=m.challenge?m.challenge.name.split(" ").pop().toUpperCase():"PICK A CARD";
+  return `<div class="ring-read wait"><b>${nm}</b><span>${m.challenge?"pick your answer":"bigger zone = more likely"}</span></div>`;
 }
 function ringResultHTML(){
   // token only — the words live in the commentary line below the wheel
@@ -6471,91 +6552,68 @@ function setRingRead(b,s){
   const el=document.querySelector("#ringCenter .ring-read");
   if(el)el.innerHTML=`<b>${b}</b><span>${s}</span>`;
 }
-/* The narrator: WHY the zones move, in cricket words. Their card's
-   dominant weapon shapes stage 1; your card's best pairing edge (or
-   deficit) shapes stage 2. Same math the engine rolls with. */
-function stageNotes(res){
-  const bowlerC=m.phase==="bat"?res.rival:res.you;
-  const batterC=m.phase==="bat"?res.you:res.rival;
-  const b=effSubs(bowlerC,"bowl"),bt=effSubs(batterC,"bat");
-  let theirNote,yourNote;
-  if(m.phase==="bat"){
-    theirNote=[["pace & swing — the W zone grows",(b.movement+b.pace)/2],
-               ["nails the length — dots stack up",b.accuracy],
-               ["hides it well — boundaries shrink",b.deception]].sort((x,y)=>y[1]-x[1])[0][0];
-    const e=[["reads the swing — W zone shrinks",bt.technique-(b.movement+b.pace)/2],
-             ["rotates the strike — 1s & 2s grow",bt.timing-b.accuracy],
-             ["muscles it — boundary zones grow",bt.power-b.deception]].sort((x,y)=>y[1]-x[1]);
-    yourNote=e[0][1]>=0?e[0][0]:"outgunned — the field stays hostile";
-    const st=currentStance();
-    if(m.phase==="bat"&&st!=="push")yourNote=STANCES.bat[st].note;
-  }else{
-    theirNote=[["raw power — the SIX zone swells",bt.power],
-               ["quick hands — singles open up",bt.timing],
-               ["tight defence — your W zone shrinks",bt.technique]].sort((x,y)=>y[1]-x[1])[0][0];
-    const e=[["beats the bat — W zone grows",(b.movement+b.pace)/2-bt.technique],
-             ["dries up the runs — dots grow",b.accuracy-bt.timing],
-             ["cramps the swing — boundaries shrink",b.deception-bt.power]].sort((x,y)=>y[1]-x[1]);
-    yourNote=e[0][1]>=0?e[0][0]:"they're on top — hold your breath";
-    const st=currentStance();
-    if(st!=="line")yourNote=STANCES.bowl[st].note;
-  }
-  return {theirNote,yourNote};
-}
 function startResolveSequence(){
   clearSpin();
   const res=m.result;
-  const theirShape=ringFracs(outcomeStrip(m.phase,NEUTRAL_CARD,res.rival));
-  const finalShape=ringFracs(res.strip);
-  const theirName=res.rival.name.split(" ").pop().toUpperCase();
-  const yourName=res.you.name.split(" ").pop().toUpperCase();
-  const notes=stageNotes(res);
-  spinTimers.push(setTimeout(()=>{
-    setRingRead(theirName,notes.theirNote);
-    animateRing(fracMap(GHOST_FRACS),theirShape);
-  },380));
-  spinTimers.push(setTimeout(()=>{
-    setRingRead(yourName,notes.yourNote);
-    animateRing(fracMap(theirShape),finalShape);
-  },1500));
-  spinTimers.push(setTimeout(()=>{
-    setRingRead("LIVE","tap to skip ▸");
-    startRingSpin(res.strip[res.roll]);
-  },2580));
-  return 2580+2640; // stages + fixed needle spin
-}
-/* The NEEDLE spin: a carnival wheel pointer whips around the field,
-   decelerates, and lands on the outcome zone. Full casino. */
-function startRingSpin(rollToken){
-  clearSpin();
-  const target=document.querySelector(`.ring-sec[data-tk="${rollToken}"]`);
+  const from=m.theirShape||GHOST_FRACS;
+  const beats=res.beats||[];
   const needle=$("#ringNeedle");
-  // land ANYWHERE inside the zone — sometimes a whisker from the line
-  const a0=target?parseFloat(target.dataset.a0):0;
-  const sweep=target?parseFloat(target.dataset.sweep):0;
-  const mid=a0+sweep*(0.08+0.84*Math.random());
-  if(m?.result)m.result.needleAt=mid; // settle re-render keeps this exact spot
-  const dur=2500;
-  if(needle){
-    needle.style.transition="none";
-    needle.style.transform="rotate(0deg)";
-    void needle.offsetWidth;
-    needle.style.transition=`transform ${dur}ms cubic-bezier(.12,.64,.13,1)`;
-    needle.style.transform=`rotate(${720+mid}deg)`;
+  if(needle)needle.classList.add("spinning"); // supersonic while the story plays
+  let t=380,prev=from;
+  beats.forEach(b=>{
+    const shape=ringFracs(b.strip),pv=prev;
+    spinTimers.push(setTimeout(()=>{
+      setRingRead(b.label,b.note);
+      animateRing(fracMap(pv),shape);
+      if(b.kind==="coach"){
+        const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);
+        if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}
+      }
+      if(b.kind==="tool"){
+        const k=document.querySelector(".kit-card.armed");
+        if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}
+      }
+    },t));
+    t+=840;
+    prev=shape;
+  });
+  const landAt=t+220;
+  spinTimers.push(setTimeout(()=>{setRingRead("...","");landNeedle(res)},landAt));
+  return landAt+1850;
+}
+function currentRotationDeg(el){
+  const t=getComputedStyle(el).transform;
+  if(!t||t==="none")return 0;
+  const mm=t.match(/matrix\(([-\d.]+),\s*([-\d.]+)/);
+  return mm?Math.atan2(+mm[2],+mm[1])*180/Math.PI:0;
+}
+function landNeedle(res){
+  const target=document.querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
+  const needle=$("#ringNeedle");
+  if(!needle||!target){finishLanding(res,target);return}
+  const a0=parseFloat(target.dataset.a0),sweep=parseFloat(target.dataset.sweep);
+  const land=a0+sweep*(0.08+0.84*Math.random());
+  res.needleAt=land;
+  const cur=((currentRotationDeg(needle)%360)+360)%360;
+  needle.classList.remove("spinning");
+  needle.style.transition="none";
+  needle.style.transform=`rotate(${cur}deg)`;
+  void needle.offsetWidth;
+  needle.style.transition="transform 1650ms cubic-bezier(.08,.65,.1,1)";
+  needle.style.transform=`rotate(${cur+360+((land-cur%360)+360)%360}deg)`;
+  spinTimers.push(setTimeout(()=>finishLanding(res,target),1700));
+}
+function finishLanding(res,target){
+  if(target)target.classList.add("landed");
+  const c=$("#ringCenter");
+  if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
+  const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
+  const g=document.querySelector(".av-ground");
+  const tk=res.strip[res.roll];
+  if(g){
+    const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;
+    if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
   }
-  spinTimers.push(setTimeout(()=>{
-    if(target)target.classList.add("landed");
-    const c=$("#ringCenter");
-    if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
-    const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
-    // the moment HITS: shake on wickets, blaze on boundaries
-    const g=document.querySelector(".av-ground");
-    if(g){
-      const cls=rollToken==="W"?"hit-wicket":rollToken==="6"?"hit-six":rollToken==="4"?"hit-four":null;
-      if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
-    }
-  },dur+90));
-  return dur+140;
 }
 /* Danger / answer telegraphs: the rival card menaces when it outguns your
    best available answer; your pick calms the board when it answers back. */
@@ -6575,16 +6633,20 @@ function renderDuel(pop=false){
   const d=$("#duel");
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
   const deal=challengeAnim;challengeAnim=false;
-  const info=pitchStripInfo();
   const danger=!m.result&&dangerRead()==="danger";
-  const data=info?ringFracs(info.strip):null;
-  // pre-play the wheel sits on the even field — the contest, unresolved
-  const ring=data?fieldRingSVG(null,{fracs:data}):fieldRingSVG(null,{fracs:GHOST_FRACS}).replace('class="ring-svg"','class="ring-svg idle"');
+  // the field ALWAYS shows their shape pre-play (public info — their card
+  // is face-up). YOUR answer is what stays a gamble until the ball flies.
+  const idleFracs=m.introPending?GHOST_FRACS:(m.theirShape||GHOST_FRACS);
+  const ringHTML=m.result
+    ?fieldRingSVG(null,{fracs:m.result.state==="settled"?ringFracs(m.result.strip):(m.theirShape||GHOST_FRACS)})
+    :fieldRingSVG(null,{fracs:idleFracs});
   const fh=m.freeHit&&!m.result?`<div class="av-freehit">FREE HIT</div>`:"";
   const youCard=m.result?m.result.you:(m.selected||null);
   const youSlot=youCard
     ?duelCardHTML(youCard,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,(m.result?.state==="settled"&&resultWinner(m.result)==="you")?"winner":"")
     :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
+  const stanceDock=(!m.result&&m.selected)?`<div class="stance-dock">${stanceChipsHTML()}</div>`:"";
+  const youCol=`<div class="you-col">${youSlot}${stanceDock}</div>`;
   const rivCard=m.result?m.result.rival:m.challenge;
   const rivSlot=rivCard
     ?duelCardHTML(rivCard,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph,`${danger?"danger":""} ${(m.result?.state==="settled"&&resultWinner(m.result)==="rival")?"winner":""}`)
@@ -6594,17 +6656,16 @@ function renderDuel(pop=false){
     renderActions();return;
   }
   const resolving=m.result?.state==="resolving";
-  const ringHTML=resolving?fieldRingSVG(null,{fracs:GHOST_FRACS}):ring;
-  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 22 L184 74 L170 63 L156 74 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><circle cx="170" cy="170" r="7" fill="#17211f" stroke="#fff6e3" stroke-width="2"/></svg></div>`;
+  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 112 L181 170 L170 163 L159 170 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><circle cx="170" cy="170" r="8" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/></svg></div>`;
   const centerBits=resolving
-    ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE DUEL</b><span>even field</span></div></div>`
+    ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE BALL IS COMING</b><span>tap to skip ▸</span></div></div>`
     :m.result
       ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"></div></div>`
       :`<div class="ring-center" id="ringCenter">${ringCenterRead()}<div class="actions" id="actions"></div></div>`;
   d.innerHTML=`${fh}
     <div class="av-overarc">${renderOverStrip()}</div>
     <div class="av-duelrow ${danger?'threat':''}">
-      ${youSlot}
+      ${youCol}
       <div class="av-ringwrap">${ringHTML}${needle}${centerBits}</div>
       ${rivSlot}
     </div>
@@ -6612,6 +6673,7 @@ function renderDuel(pop=false){
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
+  d.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
   if(resolving&&!m.result.spinStarted){
     m.result.spinStarted=true;
     m.result.spinDur=startResolveSequence();
@@ -6622,9 +6684,56 @@ function renderDuel(pop=false){
       const n=$("#ringNeedle");
       if(n)n.style.transform=`rotate(${m.result.needleAt??el.dataset.mid}deg)`; // needle rests where it landed
     }
+  }else if(!m.result&&m.introPending){
+    m.introPending=false;
+    playBallIntro();
+  }
+  // the picked card SLIDES from your hand to the crease (FLIP)
+  if(m.__dealFrom&&m.selected&&!m.result){
+    const el=d.querySelector(".you-col .card");
+    if(el){
+      const r2=el.getBoundingClientRect(),f=m.__dealFrom;
+      if(r2.width)el.animate(
+        [{transform:`translate(${(f.left-r2.left).toFixed(0)}px,${(f.top-r2.top).toFixed(0)}px) scale(${(f.width/r2.width).toFixed(3)})`,opacity:.92},
+         {transform:"none",opacity:1}],
+        {duration:300,easing:"cubic-bezier(.2,.9,.3,1)"});
+    }
+    m.__dealFrom=null;
   }
   renderActions();
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
+}
+/* Ball intro: the bowler ARRIVES, then his attributes warp the field
+   beat by beat — now the player thinks. Cricket is sequential. */
+function theirIntroNotes(){
+  const rv=m.challenge;
+  if(m.phase==="bat"){
+    const b=effSubs(rv,"bowl");
+    return [["pace & swing — the W zone grows",(b.movement+b.pace)/2],
+            ["nails the length — dots stack up",b.accuracy],
+            ["hides it well — boundaries shrink",b.deception]].sort((x,y)=>y[1]-x[1]).map(w=>w[0]);
+  }
+  const bt=effSubs(rv,"bat");
+  return [["raw power — the SIX zone swells",bt.power],
+          ["quick hands — singles open up",bt.timing],
+          ["tight defence — your W zone shrinks",bt.technique]].sort((x,y)=>y[1]-x[1]).map(w=>w[0]);
+}
+function midFracs(a,b){
+  const keys=[...new Set([...a.map(d=>d.tk),...b.map(d=>d.tk)])];
+  return RING_ORDER.filter(t=>keys.includes(t)).map(t=>{
+    const fa=a.find(x=>x.tk===t)?.frac??0,fb=b.find(x=>x.tk===t)?.frac??0;
+    return {tk:t,frac:(fa+fb)/2};
+  });
+}
+function playBallIntro(){
+  clearSpin();
+  const their=m.theirShape;if(!their)return;
+  const name=m.challenge.name.split(" ").pop().toUpperCase();
+  const notes=theirIntroNotes();
+  const half=midFracs(GHOST_FRACS,their);
+  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half)},520));
+  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their)},1500));
+  spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your answer")},2450));
 }
 /* ---------- DUGOUT (coach art, not text) + KIT BAG (armable tools) */
 function renderDugout(){
@@ -6632,7 +6741,7 @@ function renderDugout(){
   const active=activeCoaches();
   const seats=[];
   active.forEach(coach=>{
-    seats.push(`<div class="seat filled ${coach.edition?'ed-'+coach.edition:''}" title="${coach.name} — ${coach.desc}">
+    seats.push(`<div class="seat filled ${coach.edition?'ed-'+coach.edition:''}" data-coach="${coach.instId||coach.id}" title="${coach.name} — ${coach.desc}">
       <img src="${coachArt(coach)}" alt="" loading="lazy"><span class="seat-name">${coach.name}</span>
       ${coach.ballTag?`<i class="seat-ball" title="works balls ${coach.ballTag.balls.join(" & ")}">${coach.ballTag.icon}</i>`:""}
     </div>`);
@@ -6674,11 +6783,10 @@ function renderActions(){
   if(!a)return;
   if(m.result?.state==="settled")a.innerHTML=`<button class="ring-go next" id="nextBall">NEXT<br>BALL</button>`;
   else if(m.result)a.innerHTML="";
-  else if(m.selected)a.innerHTML=`${stanceChipsHTML()}<button class="ring-go" id="confirmBtn">PLAY</button>`;
+  else if(m.selected)a.innerHTML=`<button class="ring-go" id="confirmBtn">PLAY</button>`;
   else a.innerHTML="";
   const map={nextBall:nextBall,confirmBtn:confirmSelected};
   for(const id in map){const el=$("#"+id);if(el)el.onclick=map[id]}
-  a.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
 }
 /* Two-tier rails: the top 6 phase-relevant cards sit ready at full mini
    size; the rest stay visible as slivers (number + surname) one click away.
@@ -6713,7 +6821,7 @@ function renderHand(){
   // hover zoom is CSS-only and reveals the card, never the odds
   document.querySelectorAll("#hand .fanhold").forEach(h=>{
     const card=()=>activeSquad().find(c=>c.id===h.dataset.id);
-    h.onclick=e=>{e.stopPropagation();lockCard(card())};
+    h.onclick=e=>{e.stopPropagation();if(Date.now()-dragEndedAt<180)return;lockCard(card())};
   });
   const scan=$("#scanMineBtn");if(scan)scan.onclick=openPlayerDeck;
   const dp=$("#discardPile");if(dp)dp.onclick=openPlayerDeck;
@@ -7270,6 +7378,49 @@ $("#duel").onclick=e=>{
   const card=e.target.closest(".card--duel");
   if(card)toggleFlip(card.dataset.id);
 };
+/* ---------- card physics: pick a card UP and carry it to the crease.
+   A ghost follows the pointer with momentum tilt; dropping it on the
+   field plays it, dropping it back returns it to the hand. ---------- */
+let dragGhost=null,dragId=null,dragMoved=false,dragOX=0,dragOY=0,dragLastX=0,dragEndedAt=0;
+document.addEventListener("pointerdown",e=>{
+  const h=e.target.closest("#hand .fanhold");
+  if(!h||m?.result||anim)return;
+  dragId=h.dataset.id;dragMoved=false;dragLastX=e.clientX;
+  const r=h.getBoundingClientRect();
+  dragOX=e.clientX-r.left;dragOY=e.clientY-r.top;
+  const src=h.querySelector(".card");
+  if(!src)return;
+  dragGhost=src.cloneNode(true);
+  Object.assign(dragGhost.style,{position:"fixed",left:r.left+"px",top:r.top+"px",width:r.width+"px",height:"auto",zIndex:999,pointerEvents:"none",opacity:0,margin:0,transition:"none"});
+  document.body.appendChild(dragGhost);
+});
+document.addEventListener("pointermove",e=>{
+  if(!dragGhost)return;
+  if(!dragMoved){
+    const sx=parseFloat(dragGhost.style.left)+dragOX,sy=parseFloat(dragGhost.style.top)+dragOY;
+    if(Math.hypot(e.clientX-sx,e.clientY-sy)>8){dragMoved=true;dragGhost.style.opacity=1;document.body.classList.add("dragging-card")}
+  }
+  if(dragMoved){
+    const vx=e.clientX-dragLastX;dragLastX=e.clientX;
+    dragGhost.style.left=(e.clientX-dragOX)+"px";
+    dragGhost.style.top=(e.clientY-dragOY)+"px";
+    dragGhost.style.transform=`rotate(${Math.max(-11,Math.min(11,vx*1.6))}deg)`;
+  }
+});
+document.addEventListener("pointerup",e=>{
+  if(!dragGhost)return;
+  const id=dragId,moved=dragMoved;
+  const gr=dragGhost.getBoundingClientRect();
+  dragGhost.remove();dragGhost=null;dragId=null;dragMoved=false;
+  document.body.classList.remove("dragging-card");
+  if(!moved)return; // plain click — the holder's click handler selects
+  dragEndedAt=Date.now();
+  const fanTop=document.querySelector(".av-fanwrap")?.getBoundingClientRect().top??1e9;
+  if(e.clientY<fanTop-8){
+    const c=activeSquad().find(x=>x.id===id&&!x.used);
+    if(c){m.__dealFrom=gr;lockCard(c)}
+  }
+});
 $("#scanBtn").onclick=openRivalDeck;
 $("#closeScout").onclick=closeRivalDeck;
 $("#rivalDrawer").onclick=(e)=>{if(e.target.id==="rivalDrawer")closeRivalDeck()};
