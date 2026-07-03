@@ -5116,7 +5116,7 @@ const SFX=(()=>{
     coach(){const t=ctx.currentTime;tone(1180,t,.16,"triangle",.18);tone(1760,t+.04,.18,"sine",.12)},
     four(){batCrack(false);boundaryWaa(false)},
     six(){batCrack(true);tone(95,ctx.currentTime+.03,.14,"sine",.08);boundaryWaa(true)},
-    clack(){const t=ctx.currentTime;tone(1480,t,.024,"triangle",.045)},
+    clack(){const t=ctx.currentTime;tone(560,t,.05,"sine",.09);tone(280,t,.06,"sine",.05)},
     clunk(){const t=ctx.currentTime;tone(108,t,.14,"sine",.22);tone(216,t+.018,.09,"triangle",.08)},
     run(){const t=ctx.currentTime;noise(.03,"bandpass",1800,.34,t,2);tone(200,t,.06,"sine",.2)},
     dot(){const t=ctx.currentTime;noise(.06,"lowpass",320,.32,t);tone(95,t,.1,"sine",.22)},
@@ -6988,8 +6988,7 @@ function startResolveSequence(){
     prev=shape;
   });
   const landAt=t+260;
-  // casino whir: steady clacks while the wheel is racing round
-  for(let ct=560;ct<landAt-40;ct+=92)spinTimers.push(setTimeout(()=>SFX.play("clack"),ct));
+  // (no steady clack whir during the spin — it read as a scratch)
   spinTimers.push(setTimeout(()=>{setRingRead("&#8230;","the ball is in the air");landNeedle(res)},landAt));
   return landAt+1900;
 }
@@ -7015,13 +7014,12 @@ function landNeedle(res){
   const delta=((land-cur)%360+360)%360;      // shortest forward path
   needle.style.transition="transform 1750ms cubic-bezier(.09,.62,.11,1)";
   needle.style.transform=`rotate(${cur+720+delta}deg)`; // two more laps, then settle
-  // decelerating ratchet — the wheel clicking slower and slower, then it drops.
-  // On a boundary the clacks stop early and the crowd HUSHES (held breath)
-  // so the cheer erupts out of near-silence.
+  // a few soft, clearly-spaced ticks slowing to a stop — not a buzzy stream.
+  // On a boundary they stop early and the crowd HUSHES (held breath).
   const tk=res.strip[res.roll],boundary=(tk==="4"||tk==="6");
-  const clackEnd=boundary?1080:1600;
-  let tt=0,gap=46;
-  while(tt<clackEnd){const at=tt;spinTimers.push(setTimeout(()=>SFX.play("clack"),at));gap=Math.min(200,gap*1.14+3);tt+=gap}
+  const clackEnd=boundary?900:1500;
+  let tt=120,gap=150;
+  while(tt<clackEnd){const at=tt;spinTimers.push(setTimeout(()=>SFX.play("clack"),at));gap=Math.min(280,gap*1.2+8);tt+=gap}
   if(boundary)spinTimers.push(setTimeout(()=>SFX.duck(950),clackEnd+40));
   spinTimers.push(setTimeout(()=>SFX.play("clunk"),1720));
   spinTimers.push(setTimeout(()=>finishLanding(res,target),1780));
