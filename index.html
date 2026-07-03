@@ -5129,22 +5129,26 @@
      bottom, coaches in a dugout, tools in a kit bag. No number boxes,
      no graphs, no essay panels.
      ================================================================ */
+  /* SUMMER STREET retheme: school holidays, two friends battling it out.
+     Blazing sky, sun-washed maidan, chalk lines, sticker-comic punch. */
   :root{
-    --nite:#0b1417;
-    --nite2:#101d22;
-    --turf:#153428;
-    --chalk:#eef6ec;
-    --mutn:#8fa9a0;
-    --gold:#ffd23f;
-    --dangerc:#ff4155;
-    --goodc:#2fd9a0;
+    --nite:#fff6e3;          /* paper cream (was night) */
+    --nite2:#ffefd2;
+    --turf:#5faf3d;          /* sunny grass */
+    --chalk:#1b2320;         /* ink text on light */
+    --mutn:#7a6a4a;          /* sun-faded label */
+    --gold:#ffc93c;          /* sunshine CTA */
+    --dangerc:#e8283f;
+    --goodc:#1ea86b;
+    --ink:#17211f;
+    --punch:#ff5a2d;         /* hot summer orange */
   }
   body{
     background:
-      radial-gradient(900px 480px at 10% -8%, rgba(255,244,200,.11), transparent 62%),
-      radial-gradient(900px 480px at 90% -8%, rgba(255,244,200,.11), transparent 62%),
-      radial-gradient(1300px 860px at 50% 120%, #143028 0%, transparent 64%),
-      linear-gradient(#0c1518,#090f12) !important;
+      radial-gradient(700px 380px at 85% -6%, rgba(255,236,150,.85), transparent 60%),
+      radial-gradient(1400px 700px at 50% -12%, #9fe4f2, transparent 70%),
+      linear-gradient(#58c8e4 0%, #a9e4ee 34%, #f2e3b8 60%, #e8c97a 100%) !important;
+    background-attachment:fixed !important;
   }
   .screen, .screen.active{background:transparent !important}
   /* ---------- match board grid ---------- */
@@ -5161,7 +5165,9 @@
   }
   #match>*{grid-area:auto !important;min-width:0}
   #match .top{background:transparent !important;border:0 !important;box-shadow:none !important;padding:2px 6px !important}
-  #match .top .sub{color:var(--mutn) !important}
+  #match .top .match-title{color:var(--punch) !important;text-shadow:2.5px 2.5px 0 var(--ink) !important}
+  #match .top .sub{color:#33413a !important}
+  #match .top .sub b{color:var(--ink) !important}
   /* ---------- rival dugout row ---------- */
   .av-rivalrow{display:grid;gap:4px;justify-items:center}
   .av-rivalhead{display:flex;align-items:center;gap:12px}
@@ -5169,7 +5175,7 @@
     font-family:Oswald,Arial,sans-serif;font-size:10px;font-weight:700;
     letter-spacing:2.6px;color:var(--mutn);text-transform:uppercase;
   }
-  .av-rivalmeta{font-size:11px;font-weight:800;color:var(--gold)}
+  .av-rivalmeta{font-size:11px;font-weight:800;color:var(--ink);background:var(--gold);border:2px solid var(--ink);border-radius:99px;padding:1px 10px}
   .av-rivalfan{display:flex;justify-content:center;align-items:flex-start;gap:0}
   .rivhold{width:clamp(76px,5.6vw,120px);margin-left:max(-24px,-1.2vw);position:relative}
   .rivhold:first-child{margin-left:0}
@@ -5192,18 +5198,19 @@
   .av-dugout,.av-kitbag{
     display:flex;flex-direction:column;align-items:center;gap:10px;
     padding:12px 8px;border-radius:16px;min-height:0;overflow:hidden auto;
-    background:linear-gradient(rgba(16,29,34,.85),rgba(11,20,23,.9));
-    border:1px solid rgba(255,255,255,.07);
+    background:var(--nite);
+    border:3px solid var(--ink);
+    box-shadow:5px 5px 0 rgba(23,33,31,.55);
   }
   .seats,.kits{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
   .seat{
     width:min(150px,92%);aspect-ratio:5/6;border-radius:12px;position:relative;overflow:hidden;
-    background:#16292c;border:2px solid #274046;
+    background:linear-gradient(#bfe8f2,#e9f7e2);border:2.5px solid var(--ink);
   }
   .seat img{width:100%;height:100%;object-fit:cover;object-position:top}
   .seat-name{
     position:absolute;left:0;right:0;bottom:0;padding:3px 4px;
-    background:rgba(8,14,12,.85);color:var(--chalk);
+    background:var(--ink);color:#fff6e3;
     font-size:9.5px;font-weight:800;text-align:center;line-height:1.15;
   }
   .seat-ball{
@@ -5211,19 +5218,20 @@
     background:var(--gold);color:#111;font-style:normal;font-size:11px;font-weight:900;
     display:grid;place-items:center;border:2px solid #0c1214;
   }
-  .seat.open{border-style:dashed;border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.02);display:grid;place-items:center}
-  .seat.open svg{width:54%;color:rgba(255,255,255,.10)}
+  .seat.open{border-style:dashed;border-color:rgba(23,33,31,.35);background:rgba(23,33,31,.04);display:grid;place-items:center}
+  .seat.open svg{width:54%;color:rgba(23,33,31,.16)}
   .seat.ed-foil{box-shadow:0 0 10px rgba(155,193,255,.5)}
   .seat.ed-holographic{box-shadow:0 0 10px rgba(216,145,255,.5)}
   .seat.ed-polychrome{box-shadow:0 0 12px rgba(91,225,136,.6)}
   .seat.ed-negative{filter:invert(1) hue-rotate(180deg)}
   .kit-card{
     width:min(150px,92%);display:grid;justify-items:center;gap:4px;padding:9px 6px;
-    background:#152621;border:2px solid #2c4a40;border-radius:12px;cursor:pointer;
-    color:var(--chalk);font-family:inherit;position:relative;
+    background:#fff;border:2.5px solid var(--ink);border-radius:12px;cursor:pointer;
+    color:var(--ink);font-family:inherit;position:relative;
+    box-shadow:3px 3px 0 rgba(23,33,31,.5);
     transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
   }
-  .kit-card:hover{transform:translateY(-2px);border-color:#3f6b5b}
+  .kit-card:hover{transform:translateY(-2px)}
   .kit-ico{width:26px;height:26px;display:grid;place-items:center}
   .kit-ico svg{width:24px;height:24px}
   .kit-name{font-size:10.5px;font-weight:800;text-align:center;line-height:1.15}
@@ -5239,23 +5247,23 @@
   }
   .kit-card.offmode{opacity:.5}
   .kit-empty{display:grid;place-items:center;padding:14px 0}
-  .bag-ill{width:56px;color:rgba(255,255,255,.10)}
+  .bag-ill{width:56px;color:rgba(23,33,31,.16)}
   /* ---------- the pitch ---------- */
   #match .av-pitch{
     position:relative;border-radius:20px;min-height:0;min-width:0;
     display:grid;grid-template-rows:minmax(0,1fr) auto auto;gap:4px;
     padding:10px 16px 10px;overflow:hidden;
     background:
-      radial-gradient(58% 74% at 50% 46%, #1d4a35 0%, #16382a 52%, rgba(13,26,22,.9) 100%),
-      linear-gradient(#0e1a16,#0c1512);
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow:inset 0 0 90px rgba(0,0,0,.55), 0 10px 40px rgba(0,0,0,.5);
+      radial-gradient(60% 78% at 50% 46%, #7cc94f 0%, #64b23e 55%, #4f9433 100%);
+    border:3px solid var(--ink);
+    box-shadow:6px 6px 0 rgba(23,33,31,.55);
   }
-  #match .av-pitch::before{ /* floodlight cones */
+  #match .av-pitch::before{ /* chalk boundary + sun glare + mown stripes */
     content:"";position:absolute;inset:0;pointer-events:none;
     background:
-      radial-gradient(420px 240px at 18% 0%, rgba(255,246,214,.09), transparent 70%),
-      radial-gradient(420px 240px at 82% 0%, rgba(255,246,214,.09), transparent 70%);
+      radial-gradient(closest-side at 50% 46%, transparent 96%, rgba(255,255,255,.65) 97.5%, transparent 99%),
+      radial-gradient(500px 260px at 78% -4%, rgba(255,246,190,.35), transparent 70%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 60px, transparent 60px 120px);
   }
   .av-duelrow{
     display:grid;grid-template-columns:minmax(160px,340px) minmax(280px,540px) minmax(160px,340px);
@@ -5269,15 +5277,15 @@
   .av-duelrow .dslot .dlabel{
     display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:99px;
     font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
-    background:rgba(8,14,12,.7);color:var(--chalk);border:1px solid rgba(255,255,255,.14);
+    background:var(--ink);color:#fff6e3;border:2px solid var(--ink);
   }
   .av-duelrow .dslot .dlabel svg{width:13px;height:13px}
   .av-duelrow .placeholder{
     height:min(38vh,430px) !important;
     width:auto !important;
     aspect-ratio:5/7;border-radius:14px;
-    border:2px dashed rgba(255,255,255,.16) !important;display:grid;place-items:center;
-    color:rgba(255,255,255,.25);font-size:34px;background:rgba(255,255,255,.02) !important;
+    border:3px dashed rgba(255,255,255,.75) !important;display:grid;place-items:center;
+    color:rgba(255,255,255,.85);font-size:34px;background:rgba(255,255,255,.10) !important;
     box-shadow:none !important;
   }
   .av-duelrow .dslot.danger .card{animation:threatPulse 1.5s ease-in-out infinite}
@@ -5322,8 +5330,8 @@
   .ring-sec path{transition:filter .18s ease}
   .ring-sec.lit path{filter:brightness(1.9) saturate(1.2)}
   .ring-sec.landed path{
-    stroke:#fff;stroke-width:4;
-    filter:brightness(1.4) drop-shadow(0 0 12px rgba(255,255,255,.35));
+    stroke:#17211f;stroke-width:4.5;
+    filter:brightness(1.25) drop-shadow(0 0 12px rgba(255,255,255,.7));
   }
   .ring-sec.flash path{animation:secFlash .9s ease}
   @keyframes secFlash{0%{filter:brightness(2.6)}100%{filter:brightness(1)}}
@@ -5350,20 +5358,20 @@
   .ring-read span{font-size:11px;font-weight:800;color:var(--mutn);letter-spacing:1px;text-transform:uppercase}
   .ring-read.favored b{color:var(--goodc)}
   .ring-read.danger b{color:var(--dangerc)}
-  .ring-read.wait b{color:rgba(255,255,255,.5)}
-  .ring-read.spin b{color:var(--gold)}
+  .ring-read.wait b{color:rgba(23,33,31,.55)}
+  .ring-read.spin b{color:var(--punch)}
   .ring-read.result b.ring-token{font-size:clamp(38px,4.6vw,58px)}
   .ring-read.result.wicket b{color:var(--dangerc)}
-  .ring-read.result.boundary b{color:var(--gold)}
+  .ring-read.result.boundary b{color:#f08f00}
   .ring-read.result.run b{color:var(--goodc)}
-  .ring-read.result.extra b{color:#b98cff}
+  .ring-read.result.extra b{color:#8a52e8}
   .ring-center.slam .ring-read{animation:ringSlam .5s cubic-bezier(.2,1.6,.4,1)}
   @keyframes ringSlam{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
   #match .av-pitch.resolving{cursor:pointer}
   /* commentary + foot inside pitch */
   #match .av-pitch .commentary-strip{position:relative;z-index:2}
-  #match .commentary-strip.quiet,#match .commentary-strip.quiet.muted{color:#a9c0b1 !important}
-  #match .commentary-strip.live .c-line{color:#dcebdc !important}
+  #match .commentary-strip.quiet,#match .commentary-strip.quiet.muted{color:#fff !important;text-shadow:1.5px 1.5px 0 rgba(23,33,31,.6)}
+  #match .commentary-strip.live .c-line{color:#fff !important;text-shadow:1.5px 1.5px 0 rgba(23,33,31,.7)}
   /* ---------- your hand: the fan (tucks over the pitch edge) ----------
      The HOLDER never transforms on hover — only the card inside zooms.
      A stable hitbox means no enter/leave flicker (the jitter bug). */
@@ -7099,14 +7107,14 @@ function fieldRingSVG(strip,opts={}){
     const label=d.tk==="0"?"&#9679;":d.tk;
     const pct=wide?`<text x="${lx}" y="${(ly+17).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="rgba(255,255,255,.85)" stroke="#0a1214" stroke-width="2.5" paint-order="stroke">${Math.round(d.frac*100)}%</text>`:"";
     return `<g class="ring-sec ${opts.changed&&opts.changed.has(d.tk)?'flash':''}" data-tk="${d.tk}">
-      <path d="${ringArcPath(cx,cy,r0,r1,a0,a1)}" fill="${RING_COLORS[d.tk]||"#46605a"}" stroke="#0a1214" stroke-width="2.5"/>
-      <text x="${lx}" y="${(ly+(wide?2:6)).toFixed(1)}" text-anchor="middle" font-size="${d.tk==="0"?fs*.72:fs.toFixed(0)}" font-weight="700" fill="#fff" stroke="#0a1214" stroke-width="3.5" paint-order="stroke">${label}</text>${pct}
+      <path d="${ringArcPath(cx,cy,r0,r1,a0,a1)}" fill="${RING_COLORS[d.tk]||"#46605a"}" stroke="#fff6e3" stroke-width="3"/>
+      <text x="${lx}" y="${(ly+(wide?2:6)).toFixed(1)}" text-anchor="middle" font-size="${d.tk==="0"?fs*.72:fs.toFixed(0)}" font-weight="700" fill="#fff" stroke="#17211f" stroke-width="3.5" paint-order="stroke">${label}</text>${pct}
     </g>`;
   }).join("");
   return `<svg class="ring-svg" viewBox="0 0 340 340" aria-hidden="true">
-    <circle cx="${cx}" cy="${cy}" r="${r0+6}" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="2" stroke-dasharray="3 7"/>
-    <circle cx="${cx}" cy="${cy}" r="${r1-6}" fill="#0e1a16"/>
-    <rect x="${cx-13}" y="${cy-40}" width="26" height="80" rx="6" fill="#c9ad6f" opacity=".28"/>
+    <circle cx="${cx}" cy="${cy}" r="${r0+6}" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2.5" stroke-dasharray="3 8"/>
+    <circle cx="${cx}" cy="${cy}" r="${r1-4}" fill="#ecd9a4" stroke="#17211f" stroke-width="2.5"/>
+    <rect x="${cx-13}" y="${cy-40}" width="26" height="80" rx="6" fill="#fff" opacity=".45"/>
     ${secs}
   </svg>`;
 }
