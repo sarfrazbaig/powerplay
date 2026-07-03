@@ -5153,23 +5153,62 @@
   .screen, .screen.active{background:transparent !important}
   /* ---------- match board grid ---------- */
   #match.screen.active{
-    display:grid !important;
-    grid-template-columns:1fr !important;
-    grid-template-rows:auto auto minmax(0,1fr) auto auto !important;
-    grid-template-areas:none !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
     gap:8px !important;
     padding:8px clamp(18px,2vw,44px) 10px !important;
     height:100dvh !important;
     width:100%;
     overflow:hidden;
   }
+  #match .top,#match .scorebug{flex:0 0 auto}
+  #match .av-ground{flex:1 1 0;min-height:0}
+  /* ---------- THE GROUND: one surface holds everything ----------
+     Rival bench at the top edge, dugout & kit bag as chalk-painted
+     zones on the grass, your hand standing at the bottom rope.
+     One grid — the pieces cannot drift apart at any screen size. */
+  .av-ground{
+    position:relative;border-radius:22px;min-height:0;min-width:0;
+    display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+    gap:clamp(4px,.8vh,10px);
+    padding:clamp(8px,1vw,18px) clamp(12px,1.4vw,26px);
+    overflow:hidden;
+    background:radial-gradient(62% 80% at 50% 44%, #7cc94f 0%, #64b23e 55%, #4f9433 100%);
+    border:3px solid var(--ink);
+    box-shadow:6px 6px 0 rgba(23,33,31,.55);
+  }
+  .av-ground::before{ /* chalk boundary + sun glare + mown stripes */
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(closest-side at 50% 44%, transparent 95.5%, rgba(255,255,255,.6) 97%, transparent 98.5%),
+      radial-gradient(500px 260px at 78% -4%, rgba(255,246,190,.35), transparent 70%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 60px, transparent 60px 120px);
+  }
+  .av-row2{
+    display:grid;grid-template-columns:minmax(112px,.5fr) minmax(0,3.2fr) minmax(112px,.5fr);
+    gap:clamp(10px,1.2vw,24px);min-height:0;position:relative;z-index:2;
+  }
+  .av-dock{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    padding:10px 8px;border-radius:14px;
+    min-height:0;height:100%;max-height:100%;overflow:hidden auto;
+    background:rgba(255,255,255,.10);
+    border:2.5px dashed rgba(255,255,255,.8);
+    align-self:stretch;
+  }
+  .av-dock .seat{width:min(120px,92%);flex:0 0 auto}
+  .av-dock .kit-card{width:min(120px,92%);flex:0 0 auto}
+  .av-dock .av-zonetag{color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(23,33,31,.5)}
   #match>*{grid-area:auto !important;min-width:0}
   #match .top{background:transparent !important;border:0 !important;box-shadow:none !important;padding:2px 6px !important}
   #match .top .match-title{color:var(--punch) !important;text-shadow:2.5px 2.5px 0 var(--ink) !important}
   #match .top .sub{color:#33413a !important}
   #match .top .sub b{color:var(--ink) !important}
-  /* ---------- rival dugout row ---------- */
-  .av-rivalrow{display:grid;gap:4px;justify-items:center}
+  /* ---------- rival bench: painted at the top edge of the ground ---------- */
+  .av-rivalrow{display:grid;gap:4px;justify-items:center;position:relative;z-index:3}
+  .av-rivalrow .av-zonetag{color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(23,33,31,.5)}
   .av-rivalhead{display:flex;align-items:center;gap:12px}
   .av-zonetag{
     font-family:Oswald,Arial,sans-serif;font-size:10px;font-weight:700;
@@ -5177,7 +5216,7 @@
   }
   .av-rivalmeta{font-size:11px;font-weight:800;color:var(--ink);background:var(--gold);border:2px solid var(--ink);border-radius:99px;padding:1px 10px}
   .av-rivalfan{display:flex;justify-content:center;align-items:flex-start;gap:0}
-  .rivhold{width:clamp(76px,5.6vw,120px);margin-left:max(-24px,-1.2vw);position:relative}
+  .rivhold{width:clamp(56px,min(5.6vw,9vh),120px);margin-left:max(-24px,-1.2vw);position:relative}
   .rivhold:first-child{margin-left:0}
   .rivhold .card{width:100%;pointer-events:none;transition:transform .16s ease;transform-origin:50% 0%}
   .rivhold:hover{z-index:30}
@@ -5189,18 +5228,6 @@
     position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
     background:var(--gold);color:#111;font-size:8px;font-weight:900;letter-spacing:1px;
     padding:2px 7px;border-radius:99px;border:2px solid #0c1214;white-space:nowrap;z-index:3;
-  }
-  /* ---------- stage: dugout | pitch | kit bag ---------- */
-  .av-stage{
-    display:grid;grid-template-columns:minmax(140px,.55fr) minmax(0,3fr) minmax(140px,.55fr);
-    gap:clamp(12px,1.2vw,26px);min-height:0;
-  }
-  .av-dugout,.av-kitbag{
-    display:flex;flex-direction:column;align-items:center;gap:10px;
-    padding:12px 8px;border-radius:16px;min-height:0;overflow:hidden auto;
-    background:var(--nite);
-    border:3px solid var(--ink);
-    box-shadow:5px 5px 0 rgba(23,33,31,.55);
   }
   .seats,.kits{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
   .seat{
@@ -5249,21 +5276,11 @@
   .kit-empty{display:grid;place-items:center;padding:14px 0}
   .bag-ill{width:56px;color:rgba(23,33,31,.16)}
   /* ---------- the pitch ---------- */
-  #match .av-pitch{
-    position:relative;border-radius:20px;min-height:0;min-width:0;
-    display:grid;grid-template-rows:minmax(0,1fr) auto auto;gap:4px;
-    padding:10px 16px 10px;overflow:hidden;
-    background:
-      radial-gradient(60% 78% at 50% 46%, #7cc94f 0%, #64b23e 55%, #4f9433 100%);
-    border:3px solid var(--ink);
-    box-shadow:6px 6px 0 rgba(23,33,31,.55);
-  }
-  #match .av-pitch::before{ /* chalk boundary + sun glare + mown stripes */
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background:
-      radial-gradient(closest-side at 50% 46%, transparent 96%, rgba(255,255,255,.65) 97.5%, transparent 99%),
-      radial-gradient(500px 260px at 78% -4%, rgba(255,246,190,.35), transparent 70%),
-      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 60px, transparent 60px 120px);
+  #match .av-pitch{ /* the center of the ground — transparent, the GROUND is the surface */
+    position:relative;min-height:0;min-width:0;
+    display:grid;grid-template-rows:minmax(0,1fr) auto;gap:4px;
+    padding:4px 8px;overflow:visible;
+    background:none;border:0;box-shadow:none;
   }
   .av-duelrow{
     display:grid;grid-template-columns:minmax(160px,340px) minmax(280px,540px) minmax(160px,340px);
@@ -5272,7 +5289,7 @@
     min-height:0;position:relative;z-index:2;
   }
   .av-duelrow .dslot{display:grid;gap:6px;justify-items:center;min-width:0}
-  .av-duelrow .dslot .card{height:min(38vh,430px) !important;width:auto !important;aspect-ratio:5/7}
+  #match .av-duelrow .dslot .card{height:min(430px,calc(100dvh - 525px)) !important;min-height:172px !important;width:auto !important;aspect-ratio:5/7;min-width:0 !important}
   .av-duelrow .dslot .card .cflip,.av-duelrow .dslot .card .cface,.av-duelrow .dslot .card .tc{height:100%}
   .av-duelrow .dslot .dlabel{
     display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:99px;
@@ -5280,8 +5297,8 @@
     background:var(--ink);color:#fff6e3;border:2px solid var(--ink);
   }
   .av-duelrow .dslot .dlabel svg{width:13px;height:13px}
-  .av-duelrow .placeholder{
-    height:min(38vh,430px) !important;
+  #match .av-duelrow .placeholder{
+    height:min(430px,max(172px,calc(100dvh - 525px))) !important;
     width:auto !important;
     aspect-ratio:5/7;border-radius:14px;
     border:3px dashed rgba(255,255,255,.75) !important;display:grid;place-items:center;
@@ -5309,7 +5326,10 @@
   }
   @keyframes fhBob{0%,100%{transform:translateX(-50%) rotate(-2deg)}50%{transform:translateX(-50%) rotate(2deg)}}
   /* ---------- the field ring ---------- */
-  .av-ringwrap{position:relative;width:min(100%,min(500px,50vh));aspect-ratio:1;margin:0 auto}
+  /* the wheel sizes to the height that actually exists for its row:
+     viewport minus top bar, rival bench, hand, scorebug and chrome */
+  .av-ringwrap{position:relative;width:min(100%,500px,calc(100dvh - 515px));min-width:200px;aspect-ratio:1;margin:0 auto}
+  #match .av-pitch .commentary-strip{max-height:26px;overflow:hidden;font-size:12.5px !important;padding:2px 0 !important}
   .ring-svg.idle{opacity:.85;filter:saturate(.8)}
   /* real CTAs: fixed dock, bottom-right of the pitch — never inside the wheel */
   .av-cta{
@@ -5355,7 +5375,12 @@
     font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.8px;
     font-size:clamp(18px,1.9vw,27px);color:var(--chalk);line-height:1.05;
   }
-  .ring-read span{font-size:11px;font-weight:800;color:var(--mutn);letter-spacing:1px;text-transform:uppercase}
+  .ring-read span{font-size:11px;font-weight:800;color:var(--mutn);letter-spacing:.8px;text-transform:uppercase;max-width:180px;line-height:1.35}
+  .ring-cap{
+    position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+    font-size:9.5px;font-weight:800;letter-spacing:2px;white-space:nowrap;
+    color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(23,33,31,.55);
+  }
   .ring-read.favored b{color:var(--goodc)}
   .ring-read.danger b{color:var(--dangerc)}
   .ring-read.wait b{color:rgba(23,33,31,.55)}
@@ -5372,17 +5397,17 @@
   #match .av-pitch .commentary-strip{position:relative;z-index:2}
   #match .commentary-strip.quiet,#match .commentary-strip.quiet.muted{color:#fff !important;text-shadow:1.5px 1.5px 0 rgba(23,33,31,.6)}
   #match .commentary-strip.live .c-line{color:#fff !important;text-shadow:1.5px 1.5px 0 rgba(23,33,31,.7)}
-  /* ---------- your hand: the fan (tucks over the pitch edge) ----------
+  /* ---------- your hand: standing at the bottom rope of the ground ----
      The HOLDER never transforms on hover — only the card inside zooms.
      A stable hitbox means no enter/leave flicker (the jitter bug). */
-  .av-fanwrap{position:relative;height:clamp(150px,19vh,250px);z-index:8;overflow:visible;margin-top:-42px}
+  .av-fanwrap{position:relative;height:clamp(112px,16vh,230px);z-index:8;overflow:visible}
   .av-fan{
     position:relative;height:100%;display:flex;justify-content:center;align-items:flex-end;
     padding-bottom:2px;
   }
   .av-scanmine{position:absolute;right:14px;bottom:10px;z-index:40}
   .fanhold{
-    width:clamp(118px,8.6vw,196px);flex:0 0 auto;margin-left:max(-52px,-2.6vw);position:relative;
+    width:clamp(96px,min(8.6vw,13vh),196px);flex:0 0 auto;margin-left:max(-52px,-2.6vw);position:relative;
     transform:rotate(var(--rot)) translateY(calc(14px + var(--lift,0px)));
     transform-origin:50% 130%;
     z-index:var(--z);
@@ -5520,18 +5545,18 @@
       </div>
     </div>
 
-    <div class="av-rivalrow">
-      <div class="av-rivalhead"><span class="av-zonetag">RIVAL DUGOUT</span><span class="av-rivalmeta" id="rivalStripMeta"></span><button class="btn secondary sm" id="scanBtn" title="Scout the rival's full squad">Scout ▸</button></div>
-      <div class="av-rivalfan" id="rivalStrip"></div>
+    <div class="av-ground">
+      <div class="av-rivalrow">
+        <div class="av-rivalhead"><span class="av-zonetag">RIVAL DUGOUT</span><span class="av-rivalmeta" id="rivalStripMeta"></span><button class="btn secondary sm" id="scanBtn" title="Scout the rival's full squad">Scout ▸</button></div>
+        <div class="av-rivalfan" id="rivalStrip"></div>
+      </div>
+      <div class="av-row2">
+        <aside class="av-dock" id="dugout"></aside>
+        <div class="av-pitch" id="duel"></div>
+        <aside class="av-dock" id="kitbag"></aside>
+      </div>
+      <div class="av-fanwrap"><div class="av-fan" id="hand"></div></div>
     </div>
-
-    <div class="av-stage">
-      <aside class="av-dugout" id="dugout"></aside>
-      <div class="av-pitch" id="duel"></div>
-      <aside class="av-kitbag" id="kitbag"></aside>
-    </div>
-
-    <div class="av-fanwrap"><div class="av-fan" id="hand"></div></div>
 
     <div class="scorebug" id="scorebug"></div>
 
@@ -7165,6 +7190,33 @@ function setRingRead(b,s){
   const el=document.querySelector("#ringCenter .ring-read");
   if(el)el.innerHTML=`<b>${b}</b><span>${s}</span>`;
 }
+/* The narrator: WHY the zones move, in cricket words. Their card's
+   dominant weapon shapes stage 1; your card's best pairing edge (or
+   deficit) shapes stage 2. Same math the engine rolls with. */
+function stageNotes(res){
+  const bowlerC=m.phase==="bat"?res.rival:res.you;
+  const batterC=m.phase==="bat"?res.you:res.rival;
+  const b=effSubs(bowlerC,"bowl"),bt=effSubs(batterC,"bat");
+  let theirNote,yourNote;
+  if(m.phase==="bat"){
+    theirNote=[["pace & swing — the W zone grows",(b.movement+b.pace)/2],
+               ["nails the length — dots stack up",b.accuracy],
+               ["hides it well — boundaries shrink",b.deception]].sort((x,y)=>y[1]-x[1])[0][0];
+    const e=[["reads the swing — W zone shrinks",bt.technique-(b.movement+b.pace)/2],
+             ["rotates the strike — 1s & 2s grow",bt.timing-b.accuracy],
+             ["muscles it — boundary zones grow",bt.power-b.deception]].sort((x,y)=>y[1]-x[1]);
+    yourNote=e[0][1]>=0?e[0][0]:"outgunned — the field stays hostile";
+  }else{
+    theirNote=[["raw power — the SIX zone swells",bt.power],
+               ["quick hands — singles open up",bt.timing],
+               ["tight defence — your W zone shrinks",bt.technique]].sort((x,y)=>y[1]-x[1])[0][0];
+    const e=[["beats the bat — W zone grows",(b.movement+b.pace)/2-bt.technique],
+             ["dries up the runs — dots grow",b.accuracy-bt.timing],
+             ["cramps the swing — boundaries shrink",b.deception-bt.power]].sort((x,y)=>y[1]-x[1]);
+    yourNote=e[0][1]>=0?e[0][0]:"they're on top — hold your breath";
+  }
+  return {theirNote,yourNote};
+}
 function startResolveSequence(){
   clearSpin();
   const res=m.result;
@@ -7172,12 +7224,13 @@ function startResolveSequence(){
   const finalShape=ringFracs(res.strip);
   const theirName=res.rival.name.split(" ").pop().toUpperCase();
   const yourName=res.you.name.split(" ").pop().toUpperCase();
+  const notes=stageNotes(res);
   spinTimers.push(setTimeout(()=>{
-    setRingRead(theirName,m.phase==="bat"?"shapes the field":"comes out swinging");
+    setRingRead(theirName,notes.theirNote);
     animateRing(fracMap(GHOST_FRACS),theirShape);
-  },420));
+  },380));
   spinTimers.push(setTimeout(()=>{
-    setRingRead(yourName,"answers back");
+    setRingRead(yourName,notes.yourNote);
     animateRing(fracMap(theirShape),finalShape);
   },1500));
   spinTimers.push(setTimeout(()=>{
@@ -7264,7 +7317,7 @@ function renderDuel(pop=false){
   d.innerHTML=`${fh}
     <div class="av-duelrow ${danger?'threat':''}">
       ${youSlot}
-      <div class="av-ringwrap">${ringHTML}${centerBits}</div>
+      <div class="av-ringwrap">${ringHTML}${centerBits}<div class="ring-cap">BIGGER ZONE&nbsp;=&nbsp;MORE LIKELY</div></div>
       ${rivSlot}
     </div>
     ${commentaryHTML()}
