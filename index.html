@@ -4354,24 +4354,32 @@
     padding:4px 8px;overflow:visible;
     background:none;border:0;box-shadow:none;
   }
+  /* Everything sizes to the ACTUAL row height (100% of a stretched cell),
+     never a dvh guess — so cards/wheel can't overflow or clip at any size. */
   .av-duelrow{
-    display:grid;grid-template-columns:minmax(160px,340px) minmax(280px,540px) minmax(160px,340px);
-    align-items:center;justify-content:space-evenly;gap:clamp(10px,2vw,40px);
-    width:100%;
-    min-height:0;position:relative;z-index:2;
+    display:grid;grid-template-columns:minmax(150px,330px) minmax(260px,520px) minmax(150px,330px);
+    align-items:stretch;justify-content:space-evenly;gap:clamp(10px,2vw,40px);
+    width:100%;min-height:0;position:relative;z-index:2;
   }
-  .av-duelrow .dslot{display:grid;gap:6px;justify-items:center;min-width:0}
-  #match .av-duelrow .dslot .card{height:min(430px,calc(100dvh - 525px)) !important;min-height:172px !important;width:auto !important;aspect-ratio:5/7;min-width:0 !important}
+  .av-duelrow>.dslot,.av-duelrow>.you-col{min-width:0;min-height:0;height:100%}
+  .av-duelrow .dslot{display:flex;align-items:center;justify-content:center;position:relative}
+  #match .av-duelrow .dslot .card{
+    height:98% !important;width:auto !important;
+    max-height:420px !important;max-width:100% !important;
+    aspect-ratio:5/7;min-width:0 !important;min-height:0 !important;
+  }
   .av-duelrow .dslot .card .cflip,.av-duelrow .dslot .card .cface,.av-duelrow .dslot .card .tc{height:100%}
+  /* the You bowl / Rival bats label floats on the card's top edge */
   .av-duelrow .dslot .dlabel{
+    position:absolute;top:-11px;left:50%;transform:translateX(-50%);z-index:4;
     display:inline-flex;align-items:center;gap:6px;padding:3px 12px;border-radius:99px;
-    font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+    font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;
     background:var(--ink);color:#fff6e3;border:2px solid var(--ink);
   }
   .av-duelrow .dslot .dlabel svg{width:13px;height:13px}
   #match .av-duelrow .placeholder{
-    height:min(430px,max(172px,calc(100dvh - 525px))) !important;
-    width:auto !important;
+    height:100% !important;width:auto !important;
+    max-height:430px !important;max-width:100% !important;
     aspect-ratio:5/7;border-radius:14px;
     border:3px dashed rgba(255,255,255,.75) !important;display:grid;place-items:center;
     color:rgba(255,255,255,.85);font-size:34px;background:rgba(255,255,255,.10) !important;
@@ -4400,7 +4408,7 @@
   /* ---------- the field ring ---------- */
   /* the wheel sizes to the height that actually exists for its row:
      viewport minus top bar, rival bench, hand, scorebug and chrome */
-  .av-ringwrap{position:relative;width:min(100%,500px,calc(100dvh - 515px));min-width:200px;aspect-ratio:1;margin:0 auto}
+  .av-ringwrap{position:relative;height:97%;max-height:540px;aspect-ratio:1;width:auto;max-width:100%;margin:0 auto;align-self:center;justify-self:center}
   #match .av-pitch .commentary-strip{max-height:26px;overflow:hidden;font-size:12.5px !important;padding:2px 0 !important}
   .ring-svg.idle{opacity:.85;filter:saturate(.8)}
   /* real CTAs: fixed dock, bottom-right of the pitch — never inside the wheel */
@@ -4419,7 +4427,7 @@
   .ring-sec.flash path{animation:secFlash .9s ease}
   @keyframes secFlash{0%{filter:brightness(2.6)}100%{filter:brightness(1)}}
   .ring-center{
-    position:absolute;inset:18%;pointer-events:none;
+    position:absolute;inset:18%;pointer-events:none;z-index:6;
     display:flex !important;flex-direction:column;align-items:center;justify-content:center;gap:9px;
   }
   #match .ring-center .actions{
@@ -4444,11 +4452,12 @@
     font-size:9.5px;font-weight:800;letter-spacing:2px;white-space:nowrap;
     color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(23,33,31,.55);
   }
-  /* the carnival needle */
+  /* the ball-marker: a small arrow riding the inner rim, orbiting the
+     centre — never covers the commentary that lives in the middle */
   .ring-needle{
-    position:absolute;inset:0;pointer-events:none;z-index:2;
-    transform-origin:50% 50%;
-    filter:drop-shadow(0 2px 3px rgba(23,33,31,.4));
+    position:absolute;inset:0;pointer-events:none;z-index:4;
+    transform-origin:50% 50%;will-change:transform;
+    filter:drop-shadow(0 1px 2px rgba(23,33,31,.5));
   }
   .ring-needle svg{width:100%;height:100%;display:block}
   /* THE button: round, gold, dead center — eyes never leave the wheel */
@@ -4470,29 +4479,38 @@
   }
   .ring-center{gap:6px}
   .ring-center .actions{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:9px}
-  /* stance chips: the second verb, one glance each */
-  .stance-row{display:flex;gap:7px;justify-content:center}
+  /* stance chips: the second verb, one glance each — big enough to read */
+  .stance-row{display:flex;gap:8px;justify-content:center}
   .stance-chip{
-    width:clamp(52px,4.6vw,64px);border-radius:12px;padding:5px 2px 4px;
-    display:grid;justify-items:center;gap:1px;cursor:pointer;
-    background:#fff6e3;border:2.5px solid rgba(23,33,31,.45);color:var(--ink);
+    width:clamp(72px,6.2vw,92px);border-radius:13px;padding:8px 4px 7px;
+    display:grid;justify-items:center;gap:2px;cursor:pointer;
+    background:#fff6e3;border:3px solid rgba(23,33,31,.5);color:var(--ink);
     font-family:Oswald,Arial,sans-serif;
+    box-shadow:0 3px 0 rgba(23,33,31,.28);
     transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;
   }
-  .stance-chip i{font-style:normal;font-size:15px;line-height:1}
-  .stance-chip b{font-size:9px;font-weight:700;letter-spacing:.8px}
-  .stance-chip span{font-size:8px;font-weight:800;color:#7a6a4a;letter-spacing:.4px}
+  .stance-chip i{font-style:normal;font-size:21px;line-height:1}
+  .stance-chip b{font-size:12px;font-weight:700;letter-spacing:.6px}
+  .stance-chip span{font-size:9.5px;font-weight:800;color:#7a6a4a;letter-spacing:.3px}
   .stance-chip:hover{transform:translateY(-2px)}
   .stance-chip.on{
     border-color:var(--ink);background:var(--gold);
-    box-shadow:0 3px 0 var(--ink);
+    box-shadow:0 4px 0 var(--ink),0 0 16px rgba(255,201,60,.4);
   }
   .stance-chip.on span{color:#4a3d00}
-  /* stance dock lives under YOUR card — strategy at the crease */
-  .you-col{display:grid;gap:8px;justify-items:center;min-width:0;position:relative}
-  .you-col .stance-dock{display:flex;justify-content:center}
-  /* the compass spinner */
-  .ring-needle.spinning{animation:needleSpin .3s linear infinite}
+  /* stance dock overlays the bottom of YOUR card — strategy right at the
+     crease, zero layout cost so the card stays full size and symmetric */
+  .you-col{display:flex;align-items:center;justify-content:center;min-width:0;position:relative}
+  .you-col .dslot{height:100%}
+  .you-col .stance-dock{
+    position:absolute;left:50%;bottom:2px;transform:translateX(-50%);z-index:7;
+    display:flex;justify-content:center;
+    padding:5px 7px;border-radius:14px;
+    background:rgba(255,246,227,.86);border:2.5px solid var(--ink);
+    box-shadow:0 4px 0 rgba(23,33,31,.4);backdrop-filter:blur(1px);
+  }
+  /* the ball whipping round the field before it lands */
+  .ring-needle.spinning{animation:needleSpin .42s linear infinite}
   @keyframes needleSpin{to{transform:rotate(360deg)}}
   /* a coach FIRING is an event — the seat erupts */
   .seat.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
@@ -4503,15 +4521,21 @@
     100%{transform:scale(1)}
   }
   .kit-card.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
-  /* the bowler ARRIVES — cricket is sequential */
-  .dslot.frompile .card{animation:dealArrive .5s cubic-bezier(.2,.9,.3,1)}
+  /* the bowler ARRIVES from the top of the ground — cricket is sequential */
+  .dslot.frompile .card{animation:dealArrive .62s cubic-bezier(.18,.72,.24,1) both}
   @keyframes dealArrive{
-    from{transform:translate(70px,-150px) rotate(8deg);opacity:.15}
-    to{transform:none;opacity:1}
+    0%{transform:translate(0,-280px) rotate(-5deg);opacity:0}
+    55%{opacity:1}
+    100%{transform:none;opacity:1}
   }
   body.dragging-card{cursor:grabbing}
   body.dragging-card .av-ground{outline:3px dashed rgba(255,255,255,.5);outline-offset:-10px}
   .fanhold{touch-action:none}
+  /* the carried card: the clone must fill its fixed box (the height chain
+     is broken by position:fixed, so force it) */
+  .drag-ghost{display:block;filter:drop-shadow(0 12px 22px rgba(23,33,31,.45))}
+  .drag-ghost .cflip,.drag-ghost .cface,.drag-ghost .tc{width:100%!important;height:100%!important}
+  .drag-ghost .flipchip,.drag-ghost .cback{display:none}
   /* the over rail lives ON the ground, above the wheel — the timeline
      of the innings right where the eyes already are */
   .av-overarc{display:flex;justify-content:center;position:relative;z-index:3;padding-top:2px}
@@ -5805,7 +5829,10 @@ function getStripFor(mode,card){
 function setStance(st){
   if(m.result)return;
   m.stance=st;
-  renderDuel();
+  m.stripCache={};
+  // no preview means the wheel doesn't change — just move the highlight,
+  // no rebuild (no flash) on the board
+  document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
 }
 /* The full modifier chain, captured as BEATS at roll time — the resolve
    replays these exact strips one by one, so the theater IS the truth.
@@ -5881,8 +5908,7 @@ function resolveBowl(c){
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
   coachOutcome(out,"bowl");
   addHistory(out.text,`Bowl ${mine} v Bat ${theirs}`);
-  render(true);
-  settleResult(m.result);
+  enterResolve();
 }
 function resolveBat(c){
   const mine=batVal(c),theirs=bowlVal(m.challenge);
@@ -5908,13 +5934,24 @@ function resolveBat(c){
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
   coachOutcome(out,"bat");
   addHistory(out.text,`Bat ${mine} v Bowl ${theirs}`);
-  render(true);
-  settleResult(m.result);
+  enterResolve();
 }
-let settleTimer=null;
-// the ring spin sets result.spinDur; scores/equation update right when it lands
-function settleResult(result){clearTimeout(settleTimer);settleTimer=setTimeout(()=>{if(m?.result===result){m.result.state="settled";render()}},(result.spinDur||3200)+900)}
-function skipResolve(){if(m?.result&&m.result.state==="resolving"){clearTimeout(settleTimer);clearSpin();m.result.state="settled";render()}}
+let settleTimer=null; // legacy: some paths still clearTimeout it defensively
+function skipResolve(){
+  if(!(m?.result&&m.result.state==="resolving"))return;
+  clearSpin();
+  const res=m.result;
+  paintRing(ringSvgEl(),ringFracs(res.strip)); // final field first, so angles are right
+  const target=document.querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
+  const needle=$("#ringNeedle");
+  if(needle&&target){
+    const a0=parseFloat(target.dataset.a0),sw=parseFloat(target.dataset.sweep);
+    res.needleAt=res.needleAt??(a0+sw*0.5);
+    needle.classList.remove("spinning");needle.style.transition="none";
+    needle.style.transform=`rotate(${res.needleAt}deg)`;
+  }
+  finishLanding(res,target);
+}
 function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-9)}
 function end(title,text){
   clearTimeout(settleTimer);
@@ -6504,24 +6541,83 @@ function fieldRingSVG(strip,opts={}){
   </svg>`;
 }
 const GHOST_FRACS=["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}));
-/* Smooth morph: zones grow/shrink into their new share, then flash. */
+/* ---------- IN-PLACE wheel painting: mutate the existing SVG nodes,
+   never rebuild. One sector = one stable <g>; animation just moves the
+   path d + label. This kills the per-frame DOM thrash that made sectors
+   jump randomly and made the resolve feel like a new screen. ---------- */
+const RING_GEO={cx:170,cy:170,r0:158,r1:88,gap:2.2};
+function ringLayout(fracs){
+  const data=(fracs||[]).filter(d=>d.frac>0.0001);
+  const {gap}=RING_GEO,usable=360-gap*data.length;
+  let acc=-90,out=[];
+  for(const d of data){
+    const sweep=Math.min(354,usable*d.frac);
+    const a0=acc+gap/2,a1=a0+sweep;acc=a1+gap/2;
+    out.push({tk:d.tk,a0,a1,mid:(a0+a1)/2,sweep});
+  }
+  return out;
+}
+const SVGNS="http://www.w3.org/2000/svg";
+function ensureSector(svg,tk){
+  let g=svg.querySelector(`.ring-sec[data-tk="${tk}"]`);
+  if(g)return g;
+  g=document.createElementNS(SVGNS,"g");g.setAttribute("class","ring-sec");g.dataset.tk=tk;
+  const path=document.createElementNS(SVGNS,"path");
+  path.setAttribute("fill",RING_COLORS[tk]||"#46605a");path.setAttribute("stroke","#fff6e3");path.setAttribute("stroke-width","3");
+  const txt=document.createElementNS(SVGNS,"text");
+  txt.setAttribute("text-anchor","middle");txt.setAttribute("font-weight","700");txt.setAttribute("fill","#fff");
+  txt.setAttribute("stroke","#17211f");txt.setAttribute("stroke-width","3.5");txt.setAttribute("paint-order","stroke");
+  txt.textContent=tk==="0"?"●":tk;
+  g.appendChild(path);g.appendChild(txt);svg.appendChild(g);
+  return g;
+}
+function paintRing(svg,fracs){
+  if(!svg)return;
+  const {cx,cy,r0,r1}=RING_GEO,lr=(r0+r1)/2,lay=ringLayout(fracs),seen=new Set();
+  for(const s of lay){
+    seen.add(s.tk);
+    const g=ensureSector(svg,s.tk),path=g.querySelector("path"),txt=g.querySelector("text");
+    path.setAttribute("d",ringArcPath(cx,cy,r0,r1,s.a0,s.a1));
+    const midR=s.mid*Math.PI/180;
+    txt.setAttribute("x",(cx+Math.cos(midR)*lr).toFixed(1));
+    txt.setAttribute("y",(cy+Math.sin(midR)*lr+6).toFixed(1));
+    const fs=Math.max(15,Math.min(27,s.sweep*.5));
+    txt.setAttribute("font-size",(s.tk==="0"?fs*.72:fs).toFixed(1));
+    txt.setAttribute("opacity",s.sweep<11?"0":"1");
+    g.dataset.mid=(s.mid+90).toFixed(1);g.dataset.a0=(s.a0+90).toFixed(1);g.dataset.sweep=s.sweep.toFixed(1);
+  }
+  svg.querySelectorAll(".ring-sec").forEach(g=>{if(!seen.has(g.dataset.tk))g.remove()});
+}
+function ringSvgEl(){return document.querySelector(".av-ringwrap .ring-svg")}
 let morphRAF=null;
-function animateRing(prevMap,data){
+/* Each changed sector eases into its new size, but STAGGERED — one after
+   the other — so the eye follows what changed instead of everything
+   shifting at once. */
+function animateRing(prevMap,data,opts={}){
   cancelAnimationFrame(morphRAF);
-  const union=RING_ORDER.filter(t=>(prevMap[t]||0)>0.0001||data.some(d=>d.tk===t&&d.frac>0.0001));
-  const from=union.map(t=>prevMap[t]||0);
-  const to=union.map(t=>{const d=data.find(x=>x.tk===t);return d?d.frac:0});
-  const changed=new Set(union.filter((t,i)=>Math.abs(from[i]-to[i])>0.004));
-  if(!changed.size)return;
-  const t0=performance.now(),dur=420;
+  const svg=ringSvgEl();if(!svg)return;
+  const union=RING_ORDER.filter(t=>(prevMap[t]||0)>1e-4||data.some(d=>d.tk===t&&d.frac>1e-4));
+  const from={},to={};
+  union.forEach(t=>{from[t]=prevMap[t]||0;to[t]=(data.find(d=>d.tk===t)?.frac)||0});
+  const changed=union.filter(t=>Math.abs(from[t]-to[t])>0.004);
+  if(!changed.length){paintRing(svg,data);return}
+  const stagger=opts.stagger??150,dur=opts.dur??430,startAt={};
+  changed.forEach((t,i)=>startAt[t]=i*stagger);
+  const total=dur+stagger*Math.max(0,changed.length-1),t0=performance.now();
   const step=now=>{
-    const host=document.querySelector(".av-ringwrap .ring-svg:not(.ghost)");
-    if(!host)return;
-    const p=Math.min(1,(now-t0)/dur);
-    const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
-    const cur=union.map((t,i)=>({tk:t,frac:from[i]+(to[i]-from[i])*e}));
-    host.outerHTML=fieldRingSVG(null,{fracs:cur,changed:p>=1?changed:null});
-    if(p<1)morphRAF=requestAnimationFrame(step);
+    const el=now-t0;
+    const cur=union.map(t=>{
+      const s=(t in startAt)?startAt[t]:0;
+      const p=Math.max(0,Math.min(1,(el-s)/dur));
+      const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+      return {tk:t,frac:from[t]+(to[t]-from[t])*e};
+    });
+    paintRing(svg,cur);
+    if(el<total)morphRAF=requestAnimationFrame(step);
+    else{
+      paintRing(svg,data);
+      if(opts.flash)changed.forEach(t=>{const g=svg.querySelector(`.ring-sec[data-tk="${t}"]`);if(g){g.classList.remove("flash");void g.offsetWidth;g.classList.add("flash");setTimeout(()=>g.classList.remove("flash"),650)}});
+    }
   };
   morphRAF=requestAnimationFrame(step);
 }
@@ -6552,68 +6648,87 @@ function setRingRead(b,s){
   const el=document.querySelector("#ringCenter .ring-read");
   if(el)el.innerHTML=`<b>${b}</b><span>${s}</span>`;
 }
+/* Enter the resolve WITHOUT rebuilding the board — mutate the same DOM
+   the player was just looking at, so it reads as one continuous motion. */
+function enterResolve(){
+  const d=$("#duel");if(!d)return;
+  d.querySelector(".you-col .stance-dock")?.remove();
+  const a=$("#actions");if(a)a.innerHTML="";
+  const rc=$("#ringCenter");
+  if(rc){rc.classList.remove("slam");rc.innerHTML=`<div class="ring-read spin"><b>THE BALL</b><span>tap to skip &#9654;</span></div>`}
+  d.classList.remove("settled");d.classList.add("resolving");
+  const ms=$("#match");if(ms){ms.classList.add("is-resolving");ms.classList.remove("is-settled","is-card-locked","is-previewing")}
+  renderHand();               // the played card leaves the hand for the crease
+  m.result.spinStarted=true;
+  m.result.spinDur=startResolveSequence();
+}
 function startResolveSequence(){
   clearSpin();
   const res=m.result;
-  const from=m.theirShape||GHOST_FRACS;
+  // make sure the wheel currently shows THEIR shape (where the story starts)
+  paintRing(ringSvgEl(),m.theirShape||GHOST_FRACS);
   const beats=res.beats||[];
   const needle=$("#ringNeedle");
-  if(needle)needle.classList.add("spinning"); // supersonic while the story plays
-  let t=380,prev=from;
+  if(needle){needle.style.transition="none";needle.classList.add("spinning")}
+  let t=520,prev=m.theirShape||GHOST_FRACS;
   beats.forEach(b=>{
     const shape=ringFracs(b.strip),pv=prev;
+    const changes=RING_ORDER.filter(tk=>Math.abs((fracMap(pv)[tk]||0)-(fracMap(shape)[tk]||0))>0.004).length;
     spinTimers.push(setTimeout(()=>{
       setRingRead(b.label,b.note);
-      animateRing(fracMap(pv),shape);
-      if(b.kind==="coach"){
-        const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);
-        if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}
-      }
-      if(b.kind==="tool"){
-        const k=document.querySelector(".kit-card.armed");
-        if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}
-      }
+      animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
+      if(b.kind==="coach"){const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
+      if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
     },t));
-    t+=840;
+    t+=760+170*Math.max(0,changes-1); // slow enough to read each beat's cascade
     prev=shape;
   });
-  const landAt=t+220;
-  spinTimers.push(setTimeout(()=>{setRingRead("...","");landNeedle(res)},landAt));
-  return landAt+1850;
+  const landAt=t+260;
+  spinTimers.push(setTimeout(()=>{setRingRead("&#8230;","the ball is in the air");landNeedle(res)},landAt));
+  return landAt+1900;
 }
 function currentRotationDeg(el){
   const t=getComputedStyle(el).transform;
   if(!t||t==="none")return 0;
   const mm=t.match(/matrix\(([-\d.]+),\s*([-\d.]+)/);
-  return mm?Math.atan2(+mm[2],+mm[1])*180/Math.PI:0;
+  return mm?(Math.atan2(+mm[2],+mm[1])*180/Math.PI+360)%360:0;
 }
 function landNeedle(res){
+  paintRing(ringSvgEl(),ringFracs(res.strip)); // settle the field so angles are final
   const target=document.querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
   const needle=$("#ringNeedle");
   if(!needle||!target){finishLanding(res,target);return}
   const a0=parseFloat(target.dataset.a0),sweep=parseFloat(target.dataset.sweep);
-  const land=a0+sweep*(0.08+0.84*Math.random());
+  const land=a0+sweep*(0.12+0.76*Math.random()); // anywhere in the zone
   res.needleAt=land;
-  const cur=((currentRotationDeg(needle)%360)+360)%360;
+  const cur=currentRotationDeg(needle);
   needle.classList.remove("spinning");
   needle.style.transition="none";
   needle.style.transform=`rotate(${cur}deg)`;
   void needle.offsetWidth;
-  needle.style.transition="transform 1650ms cubic-bezier(.08,.65,.1,1)";
-  needle.style.transform=`rotate(${cur+360+((land-cur%360)+360)%360}deg)`;
-  spinTimers.push(setTimeout(()=>finishLanding(res,target),1700));
+  const delta=((land-cur)%360+360)%360;      // shortest forward path
+  needle.style.transition="transform 1750ms cubic-bezier(.09,.62,.11,1)";
+  needle.style.transform=`rotate(${cur+720+delta}deg)`; // two more laps, then settle
+  spinTimers.push(setTimeout(()=>finishLanding(res,target),1780));
 }
 function finishLanding(res,target){
+  m.result.state="settled";
   if(target)target.classList.add("landed");
+  paintRing(ringSvgEl(),ringFracs(res.strip));
+  if(target){const n=$("#ringNeedle");if(n&&res.needleAt!=null){n.style.transition="none";n.style.transform=`rotate(${res.needleAt}deg)`}}
   const c=$("#ringCenter");
-  if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
-  const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
+  if(c){c.innerHTML=`${ringResultHTML()}<div class="actions" id="actions"><button class="ring-go next" id="nextBall">NEXT<br>BALL</button></div>`;c.classList.add("slam");const nb=$("#nextBall");if(nb)nb.onclick=nextBall}
+  const d=$("#duel");if(d){d.classList.remove("resolving");d.classList.add("settled","ball-landed")}
+  const ms=$("#match");if(ms){ms.classList.remove("is-resolving");ms.classList.add("is-settled")}
+  const win=resultWinner(res);
+  d?.querySelector(".you-col .dslot")?.classList.toggle("winner",win==="you");
+  d?.querySelectorAll(".av-duelrow > .dslot")?.forEach(s=>s.classList.toggle("winner",win==="rival"));
+  renderScorebug();           // reveal the score exactly as it lands
+  const cs=d?.querySelector(".commentary-strip");
+  if(cs){cs.className="commentary-strip quiet";cs.textContent=commentaryLines(res)[2]}
   const g=document.querySelector(".av-ground");
   const tk=res.strip[res.roll];
-  if(g){
-    const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;
-    if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
-  }
+  if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
 }
 /* Danger / answer telegraphs: the rival card menaces when it outguns your
    best available answer; your pick calms the board when it answers back. */
@@ -6656,11 +6771,13 @@ function renderDuel(pop=false){
     renderActions();return;
   }
   const resolving=m.result?.state==="resolving";
-  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 112 L181 170 L170 163 L159 170 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><circle cx="170" cy="170" r="8" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/></svg></div>`;
+  // small arrow riding the inner rim, pointing outward — orbits the centre,
+  // never covers the commentary that sits in the middle
+  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 62 L179 88 L170 82 L161 88 Z" fill="#ff2f14" stroke="#17211f" stroke-width="2.5"/></svg></div>`;
   const centerBits=resolving
-    ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE BALL IS COMING</b><span>tap to skip ▸</span></div></div>`
+    ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE BALL</b><span>tap to skip &#9654;</span></div></div>`
     :m.result
-      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"></div></div>`
+      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"><button class="ring-go next" id="nextBall">NEXT<br>BALL</button></div></div>`
       :`<div class="ring-center" id="ringCenter">${ringCenterRead()}<div class="actions" id="actions"></div></div>`;
   d.innerHTML=`${fh}
     <div class="av-overarc">${renderOverStrip()}</div>
@@ -6675,14 +6792,14 @@ function renderDuel(pop=false){
   d.classList.remove("ball-landed");
   d.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
   if(resolving&&!m.result.spinStarted){
-    m.result.spinStarted=true;
-    m.result.spinDur=startResolveSequence();
+    // fallback only — normal entry is enterResolve (in place, no rebuild)
+    enterResolve();
   }else if(m.result?.state==="settled"){
     const el=d.querySelector(`.ring-sec[data-tk="${m.result.strip[m.result.roll]}"]`);
     if(el){
       el.classList.add("landed");
       const n=$("#ringNeedle");
-      if(n)n.style.transform=`rotate(${m.result.needleAt??el.dataset.mid}deg)`; // needle rests where it landed
+      if(n)n.style.transform=`rotate(${m.result.needleAt??el.dataset.mid}deg)`;
     }
   }else if(!m.result&&m.introPending){
     m.introPending=false;
@@ -6701,7 +6818,6 @@ function renderDuel(pop=false){
     m.__dealFrom=null;
   }
   renderActions();
-  if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
 }
 /* Ball intro: the bowler ARRIVES, then his attributes warp the field
    beat by beat — now the player thinks. Cricket is sequential. */
@@ -6728,12 +6844,17 @@ function midFracs(a,b){
 function playBallIntro(){
   clearSpin();
   const their=m.theirShape;if(!their)return;
+  const role=m.phase==="bat"?"in to bowl":"out to bat";
   const name=m.challenge.name.split(" ").pop().toUpperCase();
   const notes=theirIntroNotes();
   const half=midFracs(GHOST_FRACS,their);
-  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half)},520));
-  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their)},1500));
-  spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your answer")},2450));
+  paintRing(ringSvgEl(),GHOST_FRACS);
+  // the bowler ARRIVES first (deliberate pause), THEN shapes the field,
+  // one attribute at a time — not an instant automatic snap
+  setRingRead(name,role);
+  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half,{stagger:180,dur:480,flash:true})},1000));
+  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their,{stagger:180,dur:480,flash:true})},2300));
+  spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your answer")},3500));
 }
 /* ---------- DUGOUT (coach art, not text) + KIT BAG (armable tools) */
 function renderDugout(){
@@ -7390,8 +7511,11 @@ document.addEventListener("pointerdown",e=>{
   dragOX=e.clientX-r.left;dragOY=e.clientY-r.top;
   const src=h.querySelector(".card");
   if(!src)return;
+  const cr=src.getBoundingClientRect();
+  dragOX=e.clientX-cr.left;dragOY=e.clientY-cr.top;
   dragGhost=src.cloneNode(true);
-  Object.assign(dragGhost.style,{position:"fixed",left:r.left+"px",top:r.top+"px",width:r.width+"px",height:"auto",zIndex:999,pointerEvents:"none",opacity:0,margin:0,transition:"none"});
+  dragGhost.className="card drag-ghost";
+  Object.assign(dragGhost.style,{position:"fixed",left:cr.left+"px",top:cr.top+"px",width:cr.width+"px",height:cr.height+"px",zIndex:999,pointerEvents:"none",opacity:0,margin:0,transition:"none"});
   document.body.appendChild(dragGhost);
 });
 document.addEventListener("pointermove",e=>{
@@ -7442,6 +7566,7 @@ function pointerInHost(host,e,pad=26){
   return !!r&&e.clientX>=r.left-pad&&e.clientX<=r.right+pad&&e.clientY>=r.top-pad&&e.clientY<=r.bottom+pad;
 }
 document.addEventListener("pointermove",e=>{
+  if(dragGhost){clearMatchParallax();return}
   if(document.querySelector("#match.screen.active .duel.resolving")){clearMatchParallax();return}
   const targetHost=matchParallaxTarget(e.target);
   const host=targetHost||(parallaxHost&&pointerInHost(parallaxHost,e)?parallaxHost:null);
