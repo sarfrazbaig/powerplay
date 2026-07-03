@@ -4530,6 +4530,9 @@
   .bug-heat .heat-lbl{font-weight:900;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
   .bug-heat.heat-fire .heat-lbl{color:#ff4d1c}
   .bug-heat.heat-warm .heat-lbl{color:#ff8a2b}
+  .bug-cell.scored{animation:bugScored .6s cubic-bezier(.2,1.5,.3,1)}
+  .bug-cell.scored b{color:#1e8a4a !important}
+  @keyframes bugScored{0%{background:#d6f5dd}45%{background:#e6f9ec}100%{background:#fffdf4}}
   .heat-explain{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:38;max-width:min(560px,86%);
     background:var(--nite,#fff6e3);color:var(--ink,#17211f);border:3px solid var(--ink,#17211f);border-radius:14px;
     box-shadow:0 6px 0 rgba(23,33,31,.4);padding:11px 18px;font-family:"Work Sans",sans-serif;font-weight:700;
@@ -7128,9 +7131,28 @@ function renderScorebug(){
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
     <div class="bug-cell bug-over"><span>This over</span>${renderOverStrip()}</div>
     <div class="bug-cell bug-heat heat-${momentumState()||'cold'}"><span>Heat</span>${heatBarHTML()}</div>
-    <div class="bug-cell"><span>You</span><b>${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
-    <div class="bug-cell"><span>Rival</span><b>${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
+    <div class="bug-cell bug-score-you"><span>You</span><b data-run="you">${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
+    <div class="bug-cell bug-score-rival"><span>Rival</span><b data-run="rival">${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
     <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
+  // "number go up": when a side's score jumps, tick it up + flash the cell
+  const you=v.you.runs,rival=v.rival.runs;
+  const bump=(sel,from,to,wk)=>{const b=document.querySelector(sel);if(!b)return;countUp(b,from,to,wk);const cell=b.closest(".bug-cell");if(cell){cell.classList.remove("scored");void cell.offsetWidth;cell.classList.add("scored")}};
+  if(m.__shownYou!=null&&you>m.__shownYou)bump('#scorebug [data-run="you"]',m.__shownYou,you,v.you.wk);
+  if(m.__shownRival!=null&&rival>m.__shownRival)bump('#scorebug [data-run="rival"]',m.__shownRival,rival,v.rival.wk);
+  m.__shownYou=you;m.__shownRival=rival;
+}
+function countUp(el,from,to,wk,dur=620){
+  if(!el)return;
+  if(el.__cuRAF)cancelAnimationFrame(el.__cuRAF);   // never overlap
+  const final=`${to}/${wk}`;
+  if(to<=from){el.textContent=final;return}
+  const start=performance.now();
+  const step=now=>{
+    const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=`${Math.round(from+(to-from)*e)}/${wk}`;
+    if(p<1)el.__cuRAF=requestAnimationFrame(step);else{el.textContent=final;el.__cuRAF=null}
+  };
+  el.__cuRAF=requestAnimationFrame(step);
 }
 function heatBarHTML(){
   const n=m.momentum||0,st=momentumState();
