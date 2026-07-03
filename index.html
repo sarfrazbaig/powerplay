@@ -6235,7 +6235,7 @@ function applyMatchModifiers(mode,strip,card){
    As it climbs, the wheel literally reshapes in your favour — but a wicket
    (batting) or a boundary conceded (bowling) resets it to zero. That's the
    real per-ball decision: cash in the heat, or protect it. ---------------- */
-const MOM_WARM=2, MOM_FIRE=4, MOM_CAP=6;
+const MOM_WARM=1, MOM_FIRE=3, MOM_CAP=6;
 function fireThreshold(){return activeCoaches().some(c=>c.fireEarly)?MOM_FIRE-1:MOM_FIRE}  // Furnace: catch fire sooner
 function momentumSlots(){const n=m?.momentum||0;return n>=fireThreshold()?2+(activeCoaches().some(c=>c.fireBoost)?1:0):n>=MOM_WARM?1:0}
 function momentumState(){const n=m?.momentum||0;return n>=fireThreshold()?"fire":n>=MOM_WARM?"warm":null}
