@@ -3183,20 +3183,22 @@
   }
   .packx:not(:hover) .packx-tilt .pack-art{transition:transform .5s cubic-bezier(.2,.8,.2,1)}
   .packx-cta{
-    padding:8px 18px;
-    border:3px solid #050505;
-    background:#12c79a;
-    color:#06110e;
+    padding:9px 20px;
+    border:3px solid var(--ink,#17211f);
+    background:var(--gold,#ffc93c);
+    color:#17211f;
     font-family:"Work Sans",Inter,sans-serif;
     font-weight:900;
     font-size:13px;
+    letter-spacing:.5px;
     text-transform:uppercase;
-    box-shadow:3px 3px 0 #050505;
+    border-radius:11px;
+    box-shadow:0 4px 0 var(--ink,#17211f);
     transition:transform .1s ease;
   }
   .packx:not(:disabled):hover .packx-cta{transform:translateY(-2px)}
-  .packx-cta.opened{background:#ffd91f}
-  .packx-cta.picked{background:#9aa39c;color:#2c332e}
+  .packx-cta.opened{background:#fff6e3}
+  .packx-cta.picked{background:#cdbfa4;color:#4a3d24;box-shadow:0 4px 0 rgba(23,33,31,.5)}
   .packx.picked .pack-art{filter:grayscale(.85) brightness(.8)}
   .packx.picked .packx-tilt{animation:none}
   .packx-stamp{
@@ -4755,11 +4757,40 @@
     box-shadow:0 3px 0 var(--ink)}
   .purse .coindot{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff2b0,#f0b400 70%,#c98a00);
     border:2px solid var(--ink);display:inline-block;flex:0 0 auto}
-  .purse.bump{animation:purseBump .4s cubic-bezier(.2,1.5,.4,1)}
+  .purse.bump,.coins-tag.bump{animation:purseBump .4s cubic-bezier(.2,1.5,.4,1)}
   @keyframes purseBump{0%{transform:scale(1)}45%{transform:scale(1.18)}100%{transform:scale(1)}}
+  .earn-chip{display:inline-block;background:var(--gold,#ffc93c);color:#4a3300;border:2.5px solid var(--ink,#17211f);
+    border-radius:999px;padding:2px 12px;font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;
+    letter-spacing:.4px;box-shadow:0 3px 0 var(--ink,#17211f);animation:earnPop .5s cubic-bezier(.2,1.6,.4,1);vertical-align:middle}
+  @keyframes earnPop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
   .coin-fly{position:fixed;z-index:9000;pointer-events:none;font-family:Anton,Impact,sans-serif;font-style:italic;
     font-size:22px;color:#2b7a3d;text-shadow:1.5px 1.5px 0 var(--ink);animation:coinFly 1s ease forwards}
   @keyframes coinFly{0%{opacity:0;transform:translateY(6px) scale(.7)}20%{opacity:1;transform:translateY(-4px) scale(1.1)}100%{opacity:0;transform:translateY(-46px) scale(1)}}
+  /* ---- GUIDED FIRST-MATCH TUTORIAL (coach-marks) ---- */
+  #tutLayer{position:fixed;inset:0;z-index:9500;pointer-events:none}
+  #tutLayer.on{display:block}
+  #tutLayer:not(.on){display:none}
+  .tut-hole{position:absolute;border-radius:16px;pointer-events:none;
+    box-shadow:0 0 0 9999px rgba(12,18,16,.66);border:3px dashed var(--gold,#ffc93c);
+    transition:all .35s cubic-bezier(.3,.9,.3,1)}
+  .tut-hole.nohole{box-shadow:0 0 0 9999px rgba(12,18,16,.72);border-color:transparent}
+  .tut-bubble{position:absolute;pointer-events:auto;max-width:290px;background:var(--nite,#fff6e3);
+    color:var(--ink,#17211f);border:3px solid var(--ink,#17211f);border-radius:16px;
+    box-shadow:5px 6px 0 rgba(23,33,31,.5);padding:14px 16px 12px;
+    animation:tutPop .35s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes tutPop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+  .tut-bubble .tut-step{font-family:"Work Sans",sans-serif;font-weight:900;font-size:10px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--punch,#ff5a2d)}
+  .tut-bubble .tut-text{font-family:"Work Sans",sans-serif;font-weight:700;font-size:14px;line-height:1.4;margin:5px 0 11px}
+  .tut-bubble .tut-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .tut-bubble .tut-skip{background:none;border:none;color:var(--mutn,#7a6a4a);font-family:"Work Sans",sans-serif;
+    font-weight:800;font-size:12px;cursor:pointer;text-decoration:underline;padding:0}
+  .tut-bubble .tut-next{background:var(--gold,#ffc93c);color:#17211f;border:2.5px solid var(--ink,#17211f);
+    border-radius:10px;box-shadow:0 3px 0 var(--ink,#17211f);font-family:"Work Sans",sans-serif;font-weight:900;
+    font-size:13px;padding:7px 16px;cursor:pointer;letter-spacing:.4px}
+  .tut-bubble .tut-next:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink,#17211f)}
+  .tut-bubble .tut-wait{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:var(--turf,#5faf3d);letter-spacing:.5px}
+  .tut-help{cursor:pointer}
   /* ---- PURPOSE HEADER (why you're here) shared recipe ---- */
   .purpose{display:flex;flex-direction:column;gap:2px}
   .purpose .why{font-size:12.5px;font-weight:700;color:#33413a;letter-spacing:.2px}
@@ -4814,6 +4845,47 @@
   }
   .draft-card.selected .draft-status{background:var(--goodc);color:#fff}
   .draft-card.benched .draft-status{background:var(--cream);color:var(--ink)}
+
+  /* ================================================================
+     SUMMER SKIN — between-match screens. Kills every remaining old
+     dark colour so title/draft/toss/shop/squad/over/pack/scout match
+     the match board. Additive + authoritative (last in the cascade).
+     ================================================================ */
+  /* panels & rails -> cream stickers */
+  .title-inner,.scout-panel,.scout-head,.setup-panel,.prep-panel,.squad-room,
+  .railx-head,.railx-scroll,.deck-title,.staffx,.singlex,.vcard,.chipx-list,
+  .stagex-head,.toss-summary,.coin-msg,.pov-head,.pov-actions,.pack-open-copy,
+  #shop .shopx-body,.roster-group,.setup-box{
+    background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important;
+  }
+  /* dark chips / heads -> ink */
+  .railx-head,.deck-title,.stagex-head,.scout-head,.rival-strip-head,.draft-lane-head{
+    background:var(--ink) !important;color:#fff6e3 !important;border-color:var(--ink) !important;
+  }
+  .railx-head *,.deck-title *,.stagex-head *,.scout-head h3,.scout-head #scoutTitle,.draft-lane-head *{color:#fff6e3 !important}
+  .shopx-foot{background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important}
+  .shopx-foot *:not(.btn):not(.coin){color:var(--ink) !important}
+  .scout-head .btn{color:var(--ink) !important}
+  /* headings -> hot orange with ink shadow */
+  .setup-panel h1,.setup-panel h2,.setup-panel h3,.prep-panel h3,.squad-room h3,
+  .roster-group h3,.title-inner .logo,#overTitle{color:var(--punch) !important;text-shadow:2px 2px 0 var(--ink) !important}
+  .roster-group h3{background:transparent !important;border:0 !important}
+  /* prices / gold accents -> sunshine gold */
+  .vcard-price,.packx-tilt .cost,.singlex-price,.pack-cost{background:var(--gold) !important;color:#4a3300 !important;border-color:var(--ink) !important}
+  /* pack cards & pack overlay -> summer sticker */
+  .pack-card,.packx-tilt,.pov-pack-body,.pov-tear{filter:none}
+  .pov,.pack-open-stage{background:transparent !important}
+  .pack-open-choice,.pchoice-card{background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important}
+  /* dead old-green rule neutralised */
+  .pov-ground{display:none !important}
+  /* borders: old near-black -> ink (soft catch-all for lingering rules) */
+  .setup-box,.chipx-list,.vcard,.singlex,.staffx,.roster-row,.scout-card,.pack-open-choice{border-width:2.5px !important}
+  /* muted sub text stays readable on cream */
+  .setup-panel .sub,.prep-panel .sub,.squad-room .sub,.scout-head #scoutSub,.stagex-head .sub,.setup-box .sub,.setup-box small{color:#5a4a2a !important}
+  /* coin readouts -> gold purse */
+  .coins-tag{background:var(--gold) !important;color:#4a3300 !important;border:3px solid var(--ink) !important;
+    border-radius:999px !important;box-shadow:0 3px 0 var(--ink) !important;font-family:Anton,Impact,sans-serif;font-style:italic}
+  .coins-tag .coin{filter:none}
 </style>
 </head>
 <body>
@@ -4912,6 +4984,8 @@
         <div class="stepper" id="stepper"></div>
       </div>
       <div class="top-actions">
+        <div class="coins-tag" id="matchCoinsWrap" title="Your coins — win this match to earn more, then spend them in the Clubhouse"><span class="coin"></span><span id="matchCoins">0</span></div>
+        <button class="btn secondary sm tut-help" id="tutHelpBtn" title="Show the how-to-play tips again">?</button>
         <button class="btn secondary sm" id="muteBtn" title="Toggle sound">&#128266;</button>
         <button class="btn secondary sm test-win-btn" id="testWinBtn" title="Testing shortcut: mark this match as won and open the shop">Test Win</button>
         <button class="btn secondary sm" id="homeMatchBtn">Main Menu</button>
@@ -5002,6 +5076,8 @@
     </div>
   </section>
 </div>
+
+<div id="tutLayer"><div class="tut-hole" id="tutHole"></div><div class="tut-bubble" id="tutBubble"></div></div>
 
 <script>
 "use strict";
@@ -5724,6 +5800,7 @@ function toggleFlip(id){
   document.querySelectorAll(`[data-id="${id}"]`).forEach(el=>{
     if(el.querySelector(".cback"))el.classList.toggle("flipped",flippedCards.has(id));
   });
+  if(typeof TUT!=="undefined")TUT.notify("flip");
 }
 
 function show(id){
@@ -6088,9 +6165,13 @@ function newChallenge(keepLog=false){
     return false;
   }
   dealAnim=true;
-  // THEIR shape is public — their card is face-up. Precomputed once so
-  // the intro morph and the resolve start from the same truth.
-  m.theirShape=ringFracs(outcomeStrip(m.phase,NEUTRAL_CARD,m.challenge));
+  // DELIVERY-FIRST framing. When you BAT, the rival BOWLER delivers first, so
+  // his ball already shapes the field before you pick a shot — that public
+  // shape is m.theirShape. When you BOWL, nobody has delivered yet (YOU are the
+  // bowler and haven't picked), so the field stays EVEN until your delivery.
+  m.theirShape=m.phase==="bat"
+    ?ringFracs(outcomeStrip("bat",NEUTRAL_CARD,m.challenge))
+    :GHOST_FRACS;
   m.introPending=true;
   if(!keepLog)m.log=m.phase==="bowl"?`Ball ${m.ball}: choose a bowler.`:`Ball ${m.ball}: choose a batter.`;
   return true;
@@ -6117,6 +6198,7 @@ function selectCard(c,lock=false){
   if(lock)m.selectionLocked=true;
   SFX.play("click");
   render();
+  if(typeof TUT!=="undefined")TUT.notify("pick");
 }
 function confirmSelected(){
   if(!m.selected||!m.challenge||m.result||anim)return;
@@ -6263,14 +6345,30 @@ function setStance(st){
   // no preview means the wheel doesn't change — just move the highlight,
   // no rebuild (no flash) on the board
   document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
+  if(typeof TUT!=="undefined")TUT.notify("stance");
 }
 /* The full modifier chain, captured as BEATS at roll time — the resolve
    replays these exact strips one by one, so the theater IS the truth.
    Order mirrors applyMatchModifiers: stance -> trait -> coaches -> tool. */
 function stripChain(mode,card){
   const beats=[];
+  const myName=card.name.split(" ").pop().toUpperCase();
+  const rivalName=m.challenge.name.split(" ").pop().toUpperCase();
+  // The TRUE contested base (both cards paired) — the modifier chain builds on this.
   let s=outcomeStrip(mode,card,m.challenge);
-  beats.push({label:card.name.split(" ").pop().toUpperCase(),note:"takes the crease",strip:s.slice(),kind:"card"});
+  if(mode==="bowl"){
+    // ACT 1 — YOUR DELIVERY. You are the bowler: your ball shapes the even
+    // field first (your bowling vs a nobody batter), then...
+    const delivery=outcomeStrip("bowl",card,NEUTRAL_CARD);
+    beats.push({label:myName,note:"bangs the ball in",strip:delivery.slice(),kind:"delivery"});
+    // ACT 2 — THE RIVAL BATSMAN READS IT and drags the field toward the real
+    // contest. This second act is the batsman's answer to your delivery.
+    beats.push({label:rivalName,note:"reads it, counters",strip:s.slice(),kind:"react"});
+  }else{
+    // BATTING: the rival bowler's delivery ALREADY shaped the field (m.theirShape).
+    // Your shot is the answer — it's the first thing that moves the field.
+    beats.push({label:myName,note:"plays the shot",strip:s.slice(),kind:"card"});
+  }
   const st=currentStance();
   const s2=applyStance(mode,s,card);
   if(s2.join("|")!==s.join("|")){
@@ -6661,6 +6759,38 @@ function startRelease(){SFX.play("click");run.pending={type:"release"};renderMan
 function sellValue(c){return Math.max(2,Math.round((RARITIES[c.rarity]||RARITIES.common).price*0.6))}
 let hintTimer=null;
 function managementHintEl(){return $("#squadManageHint")||$("#shopSub")}
+/* ── Money made legible ───────────────────────────────────────────────
+   One helper keeps every coin readout (shop / squad / match) in sync and
+   gives any change a visible beat: the purse bumps and a +N / -N chip
+   floats up. Because every buy/sell path re-renders its screen (which calls
+   syncCoins), the animation fires without touching each transaction site. */
+function floatCoins(delta){
+  if(!delta)return;
+  const scr=document.querySelector(".screen.active");
+  const tag=scr&&scr.querySelector(".coins-tag,.purse");
+  if(!tag)return;
+  const r=tag.getBoundingClientRect();if(!r.width)return;
+  const f=document.createElement("div");
+  f.className="coin-fly";
+  f.textContent=(delta>0?"+":"")+delta;
+  f.style.color=delta>0?"#2b7a3d":"#c0303f";
+  f.style.left=(r.left+r.width/2-10)+"px";
+  f.style.top=(r.top-2)+"px";
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),1050);
+}
+function syncCoins(opts={}){
+  const v=(typeof run!=="undefined"&&run)?(run.coins||0):0;
+  const prev=(run&&run.__coinsShown!=null)?run.__coinsShown:v;
+  const delta=v-prev;
+  ["coins","squadCoins","matchCoins"].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.textContent=v;
+    if(delta!==0||opts.bump){const w=el.closest(".coins-tag,.purse")||el;w.classList.remove("bump");void w.offsetWidth;w.classList.add("bump")}
+  });
+  if(delta!==0&&opts.float!==false)floatCoins(delta);
+  if(run)run.__coinsShown=v;
+}
 function flashHint(t){
   SFX.play("bad");
   const el=managementHintEl();if(!el)return;
@@ -6709,7 +6839,10 @@ function render(pop=false){
   $("#matchName").textContent=matchLabel(m.def);
   $("#phaseLabel").innerHTML=phaseLabelText();
   $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
+  syncCoins({float:false});
   renderDuel(pop);renderHand();renderDugout();renderKitbag();renderScorebug();renderRivalStrip();
+  maybeStartTutorial();
+  if(typeof TUT!=="undefined")TUT.reposition();
 }
 // Scores mutate the moment a ball is rolled, but the board/equation/over-strip
 // must not spoil the resolve animation: they render this view instead, which
@@ -7084,8 +7217,13 @@ function animateRing(prevMap,data,opts={}){
    reveals only in the staged battle. That's the spark. */
 function ringCenterRead(){
   if(m.selected)return ""; // the big PLAY button IS the message
-  const nm=m.challenge?m.challenge.name.split(" ").pop().toUpperCase():"PICK A CARD";
-  return `<div class="ring-read wait"><b>${nm}</b><span>${m.challenge?"pick your answer":"bigger zone = more likely"}</span></div>`;
+  if(!m.challenge)return `<div class="ring-read wait"><b>PICK A CARD</b><span>bigger zone = more likely</span></div>`;
+  const nm=m.challenge.name.split(" ").pop().toUpperCase();
+  // BOWL: even field, YOU deliver — prompt for the delivery. BAT: their ball is
+  // already on the field, prompt for the shot that answers it.
+  const sub=m.phase==="bowl"?"pick your delivery":"pick your shot";
+  const head=m.phase==="bowl"?"YOUR BALL":nm;
+  return `<div class="ring-read wait"><b>${head}</b><span>${sub}</span></div>`;
 }
 function ringResultHTML(){
   // token only — the words live in the commentary line below the wheel
@@ -7110,6 +7248,7 @@ function setRingRead(b,s){
    the player was just looking at, so it reads as one continuous motion. */
 function enterResolve(){
   const d=$("#duel");if(!d)return;
+  if(typeof TUT!=="undefined")TUT.notify("play");
   d.querySelector(".you-col .stance-dock")?.remove();
   const a=$("#actions");if(a)a.innerHTML="";
   const rc=$("#ringCenter");
@@ -7136,7 +7275,7 @@ function startResolveSequence(){
     spinTimers.push(setTimeout(()=>{
       setRingRead(b.label,b.note);
       animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
-      SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":"swish");
+      SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
       if(b.kind==="coach"){const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
     },t));
@@ -7200,6 +7339,7 @@ function finishLanding(res,target){
   const g=document.querySelector(".av-ground");
   const tk=res.strip[res.roll];
   if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
+  if(typeof TUT!=="undefined")TUT.notify("land");
 }
 /* Danger / answer telegraphs: the rival card menaces when it outguns your
    best available answer; your pick calms the board when it answers back. */
@@ -7301,9 +7441,9 @@ function theirIntroNotes(){
             ["hides it well — boundaries shrink",b.deception]].sort((x,y)=>y[1]-x[1]).map(w=>w[0]);
   }
   const bt=effSubs(rv,"bat");
-  return [["raw power — the SIX zone swells",bt.power],
-          ["quick hands — singles open up",bt.timing],
-          ["tight defence — your W zone shrinks",bt.technique]].sort((x,y)=>y[1]-x[1]).map(w=>w[0]);
+  return [["raw power — mind the SIX",bt.power],
+          ["quick hands — steals singles",bt.timing],
+          ["tight defence — hard to bowl out",bt.technique]].sort((x,y)=>y[1]-x[1]).map(w=>w[0]);
 }
 function midFracs(a,b){
   const keys=[...new Set([...a.map(d=>d.tk),...b.map(d=>d.tk)])];
@@ -7314,21 +7454,32 @@ function midFracs(a,b){
 }
 function playBallIntro(){
   clearSpin();
-  const their=m.theirShape;if(!their)return;
-  const role=m.phase==="bat"?"in to bowl":"out to bat";
   const name=m.challenge.name.split(" ").pop().toUpperCase();
   const notes=theirIntroNotes();
-  const half=midFracs(GHOST_FRACS,their);
-  paintRing(ringSvgEl(),GHOST_FRACS);
-  // the bowler ARRIVES first (deliberate pause), THEN shapes the field,
-  // one attribute at a time — not an instant automatic snap
-  setRingRead(name,role);
-  SFX.play("whoosh");         // the bowler runs in
-  spinTimers.push(setTimeout(()=>SFX.play("swish"),1000));
-  spinTimers.push(setTimeout(()=>SFX.play("swish"),2300));
-  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half,{stagger:180,dur:480,flash:true})},1000));
-  spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their,{stagger:180,dur:480,flash:true})},2300));
-  spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your answer")},3500));
+  if(m.phase==="bat"){
+    // YOU BAT: the rival BOWLER runs in and his delivery shapes the field
+    // BEFORE you choose a shot. That warped field is what you answer.
+    const their=m.theirShape;if(!their)return;
+    const half=midFracs(GHOST_FRACS,their);
+    paintRing(ringSvgEl(),GHOST_FRACS);
+    setRingRead(name,"in to bowl");
+    SFX.play("whoosh");         // the bowler runs in
+    spinTimers.push(setTimeout(()=>SFX.play("swish"),1000));
+    spinTimers.push(setTimeout(()=>SFX.play("swish"),2300));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half,{stagger:180,dur:480,flash:true})},1000));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their,{stagger:180,dur:480,flash:true})},2300));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your shot")},3500));
+  }else{
+    // YOU BOWL: the batsman walks out and takes guard — but the field stays
+    // EVEN. Nothing is shaped until YOU deliver. His notes are a THREAT to read
+    // ("watch the six zone"), not a shape imposed on you.
+    paintRing(ringSvgEl(),GHOST_FRACS);
+    setRingRead(name,"takes guard");
+    SFX.play("whoosh");
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);SFX.play("swish")},1100));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);SFX.play("swish")},2400));
+    spinTimers.push(setTimeout(()=>{setRingRead("YOUR BALL","pick your delivery")},3500));
+  }
 }
 /* ---------- DUGOUT (coach art, not text) + KIT BAG (armable tools) */
 function renderDugout(){
@@ -7534,10 +7685,17 @@ function renderShop(){
     `<div class="staffx">${coachCardHTML(coach,true)}<button class="btn secondary sm" data-sell-coach="${i}">Sell +${coachSellValue(coach)}</button></div>`
   ).concat(Array.from({length:emptySlots},()=>`<div class="staffx empty"><span>Empty slot</span><small>Rip a Coach Pack</small></div>`)).join("");
   const consumables=(run.consumables||[]).map(c=>`<span class="chipx ${c.mode}"><b>${c.name}</b><small>${c.mode==="any"?"Any ball":c.mode==="bat"?"Batting":"Bowling"}</small></span>`).join("");
-  $("#shopSub").innerHTML=`Next: <b>${matchLabel(next)}</b> (${run.match+1}/${MATCHES.length}). Rip a pack, keep one pull, then scout.`;
+  const firstShop=!localStorage.getItem("pp_seen_shop");
+  const rewardChip=run.__reward>0?`<span class="earn-chip">MATCH WON &middot; +${run.__reward} coins</span> `:"";
+  const intro=firstShop
+    ?`This is the Clubhouse. You earn coins by winning — spend them on packs, coaches &amp; training to get stronger for the next rival.`
+    :`Next: <b>${matchLabel(next)}</b> (${run.match+1}/${MATCHES.length}). Rip a pack, keep one pull, then scout.`;
+  $("#shopSub").innerHTML=rewardChip+intro;
+  localStorage.setItem("pp_seen_shop","1");
   $("#nextBtn").textContent="Scout Next Rival";
   $("#nextBtn").disabled=false;
-  $("#coins").textContent=run.coins;
+  syncCoins();
+  run.__reward=0;   // consume the earn beat so it shows once
   $("#deckCount").textContent=roster().length;
   $("#rerollBtn").textContent=run.noReroll?"Reroll Sealed":rerollCost()?`Reroll Packs - ${rerollCost()}`:"Reroll Packs - Free";
   $("#rerollBtn").disabled=run.noReroll||run.coins<rerollCost();
@@ -7671,7 +7829,7 @@ function bindSquadActions(){
 }
 function renderSquadManager(){
   const owned=roster().slice().sort(sortStrong),ids=activeIds(),p=run.pending;
-  $("#squadCoins").textContent=run.coins;
+  syncCoins();
   $("#rosterCount").textContent=owned.length;
   $("#activeCount").textContent=`${activeSquad().length}/12`;
   $("#benchCount").textContent=Math.max(0,owned.length-activeSquad().length);
@@ -7912,6 +8070,7 @@ function completeMatchWin(){
   run.wins++;run.coins+=reward;save.best=Math.max(save.best,m.you.runs);persist();
   const endBonus=activeCoaches().reduce((s,co)=>s+(co.onMatchEnd?co.onMatchEnd()||0:0),0);
   if(endBonus>0)run.coins+=endBonus;
+  run.__reward=reward+(endBonus>0?endBonus:0);   // shown as the earn beat in the shop
   if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You won both cups. Final: ${m.you.runs}/${m.you.wk} vs ${m.rival.runs}/${m.rival.wk}.`);return}
   run.match++;run.pending=null;run.noReroll=false;prepNextRival();rollShop();show("shop");renderShop();
 }
@@ -7951,6 +8110,83 @@ function nextBall(){
   if(!newChallenge()){finish();return}
   render();
 }
+/* ── Guided first-match tutorial (coach-marks) ────────────────────────
+   A dim overlay with a spotlight cut-out around the element that matters
+   right now, plus a summer speech bubble. Action steps advance on the
+   player's REAL move (flip / pick / stance / play); info steps have a
+   button. First match only (pp_tut_done); skippable; re-openable via ? */
+const TUT=(()=>{
+  let active=false,step=0;
+  const STEPS=[
+    {tag:"How to play",text:"On the right is your rival, face-up. Tap any card to flip it and read what its numbers do.",
+     target:()=>document.querySelector("#duel .av-duelrow > .dslot"),wait:"flip"},
+    {tag:"Step 1 — pick",text:"Your team is the fan below. Tap a player to send them out to the middle.",
+     target:()=>document.querySelector("#hand"),wait:"pick"},
+    {tag:"Step 2 — intent",text:"Choose HOW to play it. Defend is safe, Push is balanced, Attack swings big and reshapes the field.",
+     target:()=>document.querySelector("#duel .stance-dock"),wait:"stance"},
+    {tag:"Step 3 — play",text:"Ready? Hit PLAY and the field decides the ball.",
+     target:()=>document.querySelector("#confirmBtn"),wait:"play"},
+    {tag:"The ball",text:"Bigger zones = more likely. The needle spins and lands on your real outcome — nothing is rigged.",
+     target:()=>document.querySelector("#duel .av-ringwrap"),wait:"land"},
+    {tag:"You're set",text:"Win matches to earn coins, then spend them in the Clubhouse on packs, coaches & training. Good luck!",
+     target:null,button:"Let's go"}
+  ];
+  const el=id=>document.getElementById(id);
+  function waitLabel(w){return w==="flip"?"tap a card to flip":w==="pick"?"tap a player":w==="stance"?"choose an intent":w==="play"?"hit PLAY":"watching…"}
+  function body(s){
+    const btn=s.button?`<button class="tut-next" id="tutNext">${s.button} ▸</button>`
+      :`<span class="tut-wait">→ ${waitLabel(s.wait)}</span>`;
+    return `<div class="tut-step">${s.tag} &middot; ${step+1}/${STEPS.length}</div>
+      <div class="tut-text">${s.text}</div>
+      <div class="tut-row"><button class="tut-skip" id="tutSkip">Skip tips</button>${btn}</div>`;
+  }
+  function place(){
+    if(!active)return;
+    const s=STEPS[step];if(!s){finish();return}
+    const layer=el("tutLayer"),hole=el("tutHole"),bub=el("tutBubble");
+    if(!layer||!hole||!bub)return;
+    layer.classList.add("on");
+    const t=s.target&&s.target(),r=t&&t.getBoundingClientRect();
+    const vw=innerWidth,vh=innerHeight;
+    bub.innerHTML=body(s);
+    if(r&&r.width){
+      const pad=8;
+      hole.classList.remove("nohole");
+      hole.style.left=(r.left-pad)+"px";hole.style.top=(r.top-pad)+"px";
+      hole.style.width=(r.width+pad*2)+"px";hole.style.height=(r.height+pad*2)+"px";
+      bub.style.visibility="hidden";bub.style.left="0px";bub.style.top="0px";
+      requestAnimationFrame(()=>{
+        const bw=bub.offsetWidth,bh=bub.offsetHeight;
+        const bx=Math.min(Math.max(12,r.left+r.width/2-bw/2),vw-bw-12);
+        const by=(r.bottom+16+bh<vh-12)?r.bottom+16:Math.max(12,r.top-16-bh);
+        bub.style.left=bx+"px";bub.style.top=by+"px";bub.style.visibility="";
+      });
+    }else{
+      hole.classList.add("nohole");hole.style.width="0px";hole.style.height="0px";
+      hole.style.left="50%";hole.style.top="50%";
+      bub.style.visibility="hidden";
+      requestAnimationFrame(()=>{
+        const bw=bub.offsetWidth,bh=bub.offsetHeight;
+        bub.style.left=(vw/2-bw/2)+"px";bub.style.top=(vh/2-bh/2)+"px";bub.style.visibility="";
+      });
+    }
+    const nx=bub.querySelector("#tutNext");if(nx)nx.onclick=()=>{SFX.play("nav");advance()};
+    const sk=bub.querySelector("#tutSkip");if(sk)sk.onclick=()=>{SFX.play("nav");finish()};
+  }
+  function advance(){step++;if(step>=STEPS.length){finish();return}place()}
+  function notify(action){
+    if(!active)return;const s=STEPS[step];if(!s||s.wait!==action)return;
+    setTimeout(advance,action==="flip"?250:action==="land"?700:180);
+  }
+  function start(){active=true;step=0;addEventListener("resize",place);place()}
+  function finish(){active=false;localStorage.setItem("pp_tut_done","1");removeEventListener("resize",place);const l=el("tutLayer");if(l)l.classList.remove("on")}
+  return {start,notify,finish,reposition:()=>{if(active)place()},isActive:()=>active};
+})();
+function maybeStartTutorial(){
+  if(TUT.isActive()||localStorage.getItem("pp_tut_done"))return;
+  if(!m||!m.challenge||m.result)return;
+  if(run&&run.match===0)TUT.start();
+}
 function renderTitle(){
   const hm=$("#heroMark");if(hm)hm.innerHTML=fieldRingSVG(null,{fracs:GHOST_FRACS});
   $("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`;
@@ -7967,6 +8203,7 @@ $("#introGo").onclick=startFirstMatch;
 $("#restartBtn").onclick=()=>startRun();
 $("#homeMatchBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
 $("#testWinBtn").onclick=()=>{if(m)completeMatchWin()};
+$("#tutHelpBtn").onclick=()=>{SFX.play("nav");if(m&&m.challenge){localStorage.removeItem("pp_tut_done");TUT.start()}};
 $("#draftRestartBtn").onclick=()=>startRun();
 $("#draftAutoBtn").onclick=autoSelectDraft;
 $("#draftConfirmBtn").onclick=confirmDraft;
