@@ -4572,6 +4572,14 @@
   #toss #tossChoices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
   .toss-lost{width:100%;text-align:center;font-weight:800;color:#5a4a2a;margin-bottom:2px}
   .toss-restart{margin-top:2px;opacity:.85}
+  /* boss / cup-final framing — the run's climax */
+  .toss-card2.is-final{border-color:#c0303f !important;box-shadow:6px 6px 0 rgba(192,48,63,.32) !important}
+  .toss-card2.is-final .toss-head b{color:#c0303f !important}
+  .toss-boss{width:100%;text-align:center;background:linear-gradient(180deg,#fff3d6,#ffe4a2);
+    border:3px solid #17211f;border-radius:12px;padding:9px 14px;margin-bottom:4px;box-shadow:0 3px 0 rgba(23,33,31,.3)}
+  .toss-boss b{display:block;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:22px;color:#c0303f;text-shadow:1.5px 1.5px 0 var(--ink,#17211f);line-height:1.1}
+  .toss-boss span{display:block;font-weight:700;font-size:12px;color:#5a4a2a;margin-top:2px}
+  .boss-vs{color:#c0303f;font-size:.68em;font-style:italic}
   .ring-read{
     display:grid;justify-items:center;gap:3px;
     text-align:center;padding:4px;
@@ -5516,12 +5524,12 @@ const MATCHES=[
   {cup:"Street Cup",name:"Park Rivals",balls:6,wickets:2,reward:6,level:1,rarities:["common"],shop:["common","common","uncommon"],enemyShift:-3,enemyCap:37},
   {cup:"Street Cup",name:"Market Knockout",balls:6,wickets:2,reward:8,level:2,rarities:["common","common","uncommon"],shop:["common","uncommon"],enemyShift:-3,enemyCap:52,enemyTraitRate:.25},
   {cup:"Street Cup",name:"Underpass Semi",balls:6,wickets:2,reward:9,level:3,rarities:["common","uncommon"],shop:["uncommon","rare"],enemyShift:-4,enemyCap:52,enemyTraitRate:.25},
-  {cup:"Street Cup",name:"Street Cup Final",balls:6,wickets:2,reward:11,level:4,rarities:["uncommon","uncommon","rare"],shop:["uncommon","rare"],enemyShift:-10,enemyCap:56,enemyTraitRate:.2},
+  {cup:"Street Cup",name:"Street Cup Final",balls:6,wickets:2,reward:11,level:4,rarities:["uncommon","uncommon","rare"],shop:["uncommon","rare"],enemyShift:-10,enemyCap:56,enemyTraitRate:.5,boss:{team:"The Alley Kings",desc:"Unbeaten kings of the street. Win to lift the Street Cup."}},
   {cup:"City Cup",name:"Club Opener",balls:6,wickets:2,reward:10,level:5,rarities:["uncommon","uncommon","rare"],shop:["uncommon","rare"],enemyShift:-12,enemyCap:60,enemyTraitRate:.22},
   {cup:"City Cup",name:"Railway Derby",balls:6,wickets:2,reward:10,level:6,rarities:["uncommon","rare"],shop:["uncommon","rare","rare"],enemyShift:-10,enemyCap:64,enemyTraitRate:.35},
   {cup:"City Cup",name:"Stadium Lights",balls:6,wickets:2,reward:11,level:7,rarities:["rare","rare","uncommon"],shop:["rare","epic"],enemyShift:-6,enemyCap:70,enemyTraitRate:.6},
   {cup:"City Cup",name:"City Semi",balls:6,wickets:2,reward:11,level:8,rarities:["rare","rare","rare"],shop:["rare","epic"],enemyShift:-7,enemyCap:72,enemyTraitRate:.65},
-  {cup:"City Cup",name:"PowerPlay Final",balls:6,wickets:2,reward:0,level:9,rarities:["rare","rare","epic"],shop:["rare","epic"],enemyShift:-8,enemyCap:76,enemyTraitRate:.75}
+  {cup:"City Cup",name:"PowerPlay Final",balls:6,wickets:2,reward:0,level:9,rarities:["rare","rare","epic"],shop:["rare","epic"],enemyShift:-8,enemyCap:76,enemyTraitRate:1,boss:{team:"The Invincibles",desc:"Unbeaten all season, every player a star. Beat them to lift the PowerPlay Cup."}}
 ];
 const RARITIES={
   common:{label:"Common",short:"COM",min:20,max:40,trait:0,price:3,fill:"#8aa0a8"},
@@ -6040,7 +6048,8 @@ function enemy(def){
     const c=card(rarityFromPool(def.rarities),role,opts);
     if(arch.tiltBat&&(role==="bat"||role==="all"))boostCard(c,arch.tiltBat,0);
     if(arch.tiltBowl&&(role==="bowl"||role==="all"))boostCard(c,0,arch.tiltBowl);
-    if(def.enemyTraitRate!=null&&c.trait&&Math.random()>def.enemyTraitRate)c.trait=null;
+    if(def.boss&&!c.trait)c.trait=pickTrait(c.role);   // the champions: every player a star
+    else if(def.enemyTraitRate!=null&&c.trait&&Math.random()>def.enemyTraitRate)c.trait=null;
     return c;
   });
   return {deck,arch};
@@ -7038,7 +7047,7 @@ function render(pop=false){
     matchScreen.classList.toggle("is-resolving",m.result?.state==="resolving");
     matchScreen.classList.toggle("is-settled",m.result?.state==="settled");
   }
-  $("#matchName").textContent=matchLabel(m.def);
+  $("#matchName").innerHTML=m.def.boss?`🏆 ${escSVG(m.def.cup)} FINAL <span class="boss-vs">vs ${escSVG(m.def.boss.team)}</span>`:escSVG(matchLabel(m.def));
   $("#phaseLabel").innerHTML=phaseLabelText();
   $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
   syncCoins({float:false});
@@ -8244,7 +8253,9 @@ function tossSummaryHTML(){
   </div>`;
 }
 function renderToss(){
-  $("#tossTitle").textContent="The Toss";
+  const boss=m.def.boss;
+  $("#tossTitle").innerHTML=boss?`🏆 ${m.def.cup} FINAL`:"The Toss";
+  const tc=$("#tossCard")||$("#toss .toss-card2");if(tc)tc.classList.toggle("is-final",!!boss);
   const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
   const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
   $("#coinFlip").classList.toggle("spin",!!m.tossCall);
@@ -8265,8 +8276,10 @@ function renderToss(){
     }
   }
   // one-line reads so the decision is informed but uncluttered
-  $("#tossRival").innerHTML=`<span class="toss-read-chip you">YOUR XI · BAT ${yBat} / BOWL ${yBowl}</span>`
-    +`<span class="toss-read-chip rival">RIVAL: ${deckLean(m.rivalDeck).toUpperCase()} · BAT ${rBat} / BOWL ${rBowl}</span>`;
+  const bossBanner=boss?`<div class="toss-boss"><b>${boss.team}</b><span>${boss.desc}</span></div>`:"";
+  $("#tossRival").innerHTML=bossBanner
+    +`<span class="toss-read-chip you">YOUR XI · BAT ${yBat} / BOWL ${yBowl}</span>`
+    +`<span class="toss-read-chip rival">${boss?boss.team.toUpperCase():"RIVAL: "+deckLean(m.rivalDeck).toUpperCase()} · BAT ${rBat} / BOWL ${rBowl}</span>`;
   $("#tossChoices").querySelectorAll("[data-call]").forEach(b=>b.onclick=()=>callToss(b.dataset.call));
   $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>chooseInnings(b.dataset.innings));
   const sl=$("#startLost");if(sl)sl.onclick=startLostToss;
@@ -8315,7 +8328,7 @@ function completeMatchWin(){
   const endBonus=activeCoaches().reduce((s,co)=>s+(co.onMatchEnd?co.onMatchEnd()||0:0),0);
   if(endBonus>0)run.coins+=endBonus;
   run.__reward=reward+(endBonus>0?endBonus:0);   // shown as the earn beat in the shop
-  if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You won both cups. Final: ${m.you.runs}/${m.you.wk} vs ${m.rival.runs}/${m.rival.wk}.`);return}
+  if(run.match===MATCHES.length-1){save.cups++;persist();end("Champions!",`You beat ${m.def.boss?.team||"the field"} ${m.you.runs}/${m.you.wk} to ${m.rival.runs}/${m.rival.wk} and lifted the PowerPlay Cup!`);return}
   run.match++;run.pending=null;run.noReroll=false;prepNextRival();rollShop();show("shop");renderShop();
 }
 function finish(){
