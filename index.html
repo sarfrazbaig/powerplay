@@ -4522,6 +4522,14 @@
   .bug-heat .heat-lbl{font-weight:900;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
   .bug-heat.heat-fire .heat-lbl{color:#ff4d1c}
   .bug-heat.heat-warm .heat-lbl{color:#ff8a2b}
+  .heat-explain{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:38;max-width:min(560px,86%);
+    background:var(--nite,#fff6e3);color:var(--ink,#17211f);border:3px solid var(--ink,#17211f);border-radius:14px;
+    box-shadow:0 6px 0 rgba(23,33,31,.4);padding:11px 18px;font-family:"Work Sans",sans-serif;font-weight:700;
+    font-size:13.5px;line-height:1.35;text-align:center;animation:heatExplainIn .4s cubic-bezier(.2,1.4,.3,1)}
+  .heat-explain b{color:#ff4d1c;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:16px;margin-right:4px}
+  .heat-explain.out{animation:heatExplainOut .4s ease forwards}
+  @keyframes heatExplainIn{from{opacity:0;transform:translateX(-50%) translateY(14px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+  @keyframes heatExplainOut{to{opacity:0;transform:translateX(-50%) translateY(14px)}}
   @keyframes btPop{0%{opacity:0;transform:translateX(-50%) scale(.5) translateY(8px)}
     20%{opacity:1;transform:translateX(-50%) scale(1.12) translateY(0)}
     35%{transform:translateX(-50%) scale(1)}
@@ -7524,6 +7532,7 @@ function finishLanding(res,target){
   const tk=res.strip[res.roll];
   if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
   showOutcomePop(res);        // the dopamine beat — the outcome punches in
+  maybeExplainHeat();         // teach the heat mechanic once, in context
   if(typeof TUT!=="undefined")TUT.notify("land");
 }
 /* The juice: a big sticker word slams in on the outcome, and the board shakes
@@ -7546,6 +7555,16 @@ function showOutcomePop(res){
   host.appendChild(el);
   setTimeout(()=>el.remove(),1150);
   if(tk==="6"||tk==="W"){host.classList.remove("shake");void host.offsetWidth;host.classList.add("shake");setTimeout(()=>host.classList.remove("shake"),480)}
+}
+/* Teach the heat mechanic in context, exactly once, the first time it rises. */
+function maybeExplainHeat(){
+  if(localStorage.getItem("pp_seen_heat")||!momentumState())return;
+  localStorage.setItem("pp_seen_heat","1");
+  const host=document.querySelector("#match .av-ground");if(!host)return;
+  const el=document.createElement("div");el.className="heat-explain";
+  el.innerHTML=`<b>🔥 HEAT!</b> A hot streak grows your ${m.phase==="bat"?"boundary":"wicket"} zones on the wheel — a ${m.phase==="bat"?"wicket":"boundary conceded"} resets it. Cash it in.`;
+  host.appendChild(el);
+  setTimeout(()=>{el.classList.add("out");setTimeout(()=>el.remove(),400)},4600);
 }
 /* Balatro's spark: when a coach / trait / tool reshapes the field, it pops a
    flashy pill above the wheel so the player SEES their build pay off. */
