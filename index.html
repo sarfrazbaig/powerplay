@@ -4515,6 +4515,27 @@
   .over-stats .stat-pill b{color:var(--punch,#ff5a2d);font-size:15px;margin-left:5px}
   .over-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
   .confetti-burst{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:2}
+  /* ---------- toss: a clean, centred coin moment ---------- */
+  .toss-card2{display:flex;flex-direction:column;align-items:center;gap:18px;padding:32px 44px !important;max-width:600px}
+  .toss-head{text-align:center;display:flex;flex-direction:column;gap:5px}
+  .toss-head b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(34px,4.4vw,52px);color:var(--punch,#ff5a2d) !important;text-shadow:2.5px 2.5px 0 var(--ink,#17211f);line-height:1}
+  .toss-head span{font-weight:700;font-size:14px;color:#5a4a2a !important}
+  .toss-head span b{color:var(--punch,#ff5a2d) !important;text-shadow:none}
+  .toss-head span b{color:var(--punch,#ff5a2d);font-size:inherit;text-shadow:none}
+  .coin-stage{display:grid;place-items:center;padding:2px}
+  #toss .coin-flip{background:transparent !important;border:0 !important;box-shadow:none !important;padding:0 !important;height:auto !important;display:grid;place-items:center}
+  #toss .coin-face{width:clamp(100px,12vw,134px) !important;height:clamp(100px,12vw,134px) !important;border-radius:999px !important;
+    background:radial-gradient(circle at 38% 30%,#fff7bf,#ffc93c 56%,#bd871b) !important;border:4px solid var(--ink,#17211f) !important;
+    box-shadow:0 8px 0 #8f6816,0 12px 24px rgba(34,24,0,.28) !important;display:grid;place-items:center;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(44px,5vw,58px) !important;color:#5a3d00 !important}
+  #toss .coin-flip.spin .coin-face{animation:coinSpin .9s ease both}
+  .toss-rival{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .toss-read-chip{border:2.5px solid var(--ink,#17211f);border-radius:999px;padding:4px 13px;font-family:"Work Sans",sans-serif;font-weight:800;font-size:11px;letter-spacing:.3px}
+  .toss-read-chip.you{background:#e8f8ee;color:#0b3b22}
+  .toss-read-chip.rival{background:#fdecec;color:#4a1418}
+  #toss #tossChoices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+  .toss-lost{width:100%;text-align:center;font-weight:800;color:#5a4a2a;margin-bottom:2px}
+  .toss-restart{margin-top:2px;opacity:.85}
   .ring-read{
     display:grid;justify-items:center;gap:3px;
     text-align:center;padding:4px;
@@ -5036,25 +5057,13 @@
     </div>
   </section>
 
-  <section id="toss" class="screen prep">
-    <div class="top">
-      <div>
-        <div class="match-title" id="tossTitle">Toss</div>
-        <div class="sub" id="tossSub">Scout the rival, then choose whether to bat or bowl first.</div>
-      </div>
-      <button class="btn secondary sm" id="tossRestartBtn">Restart</button>
-    </div>
-    <div class="toss-layout">
-      <div class="coin-flip" id="coinFlip"></div>
-      <div class="prep-panel">
-        <div class="rival-strip-head"><span>Coin toss</span></div>
-        <div id="archLine" class="arch-line"></div>
-        <div id="squadCompare"></div>
-        <div class="prep-actions">
-          <span class="prep-count" id="tossHint"></span>
-          <span id="tossChoices"></span>
-        </div>
-      </div>
+  <section id="toss" class="screen title">
+    <div class="title-inner toss-card2">
+      <div class="toss-head"><b id="tossTitle">The Toss</b><span id="tossSub">Call the coin — the winner picks bat or bowl.</span></div>
+      <div class="coin-stage"><div class="coin-flip" id="coinFlip"></div></div>
+      <div class="toss-rival" id="tossRival"></div>
+      <div id="tossChoices"></div>
+      <button class="btn secondary sm toss-restart" id="tossRestartBtn">Restart Run</button>
     </div>
   </section>
 
@@ -8111,25 +8120,30 @@ function tossSummaryHTML(){
   </div>`;
 }
 function renderToss(){
-  $("#tossTitle").textContent=`Toss - ${matchLabel(m.def)}`;
-  $("#tossSub").textContent=`Your 12 are locked. Call the coin, then choose innings if you win.`;
-  const tossHead=$("#squadCompare")?.parentElement?.querySelector(".rival-strip-head span");if(tossHead)tossHead.textContent="Coin toss";
+  $("#tossTitle").textContent="The Toss";
+  const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
+  const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
   $("#coinFlip").classList.toggle("spin",!!m.tossCall);
   if(!m.tossCall){
-    $("#coinFlip").innerHTML=`<div class="coin-face">?</div><div class="coin-msg">Call the toss</div>
-      <div class="coin-calls"><button class="btn sm" data-call="H">Heads</button><button class="btn sm" data-call="T">Tails</button></div>`;
+    $("#tossSub").innerHTML=`<b>${matchLabel(m.def)}</b> · call the coin, the winner picks bat or bowl.`;
+    $("#coinFlip").innerHTML=`<div class="coin-face">?</div>`;
+    $("#tossChoices").innerHTML=`<button class="btn xl" data-call="H">Heads</button><button class="btn xl secondary" data-call="T">Tails</button>`;
   }else{
     const res=m.coinFace==="H"?"HEADS":"TAILS",called=m.tossCall==="H"?"heads":"tails";
-    $("#coinFlip").innerHTML=`<div class="coin-face spin">${m.coinFace}</div><div class="coin-msg">${m.tossWon?`You called ${called}. ${res}. You won the toss!`:`You called ${called}. It is ${res}. Rival won the toss.`}</div>`;
+    $("#coinFlip").innerHTML=`<div class="coin-face spin">${m.coinFace}</div>`;
+    $("#tossSub").innerHTML=m.tossWon
+      ?`You called ${called} — <b>${res}!</b> You won the toss. Pick your innings.`
+      :`You called ${called} — it's ${res}. The rival won the toss.`;
+    if(m.tossWon){
+      $("#tossChoices").innerHTML=`<button class="btn xl" data-innings="bat">Bat First</button><button class="btn xl secondary" data-innings="bowl">Bowl First</button>`;
+    }else{
+      $("#tossChoices").innerHTML=`<div class="toss-lost">Rival chose to <b>${m.rivalBatsFirst?"bat":"bowl"} first</b>.</div><button class="btn xl" id="startLost">Start Match &#9654;</button>`;
+    }
   }
-  $("#archLine").innerHTML=`<b>${m.arch.name}.</b> Squad is locked; this is only the innings call.`;
-  $("#squadCompare").innerHTML=tossSummaryHTML();
-  if(!m.tossCall){$("#tossHint").textContent="Heads or tails?";$("#tossChoices").innerHTML="";}
-  else if(m.tossWon){$("#tossHint").textContent="You won the toss:";
-    $("#tossChoices").innerHTML=`<button class="btn sm" data-innings="bat">Bat First</button> <button class="btn sm" data-innings="bowl">Bowl First</button>`;}
-  else{$("#tossHint").innerHTML=`Rival chose to <b>${m.rivalBatsFirst?"bat":"bowl"} first</b>.`;
-    $("#tossChoices").innerHTML=`<button class="btn sm" id="startLost">Start Match</button>`;}
-  $("#coinFlip").querySelectorAll("[data-call]").forEach(b=>b.onclick=()=>callToss(b.dataset.call));
+  // one-line reads so the decision is informed but uncluttered
+  $("#tossRival").innerHTML=`<span class="toss-read-chip you">YOUR XI · BAT ${yBat} / BOWL ${yBowl}</span>`
+    +`<span class="toss-read-chip rival">RIVAL: ${deckLean(m.rivalDeck).toUpperCase()} · BAT ${rBat} / BOWL ${rBowl}</span>`;
+  $("#tossChoices").querySelectorAll("[data-call]").forEach(b=>b.onclick=()=>callToss(b.dataset.call));
   $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>chooseInnings(b.dataset.innings));
   const sl=$("#startLost");if(sl)sl.onclick=startLostToss;
 }
