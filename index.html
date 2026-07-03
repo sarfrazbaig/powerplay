@@ -4455,9 +4455,16 @@
   .ring-sec path{transition:filter .18s ease}
   .ring-sec.lit path{filter:brightness(1.9) saturate(1.2)}
   .ring-sec.landed path{
-    stroke:#17211f;stroke-width:4.5;
-    filter:brightness(1.25) drop-shadow(0 0 12px rgba(255,255,255,.7));
+    stroke:#17211f;stroke-width:5;
+    animation:zoneLand 1.05s cubic-bezier(.2,1.4,.3,1) both;
   }
+  @keyframes zoneLand{
+    0%{filter:brightness(2.6) drop-shadow(0 0 0 rgba(255,255,255,0))}
+    28%{filter:brightness(1.55) drop-shadow(0 0 24px rgba(255,255,255,.95))}
+    100%{filter:brightness(1.22) drop-shadow(0 0 12px rgba(255,255,255,.62))}
+  }
+  .ring-sec.landed text{transform-box:fill-box;transform-origin:center;animation:zoneTokenPop 1.05s cubic-bezier(.2,1.7,.35,1) both}
+  @keyframes zoneTokenPop{0%{transform:scale(1)}30%{transform:scale(1.28)}100%{transform:scale(1)}}
   .ring-sec.flash path{animation:secFlash .9s ease}
   @keyframes secFlash{0%{filter:brightness(2.6)}100%{filter:brightness(1)}}
   .ring-center{
