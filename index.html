@@ -5141,6 +5141,29 @@ const SFX=(()=>{
   };
 })();
 function outcomeSfx(token){SFX.play(token==="W"?"wicket":token==="6"?"six":token==="4"?"four":(token==="wd"||token==="nb")?"extra":(token==="1"||token==="2")?"run":"dot")}
+/* ---------- FILE-BASED MUSIC: drop a copyright-free loop at
+   assets/audio/theme.mp3 (or .ogg / music.mp3) and it plays through the
+   game, ducking under every ball. Silent if no file is present — nothing
+   synthesised, so no scratch. Shares the mute toggle. ---------- */
+const MUSIC=(()=>{
+  let el=null,wanted=false,canPlay=false,baseVol=.42;
+  const ensure=()=>{
+    if(el)return el;
+    el=new Audio();el.loop=true;el.preload="auto";el.volume=baseVol;
+    const srcs=["assets/audio/theme.mp3","assets/audio/theme.ogg","assets/audio/music.mp3"];let i=0;
+    const next=()=>{if(i<srcs.length)el.src=srcs[i++];};
+    el.addEventListener("canplay",()=>{canPlay=true;if(wanted&&!SFX.muted())el.play().catch(()=>{})});
+    el.addEventListener("error",next);
+    next();
+    return el;
+  };
+  return {
+    start(){wanted=true;if(SFX.muted())return;const a=ensure();if(canPlay)a.play().catch(()=>{})},
+    stop(){wanted=false;if(el)el.pause()},
+    duck(on){if(el)el.volume=on?baseVol*.3:baseVol},
+    setMuted(m){if(m){if(el)el.pause()}else if(wanted){const a=ensure();if(canPlay)a.play().catch(()=>{})}}
+  };
+})();
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const rng=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -5585,13 +5608,11 @@ function show(id){
     s.toggleAttribute("inert",!active);
     s.setAttribute("aria-hidden",active?"false":"true");
   });
-  SFX.music(false);              // no background music — it was masking the sfx
+  SFX.music(false);SFX.ambient(false);   // no synth beds — the file loop plays instead
+  if(id==="title"||id==="over")MUSIC.stop();else MUSIC.start();
   if(id!=="match"){
     $("#rivalDrawer")?.classList.remove("show");
     const actions=$("#actions");if(actions)actions.innerHTML="";
-    SFX.ambient(false);          // crowd murmur only during a live match
-  }else{
-    SFX.ambient(true);
   }
   window.scrollTo(0,0);
 }
@@ -6940,7 +6961,7 @@ function enterResolve(){
   d.classList.remove("settled");d.classList.add("resolving");
   const ms=$("#match");if(ms){ms.classList.add("is-resolving");ms.classList.remove("is-settled","is-card-locked","is-previewing")}
   renderHand();               // the played card leaves the hand for the crease
-  SFX.play("whoosh");         // the ball is released
+  SFX.play("whoosh");MUSIC.duck(true);   // the ball is released — music steps back
   m.result.spinStarted=true;
   m.result.spinDur=startResolveSequence();
 }
@@ -7008,6 +7029,7 @@ function landNeedle(res){
 function finishLanding(res,target){
   m.result.state="settled";
   outcomeSfx(res.strip[res.roll]);   // bat crack / stumps / cheer / thud
+  setTimeout(()=>MUSIC.duck(false),1200);   // music swells back after the moment
   if(target)target.classList.add("landed");
   paintRing(ringSvgEl(),ringFracs(res.strip));
   if(target){const n=$("#ringNeedle");if(n&&res.needleAt!=null){n.style.transition="none";n.style.transform=`rotate(${res.needleAt}deg)`}}
@@ -7777,9 +7799,10 @@ function renderTitle(){
   const cb=$("#continueBtn"),sv=savedRun();
   if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run · Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
 }
-document.addEventListener("pointerdown",()=>SFX.unlock(),{capture:true,passive:true});
-document.addEventListener("touchstart",()=>SFX.unlock(),{capture:true,passive:true});
-document.addEventListener("keydown",()=>SFX.unlock(),{capture:true});
+const _unlock=()=>{SFX.unlock();MUSIC.setMuted(SFX.muted())};
+document.addEventListener("pointerdown",_unlock,{capture:true,passive:true});
+document.addEventListener("touchstart",_unlock,{capture:true,passive:true});
+document.addEventListener("keydown",_unlock,{capture:true});
 $("#startBtn").onclick=startRun;
 $("#continueBtn").onclick=continueRun;
 $("#restartBtn").onclick=()=>startRun();
@@ -7862,7 +7885,7 @@ document.addEventListener("pointerup",e=>{
     if(c){m.__dealFrom=gr;lockCard(c)}
   }
 });
-(function(){const mb=$("#muteBtn");if(mb){const sync=()=>mb.innerHTML=SFX.muted()?"&#128263;":"&#128266;";sync();mb.onclick=()=>{SFX.toggle();SFX.play("click");sync()}}})();
+(function(){const mb=$("#muteBtn");if(mb){const sync=()=>mb.innerHTML=SFX.muted()?"&#128263;":"&#128266;";sync();mb.onclick=()=>{SFX.toggle();MUSIC.setMuted(SFX.muted());if(!SFX.muted())SFX.play("click");sync()}}})();
 $("#scanBtn").onclick=openRivalDeck;
 $("#closeScout").onclick=closeRivalDeck;
 $("#rivalDrawer").onclick=(e)=>{if(e.target.id==="rivalDrawer")closeRivalDeck()};
