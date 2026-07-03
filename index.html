@@ -4379,8 +4379,10 @@
     transform:translateX(-6px);
   }
   .kit-card.offmode{opacity:.5}
-  .kit-empty{display:grid;place-items:center;padding:14px 0;flex:1}
-  .bag-ill{width:56px;color:rgba(23,33,31,.16)}
+  .kit-empty{display:grid;place-items:center;padding:14px 6px;flex:1;gap:6px}
+  .bag-ill{width:52px;color:rgba(23,33,31,.2)}
+  .zone-hint{display:block;margin-top:6px;font-family:"Work Sans",Inter,sans-serif;font-weight:800;font-size:9.5px;
+    line-height:1.32;color:rgba(23,33,31,.55);text-align:center;max-width:150px;text-transform:none;letter-spacing:.1px}
   /* ---------- the pitch ---------- */
   #match .av-pitch{ /* the center of the ground — transparent, the GROUND is the surface */
     position:relative;min-height:0;min-width:0;
@@ -7812,7 +7814,8 @@ function renderDugout(){
   });
   const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
   for(let i=0;i<open;i++)seats.push(`<div class="seat open" title="An empty dugout seat — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 60 60"><circle cx="30" cy="22" r="11" fill="currentColor"/><path d="M10 56 Q30 34 50 56 Z" fill="currentColor"/></svg></div>`);
-  el.innerHTML=`<div class="av-zonetag">DUGOUT</div><div class="seats">${seats.join("")}</div>`;
+  const hint=active.length?"":`<span class="zone-hint">Hire coaches in the Clubhouse — they bend the wheel every ball</span>`;
+  el.innerHTML=`<div class="av-zonetag">DUGOUT</div><div class="seats">${seats.join("")}</div>${hint}`;
 }
 function renderKitbag(){
   const el=$("#kitbag");if(!el)return;
@@ -7828,7 +7831,7 @@ function renderKitbag(){
     </button>`;
   });
   const bag=`<svg class="bag-ill" viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg>`;
-  el.innerHTML=`<div class="av-zonetag">KIT BAG</div><div class="kits">${items.join("")||`<div class="kit-empty">${bag}</div>`}</div>`;
+  el.innerHTML=`<div class="av-zonetag">KIT BAG</div><div class="kits">${items.join("")||`<div class="kit-empty">${bag}<span class="zone-hint">Buy one-use tools in the Clubhouse, then arm them here</span></div>`}</div>`;
   el.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
 }
 /* The cockpit: stance chips + PLAY, in the middle of the wheel, where
