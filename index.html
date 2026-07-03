@@ -876,15 +876,15 @@
     box-shadow:4px 4px 0 #050505;
   }
   #draft.squad-prep-screen .setup-panel h3{
-    margin:-10px -10px 0;
-    padding:11px 12px;
-    background:#1976bf;
-    border-bottom:3px solid #ffd91f;
+    margin:-8px -10px 8px;
+    padding:8px 12px 9px;
+    background:transparent;
+    border-bottom:3px solid #17211f;
     font-family:Anton,Impact,sans-serif;
     font-style:italic;
     letter-spacing:.02em;
-    color:#ffd91f;
-    text-shadow:2px 2px 0 #000;
+    color:#ff5a2d;
+    text-shadow:1.5px 1.5px 0 rgba(23,33,31,.16);
     text-transform:uppercase;
   }
   #draft.squad-prep-screen .setup-panel>div:first-of-type,
@@ -3816,13 +3816,10 @@
     background:rgba(255,253,241,.07) !important;
   }
   #draft.squad-prep-screen .prep-panel.full{
-    border:3px solid #050505 !important;
-    border-radius:0 !important;
-    background:
-      radial-gradient(#132616 1.15px,transparent 1.15px),
-      linear-gradient(180deg,#42b957,#2f963f) !important;
-    background-size:12px 12px,auto !important;
-    box-shadow:4px 4px 0 #050505 !important;
+    border:3px solid var(--ink,#17211f) !important;
+    border-radius:16px !important;
+    background:linear-gradient(180deg,#fffdf4,#fff6e3) !important;
+    box-shadow:5px 5px 0 rgba(23,33,31,.4) !important;
   }
   #draft.squad-prep-screen .draft-lane{
     min-height:0;
@@ -3834,16 +3831,18 @@
     width:max-content;
     min-width:185px;
     margin:0 0 6px;
-    padding:6px 12px;
-    border:3px solid #050505;
-    background:#151817;
-    color:var(--ui-gold);
-    box-shadow:3px 3px 0 #050505;
+    padding:5px 4px 7px;
+    border:0 !important;
+    border-bottom:3px solid var(--ink,#17211f) !important;
+    background:transparent !important;
+    color:var(--punch,#ff5a2d) !important;
+    box-shadow:none !important;
   }
   #draft.squad-prep-screen .draft-lane-scroll{
-    border:3px solid rgba(5,5,5,.75);
-    background:rgba(255,253,241,.14);
-    box-shadow:inset 0 0 0 2px rgba(255,255,255,.09);
+    border:2px solid rgba(23,33,31,.14);
+    border-radius:12px;
+    background:rgba(23,33,31,.03);
+    box-shadow:none;
     overflow-x:auto !important;
     overflow-y:visible !important;
   }
@@ -4954,18 +4953,18 @@
   #shop .shopx-body,.roster-group,.setup-box{
     background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important;
   }
-  /* shop/squad section headers -> summer chalk signs (orange on cream, ink underline) */
-  .railx-head,.deck-title,.stagex-head{
+  /* shop/squad/draft section headers -> summer chalk signs (orange on cream, ink underline) */
+  .railx-head,.deck-title,.stagex-head,.draft-lane-head{
     background:transparent !important;color:var(--punch) !important;
     border:0 !important;border-bottom:3px solid var(--ink) !important;border-radius:0 !important;
   }
-  .railx-head *,.deck-title b,.stagex-head b{color:var(--punch) !important}
-  .railx-head em,.deck-title span,.stagex-head span{color:var(--mutn) !important}
+  .railx-head *,.deck-title b,.stagex-head b,.draft-lane-head span{color:var(--punch) !important}
+  .railx-head em,.deck-title span,.stagex-head span,.draft-lane-head small{color:var(--mutn) !important}
   /* heads that sit on the green field / dark drawer stay ink chips */
-  .scout-head,.rival-strip-head,.draft-lane-head{
+  .scout-head,.rival-strip-head{
     background:var(--ink) !important;color:#fff6e3 !important;border-color:var(--ink) !important;
   }
-  .scout-head h3,.scout-head #scoutTitle,.rival-strip-head *,.draft-lane-head *{color:#fff6e3 !important}
+  .scout-head h3,.scout-head #scoutTitle,.rival-strip-head *{color:#fff6e3 !important}
   .shopx-foot{background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important}
   .shopx-foot *:not(.btn):not(.coin){color:var(--ink) !important}
   .scout-head .btn{color:var(--ink) !important}
