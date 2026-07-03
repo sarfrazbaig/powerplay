@@ -5187,7 +5187,7 @@
       repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 60px, transparent 60px 120px);
   }
   .av-row2{
-    display:grid;grid-template-columns:minmax(112px,.5fr) minmax(0,3.2fr) minmax(112px,.5fr);
+    display:grid;grid-template-columns:minmax(150px,.72fr) minmax(0,3fr) minmax(150px,.72fr);
     gap:clamp(10px,1.2vw,24px);min-height:0;position:relative;z-index:2;
   }
   .av-dock{
@@ -5198,8 +5198,13 @@
     border:2.5px dashed rgba(255,255,255,.8);
     align-self:stretch;
   }
-  .av-dock .seat{width:min(120px,92%);flex:0 0 auto}
-  .av-dock .kit-card{width:min(120px,92%);flex:0 0 auto}
+  /* coaches are CHARACTERS — give the art room to breathe */
+  .av-dock .seat{width:min(176px,94%);flex:0 0 auto}
+  .av-dock .kit-card{width:min(176px,94%);flex:0 0 auto}
+  .seat-name{font-size:11px;padding:4px}
+  .kit-ico{width:34px;height:34px}
+  .kit-ico svg{width:32px;height:32px}
+  .kit-name{font-size:12px}
   .av-dock .av-zonetag{color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(23,33,31,.5)}
   #match>*{grid-area:auto !important;min-width:0}
   #match .top{background:transparent !important;border:0 !important;box-shadow:none !important;padding:2px 6px !important}
@@ -5409,6 +5414,47 @@
     font-size:9.5px;font-weight:800;letter-spacing:2px;white-space:nowrap;
     color:rgba(255,255,255,.95);text-shadow:1px 1px 0 rgba(23,33,31,.55);
   }
+  /* the carnival needle */
+  .ring-needle{
+    position:absolute;inset:0;pointer-events:none;z-index:2;
+    transform-origin:50% 50%;
+    filter:drop-shadow(0 2px 3px rgba(23,33,31,.4));
+  }
+  .ring-needle svg{width:100%;height:100%;display:block}
+  /* THE button: round, gold, dead center — eyes never leave the wheel */
+  .ring-go{
+    width:clamp(88px,9.5vw,124px);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 34% 30%, #ffe089, var(--gold) 58%, #f0b400);
+    border:3.5px solid var(--ink);color:#111;cursor:pointer;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(19px,1.9vw,25px);
+    letter-spacing:1.5px;line-height:1.05;
+    box-shadow:0 6px 0 var(--ink),0 0 28px rgba(255,201,60,.45);
+    transition:transform .12s ease,box-shadow .12s ease;
+    pointer-events:auto;
+  }
+  .ring-go:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--ink),0 0 34px rgba(255,201,60,.6)}
+  .ring-go:active{transform:translateY(2px);box-shadow:0 3px 0 var(--ink)}
+  .ring-go.next{
+    width:clamp(72px,7.5vw,96px);font-size:clamp(13px,1.3vw,16px);
+    background:radial-gradient(circle at 34% 30%, #fff, #f2ece0 60%, #d9d2c0);
+  }
+  .ring-center{gap:6px}
+  .ring-center .actions{pointer-events:auto;display:flex;justify-content:center}
+  /* the over rail lives ON the ground, above the wheel — the timeline
+     of the innings right where the eyes already are */
+  .av-overarc{display:flex;justify-content:center;position:relative;z-index:3;padding-top:2px}
+  .av-overarc .over-strip{display:flex;gap:8px}
+  .av-overarc .ball-chip{
+    width:27px;height:27px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(255,255,255,.28);border:2.5px solid rgba(255,255,255,.85);
+    color:#fff;font-weight:800;font-size:12px;position:relative;overflow:visible;
+    text-shadow:1px 1px 0 rgba(23,33,31,.5);
+  }
+  .av-overarc .ball-chip.filled{background:#2fb98b;border-color:var(--ink)}
+  .av-overarc .ball-chip.wicket{background:var(--dangerc);border-color:var(--ink)}
+  .av-overarc .ball-chip.boundary{background:var(--gold);border-color:var(--ink);color:#111;text-shadow:none}
+  .av-overarc .ball-chip.extra{background:#b98cff;border-color:var(--ink)}
+  .av-overarc .ball-chip.current{outline:2.5px solid #fff;outline-offset:2px}
   .ring-read.favored b{color:var(--goodc)}
   .ring-read.danger b{color:var(--dangerc)}
   .ring-read.wait b{color:rgba(23,33,31,.55)}
@@ -7037,8 +7083,7 @@ function renderScorebug(){
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
     <div class="bug-cell"><span>You</span><b>${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
     <div class="bug-cell"><span>Rival</span><b>${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
-    <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>
-    <div class="bug-cell bug-balls"><span>Last ${m.def.balls}</span>${renderOverStrip()}</div>`;
+    <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
 }
 function oddsSummary(strip){
   const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
@@ -7156,17 +7201,26 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact){
   }
   const name=escSVG((c.name.length>16?c.name.slice(0,15)+"…":c.name).toUpperCase());
   const roleFill=rc==="#c0303f"?"#ff8a95":rc==="#1f9b53"?"#8af0b4":"#d3b8ff";
-  // corner index (top-left): like a playing card's rank — it's all you
-  // need to read a hand of overlapped cards
+  // THE SPINE (left edge, survives hand overlap): a designed column —
+  // OVR big, role band, and the stat that decides this innings.
+  const spineStat=emph==="bowl"?bowlNum:batNum;
+  const spineKind=emph==="bowl"?"BOWL":"BAT";
+  const spineCol=emph==="bowl"?"#ff8a95":"#8af0b4";
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
+    <defs><linearGradient id="${g}spine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="rgba(8,14,12,.82)"/><stop offset=".8" stop-color="rgba(8,14,12,.45)"/><stop offset="1" stop-color="rgba(8,14,12,0)"/></linearGradient></defs>
     ${cardShell(g,dim,c.rarity,c.role)}
       <image href="${img}" x="28" y="52" width="194" height="266" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}"/>
       <rect x="20" y="266" width="210" height="64" fill="url(#${g}scrim)"/>
+      <rect x="20" y="20" width="86" height="310" fill="url(#${g}spine)"/>
     </g>
-    <text x="52" y="66" text-anchor="middle" fill="${roleFill}" stroke="#0c1214" stroke-width="8" paint-order="stroke" font-size="46" font-weight="700">${ovr}</text>
-    <rect x="30" y="76" width="${roleShort.length===2?38:52}" height="17" rx="5" fill="${rc}" stroke="#0c1214" stroke-width="2"/>
-    <text x="${roleShort.length===2?49:56}" y="89" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700" letter-spacing="1">${roleShort}</text>
-    ${gem}
+    <rect x="20" y="20" width="7" height="310" fill="${rc}"/>
+    <text x="62" y="74" text-anchor="middle" fill="#fffdf2" stroke="#0c1214" stroke-width="8" paint-order="stroke" font-size="52" font-weight="700">${ovr}</text>
+    <text x="62" y="92" text-anchor="middle" fill="#fffdf2" stroke="#0c1214" stroke-width="3" paint-order="stroke" font-size="10" font-weight="700" letter-spacing="2.5">OVR</text>
+    <rect x="38" y="104" width="48" height="19" rx="5" fill="${rc}" stroke="#0c1214" stroke-width="2"/>
+    <text x="62" y="118" text-anchor="middle" fill="#fff" font-size="11" font-weight="700" letter-spacing="1">${roleShort}</text>
+    <text x="62" y="163" text-anchor="middle" fill="${spineCol}" stroke="#0c1214" stroke-width="6" paint-order="stroke" font-size="34" font-weight="700">${spineStat}</text>
+    <text x="62" y="180" text-anchor="middle" fill="${spineCol}" stroke="#0c1214" stroke-width="3" paint-order="stroke" font-size="9.5" font-weight="700" letter-spacing="2">${spineKind}</text>
+    ${c.trait?`<path d="M62 200 l10 12 -10 12 -10 -12 Z" fill="#ffd23f" stroke="#0c1214" stroke-width="2.5"/>`:""}
     <text x="222" y="300" text-anchor="end" fill="#fff" stroke="#0c1214" stroke-width="3.5" paint-order="stroke" font-size="${name.length>13?13:15}" font-weight="700" letter-spacing=".4">${name}</text>
     <text x="222" y="318" text-anchor="end" fill="${roleFill}" stroke="#0c1214" stroke-width="3" paint-order="stroke" font-size="11" font-weight="700" letter-spacing="1">${roleName(c).toUpperCase()} #${c.num}</text>
   </svg>`;
@@ -7246,7 +7300,7 @@ function fieldRingSVG(strip,opts={}){
     const wide=sweep>34;
     const label=d.tk==="0"?"&#9679;":d.tk;
     const pct=wide?`<text x="${lx}" y="${(ly+17).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="rgba(255,255,255,.85)" stroke="#0a1214" stroke-width="2.5" paint-order="stroke">${Math.round(d.frac*100)}%</text>`:"";
-    return `<g class="ring-sec ${opts.changed&&opts.changed.has(d.tk)?'flash':''}" data-tk="${d.tk}">
+    return `<g class="ring-sec ${opts.changed&&opts.changed.has(d.tk)?'flash':''}" data-tk="${d.tk}" data-mid="${(((a0+a1)/2)+90).toFixed(1)}">
       <path d="${ringArcPath(cx,cy,r0,r1,a0,a1)}" fill="${RING_COLORS[d.tk]||"#46605a"}" stroke="#fff6e3" stroke-width="3"/>
       <text x="${lx}" y="${(ly+(wide?2:6)).toFixed(1)}" text-anchor="middle" font-size="${d.tk==="0"?fs*.72:fs.toFixed(0)}" font-weight="700" fill="#fff" stroke="#17211f" stroke-width="3.5" paint-order="stroke">${label}</text>${pct}
     </g>`;
@@ -7284,7 +7338,7 @@ function animateRing(prevMap,data){
    cards (OVR, flip, danger ribbon) and commits — the field's true shape
    reveals only in the staged battle. That's the spark. */
 function ringCenterRead(){
-  if(m.selected)return `<div class="ring-read"><b>LOCKED IN</b><span>play the ball</span></div>`;
+  if(m.selected)return ""; // the big PLAY button IS the message
   return `<div class="ring-read wait"><b>PICK A CARD</b><span>the field reveals on play</span></div>`;
 }
 function ringResultHTML(){
@@ -7352,45 +7406,36 @@ function startResolveSequence(){
     setRingRead("LIVE","tap to skip ▸");
     startRingSpin(res.strip[res.roll]);
   },2580));
-  // spin duration is deterministic: mirror startRingSpin's easing math
-  const n=finalShape.length;
-  const target=Math.max(0,finalShape.findIndex(d=>d.tk===res.strip[res.roll]));
-  const steps=n*2+target;
-  let spinT=280;
-  for(let k=0;k<=steps;k++)spinT+=55+330*(k/steps)**2;
-  return 2580+spinT;
+  return 2580+2640; // stages + fixed needle spin
 }
+/* The NEEDLE spin: a carnival wheel pointer whips around the field,
+   decelerates, and lands on the outcome zone. Full casino. */
 function startRingSpin(rollToken){
   clearSpin();
-  const secs=[...document.querySelectorAll(".ring-sec")];
-  const n=secs.length;
-  if(!n)return 1200;
-  let target=secs.findIndex(el=>el.dataset.tk===rollToken);
-  if(target<0)target=0;
-  const total=n*2+target; // two laps, land on the outcome zone
-  let t=280;
-  for(let k=0;k<=total;k++){
-    const p=k/total,delay=t;
-    t+=55+330*p*p;
-    spinTimers.push(setTimeout(()=>{
-      secs.forEach(el=>el.classList.remove("lit"));
-      const el=secs[k%n];
-      if(el)el.classList.add("lit");
-      if(k===total){
-        if(el)el.classList.add("landed");
-        const c=$("#ringCenter");
-        if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
-        const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
-        // the moment HITS: shake on wickets, blaze on boundaries
-        const g=document.querySelector(".av-ground");
-        if(g){
-          const cls=rollToken==="W"?"hit-wicket":rollToken==="6"?"hit-six":rollToken==="4"?"hit-four":null;
-          if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
-        }
-      }
-    },delay));
+  const target=document.querySelector(`.ring-sec[data-tk="${rollToken}"]`);
+  const needle=$("#ringNeedle");
+  const mid=target?parseFloat(target.dataset.mid):0;
+  const dur=2500;
+  if(needle){
+    needle.style.transition="none";
+    needle.style.transform="rotate(0deg)";
+    void needle.offsetWidth;
+    needle.style.transition=`transform ${dur}ms cubic-bezier(.12,.64,.13,1)`;
+    needle.style.transform=`rotate(${720+mid}deg)`;
   }
-  return t;
+  spinTimers.push(setTimeout(()=>{
+    if(target)target.classList.add("landed");
+    const c=$("#ringCenter");
+    if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
+    const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
+    // the moment HITS: shake on wickets, blaze on boundaries
+    const g=document.querySelector(".av-ground");
+    if(g){
+      const cls=rollToken==="W"?"hit-wicket":rollToken==="6"?"hit-six":rollToken==="4"?"hit-four":null;
+      if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
+    }
+  },dur+90));
+  return dur+140;
 }
 /* Danger / answer telegraphs: the rival card menaces when it outguns your
    best available answer; your pick calms the board when it answers back. */
@@ -7430,19 +7475,20 @@ function renderDuel(pop=false){
   }
   const resolving=m.result?.state==="resolving";
   const ringHTML=resolving?fieldRingSVG(null,{fracs:GHOST_FRACS}):ring;
+  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 22 L184 74 L170 63 L156 74 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><circle cx="170" cy="170" r="13" fill="#17211f" stroke="#fff6e3" stroke-width="3"/></svg></div>`;
   const centerBits=resolving
     ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE DUEL</b><span>even field</span></div></div>`
     :m.result
-      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}</div>`
-      :`<div class="ring-center" id="ringCenter">${ringCenterRead()}</div>`;
+      ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"></div></div>`
+      :`<div class="ring-center" id="ringCenter">${ringCenterRead()}<div class="actions" id="actions"></div></div>`;
   d.innerHTML=`${fh}
+    <div class="av-overarc">${renderOverStrip()}</div>
     <div class="av-duelrow ${danger?'threat':''}">
       ${youSlot}
-      <div class="av-ringwrap">${ringHTML}${centerBits}<div class="ring-cap">BIGGER ZONE&nbsp;=&nbsp;MORE LIKELY</div></div>
+      <div class="av-ringwrap">${ringHTML}${needle}${centerBits}<div class="ring-cap">BIGGER ZONE&nbsp;=&nbsp;MORE LIKELY</div></div>
       ${rivSlot}
     </div>
-    ${commentaryHTML()}
-    <div class="av-cta" id="actions"></div>`;
+    ${commentaryHTML()}`;
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
@@ -7451,7 +7497,11 @@ function renderDuel(pop=false){
     m.result.spinDur=startResolveSequence();
   }else if(m.result?.state==="settled"){
     const el=d.querySelector(`.ring-sec[data-tk="${m.result.strip[m.result.roll]}"]`);
-    if(el)el.classList.add("landed");
+    if(el){
+      el.classList.add("landed");
+      const n=$("#ringNeedle");
+      if(n)n.style.transform=`rotate(${el.dataset.mid}deg)`; // needle rests on the outcome
+    }
   }
   renderActions();
   if(pop){d.classList.add("pop");setTimeout(()=>d.classList.remove("pop"),360)}
@@ -7488,14 +7538,16 @@ function renderKitbag(){
   el.innerHTML=`<div class="av-zonetag">KIT BAG</div><div class="kits">${items.join("")||`<div class="kit-empty">${bag}</div>`}</div>`;
   el.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
 }
+/* One button, in the middle of the wheel, where the eyes already are.
+   No RESET — picking another card from hand swaps the selection. */
 function renderActions(){
   const a=$("#actions");
   if(!a)return;
-  if(m.result?.state==="settled")a.innerHTML=`<button class="btn" id="nextBall">Next Ball →</button>`;
+  if(m.result?.state==="settled")a.innerHTML=`<button class="ring-go next" id="nextBall">NEXT<br>BALL</button>`;
   else if(m.result)a.innerHTML="";
-  else if(currentOddsInfo())a.innerHTML=`<button class="btn" id="confirmBtn" ${!m.selected?'disabled':''}>Play</button><button class="btn secondary" id="cancelBtn" ${!m.selected&&!m.preview?'disabled':''}>Reset</button>`;
+  else if(m.selected)a.innerHTML=`<button class="ring-go" id="confirmBtn">PLAY</button>`;
   else a.innerHTML="";
-  const map={nextBall:nextBall,confirmBtn:confirmSelected,cancelBtn:cancelSelected};
+  const map={nextBall:nextBall,confirmBtn:confirmSelected};
   for(const id in map){const el=$("#"+id);if(el)el.onclick=map[id]}
 }
 /* Two-tier rails: the top 6 phase-relevant cards sit ready at full mini
