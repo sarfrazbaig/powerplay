@@ -4764,6 +4764,39 @@
   .purpose{display:flex;flex-direction:column;gap:2px}
   .purpose .why{font-size:12.5px;font-weight:700;color:#33413a;letter-spacing:.2px}
   .purpose .why b{color:var(--ink)}
+  /* ---- TITLE / HERO landing ---- */
+  #title.screen.active{display:grid !important;place-items:center;height:100dvh;padding:20px;overflow:hidden}
+  .hero{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;position:relative;z-index:2;max-width:640px}
+  .hero-mark{width:clamp(150px,20vw,220px);aspect-ratio:1;margin-bottom:-8px;filter:drop-shadow(4px 6px 0 rgba(23,33,31,.35));animation:heroSpin 44s linear infinite}
+  .hero-mark svg{width:100%;height:100%;display:block}
+  @keyframes heroSpin{to{transform:rotate(360deg)}}
+  .hero-logo{
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(52px,9vw,104px);line-height:.82;
+    letter-spacing:1px;margin:0;color:var(--gold);
+    text-shadow:4px 4px 0 var(--ink),8px 8px 0 rgba(23,33,31,.25);
+    -webkit-text-stroke:2px var(--ink);
+  }
+  .hero-logo span{color:var(--punch)}
+  .hero-hook{font-family:Oswald,Arial,sans-serif;font-weight:700;font-size:clamp(14px,1.5vw,18px);color:var(--ink);
+    line-height:1.5;background:rgba(255,246,227,.72);padding:8px 18px;border-radius:14px;border:2.5px solid var(--ink)}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+  .hero-stats{display:flex;gap:10px;margin-top:2px}
+  .hero-stats .stat-pill{background:rgba(255,246,227,.85);border:2.5px solid var(--ink);color:var(--ink);
+    border-radius:999px;padding:5px 14px;font-weight:800;font-size:13px}
+  .hero-stats .stat-pill b{color:var(--punch)}
+  /* ---- STARTER KIT-BAG reveal ---- */
+  #intro.screen.active{display:grid !important;place-items:center;height:100dvh;padding:16px;overflow:hidden}
+  .intro-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(1100px,96vw);text-align:center}
+  .intro-h{font-size:clamp(30px,5vw,52px)}
+  .intro-sub{font-family:Oswald,Arial,sans-serif;font-weight:600;font-size:clamp(13px,1.4vw,16px);color:var(--ink);line-height:1.45;
+    max-width:680px;background:rgba(255,246,227,.8);border:2.5px solid var(--ink);border-radius:14px;padding:9px 18px}
+  .intro-sub b{color:var(--punch)}
+  .intro-cards{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:flex-end;max-height:56vh;overflow:visible;perspective:1000px}
+  .intro-cards .kit-hold{width:clamp(74px,7vw,104px);aspect-ratio:5/7;flex:0 0 auto;position:relative;
+    animation:kitDeal .5s cubic-bezier(.2,.9,.3,1) both}
+  .intro-cards .kit-hold .card{width:100%;height:100%;cursor:pointer}
+  .intro-cards .kit-hold:hover{transform:translateY(-8px) rotate(-1deg);z-index:5}
+  @keyframes kitDeal{from{transform:translateY(-220px) rotate(-8deg);opacity:0}to{transform:none;opacity:1}}
   /* ---- ONE card everywhere: neutralise the old divergent draft-card
      frame/scene/tilt so the unified .card face governs; keep only the
      Active/Bench toggle + selection dimming. ---- */
@@ -4787,12 +4820,24 @@
 <div id="app">
 
   <section id="title" class="screen active title">
-    <div class="title-inner">
-      <div class="logo">Power<span>play</span></div>
-      <div class="tag">A roguelike cricket card duel. Bowl an over, then chase one. Build your squad between matches and lift the cup.</div>
-      <button class="btn" id="startBtn">Start Run</button>
-      <button class="btn secondary" id="continueBtn" style="display:none">Continue Run</button>
-      <div class="pill-row" id="titleStats"></div>
+    <div class="hero">
+      <div class="hero-mark" id="heroMark"></div>
+      <h1 class="hero-logo">POWER<span>PLAY</span></h1>
+      <div class="hero-hook">Street cricket, one over at a time.<br>Build your team &middot; spin the field &middot; lift the cup.</div>
+      <div class="hero-cta">
+        <button class="btn xl" id="startBtn">New Game</button>
+        <button class="btn secondary xl" id="continueBtn" style="display:none">Continue Run</button>
+      </div>
+      <div class="pill-row hero-stats" id="titleStats"></div>
+    </div>
+  </section>
+
+  <section id="intro" class="screen">
+    <div class="intro-wrap">
+      <div class="ds-title intro-h">Your Kit Bag</div>
+      <div class="intro-sub">Meet your street team — <b>15 players</b>. Bigger number = better card. You'll pick who bats or bowls each ball, and <i>how</i> they play it. Flip any card to see what it does.</div>
+      <div class="intro-cards" id="introCards"></div>
+      <button class="btn xl" id="introGo">Let's Play &rarr;</button>
     </div>
   </section>
 
@@ -6010,7 +6055,25 @@ function startRun(){
   clearSavedRun();
   const startingRoster=starterDraft();
   run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
+  // FIRST run ever: meet your team via the kit-bag reveal, then auto-form the
+  // XI and go straight to the toss (no draft to confuse a new player).
+  if(!localStorage.getItem("pp_seen_intro")){renderIntro();show("intro");return}
   beginSquadSelection();
+}
+function renderIntro(){
+  const cards=roster().slice().sort(sortStrong);
+  $("#introCards").innerHTML=cards.map((c,i)=>
+    `<div class="kit-hold" style="animation-delay:${i*55}ms">${cardHTML(c,{as:"div"})}</div>`).join("");
+  // flip on click so a new player can read the (now teaching) card backs
+  document.querySelectorAll("#introCards .card").forEach(el=>el.onclick=()=>{SFX.play("tick");toggleFlip(el.dataset.id)});
+}
+function startFirstMatch(){
+  localStorage.setItem("pp_seen_intro","1");
+  SFX.play("nav");
+  prepNextRival();
+  run.draftSelected=new Set(roster().slice().sort(sortStrong).slice(0,12).map(c=>c.id));
+  run.deck=selectedDraftCards();
+  setupToss();
 }
 function newChallenge(keepLog=false){
   m.result=null;m.selected=null;m.preview=null;m.selectionLocked=false;challengeAnim=true;
@@ -7889,9 +7952,10 @@ function nextBall(){
   render();
 }
 function renderTitle(){
+  const hm=$("#heroMark");if(hm)hm.innerHTML=fieldRingSVG(null,{fracs:GHOST_FRACS});
   $("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`;
   const cb=$("#continueBtn"),sv=savedRun();
-  if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run · Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
+  if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run &middot; Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
 }
 const _unlock=()=>{SFX.unlock();MUSIC.setMuted(SFX.muted())};
 document.addEventListener("pointerdown",_unlock,{capture:true,passive:true});
@@ -7899,6 +7963,7 @@ document.addEventListener("touchstart",_unlock,{capture:true,passive:true});
 document.addEventListener("keydown",_unlock,{capture:true});
 $("#startBtn").onclick=startRun;
 $("#continueBtn").onclick=continueRun;
+$("#introGo").onclick=startFirstMatch;
 $("#restartBtn").onclick=()=>startRun();
 $("#homeMatchBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
 $("#testWinBtn").onclick=()=>{if(m)completeMatchWin()};
