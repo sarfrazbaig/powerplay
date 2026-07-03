@@ -622,11 +622,8 @@
 
   /* --- shell --- */
   html,body{height:100%;overflow:hidden;color:var(--txt);background:
-    linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),
-    radial-gradient(900px 520px at 50% -18%,rgba(255,232,150,.20),transparent 64%),
-    var(--field);
-    background-size:34px 34px,34px 34px,auto,auto}
+    linear-gradient(#58c8e4 0%,#a9e4ee 34%,#f2e3b8 60%,#e8c97a 100%);
+    background-attachment:fixed}
   #app{height:100dvh;max-width:none;width:100%;margin:0;padding:12px 16px;overflow:hidden}
   .screen{display:none}
   .screen.active{height:calc(100dvh - 24px);min-height:0;overflow:hidden}
@@ -3062,13 +3059,10 @@
     grid-template-rows:auto minmax(0,1fr);
     gap:8px;
     min-height:0;
-    padding:10px;
-    border:3px solid #050505;
-    background:
-      radial-gradient(#152417 1.1px,transparent 1.1px),
-      linear-gradient(180deg,#40b653,#2f8f46);
-    background-size:11px 11px,auto;
-    box-shadow:4px 4px 0 #050505;
+    padding:10px 12px;
+    border:3px solid #17211f;
+    background:linear-gradient(180deg,#fffdf4,#fff2d6);
+    box-shadow:5px 5px 0 rgba(23,33,31,.4);
     overflow:hidden;
   }
   .railx-head{
@@ -3076,22 +3070,24 @@
     align-items:center;
     justify-content:space-between;
     gap:8px;
-    padding:7px 10px;
-    border:3px solid #050505;
-    background:#151817;
-    color:#ffd91f;
+    padding:6px 4px 8px;
+    border:none;
+    border-bottom:3px solid #17211f;
+    background:transparent;
+    color:#ff5a2d;
     font-family:Anton,Impact,sans-serif;
-    font-size:clamp(16px,1.5vw,23px);
+    font-size:clamp(16px,1.5vw,22px);
     font-style:italic;
     text-transform:uppercase;
-    text-shadow:2px 2px 0 #000;
+    text-shadow:1.5px 1.5px 0 rgba(23,33,31,.16);
+    letter-spacing:.4px;
   }
-  .railx-head em{font-style:normal;font-family:"Work Sans",Inter,sans-serif;font-size:13px;color:#fff}
+  .railx-head em{font-style:normal;font-family:"Work Sans",Inter,sans-serif;font-size:12px;color:#7a6a4a;font-weight:800}
   .railx-head.sub-head{margin-top:10px;font-size:clamp(14px,1.2vw,18px)}
   .railx-scroll{min-height:0;overflow:auto;display:block;scrollbar-width:thin;padding:2px}
   .railx-empty{
-    padding:10px;border:2px dashed rgba(0,0,0,.5);background:rgba(255,255,255,.16);
-    color:#0d2b1f;font-weight:800;font-size:12px;text-align:center;
+    padding:10px;border:2px dashed rgba(23,33,31,.4);background:rgba(23,33,31,.04);border-radius:10px;
+    color:#5a4a2a;font-weight:800;font-size:12px;text-align:center;
   }
   /* vouchers */
   .vcard-list{display:grid;gap:8px}
@@ -3146,9 +3142,9 @@
   .stagex-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
   .stagex-head b{
     font-family:Anton,Impact,sans-serif;font-style:italic;text-transform:uppercase;
-    font-size:clamp(22px,2.2vw,34px);color:#111;text-shadow:2px 2px 0 rgba(0,0,0,.14);
+    font-size:clamp(22px,2.2vw,34px);color:#ff5a2d;text-shadow:2px 2px 0 rgba(23,33,31,.16);
   }
-  .stagex-head span{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#6d7a72}
+  .stagex-head span{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#7a6a4a}
   .packx-row{
     display:flex;
     gap:clamp(14px,2.5vw,40px);
@@ -3471,6 +3467,37 @@
   .toolx-ico svg{width:52px;height:52px;color:#fff}
   .toolx b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:21px;text-transform:uppercase;text-shadow:2px 2px 0 rgba(0,0,0,.4)}
   .toolx p{margin:0;font-size:12.5px;line-height:1.35;font-weight:700;color:rgba(255,255,255,.92)}
+  /* ---------- UNIFIED BRIGHT SHOP-ITEM STICKER (coach + tool) ---------- */
+  .itemx{width:100%;background:#fff6e3;border:3px solid #17211f;border-radius:14px;
+    box-shadow:4px 4px 0 rgba(23,33,31,.4);overflow:hidden;display:flex;flex-direction:column;
+    transition:transform .12s ease,box-shadow .12s ease}
+  .staffx:hover .itemx,.pchoice:hover .itemx,.singlex:hover .itemx{transform:translateY(-3px);box-shadow:6px 8px 0 rgba(23,33,31,.42)}
+  .itemx-win{position:relative;aspect-ratio:16/9;background:linear-gradient(180deg,#63caee,#c7ecf7 52%,#8bcb52);
+    border-bottom:3px solid #17211f;display:grid;place-items:end center;overflow:hidden}
+  .itemx-win.win-bowl,.mode-bowl .itemx-win{background:linear-gradient(180deg,#ffb765,#ffd79a 52%,#8bcb52)}
+  .itemx-win.win-any,.mode-any .itemx-win{background:linear-gradient(180deg,#c9a6ff,#e7d7ff 52%,#8bcb52)}
+  .itemx-art{height:114%;width:auto;max-width:90%;object-fit:contain;object-position:bottom center;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.32));margin-bottom:-2px}
+  .itemx-glyph{font-size:clamp(34px,7vw,52px);margin-bottom:8px;line-height:1;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3))}
+  .itemx-glyph svg{width:1em;height:1em}
+  .itemx-chip{position:absolute;top:6px;left:6px;z-index:3;background:#ffc93c;border:2px solid #17211f;border-radius:8px;
+    padding:2px 8px;font:900 9px/1 "Work Sans",sans-serif;text-transform:uppercase;letter-spacing:.4px;color:#17211f}
+  .itemx-chip.chip-uncommon{background:#84e7a6}.itemx-chip.chip-rare{background:#accbff}
+  .itemx-chip.chip-epic{background:#e2aaff}.itemx-chip.chip-legendary{background:#ffe27a}
+  .itemx-kind{position:absolute;top:6px;right:6px;z-index:3;background:rgba(23,33,31,.82);color:#fff6e3;
+    border-radius:7px;padding:2px 7px;font:900 8px/1 "Work Sans",sans-serif;letter-spacing:1px}
+  .itemx-name{background:#17211f;color:#fff6e3;font-family:Anton,Impact,sans-serif;font-style:italic;
+    font-size:14px;text-align:center;padding:5px 8px;letter-spacing:.3px;line-height:1.05}
+  .itemx-effect{padding:7px 9px 9px;font:700 11px/1.32 "Work Sans",sans-serif;color:#3a3326;text-align:center;flex:1}
+  .itemx-ednote{display:block;margin-top:4px;font-style:normal;font-weight:900;font-size:9.5px;color:#7a6a4a;text-transform:uppercase;letter-spacing:.3px}
+  .itemx-sheen{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.55) 48%,transparent 60%);
+    background-size:250% 100%;background-position:180% 0;opacity:0}
+  .itemx--foil .itemx-sheen,.itemx--holographic .itemx-sheen,.itemx--polychrome .itemx-sheen{opacity:1;animation:itemxSheen 2.6s linear infinite}
+  @keyframes itemxSheen{0%{background-position:180% 0}100%{background-position:-80% 0}}
+  .itemx--negative{filter:invert(.9) hue-rotate(180deg)}
+  .itemx.compact .itemx-name{font-size:12px;padding:4px 6px}
+  .itemx.compact .itemx-effect{font-size:10px;padding:5px 7px 6px;line-height:1.28}
   /* ---------- coach sticker card (from Coach Card design) ---------- */
   .ccard{
     width:min(clamp(280px,26vw,352px),56dvh);
@@ -3746,21 +3773,21 @@
     margin:0 auto;
   }
   .screen:not(.title) .top{
-    border:3px solid #050505 !important;
+    border:0 !important;
+    border-bottom:3px solid var(--ink,#17211f) !important;
     border-radius:0 !important;
-    background:
-      linear-gradient(180deg,rgba(255,255,255,.04),transparent 44%),
-      linear-gradient(90deg,#1b211d,#0e120f) !important;
-    box-shadow:4px 4px 0 #050505 !important;
-    color:#fffdf1;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:var(--ink,#17211f);
+    padding:6px 8px 10px !important;
   }
   .screen:not(.title) .match-title,
   .screen:not(.title) .logo{
-    color:var(--ui-gold) !important;
-    text-shadow:3px 3px 0 #050505 !important;
+    color:var(--punch,#ff5a2d) !important;
+    text-shadow:2.5px 2.5px 0 var(--ink,#17211f) !important;
   }
   .screen:not(.title) .sub{
-    color:#dce8d9 !important;
+    color:#5a4a2a !important;
   }
   .screen:not(.title) .btn{
     border-radius:0 !important;
@@ -3917,33 +3944,26 @@
   #shop .shopx-stage,
   #shop .shopx-rail,
   #shop .shopx-foot{
-    border:3px solid #050505 !important;
-    border-radius:0 !important;
-    box-shadow:4px 4px 0 #050505 !important;
+    border:3px solid var(--ink,#17211f) !important;
+    border-radius:16px !important;
+    box-shadow:5px 5px 0 rgba(23,33,31,.4) !important;
   }
   #shop .shopx-stage{
     background:
-      radial-gradient(ellipse at 50% 42%,rgba(255,217,31,.18),transparent 46%),
-      linear-gradient(90deg,rgba(255,255,255,.16),transparent 18%,transparent 82%,rgba(0,0,0,.1)),
-      var(--ui-paper) !important;
+      radial-gradient(ellipse at 50% 34%,rgba(255,201,60,.22),transparent 52%),
+      linear-gradient(180deg,#fffdf4,#fff6e3) !important;
   }
   #shop .stagex-head{
-    padding-bottom:8px;
-    border-bottom:3px solid #050505;
+    padding-bottom:9px;
+    border-bottom:3px solid var(--ink,#17211f);
   }
   #shop .packx-row{
     align-content:center;
   }
   #shop .shopx-rail{
-    background:
-      radial-gradient(#132616 1.1px,transparent 1.1px),
-      linear-gradient(180deg,#42b957,#2f963f) !important;
-    background-size:12px 12px,auto !important;
+    background:linear-gradient(180deg,#fffdf4,#fff2d6) !important;
   }
   #shop .railx-head{
-    border-radius:0 !important;
-  }
-  #shop .vcard{
     border-radius:0 !important;
   }
 
@@ -4858,11 +4878,18 @@
   #shop .shopx-body,.roster-group,.setup-box{
     background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important;
   }
-  /* dark chips / heads -> ink */
-  .railx-head,.deck-title,.stagex-head,.scout-head,.rival-strip-head,.draft-lane-head{
+  /* shop/squad section headers -> summer chalk signs (orange on cream, ink underline) */
+  .railx-head,.deck-title,.stagex-head{
+    background:transparent !important;color:var(--punch) !important;
+    border:0 !important;border-bottom:3px solid var(--ink) !important;border-radius:0 !important;
+  }
+  .railx-head *,.deck-title b,.stagex-head b{color:var(--punch) !important}
+  .railx-head em,.deck-title span,.stagex-head span{color:var(--mutn) !important}
+  /* heads that sit on the green field / dark drawer stay ink chips */
+  .scout-head,.rival-strip-head,.draft-lane-head{
     background:var(--ink) !important;color:#fff6e3 !important;border-color:var(--ink) !important;
   }
-  .railx-head *,.deck-title *,.stagex-head *,.scout-head h3,.scout-head #scoutTitle,.draft-lane-head *{color:#fff6e3 !important}
+  .scout-head h3,.scout-head #scoutTitle,.rival-strip-head *,.draft-lane-head *{color:#fff6e3 !important}
   .shopx-foot{background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important}
   .shopx-foot *:not(.btn):not(.coin){color:var(--ink) !important}
   .scout-head .btn{color:var(--ink) !important}
@@ -7608,30 +7635,31 @@ function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("
 
 function coachCardHTML(coach,compact=false){
   const ed=coach.edition;
-  const rrWord=(ed?EDITIONS[ed].label.toUpperCase():(coach.tier||"COACH").toUpperCase());
-  const rr=(rrWord+" ★ ").repeat(8);
-  return `<div class="ccard ${compact?'compact':''} ${ed?'ccard--'+ed:''} tier-${coach.tier||'common'}">
-    <div class="ccard-frame">
-      <span class="ccard-rr rr-top">${rr}</span>
-      <span class="ccard-rr rr-bottom">${rr}</span>
-      <span class="ccard-rr rr-left">${rr}</span>
-      <span class="ccard-rr rr-right">${rr}</span>
-      <div class="ccard-scene">
-        <div class="ccard-sky"></div>
-        <div class="ccard-ad"></div>
-        <div class="ccard-rope"></div>
-        <div class="ccard-grass"></div>
-        <img class="ccard-art" src="${coachArt(coach)}" alt="" loading="lazy">
-        <span class="ccard-badge">${coach.tier||"coach"}</span>
-        ${ed?`<span class="ccard-edition ed-${ed}">${EDITIONS[ed].label}</span>`:""}
-        <div class="ccard-info">
-          <div class="ccard-name">${coach.name}</div>
-          <div class="ccard-effect">${coach.desc}${ed?`<em class="ed-note">${EDITIONS[ed].desc}</em>`:""}</div>
-        </div>
-        <div class="ccard-shine"></div>
-        <div class="ccard-fx"></div>
-      </div>
+  const tier=coach.tier||"common";
+  return `<div class="itemx coachx tier-${tier} ${ed?'itemx--'+ed:''} ${compact?'compact':''}">
+    <div class="itemx-win">
+      <span class="itemx-chip chip-${tier}">${ed?EDITIONS[ed].label:tier}</span>
+      <span class="itemx-kind">COACH</span>
+      <img class="itemx-art" src="${coachArt(coach)}" alt="" loading="lazy">
+      <span class="itemx-sheen"></span>
     </div>
+    <div class="itemx-name">${coach.name}</div>
+    <div class="itemx-effect">${coach.desc}${ed?`<em class="itemx-ednote">${EDITIONS[ed].label}: ${EDITIONS[ed].desc}</em>`:""}</div>
+  </div>`;
+}
+function toolCardHTML(it){
+  const ico=it.mode==="bowl"?ICON.ball:it.mode==="bat"?ICON.bat:it.mode==="train"?ICON.train:"&#9889;";
+  const kindLbl=it.kind==="instant"?"Instant":"Next ball";
+  const modeLbl=it.kind==="instant"?"Permanent · one use":it.mode==="any"?"Use on any ball":it.mode==="bat"?"Arms your batting":it.mode==="bowl"?"Arms your bowling":"Training";
+  return `<div class="itemx toolx2 mode-${it.mode}">
+    <div class="itemx-win win-${it.mode}">
+      <span class="itemx-chip">${kindLbl}</span>
+      <span class="itemx-kind">TOOL</span>
+      <div class="itemx-glyph">${ico}</div>
+      <span class="itemx-sheen"></span>
+    </div>
+    <div class="itemx-name">${it.name}</div>
+    <div class="itemx-effect">${it.desc}<em class="itemx-ednote">${modeLbl}</em></div>
   </div>`;
 }
 function renderShop(){
@@ -7661,10 +7689,7 @@ function renderShop(){
     let face="";
     if(s.kind==="player")face=`<div class="singlex-cardface">${cardHTML(it,{as:"div"})}</div>`;
     else if(s.kind==="coach")face=`<div class="singlex-cardface">${coachCardHTML(it,true)}</div>`;
-    else face=`<div class="singlex-cardface"><div class="toolx tool-single ${it.mode}">
-        <span class="toolx-tag">${it.kind==="instant"?"Instant":"Next ball"}</span>
-        <b>${it.name}</b><p>${it.desc}</p>
-      </div></div>`;
+    else face=`<div class="singlex-cardface">${toolCardHTML(it)}</div>`;
     const note=s.scouted?`<small class="singlex-note">Scouted vs ${run.nextRival?.arch?.name||"the next rival"}</small>`:"";
     const cta=s.bought?(s.kind==="coach"?"Hired":s.kind==="player"?"Signed":"Sold")
       :(s.kind==="coach"?"Hire":s.kind==="player"?"Sign":"Buy");
@@ -7766,12 +7791,7 @@ function packChoiceMarkup(choice,packIndex,choiceIndex,pack){
   }else if(choice.type==="consumable"){
     cls="tool";
     const c=choice.consumable;
-    const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:c.mode==="train"?ICON.train:"&#9889;";
-    front=`<div class="toolx ${c.mode}">
-      <span class="toolx-tag">${c.kind==="instant"?"Instant &middot; Permanent":c.mode==="any"?"Next ball":c.mode==="bat"?"Next bat ball":"Next bowl ball"}</span>
-      <div class="toolx-ico">${ico}</div>
-      <b>${c.name}</b><p>${c.desc}</p>
-    </div>${pickBtn("Keep")}`;
+    front=`${toolCardHTML(c)}${pickBtn("Keep")}`;
   }else if(choice.type==="hex"){
     cls="hexc";
     const h=choice.hex;
