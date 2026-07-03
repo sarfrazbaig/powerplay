@@ -5129,13 +5129,16 @@ const SFX=(()=>{
     if(ctx.state==="running"){try{fn()}catch(e){}}
     else{pending.push(fn);requestResume()}
   };
+  // ONLY clean interaction blips are allowed to sound. Every match/crowd/
+  // wheel/outcome cue is ignored — nothing droning or scratchy can play.
+  const UI_SOUNDS=new Set(["click","tick","nav","start","buy","toss"]);
   return {
-    play(n){const fn=S[n];if(fn)runSound(fn)},
-    ambient(on){ambWanted=!!on;if(!on){ambientStop();return}runSound(ambientStart)},
-    music(on){musicWanted=!!on;if(!on){musicStop();return}runSound(musicStart)},
-    duck(holdMs,to){runSound(()=>{duckAmbient(holdMs,to);musicDuck(holdMs,to==null?undefined:Math.min(to*3,.04))})},
-    toggle(){muted=!muted;localStorage.setItem("pp_muted",muted?"1":"0");if(muted){pending.length=0;ambientStop();musicStop()}else{ready();if(ambWanted)runSound(ambientStart);if(musicWanted)runSound(musicStart)}return muted},
-    unlock(){if(!muted){ready();if(musicWanted)runSound(musicStart)}},
+    play(n){if(!UI_SOUNDS.has(n))return;const fn=S[n];if(fn)runSound(fn)},
+    ambient(){/* disabled — no synth crowd bed */},
+    music(){/* disabled */},
+    duck(){/* no crowd/music to duck */},
+    toggle(){muted=!muted;localStorage.setItem("pp_muted",muted?"1":"0");if(muted){pending.length=0;ambientStop();musicStop()}else ready();return muted},
+    unlock(){if(!muted)ready()},
     muted(){return muted},
     state(){return ctx?ctx.state:"idle"}
   };
@@ -5608,8 +5611,7 @@ function show(id){
     s.toggleAttribute("inert",!active);
     s.setAttribute("aria-hidden",active?"false":"true");
   });
-  SFX.music(false);SFX.ambient(false);   // no synth beds — the file loop plays instead
-  if(id==="title"||id==="over")MUSIC.stop();else MUSIC.start();
+  SFX.music(false);SFX.ambient(false);MUSIC.stop();   // no beds/music — interaction sounds only
   if(id!=="match"){
     $("#rivalDrawer")?.classList.remove("show");
     const actions=$("#actions");if(actions)actions.innerHTML="";
