@@ -4475,6 +4475,46 @@
     animation:cuePulse 1.15s ease-in-out infinite;
   }
   @keyframes cuePulse{0%,100%{opacity:.45}50%{opacity:1}}
+  /* ---------- OUTCOME POP: the dopamine beat on every ball ---------- */
+  .outcome-pop{position:absolute;top:41%;left:50%;transform:translate(-50%,-50%);z-index:40;
+    pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;
+    animation:outPop 1.15s cubic-bezier(.2,1.5,.3,1) forwards}
+  .outcome-pop b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(46px,7.5vw,98px);
+    line-height:.86;-webkit-text-stroke:3px #17211f;paint-order:stroke;letter-spacing:1px;
+    text-shadow:0 7px 0 rgba(23,33,31,.32)}
+  .outcome-pop span{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(20px,3vw,38px);
+    -webkit-text-stroke:2px #17211f;paint-order:stroke;margin-top:-4px}
+  .pop-six b,.pop-six span{color:#ff9430}
+  .pop-four b,.pop-four span{color:#ffd23f}
+  .pop-wkt b{color:#ff4155}
+  .pop-run b,.pop-run span{color:#2fb98b}
+  .pop-dot b{color:#e7ddc4;font-size:clamp(30px,4vw,54px)}
+  .pop-extra b,.pop-extra span{color:#b98cff}
+  @keyframes outPop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-9deg)}
+    16%{opacity:1;transform:translate(-50%,-50%) scale(1.14) rotate(-2deg)}
+    30%{transform:translate(-50%,-50%) scale(1) rotate(0)}
+    70%{opacity:1;transform:translate(-50%,-56%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-82%) scale(.92)}}
+  #match .av-ground.shake{animation:boardShake .46s ease}
+  @keyframes boardShake{0%,100%{transform:translate(0,0)}15%{transform:translate(-7px,3px)}
+    30%{transform:translate(6px,-4px)}45%{transform:translate(-5px,-2px)}
+    60%{transform:translate(5px,3px)}75%{transform:translate(-3px,-1px)}}
+  /* ---------- end-of-run card: the "play again?" payoff ---------- */
+  .over-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
+    padding:34px 40px !important;max-width:540px}
+  .over-badge{font-size:66px;line-height:1;filter:drop-shadow(0 5px 0 rgba(23,33,31,.28));
+    animation:overBadgePop .6s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes overBadgePop{0%{transform:scale(.2) rotate(-16deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+  .over-card.win .over-badge{animation:overBadgePop .6s cubic-bezier(.2,1.6,.4,1),overBadgeFloat 2.4s ease-in-out .6s infinite}
+  @keyframes overBadgeFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-9px) rotate(3deg)}}
+  .over-card .tag{max-width:460px}
+  .over-stats{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .over-stats .stat-pill{background:rgba(255,246,227,.92);border:2.5px solid var(--ink,#17211f);color:var(--ink,#17211f);
+    border-radius:999px;padding:5px 15px;font-family:"Work Sans",Inter,sans-serif;font-weight:800;font-size:12px}
+  .over-stats .stat-pill b{color:var(--punch,#ff5a2d);font-size:15px;margin-left:5px}
+  .over-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .confetti-burst{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:2}
   .ring-read{
     display:grid;justify-items:center;gap:3px;
     text-align:center;padding:4px;
@@ -5111,10 +5151,15 @@
   </section>
 
   <section id="over" class="screen title">
-    <div class="title-inner">
+    <div class="title-inner over-card" id="overCard">
+      <div class="over-badge" id="overBadge">🏏</div>
       <div class="logo" id="overTitle">Run Over</div>
       <div class="tag" id="overText"></div>
-      <button class="btn" id="homeBtn">Back To Title</button>
+      <div class="over-stats" id="overStats"></div>
+      <div class="over-cta">
+        <button class="btn xl" id="playAgainBtn">Play Again &#9654;</button>
+        <button class="btn secondary" id="homeBtn">Back To Title</button>
+      </div>
     </div>
   </section>
 </div>
@@ -6525,10 +6570,20 @@ function skipResolve(){
   finishLanding(res,target);
 }
 function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-9)}
-function end(title,text){
+function end(title,text,opts={}){
   clearTimeout(settleTimer);
+  const won=opts.win??/champ|won|cup/i.test(title);
+  $("#overTitle").textContent=title;
+  $("#overText").textContent=text;
+  $("#overBadge").textContent=won?"🏆":"🏏";
+  $("#overStats").innerHTML=
+    `<span class="stat-pill">Matches won <b>${run?.wins||0}</b></span>`
+    +`<span class="stat-pill">Best chase <b>${save?.best||0}</b></span>`
+    +`<span class="stat-pill">Cups <b>${save?.cups||0}</b></span>`;
+  const oc=$("#overCard");if(oc){oc.classList.toggle("win",won);oc.classList.toggle("loss",!won)}
+  if(won){SFX.play("win");const c=$("#overCard");if(c){c.querySelectorAll(".confetti-burst").forEach(e=>e.remove());const b=document.createElement("div");b.className="confetti-burst";b.innerHTML=confettiHTML();c.appendChild(b)}}
   clearSavedRun();
-  $("#overTitle").textContent=title;$("#overText").textContent=text;show("over");
+  show("over");
 }
 
 /* ---------- SHOP ---------- */
@@ -7376,7 +7431,29 @@ function finishLanding(res,target){
   const g=document.querySelector(".av-ground");
   const tk=res.strip[res.roll];
   if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
+  showOutcomePop(res);        // the dopamine beat — the outcome punches in
   if(typeof TUT!=="undefined")TUT.notify("land");
+}
+/* The juice: a big sticker word slams in on the outcome, and the board shakes
+   for the game-changing ones (SIX / WICKET). Cricket's highs and lows, felt. */
+function showOutcomePop(res){
+  const tk=res.strip[res.roll];
+  const wkt=(m.phase==="bat"); // a wicket while batting is bad for you, good while bowling
+  const MAP={
+    "6":["SIX!","pop-six","+6"],"4":["FOUR!","pop-four","+4"],
+    "2":["TWO","pop-run","+2"],"1":["SINGLE","pop-run","+1"],
+    "0":["DOT","pop-dot",""],
+    "W":[wkt?"OUT!":"WICKET!","pop-wkt",""],
+    "WD":["WIDE","pop-extra","+1"],"NB":["NO BALL","pop-extra","+1"]
+  };
+  const info=MAP[tk];if(!info)return;
+  const host=document.querySelector("#match .av-ground");if(!host)return;
+  const el=document.createElement("div");
+  el.className="outcome-pop "+info[1];
+  el.innerHTML=`<b>${info[0]}</b>${info[2]?`<span>${info[2]}</span>`:""}`;
+  host.appendChild(el);
+  setTimeout(()=>el.remove(),1150);
+  if(tk==="6"||tk==="W"){host.classList.remove("shake");void host.offsetWidth;host.classList.add("shake");setTimeout(()=>host.classList.remove("shake"),480)}
 }
 /* Danger / answer telegraphs: the rival card menaces when it outguns your
    best available answer; your pick calms the board when it answers back. */
@@ -8259,6 +8336,7 @@ $("#rerollBtn").onclick=()=>{
 $("#squadBackBtn").onclick=()=>{SFX.play("nav");run.pending=null;renderShop();show("shop")};
 $("#squadNextBtn").onclick=()=>{SFX.play("nav");beginSquadSelection()};
 $("#homeBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
+$("#playAgainBtn").onclick=()=>startRun();
 $("#duel").onclick=e=>{
   if(e.target.closest("button,.actions"))return;
   if(m?.result?.state==="resolving"){skipResolve();return}
