@@ -4960,6 +4960,15 @@
   .hero-stats .stat-pill{background:rgba(255,246,227,.85);border:2.5px solid var(--ink);color:var(--ink);
     border-radius:999px;padding:5px 14px;font-weight:800;font-size:13px}
   .hero-stats .stat-pill b{color:var(--punch)}
+  /* ---- meta-progression tracker on the title ---- */
+  .unlock-track{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:10px;max-width:540px}
+  .perk-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+  .perk{font-family:"Work Sans",Inter,sans-serif;font-weight:800;font-size:11px;padding:4px 12px;border-radius:999px;
+    border:2.5px solid var(--ink);letter-spacing:.2px;box-shadow:0 2px 0 rgba(23,33,31,.28)}
+  .perk.got{background:#cfeecd;color:#1e5e2a}
+  .perk.next{background:rgba(255,246,227,.92);color:#5a4a2a;font-weight:700}
+  .perk.next b{color:var(--punch);font-weight:900;font-size:10px;letter-spacing:.6px;margin-right:5px}
+  .perk.next.all{background:var(--gold);color:#4a3300;font-weight:900}
   /* ---- STARTER KIT-BAG reveal ---- */
   #intro.screen.active{display:grid !important;place-items:center;height:100dvh;padding:16px;overflow:hidden}
   .intro-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:min(1100px,96vw);text-align:center}
@@ -5053,6 +5062,7 @@
         <button class="btn secondary xl" id="continueBtn" style="display:none">Continue Run</button>
       </div>
       <div class="pill-row hero-stats" id="titleStats"></div>
+      <div class="unlock-track" id="unlockTrack"></div>
     </div>
   </section>
 
@@ -5939,8 +5949,25 @@ const TEAMS=[
 ];
 let svgSeq=1;
 let save={};try{save=JSON.parse(localStorage.getItem("powerplay_rogue")||"{}")}catch(e){}
-save.best=save.best||0;save.cups=save.cups||0;
+save.best=save.best||0;save.cups=save.cups||0;save.furthest=save.furthest||0;
 let run,m;
+/* ---------- META-PROGRESSION: milestone unlocks (the "one more run" hook).
+   Each is a permanent passive boon earned by how far you've climbed. The
+   title shows what you've earned and what's NEXT — the reason to run again. */
+const UNLOCKS=[
+  {id:"pockets",name:"Sponsor Deal",icon:"💰",desc:"Start every run with +5 coins.",
+   need:s=>s.furthest>=2,progress:s=>`Reach the 3rd match (best: ${s.furthest+1})`,apply:r=>{r.coins+=5}},
+  {id:"scout",name:"Assistant Coach",icon:"📋",desc:"Start every run with a free Batting Coach.",
+   need:s=>s.furthest>=4,progress:s=>`Reach the 5th match (best: ${s.furthest+1})`,apply:r=>{const c=COACHES.find(x=>x.id==="bat_mentor");if(c)(r.coaches=r.coaches||[]).push({...c,instId:uid()})}},
+  {id:"veteran",name:"Star Signing",icon:"⭐",desc:"Your best card starts each run +6 BAT / +6 BOWL.",
+   need:s=>s.cups>=1,progress:s=>`Win a cup (${s.cups}/1)`,apply:r=>{const b=r.roster.slice().sort(sortStrong)[0];if(b)boostCard(b,6,6)}},
+  {id:"legend",name:"Dynasty",icon:"🏆",desc:"Start every run with +10 coins and a free Bowling Coach.",
+   need:s=>s.cups>=3,progress:s=>`Win 3 cups (${s.cups}/3)`,apply:r=>{r.coins+=10;const c=COACHES.find(x=>x.id==="bowling_mentor");if(c)(r.coaches=r.coaches||[]).push({...c,instId:uid()})}}
+];
+function unlockedPerks(){return UNLOCKS.filter(u=>u.need(save))}
+function nextLockedPerk(){return UNLOCKS.find(u=>!u.need(save))}
+function applyUnlocks(r){unlockedPerks().forEach(u=>{try{u.apply(r)}catch(e){}})}
+function noteFurthest(){const f=Math.max(save.furthest||0,(run?.match)||0);if(f!==save.furthest){save.furthest=f;persist()}}
 let dealAnim=true,challengeAnim=false,anim=false;
 /* Universal card-flip contract: clicking anywhere on a full-size card flips
    it to the radial back; flip state survives re-renders. Screens where a
@@ -6328,6 +6355,7 @@ function startRun(){
   clearSavedRun();
   const startingRoster=starterDraft();
   run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
+  applyUnlocks(run);   // permanent boons earned across runs
   // FIRST run ever: meet your team via the kit-bag reveal, then auto-form the
   // XI and go straight to the toss (no draft to confuse a new player).
   if(!localStorage.getItem("pp_seen_intro")){renderIntro();show("intro");return}
@@ -8224,6 +8252,7 @@ function createMatchShell(def){
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
+  noteFurthest();   // record how far this run has climbed (unlock progress)
   const def=MATCHES[run.match];
   m=createMatchShell(def);
   m.coinFace=null;
@@ -8468,11 +8497,20 @@ function maybeStartTutorial(){
   if(!m||!m.challenge||m.result)return;
   if(run&&run.match===0)TUT.start();
 }
+function renderUnlockTrack(){
+  const el=$("#unlockTrack");if(!el)return;
+  const got=unlockedPerks(),next=nextLockedPerk();
+  const gotChips=got.map(u=>`<span class="perk got" title="${u.name}: ${u.desc}">${u.icon} ${u.name}</span>`).join("");
+  const nextChip=next?`<span class="perk next" title="${next.name}: ${next.desc}"><b>NEXT UNLOCK</b> ${next.icon} ${next.name} — ${next.progress(save)}</span>`
+    :`<span class="perk next all">🏆 All perks unlocked — go for a perfect run!</span>`;
+  el.innerHTML=(got.length?`<div class="perk-row">${gotChips}</div>`:"")+nextChip;
+}
 function renderTitle(){
   const hm=$("#heroMark");if(hm)hm.innerHTML=fieldRingSVG(null,{fracs:GHOST_FRACS});
   $("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`;
+  renderUnlockTrack();
   const cb=$("#continueBtn"),sv=savedRun();
-  if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run &middot; Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
+  if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run · Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
 }
 const _unlock=()=>{SFX.unlock();MUSIC.setMuted(SFX.muted())};
 document.addEventListener("pointerdown",_unlock,{capture:true,passive:true});
