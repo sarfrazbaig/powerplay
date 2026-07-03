@@ -4469,6 +4469,12 @@
   }
   #match .ring-center .actions .btn{padding:7px 18px;font-size:12px}
   .ring-center .actions:empty{display:none}
+  .ring-nextcue{
+    margin-top:7px;font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:11px;
+    letter-spacing:2px;text-transform:uppercase;color:var(--mutn,#7a6a4a);
+    animation:cuePulse 1.15s ease-in-out infinite;
+  }
+  @keyframes cuePulse{0%,100%{opacity:.45}50%{opacity:1}}
   .ring-read{
     display:grid;justify-items:center;gap:3px;
     text-align:center;padding:4px;
@@ -6193,6 +6199,7 @@ function newChallenge(keepLog=false){
   m.luckyTick=Math.random()<.5;
   m.stance=null; // fresh ball, back to the natural stance
   m.stripCache={};
+  flippedCards.clear(); // flips are per-ball inspection — never carry a flipped card back into the hand
   if(typeof clearSpin==="function")clearSpin();
   m.challenge=m.phase==="bowl"?rivalCard("bat"):rivalCard("bowl");
   if(!m.challenge){
@@ -6910,6 +6917,7 @@ function renderScorebug(){
   const phase=m.phase==="bat"?"Batting":"Bowling";
   const v=bugView();
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
+    <div class="bug-cell bug-over"><span>This over</span>${renderOverStrip()}</div>
     <div class="bug-cell"><span>You</span><b>${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
     <div class="bug-cell"><span>Rival</span><b>${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
     <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
@@ -7211,9 +7219,11 @@ function paintRing(svg,fracs){
 }
 function ringSvgEl(){return document.querySelector(".av-ringwrap .ring-svg")}
 let morphRAF=null;
-/* Each changed sector eases into its new size, but STAGGERED — one after
-   the other — so the eye follows what changed instead of everything
-   shifting at once. */
+/* ONE coherent reshape per beat. Every sector eases to its new size on a
+   single clock and the fractions are re-normalised each frame so the slices
+   always fill the ring — no independent, cumulative reflow that read as
+   "random". The field smoothly morphs to the new odds; the resolve's beats
+   are what sequence the changes one at a time. */
 function animateRing(prevMap,data,opts={}){
   cancelAnimationFrame(morphRAF);
   const svg=ringSvgEl();if(!svg)return;
@@ -7222,19 +7232,15 @@ function animateRing(prevMap,data,opts={}){
   union.forEach(t=>{from[t]=prevMap[t]||0;to[t]=(data.find(d=>d.tk===t)?.frac)||0});
   const changed=union.filter(t=>Math.abs(from[t]-to[t])>0.004);
   if(!changed.length){paintRing(svg,data);return}
-  const stagger=opts.stagger??150,dur=opts.dur??430,startAt={};
-  changed.forEach((t,i)=>startAt[t]=i*stagger);
-  const total=dur+stagger*Math.max(0,changed.length-1),t0=performance.now();
+  const dur=opts.dur??560,t0=performance.now();
+  const ease=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2; // smooth cubic in-out
   const step=now=>{
-    const el=now-t0;
-    const cur=union.map(t=>{
-      const s=(t in startAt)?startAt[t]:0;
-      const p=Math.max(0,Math.min(1,(el-s)/dur));
-      const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
-      return {tk:t,frac:from[t]+(to[t]-from[t])*e};
-    });
+    const p=Math.max(0,Math.min(1,(now-t0)/dur)),e=ease(p);
+    let cur=union.map(t=>({tk:t,frac:Math.max(0,from[t]+(to[t]-from[t])*e)}));
+    const sum=cur.reduce((s,d)=>s+d.frac,0)||1;   // keep the field whole
+    cur=cur.map(d=>({tk:d.tk,frac:d.frac/sum}));
     paintRing(svg,cur);
-    if(el<total)morphRAF=requestAnimationFrame(step);
+    if(p<1)morphRAF=requestAnimationFrame(step);
     else{
       paintRing(svg,data);
       if(opts.flash)changed.forEach(t=>{const g=svg.querySelector(`.ring-sec[data-tk="${t}"]`);if(g){g.classList.remove("flash");void g.offsetWidth;g.classList.add("flash");setTimeout(()=>g.classList.remove("flash"),650)}});
@@ -7357,7 +7363,8 @@ function finishLanding(res,target){
   paintRing(ringSvgEl(),ringFracs(res.strip));
   if(target){const n=$("#ringNeedle");if(n&&res.needleAt!=null){n.style.transition="none";n.style.transform=`rotate(${res.needleAt}deg)`}}
   const c=$("#ringCenter");
-  if(c){c.innerHTML=`${ringResultHTML()}<div class="actions" id="actions"><button class="ring-go next" id="nextBall">NEXT<br>BALL</button></div>`;c.classList.add("slam");const nb=$("#nextBall");if(nb)nb.onclick=nextBall}
+  if(c){c.innerHTML=`${ringResultHTML()}<div class="ring-nextcue" id="nextCue">next ball &#9654;</div>`;c.classList.add("slam")}
+  scheduleAutoNext();   // the outcome reads, then the next ball deals itself (tap to skip)
   const d=$("#duel");if(d){d.classList.remove("resolving");d.classList.add("settled","ball-landed")}
   const ms=$("#match");if(ms){ms.classList.remove("is-resolving");ms.classList.add("is-settled")}
   const win=resultWinner(res);
@@ -7421,7 +7428,6 @@ function renderDuel(pop=false){
       ?`<div class="ring-center slam" id="ringCenter">${ringResultHTML()}<div class="actions" id="actions"><button class="ring-go next" id="nextBall">NEXT<br>BALL</button></div></div>`
       :`<div class="ring-center" id="ringCenter">${ringCenterRead()}<div class="actions" id="actions"></div></div>`;
   d.innerHTML=`${fh}
-    <div class="av-overarc">${renderOverStrip()}</div>
     <div class="av-duelrow ${danger?'threat':''}">
       ${youCol}
       <div class="av-ringwrap">${ringHTML}${needle}${centerBits}</div>
@@ -8102,8 +8108,16 @@ function finish(){
   if(won)completeMatchWin();
   else end("Run Over",`Final: you ${m.you.runs}/${m.you.wk}, rival ${m.rival.runs}/${m.rival.wk}.`);
 }
+function scheduleAutoNext(){
+  clearTimeout(m.__autoNext);
+  // let the outcome land and read, then deal the next ball automatically.
+  m.__autoNext=setTimeout(()=>{
+    if(m&&m.result&&m.result.state==="settled"&&document.getElementById("match")?.classList.contains("active"))nextBall();
+  },1500);
+}
 function nextBall(){
   if(!m.result)return;
+  clearTimeout(m.__autoNext);
   SFX.play("nav");
   if(m.innings===2){
     if(m.phase==="bat"&&m.you.runs>m.target)return finish();
@@ -8248,6 +8262,7 @@ $("#homeBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
 $("#duel").onclick=e=>{
   if(e.target.closest("button,.actions"))return;
   if(m?.result?.state==="resolving"){skipResolve();return}
+  if(m?.result?.state==="settled"){clearTimeout(m.__autoNext);nextBall();return} // tap to skip the wait
   const card=e.target.closest(".card--duel");
   if(card)toggleFlip(card.dataset.id);
 };
