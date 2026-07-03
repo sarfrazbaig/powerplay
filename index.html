@@ -5193,13 +5193,18 @@
   .av-dock{
     display:flex;flex-direction:column;align-items:center;gap:10px;
     padding:10px 8px;border-radius:14px;
-    min-height:0;height:100%;max-height:100%;overflow:hidden auto;
+    min-height:0;height:100%;max-height:100%;overflow:hidden;
     background:rgba(255,255,255,.10);
     border:2.5px dashed rgba(255,255,255,.8);
     align-self:stretch;
   }
+  /* seats flex-fit the dock height — never a scrollbar on the field */
+  .av-dock .seats,.av-dock .kits{flex:1 1 0;min-height:0;justify-content:center;gap:8px}
+  .av-dock .seat{
+    flex:1 1 0;min-height:50px;max-height:200px;
+    width:auto;aspect-ratio:5/6;max-width:min(176px,94%);align-self:center;
+  }
   /* coaches are CHARACTERS — give the art room to breathe */
-  .av-dock .seat{width:min(176px,94%);flex:0 0 auto}
   .av-dock .kit-card{width:min(176px,94%);flex:0 0 auto}
   .seat-name{font-size:11px;padding:4px}
   .kit-ico{width:34px;height:34px}
@@ -5306,7 +5311,7 @@
     transform:translateX(-6px);
   }
   .kit-card.offmode{opacity:.5}
-  .kit-empty{display:grid;place-items:center;padding:14px 0}
+  .kit-empty{display:grid;place-items:center;padding:14px 0;flex:1}
   .bag-ill{width:56px;color:rgba(23,33,31,.16)}
   /* ---------- the pitch ---------- */
   #match .av-pitch{ /* the center of the ground — transparent, the GROUND is the surface */
@@ -5485,7 +5490,7 @@
   .fanhold{
     width:clamp(118px,min(9.5vw,15vh),190px);flex:0 0 auto;position:relative;
     margin-left:calc(clamp(118px,min(9.5vw,15vh),190px)*-.68);
-    transform:translateY(16%);
+    transform:translateY(8%);
     z-index:var(--z);
     cursor:pointer;
   }
@@ -5547,7 +5552,17 @@
     display:grid;place-items:center;font-size:12px;font-weight:900;padding:0 4px;
   }
   .av-rivalfan{align-items:center;gap:16px}
-  .rivhold.slot-empty{width:76px}
+  .av-rivalfan .rivhold{margin-left:0}
+  .rivhold.slot-empty{
+    width:76px;aspect-ratio:5/7;border-radius:10px;
+    border:2.5px dashed rgba(255,255,255,.7);background:rgba(255,255,255,.08);
+    display:grid;place-items:center;
+  }
+  .rivhold.slot-empty span{
+    font-size:9px;font-weight:900;letter-spacing:2px;color:rgba(255,255,255,.85);
+    text-shadow:1px 1px 0 rgba(23,33,31,.5);
+  }
+  .ring-read.result b.ring-token{font-size:clamp(30px,3.2vw,46px)}
   /* fan cards drop old grid sizing */
   .av-fan .card,.av-rivalfan .card{height:auto !important;min-height:0 !important}
   /* ---------- scorebug stays broadcast, gains rail badges ---------- */
@@ -7339,12 +7354,13 @@ function animateRing(prevMap,data){
    reveals only in the staged battle. That's the spark. */
 function ringCenterRead(){
   if(m.selected)return ""; // the big PLAY button IS the message
-  return `<div class="ring-read wait"><b>PICK A CARD</b><span>the field reveals on play</span></div>`;
+  return `<div class="ring-read wait"><b>PICK A CARD</b><span>bigger zone = more likely</span></div>`;
 }
 function ringResultHTML(){
+  // token only — the words live in the commentary line below the wheel
   const token=ballToken(m.result.text);
   const cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":(token==="wd"||token==="nb"?"extra":"run"));
-  return `<div class="ring-read result ${cls}"><b class="ring-token">${token.toUpperCase()}</b><span>${m.result.text}</span>${shouldCelebrate(m.result)?confettiHTML():""}</div>`;
+  return `<div class="ring-read result ${cls}"><b class="ring-token">${token.toUpperCase()}</b>${shouldCelebrate(m.result)?confettiHTML():""}</div>`;
 }
 let spinTimers=[];
 function clearSpin(){spinTimers.forEach(clearTimeout);spinTimers=[];cancelAnimationFrame(morphRAF)}
@@ -7475,7 +7491,7 @@ function renderDuel(pop=false){
   }
   const resolving=m.result?.state==="resolving";
   const ringHTML=resolving?fieldRingSVG(null,{fracs:GHOST_FRACS}):ring;
-  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 22 L184 74 L170 63 L156 74 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><circle cx="170" cy="170" r="13" fill="#17211f" stroke="#fff6e3" stroke-width="3"/></svg></div>`;
+  const needle=`<div class="ring-needle" id="ringNeedle"><svg viewBox="0 0 340 340"><path d="M170 22 L184 74 L170 63 L156 74 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><circle cx="170" cy="170" r="7" fill="#17211f" stroke="#fff6e3" stroke-width="2"/></svg></div>`;
   const centerBits=resolving
     ?`<div class="ring-center" id="ringCenter"><div class="ring-read spin"><b>THE DUEL</b><span>even field</span></div></div>`
     :m.result
@@ -7485,7 +7501,7 @@ function renderDuel(pop=false){
     <div class="av-overarc">${renderOverStrip()}</div>
     <div class="av-duelrow ${danger?'threat':''}">
       ${youSlot}
-      <div class="av-ringwrap">${ringHTML}${needle}${centerBits}<div class="ring-cap">BIGGER ZONE&nbsp;=&nbsp;MORE LIKELY</div></div>
+      <div class="av-ringwrap">${ringHTML}${needle}${centerBits}</div>
       ${rivSlot}
     </div>
     ${commentaryHTML()}`;
@@ -8053,13 +8069,13 @@ function renderRivalStrip(){
       <b>${spent.length}</b><span>SPENT</span>
     </button>
     <div class="rival-deckstack" title="${unusedN} more rival cards wait their turn">
-      ${cardBackHTML()}${unusedN>1?cardBackHTML("under"):""}
+      ${cardBackHTML()}
       <b class="deck-count">${unusedN}</b>
     </div>
     ${up?`<div class="rivhold next-up">
       ${cardHTML(up,{used:false,disabled:true,emph:disc,mini:true,as:"div"})}
       <span class="pitch-flag next-flag">NEXT UP</span>
-    </div>`:`<div class="rivhold slot-empty">${cardBackHTML("ghost")}</div>`}`;
+    </div>`:`<div class="rivhold slot-empty"><span>NEXT</span></div>`}`;
   const rp=document.querySelector(".rival-pile");if(rp)rp.onclick=openRivalDeck;
   const ds=document.querySelector(".rival-deckstack");if(ds)ds.onclick=openRivalDeck;
 }
