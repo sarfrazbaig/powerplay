@@ -5229,6 +5229,34 @@
     background:var(--gold);color:#111;font-size:8px;font-weight:900;letter-spacing:1px;
     padding:2px 7px;border-radius:99px;border:2px solid #0c1214;white-space:nowrap;z-index:3;
   }
+  .pitch-flag.next-flag{background:#fff;color:var(--ink)}
+  .rivhold.next-up{transform:translateY(3px)}
+  .rivhold.next-up .card{outline:2.5px dashed #fff;outline-offset:-2px;border-radius:10px}
+  /* ---------- impact: the ball actually lands ---------- */
+  .av-ground.hit-wicket{animation:groundShake .55s cubic-bezier(.3,.9,.4,1)}
+  .av-ground.hit-six{animation:groundBlaze .8s ease}
+  .av-ground.hit-four{animation:groundFlash .7s ease}
+  @keyframes groundShake{
+    0%,100%{transform:translate(0,0)}
+    15%{transform:translate(-7px,3px) rotate(-.4deg)}
+    30%{transform:translate(6px,-4px) rotate(.4deg)}
+    45%{transform:translate(-5px,2px)}
+    60%{transform:translate(4px,-2px)}
+    75%{transform:translate(-2px,1px)}
+  }
+  @keyframes groundBlaze{
+    0%{box-shadow:6px 6px 0 rgba(23,33,31,.55)}
+    30%{box-shadow:0 0 0 6px #ff9430,0 0 70px 16px rgba(255,148,48,.8);transform:scale(1.008)}
+    100%{box-shadow:6px 6px 0 rgba(23,33,31,.55);transform:scale(1)}
+  }
+  @keyframes groundFlash{
+    0%{box-shadow:6px 6px 0 rgba(23,33,31,.55)}
+    30%{box-shadow:0 0 0 5px var(--gold),0 0 50px 10px rgba(255,210,63,.7)}
+    100%{box-shadow:6px 6px 0 rgba(23,33,31,.55)}
+  }
+  /* equation slams when the score becomes real */
+  #match.is-settled .scorebug .bug-target{animation:eqSlam .45s cubic-bezier(.2,1.5,.4,1)}
+  @keyframes eqSlam{0%{transform:scale(.82)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
   .seats,.kits{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
   .seat{
     width:min(150px,92%);aspect-ratio:5/6;border-radius:12px;position:relative;overflow:hidden;
@@ -6287,6 +6315,17 @@ function selectedDraftCards(){
   return roster().filter(c=>ids.has(c.id)).sort(sortStrong);
 }
 function rivalCard(kind){const pool=m.rivalDeck.filter(c=>!c.used);let best=pool[0],val=-1;pool.forEach(c=>{const v=kind==="bat"?batVal(c):bowlVal(c);if(v>val){best=c;val=v}});return best}
+// The rival bats in order — strongest first. So "who's padded up next"
+// is honest knowledge, and saving your best answer becomes a real call.
+function nextRivalUp(){
+  if(!m?.rivalDeck||!m.challenge)return null;
+  const kind=m.phase==="bowl"?"bat":"bowl";
+  const pool=m.rivalDeck.filter(c=>!c.used&&c!==m.challenge);
+  if(!pool.length)return null;
+  let best=pool[0],val=-1;
+  pool.forEach(c=>{const v=kind==="bat"?batVal(c):bowlVal(c);if(v>val){best=c;val=v}});
+  return best;
+}
 
 /* ---------- RUN PERSISTENCE (between-match checkpoints) ----------
    Coaches/traits/consumables hold functions, so we store ids and
@@ -7266,6 +7305,12 @@ function startRingSpin(rollToken){
         const c=$("#ringCenter");
         if(c){c.innerHTML=ringResultHTML();c.classList.add("slam")}
         const pitch=$("#duel");if(pitch)pitch.classList.add("ball-landed");
+        // the moment HITS: shake on wickets, blaze on boundaries
+        const g=document.querySelector(".av-ground");
+        if(g){
+          const cls=rollToken==="W"?"hit-wicket":rollToken==="6"?"hit-six":rollToken==="4"?"hit-four":null;
+          if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
+        }
       }
     },delay));
   }
@@ -7861,9 +7906,10 @@ function renderRivalStrip(){
   const disc=m.phase==="bowl"?"bat":"bowl"; // their relevant discipline
   $("#rivalStripMeta").textContent=`${m.rivalDeck.filter(c=>!c.used).length} left`;
   const cards=fanSort(m.rivalDeck);
-  $("#rivalStrip").innerHTML=cards.map(c=>`<div class="rivhold ${c.used?'is-used':''} ${m.challenge?.id===c.id?'on-pitch':''}">
+  const up=m.result?null:nextRivalUp();
+  $("#rivalStrip").innerHTML=cards.map(c=>`<div class="rivhold ${c.used?'is-used':''} ${m.challenge?.id===c.id?'on-pitch':''} ${up?.id===c.id?'next-up':''}">
       ${cardHTML(c,{used:c.used,disabled:true,emph:disc,mini:true,as:"div"})}
-      ${m.challenge?.id===c.id?'<span class="pitch-flag">ON PITCH</span>':''}
+      ${m.challenge?.id===c.id?'<span class="pitch-flag">ON PITCH</span>':(up?.id===c.id?'<span class="pitch-flag next-flag">NEXT UP</span>':'')}
     </div>`).join("");
 }
 function completeMatchWin(){
