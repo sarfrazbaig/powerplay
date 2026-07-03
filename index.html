@@ -8587,6 +8587,30 @@ $("#duel").onclick=e=>{
   const card=e.target.closest(".card--duel");
   if(card)toggleFlip(card.dataset.id);
 };
+/* Keyboard controls in the match — Space/Enter to play·skip·advance, 1/2/3
+   for the stance, number keys to pick a hand card, Esc to cancel. */
+document.addEventListener("keydown",e=>{
+  if(!document.getElementById("match")?.classList.contains("active"))return;
+  if(e.target?.matches?.("input,textarea,select,button"))return;
+  if(!m)return;
+  const k=e.key;
+  if(k===" "||k==="Enter"){
+    e.preventDefault();
+    if(m.result?.state==="resolving"){skipResolve();return}
+    if(m.result?.state==="settled"){clearTimeout(m.__autoNext);nextBall();return}
+    if(m.selected&&!m.result){confirmSelected();return}
+    return;
+  }
+  if(m.result)return;
+  if(k==="Escape"&&m.selected){e.preventDefault();cancelSelected();return}
+  if(m.selected){                                   // pick the stance for the selected card
+    const keys=Object.keys(STANCES[m.phase]);
+    if(["1","2","3"].includes(k)&&keys[+k-1]){e.preventDefault();setStance(keys[+k-1]);return}
+  }else if(/^[1-9]$/.test(k)){                        // pick a hand card by position
+    const pool=activeSquad().filter(c=>!c.used);const c=pool[+k-1];
+    if(c){e.preventDefault();lockCard(c)}
+  }
+});
 /* ---------- card physics: pick a card UP and carry it to the crease.
    A ghost follows the pointer with momentum tilt; dropping it on the
    field plays it, dropping it back returns it to the hand. ---------- */
