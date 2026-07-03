@@ -4071,22 +4071,22 @@
   .tool-tray{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;padding:0 0 6px}
   /* 7. scorebug: neutral band, the EQUATION is the only loud cell */
   #match .scorebug{
-    background:#151817 !important;
+    background:#fff6e3 !important;
   }
   #match .scorebug .bug-cell{
-    background:transparent !important;
-    color:#e8f0e6 !important;
-    border-color:rgba(255,253,241,.16) !important;
+    background:#fffdf4 !important;
+    color:#17211f !important;
+    border-color:#17211f !important;
   }
-  #match .scorebug .bug-cell span,
-  #match .scorebug .bug-cell small{color:#9fb0a2 !important}
-  #match .scorebug .bug-cell b{color:#fffdf1 !important}
+  #match .scorebug .bug-cell span{color:#7a6a4a !important}
+  #match .scorebug .bug-cell small{color:#5a4a2a !important}
+  #match .scorebug .bug-cell b{color:#17211f !important}
   #match .scorebug .bug-cell.bug-target{
-    background:var(--ui-gold) !important;
+    background:var(--gold,#ffc93c) !important;
   }
   #match .scorebug .bug-cell.bug-target span,
   #match .scorebug .bug-cell.bug-target small{color:#4a3d00 !important}
-  #match .scorebug .bug-cell.bug-target b{color:#111 !important}
+  #match .scorebug .bug-cell.bug-target b{color:#17211f !important}
   /* 9a. hierarchy at scale: rails are fixed-cap side columns; the
         CENTER is the hero and takes everything else (fixes 2560px
         screens where 25vw rails starved the duel to 600px) */
