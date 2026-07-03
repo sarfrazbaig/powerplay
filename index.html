@@ -1562,17 +1562,17 @@
   #squad .setup-panel h3,
   #squad .deck-title b{
     font-family:Anton,Impact,sans-serif;
-    color:#ffd91f;
+    color:#ff5a2d;
     font-style:italic;
     text-transform:uppercase;
-    text-shadow:2px 2px 0 #000;
+    text-shadow:1.5px 1.5px 0 rgba(23,33,31,.16);
   }
   #shop .shop-section h2,
   #squad .setup-panel h3{
-    margin:-12px -12px 10px;
-    padding:9px 12px;
-    border-bottom:3px solid #ffd91f;
-    background:#1976bf;
+    margin:-10px -12px 10px;
+    padding:8px 12px 9px;
+    border-bottom:3px solid #17211f;
+    background:transparent;
   }
   #shop .hint,
   #squad .setup-box p{color:#111}
@@ -1969,6 +1969,10 @@
     transform-style:preserve-3d;
     transition:transform .18s ease,filter .18s ease,opacity .18s ease;
   }
+  /* picking mode: the tappable cards pulse gold so "tap a card" is obvious */
+  #squad .roster-row .card.pickable{animation:pickPulse 1.1s ease-in-out infinite;cursor:pointer;border-radius:14px}
+  @keyframes pickPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,201,60,0)}50%{box-shadow:0 0 0 4px rgba(255,201,60,.85)}}
+  #squad .roster-row .card.pickable:hover{filter:saturate(1.12) brightness(1.04)}
   #squad .roster-row .card:hover,
   #squad .roster-row .card:focus-visible{
     transform:perspective(900px) rotateX(5deg) rotateY(-7deg) translateY(-4px) !important;
@@ -3974,25 +3978,30 @@
   }
   #squad .squad-rail,
   #squad .prep-panel.full{
-    border:3px solid #050505 !important;
-    border-radius:0 !important;
-    box-shadow:4px 4px 0 #050505 !important;
+    border:3px solid var(--ink,#17211f) !important;
+    border-radius:16px !important;
+    box-shadow:5px 5px 0 rgba(23,33,31,.4) !important;
   }
   #squad .squad-rail{
-    background:#151817 !important;
-    color:#fffdf1;
+    background:linear-gradient(180deg,#fffdf4,#fff2d6) !important;
+    color:var(--ink,#17211f) !important;
   }
   #squad .prep-panel.full{
-    background:
-      radial-gradient(#132616 1.1px,transparent 1.1px),
-      linear-gradient(180deg,#42b957,#2f963f) !important;
-    background-size:12px 12px,auto !important;
+    background:linear-gradient(180deg,#fffdf4,#fff6e3) !important;
   }
   #squad .roster-group{
-    background:rgba(255,253,241,.12);
-    border:3px solid rgba(5,5,5,.72);
+    background:rgba(23,33,31,.03) !important;
+    border:2px solid rgba(23,33,31,.16) !important;
+    border-radius:12px !important;
     padding:8px 10px 10px;
   }
+  #squad.screen.active{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+  }
+  #squad .top{order:0 !important}
+  #squad .squad-room{order:1 !important;flex:1 1 auto !important;min-height:0 !important}
   #squad .roster-row{
     overflow-x:auto !important;
     overflow-y:visible !important;
