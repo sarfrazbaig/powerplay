@@ -4509,7 +4509,19 @@
     letter-spacing:.4px;white-space:nowrap;box-shadow:0 4px 0 #17211f;
     animation:btPop 1s cubic-bezier(.2,1.5,.3,1) forwards}
   .bt-trait{background:#d3b8ff}.bt-tool{background:#8bcb52}.bt-coach{background:#ffc93c}
+  .bt-momentum{background:#ff6a2b;color:#fff}.bt-fire{background:#ff4d1c;color:#fff}.bt-warm{background:#ffb03a}
   .bt-spark{font-style:normal;filter:drop-shadow(0 1px 0 rgba(23,33,31,.3))}
+  /* the HEAT meter in the scorebug — cricket's mult */
+  .bug-heat .heat-bar{display:flex;gap:3px;margin:2px 0}
+  .bug-heat .heat-bar i{width:13px;height:13px;border-radius:3px;background:rgba(23,33,31,.16);
+    border:1.5px solid rgba(23,33,31,.32);transition:background .25s,box-shadow .25s}
+  .bug-heat .heat-bar i.on{background:#ffb03a;border-color:#17211f}
+  .bug-heat.heat-warm .heat-bar i.on{background:#ff8a2b}
+  .bug-heat.heat-fire .heat-bar i.on{background:#ff4d1c;box-shadow:0 0 6px rgba(255,77,28,.85);animation:heatFlick .55s ease-in-out infinite alternate}
+  @keyframes heatFlick{from{filter:brightness(1)}to{filter:brightness(1.4)}}
+  .bug-heat .heat-lbl{font-weight:900;text-transform:uppercase;letter-spacing:.4px;font-size:10px}
+  .bug-heat.heat-fire .heat-lbl{color:#ff4d1c}
+  .bug-heat.heat-warm .heat-lbl{color:#ff8a2b}
   @keyframes btPop{0%{opacity:0;transform:translateX(-50%) scale(.5) translateY(8px)}
     20%{opacity:1;transform:translateX(-50%) scale(1.12) translateY(0)}
     35%{transform:translateX(-50%) scale(1)}
@@ -6146,7 +6158,46 @@ function applyStance(mode,strip,card){
   return s;
 }
 function applyMatchModifiers(mode,strip,card){
-  return applyOwnedConsumableStrip(mode,applyCoachStrips(mode,applyCardStripTrait(mode,applyStance(mode,strip,card),card),card));
+  return applyMomentum(mode,applyOwnedConsumableStrip(mode,applyCoachStrips(mode,applyCardStripTrait(mode,applyStance(mode,strip,card),card),card)));
+}
+/* ---------- MOMENTUM (the "heat"): cricket's version of Balatro's mult.
+   Boundaries build your batting heat; dots+wickets build bowling pressure.
+   As it climbs, the wheel literally reshapes in your favour — but a wicket
+   (batting) or a boundary conceded (bowling) resets it to zero. That's the
+   real per-ball decision: cash in the heat, or protect it. ---------------- */
+const MOM_WARM=2, MOM_FIRE=4, MOM_CAP=6;
+function momentumSlots(){const n=m?.momentum||0;return n>=MOM_FIRE?2:n>=MOM_WARM?1:0}
+function momentumState(){const n=m?.momentum||0;return n>=MOM_FIRE?"fire":n>=MOM_WARM?"warm":null}
+function applyMomentum(mode,strip){
+  const n=momentumSlots();if(n<=0)return strip;
+  let s=strip.slice();
+  if(mode==="bat"){
+    const to=(m.momentum>=MOM_FIRE)?"6":"4";      // hot bat: worst slots become boundaries
+    const order=to==="6"?["0","1","2","4"]:["0","1","2"];  // fire can even upgrade a 4 -> 6
+    for(let i=0;i<n;i++){let done=false;
+      for(const t of order){const idx=s.indexOf(t);if(idx>=0){s[idx]=to;done=true;break}}
+      if(!done)break;
+    }
+  }else{
+    for(let i=0;i<n;i++){                           // hot bowler: a scoring slot becomes a wicket
+      const order=["6","4","2","1","0"];let done=false;
+      for(const t of order){const idx=s.indexOf(t);if(idx>=0){s[idx]="W";done=true;break}}
+      if(!done)break;
+    }
+  }
+  return s;
+}
+// after a ball settles, the heat rises or breaks (the meter conveys it)
+function updateMomentum(mode,out){
+  if(out.extra)return;               // extras don't move the heat
+  if(mode==="bat"){
+    if(out.wicket)m.momentum=0;                     // out — partnership broken
+    else if(out.runs>=4)m.momentum=Math.min(MOM_CAP,(m.momentum||0)+1);
+    else if(out.runs===0)m.momentum=Math.max(0,(m.momentum||0)-1);
+  }else{
+    if(out.runs>=4)m.momentum=0;                    // smashed for four/six — pressure released
+    else if(out.wicket||out.runs===0)m.momentum=Math.min(MOM_CAP,(m.momentum||0)+1);
+  }
 }
 function applyInstantConsumable(def){
   const report=def.use?def.use():"";
@@ -6507,7 +6558,14 @@ function stripChain(mode,card){
     const owned=nextConsumable(mode);
     beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
   }
-  return {final:s4,beats};
+  s=s4;
+  // MOMENTUM applies last — when you're hot, the heat reshapes the field.
+  const s5=applyMomentum(mode,s);
+  if(s5.join("|")!==s.join("|")){
+    const st=momentumState();
+    beats.push({label:st==="fire"?"🔥 ON FIRE":"⚡ MOMENTUM",note:st==="fire"?"the heat takes over":"the streak pays off",strip:s5.slice(),kind:"momentum"});
+  }
+  return {final:s5,beats};
 }
 // armed strip consumables burn only on a legal delivery
 function consumeArmed(mode){
@@ -6541,6 +6599,7 @@ function resolveBowl(c){
     else if(out.runs===0)m.dotsBowled=(m.dotsBowled||0)+1;
     use(c);
   }
+  updateMomentum("bowl",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
   m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
@@ -6567,6 +6626,7 @@ function resolveBat(c){
     m.hotBat=out.runs>=4;
     use(c);
   }
+  updateMomentum("bat",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
   m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
@@ -6997,9 +7057,16 @@ function renderScorebug(){
   const v=bugView();
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
     <div class="bug-cell bug-over"><span>This over</span>${renderOverStrip()}</div>
+    <div class="bug-cell bug-heat heat-${momentumState()||'cold'}"><span>Heat</span>${heatBarHTML()}</div>
     <div class="bug-cell"><span>You</span><b>${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
     <div class="bug-cell"><span>Rival</span><b>${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
     <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
+}
+function heatBarHTML(){
+  const n=m.momentum||0,st=momentumState();
+  const pips=Array.from({length:MOM_CAP},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join("");
+  const lbl=st==="fire"?"ON FIRE 🔥":st==="warm"?"heating up":(m.phase==="bat"?"hit boundaries":"dots & wickets");
+  return `<div class="heat-bar">${pips}</div><small class="heat-lbl">${lbl}</small>`;
 }
 function oddsSummary(strip){
   const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
@@ -7393,7 +7460,7 @@ function startResolveSequence(){
       SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
       if(b.kind==="coach"){const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
-      if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
+      if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait"||b.kind==="momentum")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
     t+=760+170*Math.max(0,changes-1); // slow enough to read each beat's cascade
     prev=shape;
@@ -8097,7 +8164,7 @@ function prepNextRival(){
 function createMatchShell(def){
   run.deck.forEach(c=>c.used=false);
   const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
-  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,stripCache:{},log:"Scout the rival and choose your innings."};
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,momentum:0,stripCache:{},log:"Scout the rival and choose your innings."};
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
@@ -8254,7 +8321,7 @@ function nextBall(){
     if(m.innings===1){
       if(m.phase==="bowl"){m.target=m.rival.runs;m.phase="bat";m.innings=2;m.ball=1;m.history=[];m.log=`Chase <b>${m.target+1}</b>. Bowling cards used this match are gone.`}
       else{m.target=m.you.runs;m.phase="bowl";m.innings=2;m.ball=1;m.history=[];m.log=`Defend <b>${m.target}</b>. Batting cards used this match are gone.`}
-      m.chain=0;m.hotHand=false;m.hotBat=false;m.extrasCount=0;m.freeHit=false;
+      m.chain=0;m.hotHand=false;m.hotBat=false;m.extrasCount=0;m.freeHit=false;m.momentum=0;
       if(!newChallenge(true)){finish();return}
       render();return;
     }
