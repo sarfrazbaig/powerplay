@@ -4957,8 +4957,9 @@
   .purpose .why b{color:var(--ink)}
   /* ---- TITLE / HERO landing ---- */
   #title.screen.active{display:grid !important;place-items:center;height:100dvh;padding:20px;overflow:hidden}
-  #title.screen.active{position:relative;overflow:hidden}
+  .screen.active.title{position:relative;overflow:hidden}
   .title-scene{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9}
+  #over .title-inner,#over .over-card{position:relative;z-index:2}
   .title-scene svg{width:100%;height:100%;display:block}
   .title-scene .ts-sun{transform-box:view-box;transform-origin:1180px 150px;animation:tsSun 7s ease-in-out infinite}
   @keyframes tsSun{0%,100%{opacity:.92;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
@@ -5277,6 +5278,20 @@
   </section>
 
   <section id="over" class="screen title">
+    <div class="title-scene" aria-hidden="true">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <g class="ts-sun"><circle cx="1210" cy="140" r="80" fill="#ffd23f"/><circle cx="1210" cy="140" r="128" fill="#ffd23f" opacity=".16"/></g>
+        <g stroke="#17211f" stroke-width="3" fill="none" opacity=".72"><path d="M-20 84 Q 380 200 760 104 T 1460 122"/></g>
+        <g class="ts-flags">
+          <path d="M70 108 l40 6 -30 34 Z" fill="#ff5a2d"/><path d="M210 126 l42 2 -26 38 Z" fill="#2fb98b"/>
+          <path d="M360 130 l42 -2 -22 40 Z" fill="#ffc93c"/><path d="M520 118 l42 -6 -18 40 Z" fill="#b98cff"/>
+          <path d="M760 100 l42 -4 -18 41 Z" fill="#ff4155"/><path d="M1020 116 l42 4 -26 38 Z" fill="#3aa5ee"/>
+          <path d="M1200 120 l42 0 -22 40 Z" fill="#2fb98b"/>
+        </g>
+        <path d="M0 726 Q 720 666 1440 726 V 900 H0 Z" fill="#6fae3a" opacity=".5"/>
+        <path d="M0 768 Q 720 714 1440 768 V 900 H0 Z" fill="#5c9a2e" opacity=".45"/>
+      </svg>
+    </div>
     <div class="title-inner over-card" id="overCard">
       <div class="over-badge" id="overBadge">🏏</div>
       <div class="logo" id="overTitle">Run Over</div>
