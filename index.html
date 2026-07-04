@@ -6659,7 +6659,7 @@ function card(rarityKey="common",roleForce,opts={}){
   const rarity=RARITIES[key];
   const cap=opts.cap||99;
   const base=(opts.anchor!=null?opts.anchor:levelAnchor(runLevel()))+(RARITY_BONUS[key]||0)+(opts.shift||0);
-  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,rarity:key,trait:null,used:false,batBoost:0,bowlBoost:0};
+  const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),nation:pick(NATIONS),role,rarity:key,trait:null,used:false,batBoost:0,bowlBoost:0};
   const anchorFor=(disc)=>clamp(Math.round(base+((role==="all"||role===disc)?2:0)),1,cap);
   c.batting=rollSubs(anchorFor("bat"),cap,BAT_KEYS);
   c.bowling=rollSubs(anchorFor("bowl"),cap,BOWL_KEYS);
@@ -8090,6 +8090,27 @@ const STAT_ORDER_BAT=["timing","technique","power","nerve"];
 const STAT_ORDER_BOWL=["pace","movement","accuracy","deception"];
 
 
+
+const NATIONS=["IND","AUS","ENG","NZ","PAK","SA","WI","SL"];
+function nationFor(c){return c.nation||NATIONS[Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%NATIONS.length]}
+/* tiny circular flags — flat, simplified national colours (24x24 viewBox) */
+const NATION_FLAG={
+  IND:`<rect x="0" y="0" width="24" height="8" fill="#ff9933"/><rect x="0" y="8" width="24" height="8" fill="#fff"/><rect x="0" y="16" width="24" height="8" fill="#138808"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="#054187" stroke-width="1.2"/>`,
+  AUS:`<rect width="24" height="24" fill="#00247d"/><path d="M16.5 12.5 l1.2 2.6 2.8 .3 -2.1 1.9 .6 2.7 -2.5 -1.4 -2.5 1.4 .6 -2.7 -2.1 -1.9 2.8 -.3 Z" fill="#fff"/><circle cx="7" cy="6" r="1.3" fill="#fff"/><circle cx="5" cy="12" r="1.1" fill="#fff"/><circle cx="9" cy="16" r="1.1" fill="#fff"/>`,
+  ENG:`<rect width="24" height="24" fill="#fff"/><rect x="9.5" y="0" width="5" height="24" fill="#ce1124"/><rect x="0" y="9.5" width="24" height="5" fill="#ce1124"/>`,
+  NZ:`<rect width="24" height="24" fill="#00247d"/><path d="M15.5 5 l.9 2 2.1 .2 -1.6 1.4 .5 2 -1.9 -1 -1.9 1 .5 -2 -1.6 -1.4 2.1 -.2 Z" fill="#cc142b" stroke="#fff" stroke-width=".7"/><circle cx="16.5" cy="14" r="1.5" fill="#cc142b" stroke="#fff" stroke-width=".7"/><circle cx="12" cy="18.5" r="1.5" fill="#cc142b" stroke="#fff" stroke-width=".7"/>`,
+  PAK:`<rect width="24" height="24" fill="#01411c"/><rect width="6" height="24" fill="#fff"/><path d="M17.5 7 a5.5 5.5 0 1 0 0 10 a4.4 4.4 0 1 1 0 -10 Z" fill="#fff"/><path d="M18.5 10.4 l.7 1.5 1.6 .2 -1.2 1.1 .3 1.6 -1.4 -.8 -1.4 .8 .3 -1.6 -1.2 -1.1 1.6 -.2 Z" fill="#fff"/>`,
+  SA:`<rect width="24" height="24" fill="#e03c31"/><rect y="14" width="24" height="10" fill="#001489"/><path d="M0 0 L12 12 L0 24 Z" fill="#000"/><path d="M0 8 L8 12 L0 16 Z" fill="#ffb612"/><rect y="10" width="24" height="4" fill="#007749"/>`,
+  WI:`<rect width="24" height="24" fill="#7b0041"/><path d="M12 3 l2 4.4 4.8 .5 -3.6 3.2 1 4.7 -4.2 -2.4 -4.2 2.4 1 -4.7 -3.6 -3.2 4.8 -.5 Z" fill="#fcd116"/>`,
+  SL:`<rect width="24" height="24" fill="#ffb700"/><rect x="3" y="3" width="18" height="18" fill="#8d153a"/><circle cx="12" cy="12" r="4.5" fill="#ffb700"/><circle cx="12" cy="12" r="2" fill="#8d153a"/>`
+};
+function nationFlagSVG(c,cx,cy,r){
+  const f="nf"+(svgSeq++);
+  return `<clipPath id="${f}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>
+    <g clip-path="url(#${f})"><g transform="translate(${cx-r} ${cy-r}) scale(${(2*r/24).toFixed(3)})">${NATION_FLAG[nationFor(c)]||NATION_FLAG.IND}</g></g>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#fff6e3" stroke-width="2"/>`;
+}
+
 /* Role icons — vector remakes of the user-supplied flat icons:
    red seamed ball (bowl), gold bat w/ pink-yellow grip (bat), bat+ball (all). */
 const ROLE_ICON={
@@ -8128,7 +8149,7 @@ function playerSilhouette(c,dim){
       <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
     </filter>
     <g ${flip?'transform="translate(176 0) scale(-1 1)"':""}>
-      <image href="${img}" x="16" y="24" width="144" height="254" preserveAspectRatio="xMidYMax meet" filter="url(#${f})" opacity="${dim?.88:1}"/>
+      <image href="${img}" x="-41" y="20" width="258" height="258" preserveAspectRatio="xMidYMax meet" filter="url(#${f})" opacity="${dim?.88:1}"/>
     </g>`;
 }
 const STAT_FULL={pace:"PACE",timing:"TIMING",movement:"MOVEMENT",technique:"TECHNIQUE",accuracy:"ACCURACY",power:"POWER",deception:"DECEPTION",nerve:"NERVE"};
@@ -8167,10 +8188,12 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
       ${playerSilhouette(c,dim)}
     </g>
     <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
-    ${`<circle cx="34" cy="34" r="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/><g transform="translate(22 22)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>`}
+    
     ${tiles}
     <rect x="12" y="298" width="226" height="30" rx="9" fill="#17211f"/>
-    <text x="125" y="319" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>13?16:19}" letter-spacing=".3">${name}</text>
+    <g transform="translate(21 304.5) scale(.79)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>
+    <text x="128" y="319" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>13?15:18}" letter-spacing=".3">${name}</text>
+    ${nationFlagSVG(c,224,313,10.5)}
   </svg>`;
 }
 // a face-down back for deck stacks — summer sticker language
