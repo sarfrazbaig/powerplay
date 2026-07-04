@@ -8140,16 +8140,23 @@ function playerSilhouette(c,dim){
   const img=draftArtForCard(c);
   const f="sf"+(svgSeq++);
   const flip=(Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%2)===1;
-  return `<filter id="${f}" x="-12%" y="-12%" width="124%" height="124%">
+  // rarity is readable from the FIGURE: tinted body + rarity rim; legendary glows
+  const R={common:{body:"#17211f",rim:"#fff6e3"},
+           uncommon:{body:"#0f2e1a",rim:"#8fe6b0"},
+           rare:{body:"#0e2440",rim:"#96c8f8"},
+           epic:{body:"#241040",rim:"#cfa6ff"},
+           legendary:{body:"#2b1f03",rim:"#ffd75e",glow:"#ffc93c"}}[c.rarity]||{body:"#17211f",rim:"#fff6e3"};
+  return `<filter id="${f}" x="-14%" y="-14%" width="128%" height="128%">
       <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="fat"/>
-      <feFlood flood-color="#fff6e3" result="ink"/>
-      <feComposite in="ink" in2="fat" operator="in" result="rim"/>
-      <feFlood flood-color="#17211f" result="cream"/>
-      <feComposite in="cream" in2="SourceAlpha" operator="in" result="body"/>
-      <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
+      <feFlood flood-color="${R.rim}" result="rimc"/>
+      <feComposite in="rimc" in2="fat" operator="in" result="rim"/>
+      <feFlood flood-color="${R.body}" result="bodyc"/>
+      <feComposite in="bodyc" in2="SourceAlpha" operator="in" result="body"/>
+      <feMerge result="fig"><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
+      ${R.glow?`<feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="${R.glow}" flood-opacity=".75"/>`:""}
     </filter>
     <g ${flip?'transform="translate(176 0) scale(-1 1)"':""}>
-      <image href="${img}" x="-41" y="20" width="258" height="258" preserveAspectRatio="xMidYMax meet" filter="url(#${f})" opacity="${dim?.88:1}"/>
+      <image href="${img}" x="-31" y="40" width="238" height="238" preserveAspectRatio="xMidYMax meet" filter="url(#${f})" opacity="${dim?.88:1}"/>
     </g>`;
 }
 const STAT_FULL={pace:"PACE",timing:"TIMING",movement:"MOVEMENT",technique:"TECHNIQUE",accuracy:"ACCURACY",power:"POWER",deception:"DECEPTION",nerve:"NERVE"};
@@ -8190,10 +8197,10 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
     <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
     
     ${tiles}
-    <rect x="12" y="298" width="226" height="30" rx="9" fill="#17211f"/>
-    <g transform="translate(21 304.5) scale(.79)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>
-    <text x="128" y="319" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>13?15:18}" letter-spacing=".3">${name}</text>
-    ${nationFlagSVG(c,224,313,10.5)}
+    <rect x="12" y="292" width="226" height="44" rx="10" fill="#17211f"/>
+    <g transform="translate(20 301) scale(1.08)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>
+    <text x="128" y="321" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>13?16:19}" letter-spacing=".3">${name}</text>
+    ${nationFlagSVG(c,221,314,13)}
   </svg>`;
 }
 // a face-down back for deck stacks — summer sticker language
