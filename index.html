@@ -8329,20 +8329,12 @@ function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,acti
 function hotStatFor(c){
   if(!m)return null;
   const isRival=isRivalCard(c);
-  if(!m.challengeStat){
-    // BOWLING, nothing picked yet: telegraph the batter's WEAK SPOT — his
-    // lowest answering lane pulses as a soft target (pick a bowler to hit it)
-    if(m.phase==="bowl"&&isRival&&!m.result){
-      const subs=effSubs(c,"bat");
-      return BAT_KEYS.reduce((a,k)=>subs[k]<subs[a]?k:a,BAT_KEYS[0]);
-    }
-    return null;
-  }
+  if(!m.challengeStat)return null; // bowling pre-pick: the batter's four visible numbers ARE the scout
   if(m.phase==="bat")return isRival?m.challengeStat:CHAL_PAIR[m.challengeStat];
   // bowling: your bowler shows the challenge, the rival batter shows the answer
   return isRival?CHAL_PAIR[m.challengeStat]:m.challengeStat;
 }
-function hotIsSoft(){return !!(m&&m.phase==="bowl"&&!m.challengeStat&&!m.result)}
+function hotIsSoft(){return false} // weak-spot pulse retired (lane choice covers it)
 function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}">${cardHTML(c,{emph,as:"div",duel:true,active:true,hot:hotStatFor(c),hotSoft:hotIsSoft(),eff:effSubs(c,emph==="bowl"?"bowl":"bat")})}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="placeholder">+</div></div>`}
 /* ---------- THE FIELD RING: 12 sectors of a cricket ground.
@@ -8475,9 +8467,9 @@ function ringCenterRead(){
   if(m.selected){
     // the duel, distilled: YOUR number vs THEIRS in the lane colour, above PLAY
     if(m.challengeStat){
-      const chall=m.challengeStat,resp=CHAL_PAIR[chall],lc=STAT_COLOR[chall];
-      const mine=m.phase==="bat"?Math.round(effSubs(m.selected,"bat")[resp]):Math.round(effSubs(m.selected,"bowl")[chall]);
-      const theirs=m.phase==="bat"?Math.round(effSubs(m.challenge,"bowl")[chall]):Math.round(effSubs(m.challenge,"bat")[resp]);
+      const lc=STAT_COLOR[m.challengeStat];
+      const d=m.phase==="bat"?duelStats("bat",m.selected,m.challenge):duelStats("bowl",m.challenge,m.selected);
+      const mine=m.phase==="bat"?d.respVal:d.challVal, theirs=m.phase==="bat"?d.challVal:d.respVal;
       return `<div class="duel-read" style="--lc:${lc}"><b>${mine}</b><span>vs</span><b>${theirs}</b></div>`;
     }
     return "";
