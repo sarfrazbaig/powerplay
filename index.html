@@ -4000,14 +4000,15 @@
   .coach-zone-head em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;font-size:11px;color:#7a6a4a}
   .coach-zone-row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;flex:0 1 auto;min-width:0;justify-content:center}
   .coachfx{
-    position:relative;width:104px;flex:0 0 auto;display:flex;flex-direction:column;
-    background:#fff6e3;border:2.5px solid var(--ink,#17211f);border-radius:12px;
-    box-shadow:2px 3px 0 rgba(23,33,31,.4);overflow:hidden;
+    position:relative;width:132px;flex:0 0 auto;display:flex;flex-direction:column;
+    background:#fff6e3;border:3px solid var(--ink,#17211f);border-radius:13px;
+    box-shadow:3px 4px 0 rgba(23,33,31,.42);overflow:hidden;
   }
   .coach-zone.sellable .coachfx:not(.empty){cursor:pointer;transition:transform .12s,box-shadow .12s}
-  .coach-zone.sellable .coachfx:not(.empty):hover{transform:translateY(-3px);box-shadow:2px 6px 0 rgba(23,33,31,.45)}
-  .coachfx-art{aspect-ratio:1/.92;overflow:hidden;background:linear-gradient(#63caee 0%,#c7ecf7 48%,#8bcb52 100%);border-bottom:2.5px solid var(--ink,#17211f)}
-  .coachfx-art img{width:100%;height:100%;object-fit:cover;object-position:top}
+  .coach-zone.sellable .coachfx:not(.empty):hover{transform:translateY(-3px);box-shadow:3px 7px 0 rgba(23,33,31,.45)}
+  /* FULL-ART card: a tall portrait window shows the whole coach illustration */
+  .coachfx-art{aspect-ratio:4/5;overflow:hidden;background:linear-gradient(#63caee 0%,#c7ecf7 46%,#a7db6b 74%,#7cc94f 100%);border-bottom:3px solid var(--ink,#17211f)}
+  .coachfx-art img{width:100%;height:100%;object-fit:cover;object-position:center top}
   .coachfx-name{
     font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:11px;color:var(--ink,#17211f);
     text-align:center;padding:4px 5px;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -4024,9 +4025,9 @@
   }
   .coachfx.empty{
     border-style:dashed;border-color:rgba(23,33,31,.32);background:rgba(23,33,31,.03);
-    display:grid;place-items:center;color:rgba(23,33,31,.26);min-height:120px;
+    display:grid;place-items:center;color:rgba(23,33,31,.24);align-self:stretch;
   }
-  .coachfx.empty svg{width:46px;height:46px;fill:currentColor}
+  .coachfx.empty svg{width:52px;height:52px;fill:currentColor}
   .coachfx.ed-foil{box-shadow:2px 3px 0 rgba(23,33,31,.4),0 0 10px rgba(155,193,255,.6)}
   .coachfx.ed-holographic{box-shadow:2px 3px 0 rgba(23,33,31,.4),0 0 11px rgba(216,145,255,.6)}
   .coachfx.ed-polychrome{box-shadow:2px 3px 0 rgba(23,33,31,.4),0 0 12px rgba(91,225,136,.65)}
@@ -4832,7 +4833,7 @@
   .seat.fired,.coachfx.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
   /* match dugout: full-art coaches stacked in the left dock */
   #dugout .dugout-coaches{display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;padding-top:2px}
-  #dugout .coachfx{width:min(100%,124px);flex:0 0 auto}
+  #dugout .coachfx{width:min(100%,132px);flex:0 0 auto}
   #dugout.av-dock{background:rgba(255,255,255,.14);border:2.5px dashed rgba(255,255,255,.7)}
   @keyframes seatFire{
     0%{transform:scale(1)}
@@ -5142,10 +5143,6 @@
   /* ---- TITLE / HERO landing ---- */
   #title.screen.active{display:grid !important;place-items:center;height:100dvh;padding:20px;overflow:hidden}
   .screen.active.title{position:relative;overflow:hidden}
-  /* toss: coach band pinned at top, the coin card centres in the space below */
-  #toss.screen.active{display:flex;flex-direction:column;place-items:stretch;padding-top:8px}
-  #toss .toss-coachzone{flex:0 0 auto;z-index:3;width:min(1120px,96%);margin:0 auto}
-  #toss .title-inner.toss-card2{margin:auto}
   .title-scene{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9}
   #over .title-inner,#over .over-card{position:relative;z-index:2}
   .title-scene svg{width:100%;height:100%;display:block}
@@ -5330,7 +5327,6 @@
       </div>
       <button class="btn secondary sm" id="draftRestartBtn">Restart</button>
     </div>
-    <div class="screen-coachzone prep-coachzone" id="draftCoachZone"></div>
     <div class="draft-layout">
       <aside class="setup-panel">
         <h3>Squad Setup</h3>
@@ -5365,7 +5361,6 @@
   </section>
 
   <section id="toss" class="screen title">
-    <div class="screen-coachzone toss-coachzone" id="tossCoachZone"></div>
     <div class="title-inner toss-card2">
       <div class="toss-head"><b id="tossTitle">The Toss</b><span id="tossSub">Call the coin — the winner picks bat or bowl.</span></div>
       <div class="coin-stage"><div class="coin-flip" id="coinFlip"></div></div>
@@ -8564,7 +8559,6 @@ function draftLaneHTML(role,label,cards,ids){
 }
 function renderDraft(){
   run.draftPool=roster().slice().sort(sortStrong);
-  const cz=$("#draftCoachZone");if(cz)cz.innerHTML=coachStripHTML();
   const selected=selectedDraftCards();
   $("#draftTitle").textContent=`Powerplay`;
   $("#draftSub").textContent=`Round ${run.match+1}/${MATCHES.length}`;
@@ -8675,7 +8669,6 @@ function tossSummaryHTML(){
 }
 function renderToss(){
   const boss=m.def.boss;
-  const cz=$("#tossCoachZone");if(cz)cz.innerHTML=coachStripHTML();
   $("#tossTitle").innerHTML=boss?`🏆 ${m.def.cup} FINAL`:"The Toss";
   const tc=$("#tossCard")||$("#toss .toss-card2");if(tc)tc.classList.toggle("is-final",!!boss);
   const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
