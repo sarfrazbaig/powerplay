@@ -4561,6 +4561,30 @@
   @keyframes boardShake{0%,100%{transform:translate(0,0)}15%{transform:translate(-7px,3px)}
     30%{transform:translate(6px,-4px)}45%{transform:translate(-5px,-2px)}
     60%{transform:translate(5px,3px)}75%{transform:translate(-3px,-1px)}}
+  /* streak tag under the outcome word — the build compounding */
+  .pop-streak{font-family:"Work Sans",sans-serif;font-weight:900;font-size:clamp(13px,1.7vw,20px);
+    color:#fff;background:linear-gradient(180deg,#ff7a2d,#e02a2a);border:2.5px solid #17211f;
+    border-radius:999px;padding:3px 13px;margin-top:6px;-webkit-text-stroke:0;letter-spacing:.4px;
+    box-shadow:0 3px 0 rgba(23,33,31,.4);animation:streakPop .4s cubic-bezier(.2,1.6,.4,1) both}
+  .pop-streak.big{font-size:clamp(16px,2.2vw,26px);background:linear-gradient(180deg,#ffd23f,#ff7a2d)}
+  @keyframes streakPop{0%{transform:scale(.2) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(-2deg);opacity:1}}
+  /* ON FIRE: the whole outcome runs hotter */
+  .outcome-pop.pop-hot b{-webkit-text-stroke-color:#e02a2a;text-shadow:0 0 22px rgba(255,120,45,.9),0 7px 0 rgba(23,33,31,.32)}
+  .outcome-pop.pop-hot{animation:outPop 1.15s cubic-bezier(.2,1.5,.3,1) forwards,hotShiver .16s linear 3}
+  @keyframes hotShiver{0%,100%{filter:none}50%{filter:brightness(1.3)}}
+  /* the engine comes ONLINE — a full-board eruption */
+  .ignition{position:absolute;top:33%;left:50%;transform:translate(-50%,-50%);z-index:45;pointer-events:none;
+    display:flex;flex-direction:column;align-items:center;text-align:center;
+    animation:igPop .5s cubic-bezier(.2,1.6,.35,1) both}
+  .ignition b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(38px,6vw,74px);color:#ff7a2d;
+    -webkit-text-stroke:3px #17211f;paint-order:stroke;letter-spacing:1px;text-shadow:0 0 26px rgba(255,120,45,.95),0 6px 0 rgba(23,33,31,.3)}
+  .ignition span{font-family:"Work Sans",sans-serif;font-weight:800;font-size:clamp(12px,1.6vw,17px);color:#17211f;
+    background:var(--gold,#ffc93c);border:2.5px solid #17211f;border-radius:999px;padding:3px 14px;margin-top:8px}
+  .ignition.out{animation:igOut .4s ease forwards}
+  @keyframes igPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}55%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}100%{transform:translate(-50%,-50%) scale(1)}}
+  @keyframes igOut{to{opacity:0;transform:translate(-50%,-72%) scale(.9)}}
+  #match .av-ground.ablaze{box-shadow:6px 6px 0 rgba(23,33,31,.55),inset 0 0 90px rgba(255,120,45,.5),0 0 40px rgba(255,90,40,.4)}
+  @media(prefers-reduced-motion:reduce){.pop-streak,.ignition,.outcome-pop.pop-hot{animation-duration:.01s}}
   /* build FIRES: a flashy pill above the wheel when a coach/trait/tool triggers */
   .build-trigger{position:absolute;top:6%;left:50%;transform:translateX(-50%);z-index:30;pointer-events:none;
     display:flex;align-items:center;gap:6px;padding:5px 15px;border:3px solid #17211f;border-radius:999px;
@@ -6407,6 +6431,9 @@ function updateMomentum(mode,out){
   if(out.extra)return;               // extras don't move the heat
   const bank=activeCoaches().some(c=>c.heatBank);     // Slow Burn: a break only HALVES the heat
   const brk=()=>{m.momentum=bank?Math.floor((m.momentum||0)/2):0};
+  const wasFire=momentumState()==="fire";
+  // a "good" ball for YOU: a boundary batting / a dot or wicket bowling
+  const good=mode==="bat"?out.runs>=4:(out.wicket||out.runs===0);
   if(mode==="bat"){
     if(out.wicket)brk();                              // out — partnership broken
     else if(out.runs>=4)m.momentum=Math.min(MOM_CAP,(m.momentum||0)+1);
@@ -6415,6 +6442,10 @@ function updateMomentum(mode,out){
     if(out.runs>=4)brk();                             // smashed for four/six — pressure released
     else if(out.wicket||out.runs===0)m.momentum=Math.min(MOM_CAP,(m.momentum||0)+1);
   }
+  // streak = consecutive good balls (the pop-off counter); ignition = engine just came online
+  m.streak=good?(m.streak||0)+1:0;
+  m.wktStreak=(mode==="bowl"&&out.wicket)?(m.wktStreak||0)+1:0; // hat-trick tracker
+  m.justIgnited=!wasFire&&momentumState()==="fire";
 }
 function applyInstantConsumable(def){
   const report=def.use?def.use():"";
@@ -7808,8 +7839,20 @@ function finishLanding(res,target){
   const tk=res.strip[res.roll];
   if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
   showOutcomePop(res);        // the dopamine beat — the outcome punches in
+  if(m.justIgnited){m.justIgnited=false;setTimeout(()=>showIgnition(),260)} // the engine comes ONLINE
   maybeExplainHeat();         // teach the heat mechanic once, in context
   if(typeof TUT!=="undefined")TUT.notify("land");
+}
+/* The build comes online: crossing into ON FIRE erupts a banner — the cricket
+   answer to a Balatro joker engine firing. This is the "one more run" hit. */
+function showIgnition(){
+  const host=document.querySelector("#match .av-ground");if(!host)return;
+  const el=document.createElement("div");el.className="ignition";
+  el.innerHTML=`<b>ON FIRE!</b><span>${m.phase==="bat"?"boundary zones grow — cash in":"wicket zone grows — strike now"}</span>`;
+  host.appendChild(el);
+  host.classList.add("ablaze");
+  setTimeout(()=>{el.classList.add("out");setTimeout(()=>el.remove(),400)},1500);
+  setTimeout(()=>host.classList.remove("ablaze"),1800);
 }
 /* The juice: a big sticker word slams in on the outcome, and the board shakes
    for the game-changing ones (SIX / WICKET). Cricket's highs and lows, felt. */
@@ -7825,12 +7868,20 @@ function showOutcomePop(res){
   };
   const info=MAP[tk];if(!info)return;
   const host=document.querySelector("#match .av-ground");if(!host)return;
+  // the build PAYS OFF: a good ball rides your streak/heat into a bigger moment
+  const good=m.phase==="bat"?(tk==="4"||tk==="6"):(tk==="W"||tk==="0");
+  const hot=momentumState()==="fire"&&good;
+  const streak=good?(m.streak||0):0;
+  let tag="";
+  if(m.wktStreak>=3)tag=`<span class="pop-streak big">HAT-TRICK! 🎩</span>`;
+  else if(m.wktStreak===2)tag=`<span class="pop-streak">on a hat-trick!</span>`;
+  else if(streak>=2)tag=`<span class="pop-streak">🔥 ${streak} in a row!</span>`;
   const el=document.createElement("div");
-  el.className="outcome-pop "+info[1];
-  el.innerHTML=`<b>${info[0]}</b>${info[2]?`<span>${info[2]}</span>`:""}`;
+  el.className="outcome-pop "+info[1]+(hot?" pop-hot":"");
+  el.innerHTML=`<b>${info[0]}</b>${info[2]?`<span>${info[2]}</span>`:""}${tag}`;
   host.appendChild(el);
   setTimeout(()=>el.remove(),1150);
-  if(tk==="6"||tk==="W"){host.classList.remove("shake");void host.offsetWidth;host.classList.add("shake");setTimeout(()=>host.classList.remove("shake"),480)}
+  if(tk==="6"||tk==="W"||hot||m.wktStreak>=3){host.classList.remove("shake");void host.offsetWidth;host.classList.add("shake");setTimeout(()=>host.classList.remove("shake"),480)}
 }
 /* Teach the heat mechanic in context, exactly once, the first time it rises. */
 function maybeExplainHeat(){
@@ -8480,7 +8531,7 @@ function prepNextRival(){
 function createMatchShell(def){
   run.deck.forEach(c=>c.used=false);
   const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
-  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,momentum:0,stripCache:{},log:"Scout the rival and choose your innings."};
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,momentum:0,streak:0,wktStreak:0,justIgnited:false,stripCache:{},log:"Scout the rival and choose your innings."};
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
@@ -8642,7 +8693,7 @@ function nextBall(){
     if(m.innings===1){
       if(m.phase==="bowl"){m.target=m.rival.runs;m.phase="bat";m.innings=2;m.ball=1;m.history=[];m.log=`Chase <b>${m.target+1}</b>. Bowling cards used this match are gone.`}
       else{m.target=m.you.runs;m.phase="bowl";m.innings=2;m.ball=1;m.history=[];m.log=`Defend <b>${m.target}</b>. Batting cards used this match are gone.`}
-      m.chain=0;m.hotHand=false;m.hotBat=false;m.extrasCount=0;m.freeHit=false;m.momentum=0;
+      m.chain=0;m.hotHand=false;m.hotBat=false;m.extrasCount=0;m.freeHit=false;m.momentum=0;m.streak=0;m.wktStreak=0;m.justIgnited=false;
       if(!newChallenge(true)){finish();return}
       render();return;
     }
