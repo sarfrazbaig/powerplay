@@ -3998,7 +3998,23 @@
   }
   .coach-zone-head b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;color:var(--punch,#ff5a2d);text-transform:uppercase;letter-spacing:.4px;line-height:1}
   .coach-zone-head em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;font-size:11px;color:#7a6a4a}
-  .coach-zone-row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;flex:0 1 auto;min-width:0;justify-content:center}
+  .coach-zone-row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch;flex:0 1 auto;min-width:0;justify-content:center}
+  /* FULL coach card in the zone — same footprint as a player card, 3 fit */
+  .coach-zone-row .coachcard{width:clamp(128px,11vw,158px);flex:0 0 auto;position:relative}
+  .coach-zone-row .coachcard svg{width:100%;height:auto;display:block}
+  .coach-zone.sellable .coachcard:not(.empty){cursor:pointer;transition:transform .14s cubic-bezier(.2,.9,.3,1)}
+  .coach-zone.sellable .coachcard:not(.empty):hover{transform:translateY(-6px) scale(1.02)}
+  .coachcard-sell{
+    position:absolute;bottom:9px;right:8px;font-family:"Work Sans",sans-serif;font-weight:900;font-size:11px;
+    color:#4a3300;background:var(--gold,#ffc93c);border:2.5px solid var(--ink,#17211f);border-radius:999px;
+    padding:2px 9px;display:inline-flex;align-items:center;gap:3px;line-height:1;box-shadow:0 2px 0 rgba(23,33,31,.4);pointer-events:none;
+  }
+  .coach-zone.sellable .coachcard:hover .coachcard-sell{background:var(--red,#c0303f);color:#fff}
+  .coachcard.empty .coachcard-empty{
+    aspect-ratio:5/7;border:3px dashed rgba(23,33,31,.3);border-radius:16px;background:rgba(23,33,31,.03);
+    display:grid;place-items:center;color:rgba(23,33,31,.24);
+  }
+  .coachcard.empty .coachcard-empty svg{width:56%;fill:currentColor}
   .coachfx{
     position:relative;width:132px;flex:0 0 auto;display:flex;flex-direction:column;
     background:#fff6e3;border:3px solid var(--ink,#17211f);border-radius:13px;
@@ -7546,6 +7562,40 @@ function cardShell(g,dim,rarityKey="common",role="all",plain=false){
       <rect x="17" y="188" width="216" height="26" fill="${grass}"/>`;
 }
 function roleColor(c){return c.role==="bat"?"#1f9b53":c.role==="bowl"?"#c0303f":"#7245c9"}
+// The COACH card — same size as a player trump card but a distinct identity:
+// warm gold SPOTLIGHT (coaches are the stars) vs the players' green field, a
+// COACH tab vs an OVR shield, and a "coaching bonus" ribbon (the effect is the
+// hero) vs a stat row. Editions add the premium shine.
+function coachWrap(s,n){const w=(s||"").split(" ");const out=[];let l="";w.forEach(x=>{if((l+" "+x).trim().length>n){if(l)out.push(l.trim());l=x}else l=(l+" "+x).trim()});if(l)out.push(l);return out.slice(0,3)}
+function coachCardSVG(coach){
+  const g="cg"+(svgSeq++),img=coachArt(coach),tier=coach.tier||"common",ed=coach.edition;
+  const TM={common:["#8b969d","#e9edf0"],uncommon:["#2a9d54","#d7f6e4"],rare:["#3f6fc4","#dcebff"],epic:["#9147c4","#f2ddff"],legendary:["#c79214","#ffeeb0"]}[tier]||["#8b969d","#e9edf0"];
+  const eff=coachWrap(coach.desc,26),nm=escSVG(coach.name.length>17?coach.name.slice(0,16)+"…":coach.name).toUpperCase();
+  const tlab=escSVG((ed?EDITIONS[ed].label:tier).toUpperCase());
+  return `<svg class="tc coachtc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
+    <defs>
+      <linearGradient id="${g}f" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${TM[0]}"/><stop offset=".5" stop-color="${TM[1]}"/><stop offset="1" stop-color="${TM[0]}"/></linearGradient>
+      <radialGradient id="${g}sp" cx="50%" cy="34%" r="72%"><stop offset="0" stop-color="#fff6df"/><stop offset=".55" stop-color="#ffd98a"/><stop offset="1" stop-color="#f0a445"/></radialGradient>
+      <clipPath id="${g}w"><rect x="16" y="54" width="218" height="192" rx="12"/></clipPath>
+      <filter id="${g}s"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#17211f" flood-opacity=".4"/></filter>
+    </defs>
+    <rect x="5" y="5" width="240" height="340" rx="20" fill="url(#${g}f)" filter="url(#${g}s)"/>
+    <rect x="9" y="9" width="232" height="332" rx="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/>
+    <g clip-path="url(#${g}w)"><rect x="16" y="54" width="218" height="192" fill="url(#${g}sp)"/>
+      <ellipse cx="125" cy="250" rx="150" ry="40" fill="#e79a34" opacity=".5"/>
+      <image href="${img}" x="27" y="40" width="196" height="212" preserveAspectRatio="xMidYMax meet" filter="url(#${g}s)"/>
+    </g>
+    <g filter="url(#${g}s)"><path d="M16 20 h96 l-8 15 8 15 h-96 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="3"/><text x="56" y="41" text-anchor="middle" fill="#fff" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="17" letter-spacing="1.5">COACH</text></g>
+    <g filter="url(#${g}s)"><rect x="150" y="21" width="84" height="27" rx="8" fill="${TM[0]}" stroke="#17211f" stroke-width="3"/><text x="192" y="39.5" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="900" letter-spacing=".4">${tlab}</text></g>
+    <rect x="14" y="250" width="222" height="30" rx="8" fill="#17211f"/>
+    <text x="125" y="271" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${nm.length>16?15:19}" letter-spacing=".3">${nm}</text>
+    <rect x="14" y="286" width="222" height="54" rx="11" fill="#fff2d2" stroke="#e6c583" stroke-width="2.5"/>
+    <circle cx="31" cy="313" r="11.5" fill="#ff5a2d" stroke="#17211f" stroke-width="2.5"/>
+    <path d="M33 305 L26 314 L31 314 L29 321 L36 312 L31 312 Z" fill="#fff"/>
+    <text x="49" y="303" fill="#a07a20" font-size="8.5" font-weight="900" letter-spacing="1.4">COACHING BONUS</text>
+    ${eff.map((l,i)=>`<text x="49" y="${316+i*11}" fill="#17211f" font-size="9.5" font-weight="800">${escSVG(l)}</text>`).join("")}
+  </svg>`;
+}
 function cardSVG(c,batNum,bowlNum,emph,dim,compact){
   const g="g"+(svgSeq++);
   const img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
@@ -8265,20 +8315,21 @@ function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("
    on every screen so the player always feels "this is what I optimise for".
    Slim horizontal strip: owned coaches (art + name, effect on hover) + empty
    pegs. In the shop it's sellable (tap a coach to sell). */
+function coachCardCell(coach,i,sell){
+  return `<div class="coachcard${sell?' sellable':''}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+coach.desc)}${sell?" · tap to sell +"+coachSellValue(coach):""}">
+    ${coachCardSVG(coach)}
+    ${sell?`<span class="coachcard-sell"><span class="coin"></span>${coachSellValue(coach)}</span>`:""}
+  </div>`;
+}
+function coachEmptyCell(){
+  return `<div class="coachcard empty" title="Empty coaching slot — open a Coach Pack in the Clubhouse"><div class="coachcard-empty"><svg viewBox="0 0 60 72" aria-hidden="true"><circle cx="30" cy="26" r="13"/><path d="M4 68 Q30 42 56 68 Z"/></svg></div></div>`;
+}
 function coachStripHTML(opts={}){
   const active=activeCoaches();
   const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
   const sell=!!opts.sellable;
-  const cards=active.map((c,i)=>{
-    const tier=c.tier||"common",ed=c.edition;
-    return `<div class="coachfx tier-${tier} ${ed?'ed-'+ed:''}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(c.name+" — "+c.desc)}${sell?" · tap to sell +"+coachSellValue(c):""}">
-      <div class="coachfx-art"><img src="${coachArt(c)}" alt="" loading="lazy"></div>
-      <span class="coachfx-tier chip-${tier}">${ed?EDITIONS[ed].label:tier}</span>
-      <div class="coachfx-name">${c.name}</div>
-      ${sell?`<span class="coachfx-sell"><span class="coin"></span>${coachSellValue(c)}</span>`:""}
-    </div>`;
-  });
-  for(let i=0;i<open;i++)cards.push(`<div class="coachfx empty" title="Empty coaching slot — open a Coach Pack in the Clubhouse"><svg viewBox="0 0 48 56" aria-hidden="true"><circle cx="24" cy="20" r="10"/><path d="M5 54 Q24 32 43 54 Z"/></svg></div>`);
+  const cards=active.map((c,i)=>coachCardCell(c,i,sell));
+  for(let i=0;i<open;i++)cards.push(coachEmptyCell());
   return `<div class="coach-zone${sell?' sellable':''}">
     <div class="coach-zone-head"><b>Coaches</b><em>${usedCoachSlots()} / ${coachSlotLimit()}</em></div>
     <div class="coach-zone-row">${cards.join("")}</div>
