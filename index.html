@@ -4800,10 +4800,17 @@
   #match .ring-center .actions .btn{padding:7px 18px;font-size:12px}
   .ring-center .actions:empty{display:none}
   .ring-nextcue{
-    margin-top:7px;font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:11px;
-    letter-spacing:2px;text-transform:uppercase;color:var(--mutn,#7a6a4a);
+    margin-top:8px;font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:13px;
+    letter-spacing:2px;text-transform:uppercase;color:var(--ink);
+    background:rgba(255,246,227,.9);border:2.5px solid var(--ink);border-radius:99px;padding:4px 14px;
     animation:cuePulse 1.15s ease-in-out infinite;
   }
+  /* the duel distilled: your number vs theirs, in the lane colour, over PLAY */
+  .duel-read{display:flex;align-items:baseline;gap:9px;font-family:Anton,Impact,sans-serif;font-style:italic;
+    background:rgba(255,246,227,.92);border:3px solid var(--lc,#17211f);border-radius:99px;padding:2px 18px;
+    box-shadow:0 3px 0 rgba(23,33,31,.3)}
+  .duel-read b{font-size:29px;color:var(--lc,#17211f)}
+  .duel-read span{font-size:12px;font-weight:800;color:#6a5a3a;font-family:"Work Sans",sans-serif;font-style:normal}
   @keyframes cuePulse{0%,100%{opacity:.45}50%{opacity:1}}
   /* ---------- OUTCOME POP: the dopamine beat on every ball ---------- */
   .outcome-pop{position:absolute;top:41%;left:50%;transform:translate(-50%,-50%);z-index:40;
@@ -5403,11 +5410,41 @@
   .hero-logo span{color:var(--punch)}
   .hero-hook{font-family:Oswald,Arial,sans-serif;font-weight:700;font-size:clamp(14px,1.5vw,18px);color:var(--ink);
     line-height:1.5;background:rgba(255,246,227,.72);padding:8px 18px;border-radius:14px;border:2.5px solid var(--ink)}
-  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-  .hero-stats{display:flex;gap:10px;margin-top:2px}
-  .hero-stats .stat-pill{background:rgba(255,246,227,.85);border:2.5px solid var(--ink);color:var(--ink);
-    border-radius:999px;padding:5px 14px;font-weight:800;font-size:13px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:4px}
+  /* THE title CTA: one giant gold PLAY you cannot miss (1-second rule) */
+  .hero-cta #startBtn{
+    font-family:Anton,Impact,sans-serif !important;font-style:italic;
+    font-size:clamp(30px,3.4vw,44px) !important;letter-spacing:2px;
+    padding:clamp(16px,2vh,26px) clamp(54px,7vw,110px) !important;border-radius:999px !important;
+    background:radial-gradient(circle at 34% 28%,#ffe089,var(--gold) 58%,#f0b400) !important;color:#111 !important;
+    border:4px solid var(--ink) !important;box-shadow:0 8px 0 var(--ink),0 0 34px rgba(255,201,60,.5) !important;
+    animation:titlePlayBreath 1.6s ease-in-out infinite}
+  .hero-cta #startBtn:hover{transform:translateY(-3px)}
+  @keyframes titlePlayBreath{0%,100%{box-shadow:0 8px 0 var(--ink),0 0 26px rgba(255,201,60,.4)}
+    50%{box-shadow:0 8px 0 var(--ink),0 0 60px rgba(255,201,60,.9)}}
+  .hero-cta #continueBtn{font-size:15px !important;padding:10px 22px !important}
+  /* meta rows demoted: quiet, small, they never compete with PLAY */
+  .hero-stats{display:flex;gap:10px;margin-top:2px;opacity:.85}
+  .hero-stats .stat-pill{background:rgba(255,246,227,.6);border:2px solid rgba(23,33,31,.45);color:var(--ink);
+    border-radius:999px;padding:3px 12px;font-weight:800;font-size:11.5px}
   .hero-stats .stat-pill b{color:var(--punch)}
+  .unlock-track{opacity:.85;transform:scale(.92)}
+  /* ---- VS screen (the pre-match moment) ---- */
+  #tossTitle .vs-of{display:block;font-style:normal;font-size:.32em;letter-spacing:3px;color:#8a7752;margin-bottom:2px}
+  #tossTitle .vs-vs{color:var(--punch);font-size:.62em;margin-right:.3em;vertical-align:.08em}
+  .vs-play{
+    font-family:Anton,Impact,sans-serif !important;font-style:italic;
+    font-size:clamp(26px,3vw,38px) !important;letter-spacing:2px;border-radius:999px !important;
+    padding:clamp(14px,1.8vh,22px) clamp(48px,6vw,96px) !important;
+    background:radial-gradient(circle at 34% 28%,#ffe089,var(--gold) 58%,#f0b400) !important;color:#111 !important;
+    border:4px solid var(--ink) !important;box-shadow:0 7px 0 var(--ink),0 0 30px rgba(255,201,60,.5) !important;
+    animation:titlePlayBreath 1.6s ease-in-out infinite}
+  .vs-edit{opacity:.9}
+  #tossChoices{display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;min-height:76px}
+  #tossChoices .btn{position:relative}
+  .rec-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(-2deg);
+    background:var(--gold);color:#111;border:2px solid var(--ink);border-radius:99px;
+    font-family:"Work Sans",sans-serif;font-weight:900;font-size:9px;letter-spacing:1px;padding:2px 9px;white-space:nowrap}
   /* ---- meta-progression tracker on the title ---- */
   .unlock-track{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:10px;max-width:540px}
   .perk-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -5536,9 +5573,9 @@
     <div class="hero">
       <div class="hero-mark" id="heroMark"></div>
       <h1 class="hero-logo">POWER<span>PLAY</span></h1>
-      <div class="hero-hook">Street cricket, one over at a time.<br>Build your team &middot; spin the field &middot; lift the cup.</div>
+      <div class="hero-hook">Build your street XI &middot; spin the field &middot; lift the cup.</div>
       <div class="hero-cta">
-        <button class="btn xl" id="startBtn">New Game</button>
+        <button class="btn xl" id="startBtn">PLAY</button>
         <button class="btn secondary xl" id="continueBtn" style="display:none">Continue Run</button>
       </div>
       <div class="pill-row hero-stats" id="titleStats"></div>
@@ -6794,6 +6831,19 @@ function fillToTwelve(ids,pool){
   pool.slice().sort(sortStrong).forEach(c=>{if(ids.size<12)ids.add(c.id)});
   return ids;
 }
+/* VS-first flow: auto-form the XII and land on the VS screen. The draft grid
+   is now the optional "Edit XII" side-door, not a mandatory stop. */
+function goVs(){
+  const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
+  if(!run.nextRival||run.nextRival.def!==def)prepNextRival();
+  const pool=roster().slice().sort(sortStrong);
+  const valid=new Set(pool.map(c=>c.id));
+  const ids=new Set([...(run.draftSelected||[])].filter(id=>valid.has(id)));
+  fillToTwelve(ids,pool);
+  run.draftSelected=ids;
+  run.deck=selectedDraftCards();
+  setupToss();
+}
 function beginSquadSelection(){
   const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
   if(!run.nextRival||run.nextRival.def!==def)prepNextRival();
@@ -6865,7 +6915,7 @@ function continueRun(){
   if(d.nextRival&&d.nextRival.defIndex>=0){
     run.nextRival={def:MATCHES[d.nextRival.defIndex],arch:ARCHS.find(a=>a.key===d.nextRival.archKey)||ARCHS[3],deck:d.nextRival.deck.map(rehydrateCard)};
   }
-  beginSquadSelection();
+  goVs();
 }
 function startRun(){
   SFX.play("start");
@@ -6874,10 +6924,10 @@ function startRun(){
   const startingRoster=starterDraft();
   run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
   applyUnlocks(run);   // permanent boons earned across runs
-  // FIRST run ever: meet your team via the kit-bag reveal, then auto-form the
-  // XI and go straight to the toss (no draft to confuse a new player).
-  if(!localStorage.getItem("pp_seen_intro")){renderIntro();show("intro");return}
-  beginSquadSelection();
+  // FIRST run ever: no kit-bag lecture — straight to the VS moment with an
+  // auto-formed XI; the in-match coach-marks teach lanes/stance/wheel live.
+  if(!localStorage.getItem("pp_seen_intro")){startFirstMatch();return}
+  goVs();
 }
 function renderIntro(){
   const cards=roster().slice().sort(sortStrong);
@@ -7796,7 +7846,7 @@ function oddsSummary(strip){
 function ballBadges(ballNo){
   return activeCoaches()
     .filter(co=>co.ballTag&&co.ballTag.balls.includes(ballNo)&&(!co.ballTag.phase||co.ballTag.phase===m.phase))
-    .map(co=>`<i class="rail-badge" title="${co.name}: ${co.desc}">${co.ballTag.icon}</i>`).join("");
+    .map(co=>`<i class="rail-badge" title="${co.name}: ${dispDesc(co.desc)}">${co.ballTag.icon}</i>`).join("");
 }
 function renderOverStrip(){
   const hist=bugView().hist;
@@ -7886,6 +7936,9 @@ function roleColor(c){return c.role==="bat"?"#1f9b53":c.role==="bowl"?"#c0303f":
 // warm gold SPOTLIGHT (coaches are the stars) vs the players' green field, a
 // COACH tab vs an OVR shield, and a "coaching bonus" ribbon (the effect is the
 // hero) vs a stat row. Editions add the premium shine.
+/* display renumbering: catalogue text is authored in the old 20-99 scale but
+   effects apply through SUB_RESCALE — show the REAL number, never lie. */
+function dispDesc(d){return String(d||"").replace(/([+\-])(\d+)(\s*)(Power|Timing|Technique|Nerve|Pace|Accuracy|Movement|Deception|BAT|BOWL)/gi,(mm,sg,n,sp,w)=>sg+Math.max(1,Math.round(+n*SUB_RESCALE))+sp+w)}
 function coachWrap(s,n){const w=(s||"").split(" ");const out=[];let l="";w.forEach(x=>{if((l+" "+x).trim().length>n){if(l)out.push(l.trim());l=x}else l=(l+" "+x).trim()});if(l)out.push(l);return out.slice(0,3)}
 /* Match-loadout coach card: SAME visual recipe as the player card (tier edge,
    cream frame, full-bleed art, ink name band) so coaches read as part of one
@@ -7923,7 +7976,7 @@ function coachMiniSVG(coach){
 function coachCardSVG(coach){
   const g="cg"+(svgSeq++),img=coachArt(coach),tier=coach.tier||"common",ed=coach.edition;
   const TM={common:["#8b969d","#e9edf0"],uncommon:["#2a9d54","#d7f6e4"],rare:["#3f6fc4","#dcebff"],epic:["#9147c4","#f2ddff"],legendary:["#c79214","#ffeeb0"]}[tier]||["#8b969d","#e9edf0"];
-  const eff=coachWrap(coach.desc,26),nm=escSVG(coach.name.length>17?coach.name.slice(0,16)+"…":coach.name).toUpperCase();
+  const eff=coachWrap(dispDesc(coach.desc),26),nm=escSVG(coach.name.length>17?coach.name.slice(0,16)+"…":coach.name).toUpperCase();
   const tlab=escSVG((ed?EDITIONS[ed].label:tier).toUpperCase());
   return `<svg class="tc coachtc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     <defs>
@@ -8201,7 +8254,16 @@ function animateRing(prevMap,data,opts={}){
    cards (OVR, flip, danger ribbon) and commits — the field's true shape
    reveals only in the staged battle. That's the spark. */
 function ringCenterRead(){
-  if(m.selected)return ""; // the big PLAY button IS the message
+  if(m.selected){
+    // the duel, distilled: YOUR number vs THEIRS in the lane colour, above PLAY
+    if(m.challengeStat){
+      const chall=m.challengeStat,resp=CHAL_PAIR[chall],lc=STAT_COLOR[chall];
+      const mine=m.phase==="bat"?Math.round(effSubs(m.selected,"bat")[resp]):Math.round(effSubs(m.selected,"bowl")[chall]);
+      const theirs=m.phase==="bat"?Math.round(effSubs(m.challenge,"bowl")[chall]):Math.round(effSubs(m.challenge,"bat")[resp]);
+      return `<div class="duel-read" style="--lc:${lc}"><b>${mine}</b><span>vs</span><b>${theirs}</b></div>`;
+    }
+    return "";
+  }
   if(!m.challenge)return `<div class="ring-read wait"><b>PICK A CARD</b><span>bigger zone = more likely</span></div>`;
   const nm=m.challenge.name.split(" ").pop().toUpperCase();
   // BOWL: even field, YOU deliver — prompt for the delivery. BAT: their ball is
@@ -8693,7 +8755,7 @@ function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("
    Slim horizontal strip: owned coaches (art + name, effect on hover) + empty
    pegs. In the shop it's sellable (tap a coach to sell). */
 function coachCardCell(coach,i,sell,mini){
-  return `<div class="coachcard${sell?' sellable':''}" data-coach="${coach.instId||coach.id}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+coach.desc)}${sell?" · tap to sell +"+coachSellValue(coach):""}">
+  return `<div class="coachcard${sell?' sellable':''}" data-coach="${coach.instId||coach.id}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+dispDesc(coach.desc))}${sell?" · tap to sell +"+coachSellValue(coach):""}">
     ${mini?coachMiniSVG(coach):coachCardSVG(coach)}
     ${sell?`<span class="coachcard-sell"><span class="coin"></span>${coachSellValue(coach)}</span>`:""}
   </div>`;
@@ -8718,7 +8780,7 @@ function coachStripHTML(opts={}){
 function coachCardHTML(coach,compact=false){
   const ed=coach.edition;
   const tier=coach.tier||"common";
-  const full=`${coach.name} — ${coach.desc}${ed?` (${EDITIONS[ed].label}: ${EDITIONS[ed].desc})`:""}`;
+  const full=`${coach.name} — ${dispDesc(coach.desc)}${ed?` (${EDITIONS[ed].label}: ${EDITIONS[ed].desc})`:""}`;
   return `<div class="itemx coachx tier-${tier} ${ed?'itemx--'+ed:''} ${compact?'compact':''}" title="${escSVG(full)}">
     <div class="itemx-win">
       <span class="itemx-chip chip-${tier}">${ed?EDITIONS[ed].label:tier}</span>
@@ -8727,7 +8789,7 @@ function coachCardHTML(coach,compact=false){
       <span class="itemx-sheen"></span>
     </div>
     <div class="itemx-name">${coach.name}</div>
-    <div class="itemx-effect">${coach.desc}</div>
+    <div class="itemx-effect">${dispDesc(coach.desc)}</div>
   </div>`;
 }
 function toolCardHTML(it){
@@ -9057,11 +9119,18 @@ function setupToss(){
   renderToss();
   show("toss");
 }
-function callToss(side){
+function callToss(){
+  // heads/tails was a non-decision — PLAY flips the coin itself. The only
+  // real choice (bat or bowl) appears when you actually win the toss.
   if(m.tossCall)return;
   SFX.play("toss");
-  m.tossCall=side;m.coinFace=Math.random()<.5?"H":"T";m.tossWon=(side===m.coinFace);
-  if(!m.tossWon){const b=m.rivalDeck.reduce((s,c)=>s+c.bat,0),w=m.rivalDeck.reduce((s,c)=>s+c.bowl,0);m.rivalBatsFirst=b>=w;}
+  m.tossCall="H";m.coinFace=Math.random()<.5?"H":"T";m.tossWon=Math.random()<.5;
+  if(!m.tossWon){
+    const b=m.rivalDeck.reduce((s,c)=>s+c.bat,0),w=m.rivalDeck.reduce((s,c)=>s+c.bowl,0);
+    m.rivalBatsFirst=b>=w;
+    clearTimeout(m.__tossAuto);
+    m.__tossAuto=setTimeout(()=>{if(m&&!m.phase)startLostToss()},1600); // no dead click
+  }
   renderToss();
 }
 function startLostToss(){chooseInnings(m.rivalBatsFirst?"bowl":"bat");}
@@ -9096,36 +9165,38 @@ function tossSummaryHTML(){
   </div>`;
 }
 function renderToss(){
+  // THE VS MOMENT: who you face, one giant PLAY. Coin + innings flow inline.
   const boss=m.def.boss;
-  $("#tossTitle").innerHTML=boss?`🏆 ${m.def.cup} FINAL`:"The Toss";
+  $("#tossTitle").innerHTML=boss?`🏆 ${escSVG(m.def.cup)} FINAL`:`<i class="vs-of">MATCH ${run.match+1}/${MATCHES.length}</i><span class="vs-vs">VS</span> ${escSVG(m.def.name)}`;
   const tc=$("#tossCard")||$("#toss .toss-card2");if(tc)tc.classList.toggle("is-final",!!boss);
   const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
   const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
   $("#coinFlip").classList.toggle("spin",!!m.tossCall);
   if(!m.tossCall){
-    $("#tossSub").innerHTML=`<b>${matchLabel(m.def)}</b> · call the coin, the winner picks bat or bowl.`;
+    $("#tossSub").textContent="";
     $("#coinFlip").innerHTML=`<div class="coin-face">?</div>`;
-    $("#tossChoices").innerHTML=`<button class="btn xl" data-call="H">Heads</button><button class="btn xl secondary" data-call="T">Tails</button>`;
-  }else{
-    const res=m.coinFace==="H"?"HEADS":"TAILS",called=m.tossCall==="H"?"heads":"tails";
+    $("#tossChoices").innerHTML=`<button class="btn xl vs-play" id="vsPlay">PLAY &#9654;</button>
+      <button class="btn secondary sm vs-edit" id="vsEdit">Edit XII</button>`;
+  }else if(m.tossWon){
     $("#coinFlip").innerHTML=`<div class="coin-face spin">${m.coinFace}</div>`;
-    $("#tossSub").innerHTML=m.tossWon
-      ?`You called ${called} — <b>${res}!</b> You won the toss. Pick your innings.`
-      :`You called ${called} — it's ${res}. The rival won the toss.`;
-    if(m.tossWon){
-      $("#tossChoices").innerHTML=`<button class="btn xl" data-innings="bat">Bat First</button><button class="btn xl secondary" data-innings="bowl">Bowl First</button>`;
-    }else{
-      $("#tossChoices").innerHTML=`<div class="toss-lost">Rival chose to <b>${m.rivalBatsFirst?"bat":"bowl"} first</b>.</div><button class="btn xl" id="startLost">Start Match &#9654;</button>`;
-    }
+    $("#tossSub").innerHTML=`You won the toss — <b>your call.</b>`;
+    const rec=(yBat-rBowl)>=(yBowl-rBat)?"bat":"bowl";
+    $("#tossChoices").innerHTML=
+      `<button class="btn xl ${rec!=="bat"?"secondary":""}" data-innings="bat">BAT FIRST${rec==="bat"?'<small class="rec-tag">COACH SAYS</small>':""}</button>
+       <button class="btn xl ${rec!=="bowl"?"secondary":""}" data-innings="bowl">BOWL FIRST${rec==="bowl"?'<small class="rec-tag">COACH SAYS</small>':""}</button>`;
+  }else{
+    $("#coinFlip").innerHTML=`<div class="coin-face spin">${m.coinFace}</div>`;
+    $("#tossSub").innerHTML=`Rival won the toss — they <b>${m.rivalBatsFirst?"bat":"bowl"} first</b>.`;
+    $("#tossChoices").innerHTML=`<button class="btn xl" id="startLost">START &#9654;</button>`;
   }
-  // one-line reads so the decision is informed but uncluttered
   const bossBanner=boss?`<div class="toss-boss"><b>${boss.team}</b><span>${boss.desc}</span></div>`:"";
   $("#tossRival").innerHTML=bossBanner
-    +`<span class="toss-read-chip you">YOUR XI · BAT ${yBat} / BOWL ${yBowl}</span>`
-    +`<span class="toss-read-chip rival">${boss?boss.team.toUpperCase():"RIVAL: "+deckLean(m.rivalDeck).toUpperCase()} · BAT ${rBat} / BOWL ${rBowl}</span>`;
-  $("#tossChoices").querySelectorAll("[data-call]").forEach(b=>b.onclick=()=>callToss(b.dataset.call));
-  $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>chooseInnings(b.dataset.innings));
-  const sl=$("#startLost");if(sl)sl.onclick=startLostToss;
+    +`<span class="toss-read-chip you">YOU · BAT ${yBat} / BOWL ${yBowl}</span>`
+    +`<span class="toss-read-chip rival">THEM · ${deckLean(m.rivalDeck).toUpperCase()} · BAT ${rBat} / BOWL ${rBowl}</span>`;
+  const vp=$("#vsPlay");if(vp)vp.onclick=()=>callToss();
+  const ve=$("#vsEdit");if(ve)ve.onclick=()=>{SFX.play("nav");beginSquadSelection()};
+  $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>{clearTimeout(m.__tossAuto);chooseInnings(b.dataset.innings)});
+  const sl=$("#startLost");if(sl)sl.onclick=()=>{clearTimeout(m.__tossAuto);startLostToss()};
 }
 function chooseInnings(choice){
   if(!m.coinFace)return;
@@ -9340,7 +9411,7 @@ $("#draftRestartBtn").onclick=()=>startRun();
 $("#draftAutoBtn").onclick=autoSelectDraft;
 $("#draftConfirmBtn").onclick=confirmDraft;
 $("#tossRestartBtn").onclick=()=>startRun();
-$("#nextBtn").onclick=()=>{SFX.play("nav");beginSquadSelection()};
+$("#nextBtn").onclick=()=>{SFX.play("nav");goVs()};
 $("#rerollBtn").onclick=()=>{
   if(run.noReroll){flashHint("The spirits sealed this shop.");return}
   const cost=rerollCost();
@@ -9352,7 +9423,7 @@ $("#rerollBtn").onclick=()=>{
   }
 };
 $("#squadBackBtn").onclick=()=>{SFX.play("nav");run.pending=null;renderShop();show("shop")};
-$("#squadNextBtn").onclick=()=>{SFX.play("nav");beginSquadSelection()};
+$("#squadNextBtn").onclick=()=>{SFX.play("nav");goVs()};
 $("#homeBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
 $("#playAgainBtn").onclick=()=>startRun();
 $("#duel").onclick=e=>{
