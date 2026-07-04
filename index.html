@@ -4442,6 +4442,10 @@
   .hpip-x{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:#8a5cd0;background:#f3e8ff;
     border:2px solid #8a5cd0;border-radius:8px;padding:0 6px;margin-left:2px}
   .hheat{font-size:17px}
+  .hcoins{display:inline-flex;align-items:center;gap:6px;background:#fff6e3;border:2.5px solid var(--ink);
+    border-radius:99px;padding:3px 12px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:var(--ink)}
+  .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes coinBump{30%{transform:scale(1.22)}}
   .hfree{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:#111;background:var(--gold);
     border:2px solid var(--ink);border-radius:6px;padding:1px 9px;letter-spacing:1px}
   .hgoal{font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:16px;color:var(--ink);background:#fff6e3;
@@ -6337,7 +6341,7 @@ COACHES.push(
   Object.assign(flagCoach("lane_amber","Line Drills","uncommon",2,7,"AMBER lane: +10 Accuracy and +10 Power for every card.",{}),{sub:{accuracy:10,power:10}}),
   Object.assign(flagCoach("lane_purple","Poker Face","uncommon",2,7,"PURPLE lane: +10 Deception and +10 Nerve for every card.",{}),{sub:{deception:10,nerve:10}}),
   // challenge-warpers — the build bends WHICH lane gets fought over
-  flagCoach("loaded_dice","Loaded Dice","rare",4,8,"Your bowlers lead with their strongest lane far more often.",{loadedDice:true}),
+  flagCoach("loaded_dice","Loaded Dice","rare",4,8,"+7 to whichever lane your bowler attacks.",{loadedDice:true}),
   Object.assign(flagCoach("sledge_captain","Sledging Captain","rare",4,8,"Rival Timing -7 — their answer to pace wobbles.",{}),{rivalSub:{timing:7}}),
   Object.assign(flagCoach("pace_gym","Pace Gym","rare",4,8,"+8 Pace for bowlers — pure intimidation.",{}),{sub:{pace:8},subGate:c=>c.role!=="bat"}),
   Object.assign(flagCoach("technique_temple","Technique Temple","uncommon",2,7,"+8 Technique for batters — the gate stays shut.",{}),{sub:{technique:8},subGate:c=>c.role!=="bowl"}),
@@ -7060,7 +7064,13 @@ function selectCard(c,lock=false){
   m.preview=null;
   // BOWL phase: the challenged stat is YOUR delivery — rolled from the bowler you
   // just picked. Re-picking a different bowler rolls a fresh challenge.
-  if(m.phase==="bowl"){m.challengeStat=rollChallengeStat(c);m.stripCache={}}
+  if(m.phase==="bowl"){
+    // YOUR delivery, YOUR call: default to this bowler's best lane; tapping a
+    // stat square on the selected card switches the attack lane.
+    const subs=effSubs(c,"bowl");
+    m.challengeStat=BOWL_KEYS.reduce((a,k)=>subs[k]>subs[a]?k:a,BOWL_KEYS[0]);
+    m.stripCache={};
+  }
   if(lock)m.selectionLocked=true;
   SFX.play("click");
   render();
@@ -7069,6 +7079,13 @@ function selectCard(c,lock=false){
 function confirmSelected(){
   if(!m.selected||!m.challenge||m.result||anim)return;
   play(m.selected);
+}
+function setChallengeLane(k){
+  if(m.phase!=="bowl"||!m.selected||m.result)return;
+  if(!BOWL_KEYS.includes(k)||m.challengeStat===k)return;
+  m.challengeStat=k;m.stripCache={};
+  SFX.play("tick");
+  render();
 }
 function cancelSelected(){SFX.play("click");m.selected=null;m.preview=null;m.selectionLocked=false;render()}
 /* ============================================================
@@ -7147,10 +7164,11 @@ function rollChallengeStat(bowlC){
 function duelStats(mode,batC,bowlC){
   const chall=m?.challengeStat||rollChallengeStat(bowlC);
   const resp=CHAL_PAIR[chall];
-  return {chall,resp,
-    challVal:Math.round(effSubs(bowlC,"bowl")[chall]),
-    respVal:Math.round(effSubs(batC,"bat")[resp]),
-    diff:effSubs(batC,"bat")[resp]-effSubs(bowlC,"bowl")[chall]};
+  // Loaded Dice: YOUR bowler hits harder on the lane he attacks
+  const dice=(mode==="bowl"&&!isRivalCard(bowlC)&&activeCoaches().some(co=>co.loadedDice))?rescaleSub(7):0;
+  const cv=Math.round(effSubs(bowlC,"bowl")[chall])+dice;
+  const rv=Math.round(effSubs(batC,"bat")[resp]);
+  return {chall,resp,challVal:cv,respVal:rv,diff:rv-cv};
 }
 function traitStatDelta(c,disc){return c.trait?c.trait[disc](ctx(),0):0}
 function isRivalCard(c){return !!(m&&m.rivalDeck&&m.rivalDeck.includes(c))}
@@ -7335,6 +7353,28 @@ function applyExtras(out,mode){
   m.freeHit=out.extra==="noball";
   m.chain=0;
 }
+
+/* PER-BALL MONEY — earning is a decision, not an afterthought.
+   UNDERDOG BOUNTY: win a duel you were LOSING on paper and the bookies pay
+   (bigger gap = bigger pay). Your monster wins safely but earns nothing.
+   CROWD PURSE: the crowd pays for aggression — ATTACK boundaries, wickets on
+   attacking lines. Blocks and pushes pay zero.
+   STAR KICKER: boundaries off epic/legendary bats pay +1 (they came for the
+   stars). Extras never pay. */
+function ballPay(mode,out,myCard){
+  if(out.extra)return 0;
+  const d=duelStats(mode,mode==="bat"?myCard:m.challenge,mode==="bat"?m.challenge:myCard);
+  const myAdv=mode==="bat"?d.diff:-d.diff;
+  const won=mode==="bat"?(!out.wicket&&out.runs>0):(out.wicket||out.runs===0);
+  let pay=0;
+  if(won&&myAdv<=-1)pay+=myAdv<=-8?4:myAdv<=-4?2:1;          // underdog bounty
+  const st=currentStance();
+  if(mode==="bat"&&st==="atk"&&out.runs>=4)pay+=out.runs>=6?2:1;   // crowd purse
+  if(mode==="bowl"&&(st==="atk"||st==="bait")&&out.wicket)pay+=1;
+  if(mode==="bat"&&out.runs>=4&&(myCard.rarity==="epic"||myCard.rarity==="legendary"))pay+=1; // star kicker
+  if(pay>0){run.coins+=pay;m.__ballPay=pay}else m.__ballPay=0;
+  return pay;
+}
 function resolveBowl(c){
   const mine=bowlVal(c),theirs=batVal(m.challenge);
   const wasFreeHit=m.freeHit;
@@ -7352,6 +7392,7 @@ function resolveBowl(c){
     else if(out.runs===0)m.dotsBowled=(m.dotsBowled||0)+1;
     use(c);
   }
+  ballPay("bowl",out,c);
   updateMomentum("bowl",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
@@ -7379,6 +7420,7 @@ function resolveBat(c){
     m.hotBat=out.runs>=4;
     use(c);
   }
+  ballPay("bat",out,c);
   updateMomentum("bat",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
   m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
@@ -7912,6 +7954,7 @@ function renderHud(){
   if(chase&&chase.need>0)goal=`<span class="hgoal pressure-${chasePressure()||'live'}">Need ${chase.need} &middot; ${chase.left}b</span>`;
   else if(m.innings===1)goal=`<span class="hgoal soft">${m.phase==="bat"?"Set a target":"Keep them low"}</span>`;
   el.innerHTML=`<div class="hscore"><b>${batting.runs}/${batting.wk}</b><small>${m.phase==="bat"?"YOU BAT":"RIVAL BATS"}</small></div>
+    <span class="hcoins coins-tag"><span class="coin"></span><b id="matchCoins">${run?.coins||0}</b></span>
     <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}`;
 }
 function oddsSummary(strip){
@@ -8187,7 +8230,7 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff,hotSoft){
     const y=railTop+i*unit,cx=sx+sq/2,v=eff?Math.round(eff[k]):src[k],onRaw=hot&&hot===k,soft=onRaw&&hotSoft,on=onRaw&&!hotSoft,sc=STAT_COLOR[k]||rc;
     return `
       ${soft?`<rect class="cardsq-weak" x="${sx-4}" y="${y-4}" width="${sq+8}" height="${sq+8}" rx="15" fill="none" stroke="${sc}" stroke-width="3.5" stroke-dasharray="7 6"/>`:""}
-      <rect ${on?`class="cardsq-lit" style="--lc:${sc}"`:""} x="${sx}" y="${y}" width="${sq}" height="${sq}" rx="13" fill="${on?sc:'#fdf6e6'}" stroke="${sc}" stroke-width="3.5"/>
+      <rect data-lane="${k}" ${on?`class="cardsq-lit" style="--lc:${sc}"`:""} x="${sx}" y="${y}" width="${sq}" height="${sq}" rx="13" fill="${on?sc:'#fdf6e6'}" stroke="${sc}" stroke-width="3.5"/>
       <text x="${cx}" y="${y+sq/2+11}" text-anchor="middle" fill="${on?'#fff6e3':sc}" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="30">${v}</text>
       <text x="${cx}" y="${y+sq+13.5}" text-anchor="middle" fill="#17211f" font-size="9.5" font-weight="800" letter-spacing=".2">${STAT_FULL[k]}</text>`;
   }).join("");
@@ -8695,7 +8738,15 @@ function renderDuel(pop=false){
   // deselect: the ✕ chip OR clicking the picked card returns it to your hand
   if(m.selected&&!m.result){
     const yCard=d.querySelector(".you-col .card");
-    if(yCard){yCard.style.cursor="pointer";yCard.title="Tap to change your pick";yCard.onclick=e=>{e.stopPropagation();cancelSelected()}}
+    if(yCard){
+      yCard.style.cursor="pointer";
+      yCard.title=m.phase==="bowl"?"Tap a stat square to change your attack lane · tap elsewhere to change bowler":"Tap to change your pick";
+      yCard.onclick=e=>{
+        const lane=e.target.closest&&e.target.closest("[data-lane]");
+        if(m.phase==="bowl"&&lane){e.stopPropagation();setChallengeLane(lane.getAttribute("data-lane"));return}
+        e.stopPropagation();cancelSelected();
+      };
+    }
   }
   if(resolving&&!m.result.spinStarted){
     // fallback only — normal entry is enterResolve (in place, no rebuild)
@@ -9410,7 +9461,7 @@ function renderRivalStrip(){
 function completeMatchWin(){
   clearTimeout(settleTimer);
   SFX.play("win");
-  const reward=m.def.reward+(run.scout||0);
+  const reward=Math.max(2,Math.ceil(m.def.reward*0.6))+(run.scout||0); // per-ball pay carries the economy now
   run.wins++;run.coins+=reward;save.best=Math.max(save.best,m.you.runs);persist();
   const endBonus=activeCoaches().reduce((s,co)=>s+(co.onMatchEnd?co.onMatchEnd()||0:0),0);
   if(endBonus>0)run.coins+=endBonus;
