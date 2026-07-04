@@ -4442,15 +4442,14 @@
   .hpip-x{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:#8a5cd0;background:#f3e8ff;
     border:2px solid #8a5cd0;border-radius:8px;padding:0 6px;margin-left:2px}
   .hheat{font-size:17px}
-  .hcoins{display:inline-flex;align-items:center;gap:7px;background:#fff6e3;border:2.5px solid var(--ink);
-    border-radius:99px;padding:3px 14px 3px 10px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:19px;color:var(--ink);
-    margin-left:auto;position:relative;overflow:hidden;animation:purseGlow 2.6s ease-in-out infinite}
-  .hcoins .coin{width:26px;height:26px}
-  .hcoins::after{content:"";position:absolute;top:-30%;bottom:-30%;width:26px;transform:skewX(-24deg);
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);
-    animation:purseGlint 3.2s ease-in-out infinite}
-  @keyframes purseGlint{0%,55%{left:-40px}75%,100%{left:calc(100% + 20px)}}
-  @keyframes purseGlow{0%,100%{box-shadow:0 0 6px rgba(255,201,60,.35)}50%{box-shadow:0 0 18px rgba(255,178,20,.85)}}
+  /* the purse: no pill — the star coin + a GOLDEN amount, breathing softly */
+  .hcoins{display:inline-flex;align-items:center;gap:8px;background:none;border:0;box-shadow:none;
+    padding:0 4px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:24px;
+    color:#e09400;-webkit-text-stroke:.8px rgba(23,33,31,.55);paint-order:stroke;
+    margin-left:auto;position:relative}
+  .hcoins .coin{width:30px;height:30px;filter:drop-shadow(0 0 5px rgba(255,178,20,.55));animation:coinBreath 2.6s ease-in-out infinite}
+  @keyframes coinBreath{0%,100%{transform:scale(1);filter:drop-shadow(0 0 4px rgba(255,178,20,.4))}
+    50%{transform:scale(1.1);filter:drop-shadow(0 0 12px rgba(255,178,20,.9))}}
   .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
   /* the payout stamp: gold +$N under the outcome word, then flies to the purse */
   .pay-pop{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:41;pointer-events:none;
@@ -7973,7 +7972,7 @@ function renderHud(){
   if(chase&&chase.need>0)goal=`<span class="hgoal pressure-${chasePressure()||'live'}">Need ${chase.need} &middot; ${chase.left}b</span>`;
   else if(m.innings===1)goal=`<span class="hgoal soft">${m.phase==="bat"?"Set a target":"Keep them low"}</span>`;
   el.innerHTML=`<div class="hscore"><b>${batting.runs}/${batting.wk}</b><small>${m.phase==="bat"?"YOU BAT":"RIVAL BATS"}</small></div>
-    <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}<span class="hcoins coins-tag"><span class="coin"></span><b id="matchCoins">${Math.max(0,(run?.coins||0)-(m&&m.__pendingPay||0))}</b></span>`;
+    <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}<span class="hcoins"><span class="coin"></span><b id="matchCoins">${Math.max(0,(run?.coins||0)-(m&&m.__pendingPay||0))}</b></span>`;
 }
 function oddsSummary(strip){
   const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
@@ -8656,8 +8655,8 @@ function showBallPay(){
     const pill=document.querySelector(".hcoins");
     setTimeout(()=>{
       const pr=pill?pill.getBoundingClientRect():null,er=el.getBoundingClientRect();
-      if(pr){el.style.transition="transform .55s cubic-bezier(.4,0,.8,1),opacity .55s";
-        el.style.transform=`translate(${pr.left+pr.width/2-(er.left+er.width/2)}px,${pr.top+pr.height/2-(er.top+er.height/2)}px) scale(.3)`;
+      if(pr){el.style.transition="transform .85s cubic-bezier(.45,0,.7,1),opacity .85s";
+        el.style.transform=`translate(${pr.left+pr.width/2-(er.left+er.width/2)}px,${pr.top+pr.height/2-(er.top+er.height/2)}px) scale(.35)`;
         el.style.opacity="0";}
       setTimeout(()=>{
         el.remove();
@@ -8665,9 +8664,9 @@ function showBallPay(){
         const mc=document.getElementById("matchCoins");
         if(mc){mc.textContent=run.coins;}
         if(pill){pill.classList.remove("bump");void pill.offsetWidth;pill.classList.add("bump");SFX.play("tick");}
-      },560);
-    },650);
-  },520);
+      },860);
+    },1400);
+  },600);
 }
 function showOutcomePop(res){
   const tk=res.strip[res.roll];
@@ -9531,9 +9530,10 @@ function finish(){
 function scheduleAutoNext(){
   clearTimeout(m.__autoNext);
   // let the outcome land and read, then deal the next ball automatically.
+  // a payout is a MOMENT — hold the next ball until the coin has landed
   m.__autoNext=setTimeout(()=>{
     if(m&&m.result&&m.result.state==="settled"&&document.getElementById("match")?.classList.contains("active"))nextBall();
-  },1150);
+  },1150+(m.__ballPay?2100:0));
 }
 function nextBall(){
   if(!m.result)return;
