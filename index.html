@@ -4515,6 +4515,11 @@
   .loadout-build .kit-zone-row{align-items:center;height:100%;gap:8px}
   .loadout-build .kit-zone-row .kit-slot{width:clamp(74px,5.6vw,100px);height:80%}
   .loadout-hand .fanhold{flex:0 1 clamp(150px,12.5vw,215px)}
+  /* legendary card: rays drift, halo breathes — the only animated card face */
+  .tc .raySpin{animation:raySpin 26s linear infinite}
+  @keyframes raySpin{to{transform:rotate(360deg)}}
+  .tc .haloPulse{animation:haloPulse 2.4s ease-in-out infinite}
+  @keyframes haloPulse{0%,100%{opacity:.55}50%{opacity:1}}
   /* a challenged stat square lights up like a wheel sector — the fill glows */
   .cardsq-lit{filter:drop-shadow(0 0 3px var(--lc)) brightness(1.06);animation:cardSqLit 1.05s ease-in-out infinite}
   @keyframes cardSqLit{0%,100%{filter:drop-shadow(0 0 2px var(--lc)) brightness(1.02)}50%{filter:drop-shadow(0 0 10px var(--lc)) brightness(1.12)}}
@@ -8141,9 +8146,13 @@ function playerSilhouette(c,dim){
   const f="sf"+(svgSeq++);
   const flip=(Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%2)===1;
   // rarity is readable from the FIGURE: tinted body + rarity rim; legendary glows
-  const R=c.rarity==="legendary"
-    ?{body:"#17211f",rim:"#ffd75e",glow:"#ffc93c"}
-    :{body:"#17211f",rim:"#fff6e3"};
+  const R={
+    common:{body:"#17211f",rim:"#fff6e3"},
+    uncommon:{body:"#17211f",rim:"#fff6e3",glow:"#57c98a",std:2,go:.3},
+    rare:{body:"#17211f",rim:"#fff6e3",glow:"#5aa2e8",std:3,go:.4},
+    epic:{body:"#17211f",rim:"#fff6e3",glow:"#a878ec",std:4,go:.5},
+    legendary:{body:"#17211f",rim:"#ffd75e",glow:"#ffc93c",std:6,go:.85}
+  }[c.rarity]||{body:"#17211f",rim:"#fff6e3"};
   return `<filter id="${f}" x="-14%" y="-14%" width="128%" height="128%">
       <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="fat"/>
       <feFlood flood-color="${R.rim}" result="rimc"/>
@@ -8151,7 +8160,7 @@ function playerSilhouette(c,dim){
       <feFlood flood-color="${R.body}" result="bodyc"/>
       <feComposite in="bodyc" in2="SourceAlpha" operator="in" result="body"/>
       <feMerge result="fig"><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
-      ${R.glow?`<feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="${R.glow}" flood-opacity=".75"/>`:""}
+      ${R.glow?`<feDropShadow dx="0" dy="0" stdDeviation="${R.std}" flood-color="${R.glow}" flood-opacity="${R.go}"/>`:""}
     </filter>
     <g ${flip?'transform="translate(176 0) scale(-1 1)"':""}>
       <image href="${img}" x="-31" y="40" width="238" height="238" preserveAspectRatio="xMidYMax meet" filter="url(#${f})" opacity="${dim?.88:1}"/>
@@ -8183,11 +8192,17 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
   const FIELD={common:["#f7efdc","#e9dcbb"],uncommon:["#e3f4e6","#c2e4ca"],
     rare:["#e2edfb","#c0d8f3"],epic:["#ece2fa","#d4c2f0"],
     legendary:["#fff3cd","#f5d98a"]}[c.rarity]||["#f7efdc","#e9dcbb"];
-  const legendRays=c.rarity==="legendary"
-    ?`<g opacity=".28" transform="translate(88 160)">${Array.from({length:9},(_,i)=>`<path d="M0 0 L${(Math.cos(i*Math.PI/4.5)*240).toFixed(0)} ${(Math.sin(i*Math.PI/4.5)*240).toFixed(0)} L${(Math.cos(i*Math.PI/4.5+.2)*240).toFixed(0)} ${(Math.sin(i*Math.PI/4.5+.2)*240).toFixed(0)} Z" fill="#f0b400"/>`).join("")}</g>`:"";
+  // the SUNBURST is the rarity: faint for commons, louder each tier,
+  // legendary spins with a pulsing halo (the only animated card).
+  const RAY={common:["#ffffff",.13],uncommon:["#57c98a",.20],rare:["#5aa2e8",.22],
+             epic:["#a878ec",.25],legendary:["#f0b400",.32]}[c.rarity]||["#ffffff",.13];
+  const rayPaths=Array.from({length:9},(_,i)=>`<path d="M0 0 L${(Math.cos(i*Math.PI/4.5)*240).toFixed(0)} ${(Math.sin(i*Math.PI/4.5)*240).toFixed(0)} L${(Math.cos(i*Math.PI/4.5+.2)*240).toFixed(0)} ${(Math.sin(i*Math.PI/4.5+.2)*240).toFixed(0)} Z" fill="${RAY[0]}"/>`).join("");
+  const legendRays=`<g opacity="${RAY[1]}" transform="translate(88 160)"><g class="${c.rarity==="legendary"?"raySpin":""}">${rayPaths}</g></g>`
+    +(c.rarity==="legendary"?`<circle class="haloPulse" cx="88" cy="170" r="78" fill="url(#${g}halo)"/>`:"");
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
     <defs><clipPath id="${g}art"><rect x="8" y="8" width="234" height="334" rx="16"/></clipPath>
-      <radialGradient id="${g}fld" cx="42%" cy="34%" r="85%"><stop offset="0" stop-color="${FIELD[0]}"/><stop offset="1" stop-color="${FIELD[1]}"/></radialGradient></defs>
+      <radialGradient id="${g}fld" cx="42%" cy="34%" r="85%"><stop offset="0" stop-color="${FIELD[0]}"/><stop offset="1" stop-color="${FIELD[1]}"/></radialGradient>
+      <radialGradient id="${g}halo" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd75e" stop-opacity=".55"/><stop offset="1" stop-color="#ffd75e" stop-opacity="0"/></radialGradient></defs>
     <rect x="4" y="4" width="242" height="342" rx="20" fill="${edge}"/>
     <rect x="8" y="8" width="234" height="334" rx="16" fill="url(#${g}fld)" stroke="#17211f" stroke-width="3"/>
     <g clip-path="url(#${g}art)">
