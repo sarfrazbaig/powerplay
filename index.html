@@ -4445,6 +4445,17 @@
   .hcoins{display:inline-flex;align-items:center;gap:6px;background:#fff6e3;border:2.5px solid var(--ink);
     border-radius:99px;padding:3px 12px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:var(--ink)}
   .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
+  /* the payout stamp: gold +$N under the outcome word, then flies to the purse */
+  .pay-pop{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:41;pointer-events:none;
+    display:flex;align-items:center;gap:8px;background:#fff6e3;border:3px solid var(--ink);border-radius:99px;
+    padding:5px 18px;box-shadow:0 5px 0 rgba(23,33,31,.4),0 0 26px rgba(255,201,60,.65);
+    animation:payIn .34s cubic-bezier(.2,1.6,.4,1) both}
+  .pay-pop b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:30px;color:#b8860b;
+    -webkit-text-stroke:1.2px var(--ink);paint-order:stroke}
+  .pay-pop .coin{width:22px;height:22px}
+  @keyframes payIn{0%{transform:translate(-50%,-50%) scale(.2) rotate(-8deg);opacity:0}
+    60%{transform:translate(-50%,-50%) scale(1.15) rotate(2deg);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(1)}}
   #match.you-bowl .you-col .card [data-lane]{cursor:pointer}
   @keyframes coinBump{30%{transform:scale(1.22)}}
   .hfree{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:#111;background:var(--gold);
@@ -7955,7 +7966,7 @@ function renderHud(){
   if(chase&&chase.need>0)goal=`<span class="hgoal pressure-${chasePressure()||'live'}">Need ${chase.need} &middot; ${chase.left}b</span>`;
   else if(m.innings===1)goal=`<span class="hgoal soft">${m.phase==="bat"?"Set a target":"Keep them low"}</span>`;
   el.innerHTML=`<div class="hscore"><b>${batting.runs}/${batting.wk}</b><small>${m.phase==="bat"?"YOU BAT":"RIVAL BATS"}</small></div>
-    <span class="hcoins coins-tag"><span class="coin"></span><b id="matchCoins">${run?.coins||0}</b></span>
+    <span class="hcoins coins-tag"><span class="coin"></span><b id="matchCoins">${Math.max(0,(run?.coins||0)-(m&&m.__pendingPay||0))}</b></span>
     <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}`;
 }
 function oddsSummary(strip){
@@ -8603,6 +8614,7 @@ function finishLanding(res,target){
   const tk=res.strip[res.roll];
   if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
   showOutcomePop(res);        // the dopamine beat — the outcome punches in
+  showBallPay();              // beat two: the MONEY stamps in and flies to the purse
   if(m.justIgnited){m.justIgnited=false;setTimeout(()=>showIgnition(),260)} // the engine comes ONLINE
   maybeExplainHeat();         // teach the heat mechanic once, in context
   if(typeof TUT!=="undefined")TUT.notify("land");
@@ -8620,6 +8632,37 @@ function showIgnition(){
 }
 /* The juice: a big sticker word slams in on the outcome, and the board shakes
    for the game-changing ones (SIX / WICKET). Cricket's highs and lows, felt. */
+/* Beat two of the settle: "+$N" slams in under the outcome word, hangs a
+   moment, then flies into the HUD purse — which bumps and counts up. Money
+   earned is never subtle. */
+function showBallPay(){
+  const pay=m&&m.__ballPay||0;
+  if(!pay)return;
+  m.__pendingPay=pay;
+  const host=document.querySelector("#match .av-ringwrap");if(!host){m.__pendingPay=0;return}
+  setTimeout(()=>{
+    if(!m||!m.result){m.__pendingPay=0;return}
+    const el=document.createElement("div");
+    el.className="pay-pop";
+    el.innerHTML=`<span class="coin"></span><b>+${pay}</b>`;
+    host.appendChild(el);
+    SFX.play("buy");
+    const pill=document.querySelector(".hcoins");
+    setTimeout(()=>{
+      const pr=pill?pill.getBoundingClientRect():null,er=el.getBoundingClientRect();
+      if(pr){el.style.transition="transform .55s cubic-bezier(.4,0,.8,1),opacity .55s";
+        el.style.transform=`translate(${pr.left+pr.width/2-(er.left+er.width/2)}px,${pr.top+pr.height/2-(er.top+er.height/2)}px) scale(.3)`;
+        el.style.opacity="0";}
+      setTimeout(()=>{
+        el.remove();
+        m.__pendingPay=0;
+        const mc=document.getElementById("matchCoins");
+        if(mc){mc.textContent=run.coins;}
+        if(pill){pill.classList.remove("bump");void pill.offsetWidth;pill.classList.add("bump");SFX.play("tick");}
+      },560);
+    },650);
+  },520);
+}
 function showOutcomePop(res){
   const tk=res.strip[res.roll];
   const wkt=(m.phase==="bat"); // a wicket while batting is bad for you, good while bowling
