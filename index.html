@@ -234,7 +234,7 @@
   .shop-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
   .coins-tag{background:linear-gradient(180deg,#fff,#fff5cf);border:1px solid rgba(18,49,63,.12);border-radius:12px;
     padding:8px 16px;font-weight:900;font-size:20px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:8px}
-  .coin{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe27a,#e0a91e);box-shadow:inset -2px -2px 0 rgba(0,0,0,.12)}
+  .coin{width:22px;height:22px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2048%2048%22%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2223%22%20fill%3D%22%23FFC933%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2220.5%22%20fill%3D%22none%22%20stroke%3D%22%23FFA426%22%20stroke-width%3D%225%22%20stroke-dasharray%3D%2215.5%2016.6%22%20stroke-dashoffset%3D%228%22/%3E%3Ccircle%20cx%3D%2224%22%20cy%3D%2224%22%20r%3D%2217%22%20fill%3D%22%23F58B00%22/%3E%3Cpath%20d%3D%22M24%2012.5%20l3.4%207.2%207.9%201%20-5.8%205.5%201.5%207.8%20-7%20-3.8%20-7%203.8%201.5%20-7.8%20-5.8%20-5.5%207.9%20-1%20Z%22%20fill%3D%22%23FFD34E%22/%3E%3C/svg%3E") center/contain no-repeat;box-shadow:none}
   .shop-section{background:rgba(255,253,246,.96);border-radius:16px;padding:16px;box-shadow:var(--shadow);border:1px solid rgba(18,49,63,.08);margin-bottom:14px}
   .shop-section h2{margin:0 0 4px;font-size:18px;font-weight:900;color:#13313f}
   .shop-section .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
@@ -1586,7 +1586,7 @@
     color:#111;
     box-shadow:4px 4px 0 #050505;
   }
-  .coin{background:#111;border-color:#111}
+  /* stale dark coin override removed — the star coin (data-URI) is global */
   .shop-foot{
     color:#111;
   }
@@ -4442,8 +4442,15 @@
   .hpip-x{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:#8a5cd0;background:#f3e8ff;
     border:2px solid #8a5cd0;border-radius:8px;padding:0 6px;margin-left:2px}
   .hheat{font-size:17px}
-  .hcoins{display:inline-flex;align-items:center;gap:6px;background:#fff6e3;border:2.5px solid var(--ink);
-    border-radius:99px;padding:3px 12px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:var(--ink)}
+  .hcoins{display:inline-flex;align-items:center;gap:7px;background:#fff6e3;border:2.5px solid var(--ink);
+    border-radius:99px;padding:3px 14px 3px 10px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:19px;color:var(--ink);
+    margin-left:auto;position:relative;overflow:hidden;animation:purseGlow 2.6s ease-in-out infinite}
+  .hcoins .coin{width:26px;height:26px}
+  .hcoins::after{content:"";position:absolute;top:-30%;bottom:-30%;width:26px;transform:skewX(-24deg);
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);
+    animation:purseGlint 3.2s ease-in-out infinite}
+  @keyframes purseGlint{0%,55%{left:-40px}75%,100%{left:calc(100% + 20px)}}
+  @keyframes purseGlow{0%,100%{box-shadow:0 0 6px rgba(255,201,60,.35)}50%{box-shadow:0 0 18px rgba(255,178,20,.85)}}
   .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
   /* the payout stamp: gold +$N under the outcome word, then flies to the purse */
   .pay-pop{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:41;pointer-events:none;
@@ -7966,8 +7973,7 @@ function renderHud(){
   if(chase&&chase.need>0)goal=`<span class="hgoal pressure-${chasePressure()||'live'}">Need ${chase.need} &middot; ${chase.left}b</span>`;
   else if(m.innings===1)goal=`<span class="hgoal soft">${m.phase==="bat"?"Set a target":"Keep them low"}</span>`;
   el.innerHTML=`<div class="hscore"><b>${batting.runs}/${batting.wk}</b><small>${m.phase==="bat"?"YOU BAT":"RIVAL BATS"}</small></div>
-    <span class="hcoins coins-tag"><span class="coin"></span><b id="matchCoins">${Math.max(0,(run?.coins||0)-(m&&m.__pendingPay||0))}</b></span>
-    <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}`;
+    <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}<span class="hcoins coins-tag"><span class="coin"></span><b id="matchCoins">${Math.max(0,(run?.coins||0)-(m&&m.__pendingPay||0))}</b></span>`;
 }
 function oddsSummary(strip){
   const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
