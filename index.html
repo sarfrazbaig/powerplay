@@ -4770,6 +4770,17 @@
     #squad .roster-groups{display:flex !important;flex-direction:column !important;gap:10px !important}
     .over-card,.toss-card2{max-width:94vw !important}
   }
+  /* gentle rotate nudge — only on a narrow PORTRAIT phone while in a match */
+  #rotateHint{display:none}
+  @media(max-width:680px) and (orientation:portrait){
+    body:has(#match.screen.active) #rotateHint{
+      display:flex;align-items:center;gap:8px;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);
+      z-index:9400;background:var(--ink,#17211f);color:#fff6e3;border:2.5px solid var(--gold,#ffc93c);
+      border-radius:999px;padding:8px 16px;font-family:"Work Sans",sans-serif;font-weight:800;font-size:12px;
+      box-shadow:0 5px 16px rgba(0,0,0,.35);animation:rotNudge 2.4s ease-in-out infinite}
+    #rotateHint span{font-size:16px}
+    @keyframes rotNudge{0%,100%{transform:translateX(-50%) rotate(0)}50%{transform:translateX(-50%) rotate(-8deg)}}
+  }
   .hand-empty{
     align-self:center;font-size:12px;font-weight:800;letter-spacing:1.5px;
     color:rgba(255,255,255,.9);text-shadow:1px 1px 0 rgba(23,33,31,.55);text-transform:uppercase;
@@ -5320,6 +5331,7 @@
   </section>
 </div>
 
+<div id="rotateHint" aria-hidden="true"><span>&#128260;</span> Rotate your phone for the best view</div>
 <div id="tutLayer"><div class="tut-hole" id="tutHole"></div><div class="tut-bubble" id="tutBubble"></div></div>
 
 <script>
