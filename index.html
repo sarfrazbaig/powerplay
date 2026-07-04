@@ -5472,6 +5472,17 @@
   .shopx-marketgrid .chipx.bat{border-color:#1f9b53}.shopx-marketgrid .chipx.bowl{border-color:#c0303f}
   /* squad roster: big readable cards; the grid scrolls instead of cropping */
   #squadGrid{overflow-y:auto !important;padding-bottom:10px}
+  /* over-screen run recap: the road, the build, the tease */
+  .run-path{display:flex;gap:7px;justify-content:center;margin:2px 0 4px;width:100%}
+  .run-dot{width:15px;height:15px;border-radius:50%;border:2.5px solid var(--ink);background:rgba(23,33,31,.08)}
+  .run-dot.w{background:var(--gold);box-shadow:0 0 8px rgba(255,201,60,.6)}
+  .recap-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%;margin-bottom:2px}
+  .recap-coach{font-family:Oswald,Arial,sans-serif;font-weight:700;font-size:11px;color:#4a3300;
+    background:#ffe9b3;border:2px solid var(--ink);border-radius:99px;padding:2px 10px}
+  .recap-coach.none{opacity:.55}
+  .recap-next{width:100%;text-align:center;font-family:"Work Sans",sans-serif;font-weight:800;font-size:11.5px;
+    color:#5a4a2a;background:rgba(255,246,227,.9);border:2.5px solid var(--ink);border-radius:99px;padding:4px 14px;margin-top:4px}
+  .recap-next b{color:var(--punch);letter-spacing:.8px;margin-right:6px}
   /* ---- meta-progression tracker on the title ---- */
   .unlock-track{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:10px;max-width:540px}
   .perk-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -5776,7 +5787,7 @@
           <div class="setup-row"><span>Bench</span><b id="benchCount">0</b></div>
         </div>
         <div class="setup-box">
-          <p id="squadManageHint">Pick an action, then tap a card.</p>
+          <p id="squadManageHint">TRAIN or SELL &rarr; tap a card</p>
         </div>
         <div class="squad-actions" id="squadManageActions"></div>
         <div class="setup-actions">
@@ -6300,6 +6311,14 @@ COACHES.push(
   Object.assign(flagCoach("psychologist","Sports Psychologist","uncommon",2,7,"+12 Nerve for every card — pressure slides off.",{}),{sub:{nerve:12}}),
   Object.assign(flagCoach("swing_clinic","Swing Clinic","rare",4,8,"+8 Movement for every card — the ball talks.",{}),{sub:{movement:8}}),
   Object.assign(flagCoach("timing_academy","Timing Academy","uncommon",2,7,"+8 Timing for every card — strike rotation on tap.",{}),{sub:{timing:8}}),
+  // LANE GURUS — one per colour, buff BOTH sides of the lane (the stack build)
+  Object.assign(flagCoach("lane_red","Speed Camp","uncommon",2,7,"RED lane: +10 Pace and +10 Timing for every card.",{}),{sub:{pace:10,timing:10}}),
+  Object.assign(flagCoach("lane_blue","Swing School","uncommon",2,7,"BLUE lane: +10 Movement and +10 Technique for every card.",{}),{sub:{movement:10,technique:10}}),
+  Object.assign(flagCoach("lane_amber","Line Drills","uncommon",2,7,"AMBER lane: +10 Accuracy and +10 Power for every card.",{}),{sub:{accuracy:10,power:10}}),
+  Object.assign(flagCoach("lane_purple","Poker Face","uncommon",2,7,"PURPLE lane: +10 Deception and +10 Nerve for every card.",{}),{sub:{deception:10,nerve:10}}),
+  // challenge-warpers — the build bends WHICH lane gets fought over
+  flagCoach("loaded_dice","Loaded Dice","rare",4,8,"Your bowlers lead with their strongest lane far more often.",{loadedDice:true}),
+  Object.assign(flagCoach("sledge_captain","Sledging Captain","rare",4,8,"Rival Timing -7 — their answer to pace wobbles.",{}),{rivalSub:{timing:7}}),
   Object.assign(flagCoach("pace_gym","Pace Gym","rare",4,8,"+8 Pace for bowlers — pure intimidation.",{}),{sub:{pace:8},subGate:c=>c.role!=="bat"}),
   Object.assign(flagCoach("technique_temple","Technique Temple","uncommon",2,7,"+8 Technique for batters — the gate stays shut.",{}),{sub:{technique:8},subGate:c=>c.role!=="bowl"}),
   /* ---- L. extras & free-hit builds (the tempo game) ---- */
@@ -7097,7 +7116,9 @@ function duelWeights(diff,stanceKey){
 // readable but not always the same. Uses coach/trait-modified stats.
 function rollChallengeStat(bowlC){
   const subs=effSubs(bowlC,"bowl");
-  const ws=BOWL_KEYS.map(k=>Math.pow(Math.max(1,subs[k]),3));
+  // Loaded Dice: YOUR bowlers hammer their best lane (weight ^8 vs ^3)
+  const pow=(!isRivalCard(bowlC)&&activeCoaches().some(co=>co.loadedDice))?8:3;
+  const ws=BOWL_KEYS.map(k=>Math.pow(Math.max(1,subs[k]),pow));
   let x=Math.random()*ws.reduce((a,b)=>a+b,0);
   for(let i=0;i<BOWL_KEYS.length;i++){if((x-=ws[i])<=0)return BOWL_KEYS[i]}
   return BOWL_KEYS[0];
@@ -7393,10 +7414,17 @@ function end(title,text,opts={}){
   $("#overTitle").textContent=title;
   $("#overText").textContent=text;
   $("#overBadge").innerHTML=overBadgeSVG(won);
+  // RUN RECAP — the build you made + the road you walked + what's NEXT.
+  const path=Array.from({length:MATCHES.length},(_,i)=>`<i class="run-dot ${i<(run?.wins||0)?"w":""}"></i>`).join("");
+  const coachChips=(run?.coaches||[]).slice(0,4).map(c=>`<span class="recap-coach">${escSVG(c.name)}</span>`).join("")||`<span class="recap-coach none">no coaches hired</span>`;
+  const nxt=(typeof UNLOCKS!=="undefined")?UNLOCKS.find(u=>!u.need(save)):null;
   $("#overStats").innerHTML=
-    `<span class="stat-pill">Matches won <b>${run?.wins||0}</b></span>`
+    `<div class="run-path" title="Your road through the cup">${path}</div>`
+    +`<div class="recap-row">${coachChips}</div>`
+    +`<span class="stat-pill">Matches won <b>${run?.wins||0}</b></span>`
     +`<span class="stat-pill">Best chase <b>${save?.best||0}</b></span>`
-    +`<span class="stat-pill">Cups <b>${save?.cups||0}</b></span>`;
+    +`<span class="stat-pill">Cups <b>${save?.cups||0}</b></span>`
+    +(nxt?`<div class="recap-next"><b>NEXT UNLOCK</b> ${nxt.icon||"★"} ${escSVG(nxt.name)} — ${escSVG(nxt.progress(save))}</div>`:"");
   const oc=$("#overCard");if(oc){oc.classList.toggle("win",won);oc.classList.toggle("loss",!won)}
   if(won){SFX.play("win");const c=$("#overCard");if(c){c.querySelectorAll(".confetti-burst").forEach(e=>e.remove());const b=document.createElement("div");b.className="confetti-burst";b.innerHTML=confettiHTML();c.appendChild(b)}}
   clearSavedRun();
@@ -7712,7 +7740,7 @@ function flashHint(t){
   el.textContent=t;el.style.color="var(--red)";clearTimeout(hintTimer);
   hintTimer=setTimeout(()=>{
     el.style.color="";
-    if($("#squad")?.classList.contains("active"))el.textContent="Pick an action, then tap a card.";
+    if($("#squad")?.classList.contains("active"))el.textContent="TRAIN or SELL → tap a card";
     else renderShop();
   },1600);
 }
@@ -8072,8 +8100,13 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
     <rect x="4" y="4" width="242" height="342" rx="20" fill="${edge}"/>
     <rect x="8" y="8" width="234" height="334" rx="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/>
     <g clip-path="url(#${g}art)">
-      <rect x="12" y="12" width="152" height="280" fill="#bfe3f2"/>
-      <rect x="12" y="196" width="152" height="96" fill="#7cc24a"/>
+      <linearGradient id="${g}sky" x1="0" y1="0" x2="0" y2="1">${c.role==="bowl"
+        ?'<stop offset="0" stop-color="#ffb765"/><stop offset=".55" stop-color="#ffd79a"/><stop offset="1" stop-color="#ffe9c0"/>'
+        :'<stop offset="0" stop-color="#63caee"/><stop offset=".55" stop-color="#b9e8f6"/><stop offset="1" stop-color="#e3f6ff"/>'}</linearGradient>
+      <rect x="12" y="12" width="152" height="280" fill="url(#${g}sky)"/>
+      <g opacity=".35" transform="translate(88 150)">${Array.from({length:9},(_,i)=>`<path d="M0 0 L${(Math.cos(i*Math.PI/4.5)*220).toFixed(0)} ${(Math.sin(i*Math.PI/4.5)*220).toFixed(0)} L${(Math.cos(i*Math.PI/4.5+.22)*220).toFixed(0)} ${(Math.sin(i*Math.PI/4.5+.22)*220).toFixed(0)} Z" fill="#fff"/>`).join("")}</g>
+      <rect x="12" y="206" width="152" height="86" fill="${c.role==="bowl"?"#8fc44f":"#7cc24a"}"/>
+      <ellipse cx="88" cy="292" rx="110" ry="30" fill="rgba(23,33,31,.14)"/>
       <image href="${img}" x="12" y="12" width="152" height="280" preserveAspectRatio="xMidYMid slice" opacity="${dim?.9:1}"/>
     </g>
     <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
@@ -8993,7 +9026,7 @@ function openSquadRoom(){
 function squadActionHTML(){
   const p=run.pending,trainGain=6+(run.trainBoost||0);
   if(p){
-    return `<span class="pickhint ${p.type==='release'?'release':''}">${p.type==='train'?`Tap a player for +${trainGain} ${p.stat.toUpperCase()}`:`Tap a surplus player to sell for coins`}</span><button class="btn secondary sm" id="cancelSquadPick">Cancel</button>`;
+    return `<span class="pickhint ${p.type==='release'?'release':''}">${p.type==='train'?`Tap a player for +${trainGain} ${p.stat.toUpperCase()}`:`Tap a BENCH card &rarr; +coins`}</span><button class="btn secondary sm" id="cancelSquadPick">Cancel</button>`;
   }
   return `<button class="btn secondary sm" id="squadTrainBat" ${run.coins<3?'disabled':''}>Train +${trainGain} BAT - 3</button>
     <button class="btn secondary sm" id="squadTrainBowl" ${run.coins<3?'disabled':''}>Train +${trainGain} BOWL - 3</button>
@@ -9012,7 +9045,7 @@ function renderSquadManager(){
   $("#rosterCount").textContent=owned.length;
   $("#activeCount").textContent=`${activeSquad().length}/12`;
   $("#benchCount").textContent=Math.max(0,owned.length-activeSquad().length);
-  $("#squadManageHint").textContent=p?(p.type==="train"?"Choose a player to train.":"Choose a surplus player to sell. You keep at least 12."):"Pick an action, then tap a card.";
+  $("#squadManageHint").textContent=p?(p.type==="train"?"→ tap a player to train":"→ tap a BENCH card to sell"):"TRAIN or SELL → tap a card";
   $("#squadManageActions").innerHTML=squadActionHTML();
   bindSquadActions();
   const groups=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]];
