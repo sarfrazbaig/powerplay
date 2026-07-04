@@ -4016,12 +4016,66 @@
   }
   .coachcard.empty .coachcard-empty svg{width:56%;fill:currentColor}
   .coachcard.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1);z-index:5}
-  /* match coach band: full-art coaches pinned above the board, wheel below */
-  .match-coachzone{flex:0 0 auto;z-index:3}
-  #matchCoachZone .coach-zone{padding:7px 12px}
-  #matchCoachZone .coach-zone-row .coachcard{width:clamp(98px,8.6vw,126px)}
-  #matchCoachZone .coach-zone-head b{color:#fff6e3;text-shadow:1px 1px 0 rgba(23,33,31,.6)}
+  /* match top band: the two engines you build — COACHES (left) + KIT (right) —
+     pinned above the board like Balatro's jokers+consumables. Frees the whole
+     ground below for the WHEEL to be the hero. */
+  .match-topband{flex:0 0 auto;z-index:3;display:flex;align-items:stretch;justify-content:center;gap:clamp(10px,1.4vw,22px)}
+  .match-coachzone{flex:0 1 auto;min-width:0;display:flex}
+  #matchCoachZone .coach-zone{padding:8px 14px}
+  #matchCoachZone .coach-zone-row .coachcard{width:clamp(116px,9.4vw,146px)}
+  #matchCoachZone .coach-zone-head b{color:var(--punch,#ff5a2d)}
   #matchCoachZone .coach-zone{background:linear-gradient(180deg,rgba(255,253,244,.96),rgba(255,242,214,.96))}
+  /* KIT zone — consumables as premium one-use tool cards, twin of the coach band */
+  .match-kitzone{flex:0 0 auto;display:flex}
+  .kit-zone{
+    display:flex;align-items:stretch;gap:12px;
+    background:linear-gradient(180deg,rgba(255,253,244,.96),rgba(255,242,214,.96));
+    border:3px solid var(--ink,#17211f);border-radius:16px;box-shadow:5px 5px 0 rgba(23,33,31,.4);
+    padding:7px 12px;min-height:0;
+  }
+  .kit-zone-head{
+    flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;gap:2px;
+    padding-right:10px;border-right:2.5px solid rgba(23,33,31,.14);
+  }
+  .kit-zone-head b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;color:var(--punch,#ff5a2d);text-transform:uppercase;letter-spacing:.4px;line-height:1}
+  .kit-zone-head em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;font-size:11px;color:#7a6a4a}
+  .kit-zone-row{display:flex;gap:10px;align-items:stretch;justify-content:center}
+  /* a consumable = a tall tool card: glyph on a coloured wash, ink name plate */
+  .kit-slot{
+    width:clamp(74px,6vw,90px);flex:0 0 auto;position:relative;cursor:pointer;
+    display:flex;flex-direction:column;border:2.5px solid var(--ink,#17211f);border-radius:13px;overflow:hidden;
+    background:#fff6e3;box-shadow:3px 3px 0 rgba(23,33,31,.4);color:var(--ink,#17211f);
+    font-family:inherit;text-align:center;transition:transform .14s cubic-bezier(.2,.9,.3,1),box-shadow .14s;
+  }
+  .kit-slot:hover{transform:translateY(-5px);box-shadow:4px 8px 0 rgba(23,33,31,.42)}
+  .kit-slot .kit-art{
+    flex:1 1 auto;min-height:44px;display:grid;place-items:center;
+    background:radial-gradient(120% 120% at 50% 25%,#ffe08a,#ffb43c 70%,#ff8f2d);
+    border-bottom:2.5px solid var(--ink);
+  }
+  .kit-slot.mode-bowl .kit-art{background:radial-gradient(120% 120% at 50% 25%,#ffb3bb,#d8434f 78%)}
+  .kit-slot.mode-bat .kit-art{background:radial-gradient(120% 120% at 50% 25%,#8ff0c0,#1f9b53 82%)}
+  .kit-slot .kit-art svg{width:52%;height:auto}
+  .kit-slot .kit-art svg *{fill:#fff}
+  .kit-slot .kit-glyph{font-size:26px;line-height:1;filter:drop-shadow(0 2px 0 rgba(23,33,31,.35))}
+  .kit-slot .kit-plate{
+    background:var(--ink);color:#fff6e3;font-size:9px;font-weight:800;letter-spacing:.2px;
+    padding:4px 3px;line-height:1.12;min-height:24px;display:flex;align-items:center;justify-content:center;
+    text-transform:uppercase;
+  }
+  .kit-slot.armed{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold),0 0 16px rgba(255,210,63,.5)}
+  .kit-slot.offmode{opacity:.55}
+  .kit-slot .kit-armflag{
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:3;
+    background:var(--gold);color:#111;font-size:7.5px;font-weight:900;letter-spacing:.6px;
+    padding:2px 6px;border-radius:99px;border:2px solid #0c1214;white-space:nowrap;
+  }
+  .kit-slot.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1);z-index:5}
+  /* diegetic empty kit peg — no prose, just an open hook */
+  .kit-slot.empty{cursor:default;background:rgba(23,33,31,.03);border-style:dashed;border-color:rgba(23,33,31,.28);box-shadow:none}
+  .kit-slot.empty:hover{transform:none}
+  .kit-slot.empty .kit-peg{flex:1 1 auto;display:grid;place-items:center;color:rgba(23,33,31,.24)}
+  .kit-slot.empty .kit-peg svg{width:50%;height:auto}
   #dugout:empty{border:none !important;background:none !important;box-shadow:none !important}
   .coachfx{
     position:relative;width:132px;flex:0 0 auto;display:flex;flex-direction:column;
@@ -4351,6 +4405,110 @@
     overflow:hidden;
   }
   #match .top,#match .scorebug{flex:0 0 auto}
+  /* ===== MATCH v2 skeleton: slim HUD · arena · loadout =====
+     Wins over the whole legacy #match grid cascade (top/board/arena/squad).
+     ONE continuous ground: the field paints the WHOLE match screen, and the
+     HUD + loadout float on it as translucent glass — no more broken bands. */
+  #match.screen.active{display:flex !important;flex-direction:column;gap:8px;
+    grid-template-areas:none !important;grid-template-columns:none !important;grid-template-rows:none !important;
+    height:100dvh;min-height:0;margin:-12px -16px;width:calc(100% + 32px);max-width:none;
+    padding:10px clamp(12px,1.6vw,26px) 12px !important;overflow:hidden;
+    background:
+      radial-gradient(58% 62% at 50% 42%, rgba(255,255,255,.10), transparent 62%),
+      radial-gradient(130% 130% at 50% 38%, #6bb844 0%, #58a23a 52%, #3f7d2c 100%) !important;
+  }
+  .mhud{flex:0 0 auto;position:relative;display:flex;align-items:center;gap:12px;z-index:20;
+    background:rgba(255,253,243,.62);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+    border:2.5px solid rgba(255,255,255,.85);border-radius:16px;padding:5px 10px;
+    box-shadow:0 4px 16px rgba(23,33,31,.2)}
+  .hgear,.hscout{flex:0 0 auto;width:38px;height:38px;border-radius:12px;border:3px solid var(--ink);
+    background:#fff6e3;color:var(--ink);font-size:17px;cursor:pointer;box-shadow:2px 2px 0 rgba(23,33,31,.4);
+    display:grid;place-items:center;transition:transform .12s;padding:0}
+  .hgear:hover,.hscout:hover{transform:translateY(-2px)}
+  .hscout{margin-left:auto;width:auto;padding:0 14px;font-family:Oswald,Arial,sans-serif;font-weight:700;
+    font-size:13px;letter-spacing:1px;white-space:nowrap;background:var(--gold);}
+  /* the big gold PLAY breathes so the next action is never in doubt */
+  #confirmBtn.ring-go{animation:playBreath 1.5s ease-in-out infinite}
+  @keyframes playBreath{0%,100%{box-shadow:0 6px 0 var(--ink),0 0 24px rgba(255,201,60,.4)}
+    50%{box-shadow:0 6px 0 var(--ink),0 0 48px rgba(255,201,60,.85)}}
+  .hud-info{flex:1 1 auto;display:flex;align-items:center;gap:clamp(10px,1.4vw,18px);min-width:0}
+  .hscore{display:flex;flex-direction:column;line-height:1;flex:0 0 auto}
+  .hscore b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:26px;color:var(--ink)}
+  .hscore small{font-size:9px;font-weight:900;letter-spacing:1.4px;color:#8a7752}
+  .hpips{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+  .hpip{width:13px;height:13px;border-radius:50%;border:2.5px solid var(--ink);background:transparent}
+  .hpip.done{background:var(--ink)}
+  .hpip.now{background:var(--gold);box-shadow:0 0 0 3px rgba(255,201,60,.4)}
+  .hpip-x{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:#8a5cd0;background:#f3e8ff;
+    border:2px solid #8a5cd0;border-radius:8px;padding:0 6px;margin-left:2px}
+  .hheat{font-size:17px}
+  .hfree{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:14px;color:#111;background:var(--gold);
+    border:2px solid var(--ink);border-radius:6px;padding:1px 9px;letter-spacing:1px}
+  .hgoal{font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:13px;color:var(--ink);background:#fff6e3;
+    border:2.5px solid var(--ink);border-radius:99px;padding:3px 13px;white-space:nowrap}
+  .hgoal.soft{color:#8a7752;background:transparent;border-color:transparent;padding-left:0}
+  .hgoal.pressure-warm{background:#ffe9c2}
+  .hgoal.pressure-hot{background:#ffd0d0;border-color:var(--red);color:var(--red);animation:hgoalPulse 1s ease-in-out infinite}
+  @keyframes hgoalPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  .gear-pop{position:absolute;top:46px;left:0;z-index:40;display:flex;flex-direction:column;gap:6px;
+    background:#fff6e3;border:3px solid var(--ink);border-radius:14px;padding:10px;box-shadow:5px 5px 0 rgba(23,33,31,.4)}
+  .gear-pop[hidden]{display:none}
+  /* arena = the open field holding the duel; the SCREEN is the ground, so the
+     arena sheds its own box (no border, no second surface — one lawn). */
+  #match .av-ground.mfield{display:flex !important;flex:1 1 0;min-height:0;grid-area:auto !important;
+    background:none !important;border:0 !important;box-shadow:none !important;border-radius:0;overflow:visible}
+  .av-ground.mfield>.av-row2{flex:1 1 0;min-height:0;width:100%}
+  /* the ground gets CHARACTER: pitch strip + creases + stumps + 30-yd ring +
+     fielders in position. Static, clean, behind the play. */
+  .pitch-art{position:absolute;inset:0;pointer-events:none;z-index:0}
+  .pitch-art svg{width:100%;height:100%;display:block}
+  .av-ground.mfield{position:relative}
+  .av-ground.mfield::before{border-radius:0}
+  .loadout{flex:0 0 auto;display:flex;align-items:stretch;gap:clamp(10px,1.4vw,20px);
+    height:clamp(150px,21vh,208px);min-height:0;z-index:6;position:relative;
+    background:rgba(255,253,243,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:2.5px solid rgba(255,255,255,.85);border-radius:20px;padding:9px 14px;
+    box-shadow:0 6px 22px rgba(23,33,31,.22)}
+  .loadout-hand{flex:1 1 auto;min-width:0;display:flex;align-items:flex-end}
+  .loadout-hand .av-fan{width:100%;height:100%}
+  .loadout-build{flex:0 0 auto;display:flex;align-items:stretch;gap:0}
+  .loadout-build .match-coachzone,.loadout-build .match-kitzone{display:flex;align-items:stretch}
+  /* coach + kit live IN the tray — sections marked by a divider, not new boxes */
+  .loadout-build .coach-zone,.loadout-build .kit-zone{
+    background:transparent !important;border:0 !important;box-shadow:none !important;
+    border-radius:0;border-left:2.5px dashed rgba(23,33,31,.2) !important;
+    margin-left:12px;padding:2px 2px 2px 14px !important}
+  .loadout-build .coach-zone-head,.loadout-build .kit-zone-head{border-right:0;padding-right:6px}
+  /* the 6 ready cards, sized to the band, plus the DECK stack at the end */
+  .loadout-hand .av-fan{justify-content:flex-start;gap:0}
+  .loadout-hand .av-handrow{display:flex;gap:8px;align-items:center;justify-content:center;height:100%;width:100%;overflow:visible}
+  .loadout-hand .fanhold{flex:0 1 128px;min-width:0;width:auto !important;margin-left:0 !important;transform:none !important;
+    height:auto;max-height:100%;display:flex;align-items:center;transition:transform .14s ease}
+  .loadout-hand .fanhold:hover{transform:translateY(-10px) !important;z-index:6}
+  .loadout-hand .fanhold .card{width:100%;height:auto;max-height:100%}
+  .loadout-hand .fanhold .tc,.loadout-hand .fanhold .cflip,.loadout-hand .fanhold .cface{width:100%;height:auto;display:block}
+  .hand-empty{color:#7a6a4a;font-weight:800;font-size:12px;align-self:center}
+  .hand-deck{flex:0 0 auto;align-self:center;height:78%;aspect-ratio:5/7;position:relative;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    background:linear-gradient(160deg,#ff5a2d,#e8283f);border:3px solid var(--ink);border-radius:12px;
+    color:#fff6e3;box-shadow:3px 3px 0 rgba(23,33,31,.4);font-family:Oswald,Arial,sans-serif;transition:transform .14s}
+  .hand-deck:hover{transform:translateY(-6px)}
+  .hand-deck .hd-cards{position:absolute;inset:5px;border:2px dashed rgba(255,255,255,.5);border-radius:8px}
+  .hand-deck .hd-n{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:30px;text-shadow:2px 2px 0 rgba(23,33,31,.6);z-index:1}
+  .hand-deck .hd-lbl{font-size:9px;font-weight:900;letter-spacing:2px;z-index:1}
+  /* coaches = same height as the player cards; consumables a touch smaller */
+  .loadout-build .coach-zone{padding:6px 10px;align-items:center}
+  .loadout-build .coach-zone-head b{font-size:12px}.loadout-build .coach-zone-head em{font-size:9px}
+  .loadout-build .coach-zone-row{gap:8px;flex-wrap:nowrap;align-items:center;height:100%}
+  .loadout-build #matchCoachZone .coach-zone-row .coachcard{width:auto;height:84%}
+  .loadout-build .coach-zone-row .coachcard svg{width:auto;height:100%}
+  .loadout-build .kit-zone{padding:6px 8px;align-items:center}
+  .loadout-build .kit-zone-row{align-items:center;height:100%;gap:8px}
+  .loadout-build .kit-zone-row .kit-slot{width:clamp(58px,4.4vw,72px);height:70%}
+  .loadout-hand .fanhold{flex:0 1 142px}
+  /* a challenged stat square lights up like a wheel sector — the fill glows */
+  .cardsq-lit{filter:drop-shadow(0 0 3px var(--lc)) brightness(1.06);animation:cardSqLit 1.05s ease-in-out infinite}
+  @keyframes cardSqLit{0%,100%{filter:drop-shadow(0 0 2px var(--lc)) brightness(1.02)}50%{filter:drop-shadow(0 0 10px var(--lc)) brightness(1.12)}}
   #match .av-ground{flex:1 1 0;min-height:0}
   /* ---------- THE GROUND: one surface holds everything ----------
      Rival bench at the top edge, dugout & kit bag as chalk-painted
@@ -4377,9 +4535,9 @@
       radial-gradient(80% 88% at 50% 50%, transparent 58%, rgba(20,45,20,.28) 100%);
   }
   .av-row2{
-    display:grid;grid-template-columns:minmax(150px,.72fr) minmax(0,3fr) minmax(150px,.72fr);
-    gap:clamp(10px,1.2vw,24px);min-height:0;position:relative;z-index:2;
+    display:flex;min-height:0;height:100%;position:relative;z-index:2;
   }
+  .av-row2 .av-pitch{flex:1 1 0;min-height:0}
   .av-dock{
     display:flex;flex-direction:column;align-items:center;gap:10px;
     padding:10px 8px;border-radius:14px;
@@ -4538,24 +4696,32 @@
   /* ---------- the pitch ---------- */
   #match .av-pitch{ /* the center of the ground — transparent, the GROUND is the surface */
     position:relative;min-height:0;min-width:0;
-    display:grid;grid-template-rows:minmax(0,1fr) auto;gap:4px;
+    display:flex;flex-direction:column;gap:4px;
     padding:4px 8px;overflow:visible;
     background:none;border:0;box-shadow:none;
   }
+  #match .av-pitch>.av-duelrow{flex:1 1 0;min-height:0}
+  #match .av-pitch>.commentary-strip{flex:0 0 auto}
   /* Everything sizes to the ACTUAL row height (100% of a stretched cell),
      never a dvh guess — so cards/wheel can't overflow or clip at any size. */
   .av-duelrow{
-    display:grid;grid-template-columns:minmax(150px,330px) minmax(260px,520px) minmax(150px,330px);
-    align-items:stretch;justify-content:space-evenly;gap:clamp(10px,2vw,40px);
-    width:100%;min-height:0;position:relative;z-index:2;
+    display:grid;grid-template-columns:minmax(120px,270px) minmax(240px,500px) minmax(120px,270px);
+    grid-template-rows:minmax(0,1fr);
+    align-items:stretch;justify-content:center;gap:clamp(10px,1.8vw,30px);
+    width:100%;max-width:1120px;margin-inline:auto;min-height:0;position:relative;z-index:2;
   }
   .av-duelrow>.dslot,.av-duelrow>.you-col{min-width:0;min-height:0;height:100%}
   .av-duelrow .dslot{display:flex;align-items:center;justify-content:center;position:relative}
+  /* both flanking cards size to their (equal) column width, capped by the row
+     height — so YOUR card and the rival's are always the same size. */
   #match .av-duelrow .dslot .card{
-    height:98% !important;width:auto !important;
-    max-height:420px !important;max-width:100% !important;
-    aspect-ratio:5/7;min-width:0 !important;min-height:0 !important;
+    width:100% !important;height:auto !important;
+    max-height:100% !important;max-width:min(240px,100%) !important;
+    aspect-ratio:5/7;min-width:0 !important;min-height:0 !important;margin:0 auto;
   }
+  /* the flanking cards must never be taller than the wheel's row */
+  #match .av-duelrow>.dslot,#match .av-duelrow>.you-col{max-height:100%;overflow:visible}
+  #match .av-duelrow .dslot .card .cflip,#match .av-duelrow .dslot .card .cface,#match .av-duelrow .dslot .card .tc{height:100%;width:auto}
   .av-duelrow .dslot .card .cflip,.av-duelrow .dslot .card .cface,.av-duelrow .dslot .card .tc{height:100%}
   /* the You bowl / Rival bats label floats on the card's top edge */
   .av-duelrow .dslot .dlabel{
@@ -4596,7 +4762,7 @@
   /* ---------- the field ring ---------- */
   /* the wheel sizes to the height that actually exists for its row:
      viewport minus top bar, rival bench, hand, scorebug and chrome */
-  .av-ringwrap{position:relative;height:97%;max-height:540px;aspect-ratio:1;width:auto;max-width:100%;margin:0 auto;align-self:center;justify-self:center}
+  .av-ringwrap{position:relative;height:100%;max-height:100%;aspect-ratio:1;width:auto;max-width:100%;margin:0 auto;align-self:center;justify-self:center}
   #match .av-pitch .commentary-strip{max-height:26px;overflow:hidden;font-size:12.5px !important;padding:2px 0 !important}
   .ring-svg.idle{opacity:.85;filter:saturate(.8)}
   /* real CTAs: fixed dock, bottom-right of the pitch — never inside the wheel */
@@ -4811,20 +4977,20 @@
   .ring-center{gap:6px}
   .ring-center .actions{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:9px}
   /* stance chips: the second verb — the per-ball skill choice, made legible */
-  .stance-lead{font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:10px;letter-spacing:1.2px;
-    text-transform:uppercase;color:#7a6a4a;text-align:center;margin-bottom:2px}
-  .stance-row{display:flex;gap:8px;justify-content:center}
+  .stance-lead{font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:12.5px;letter-spacing:1.4px;
+    text-transform:uppercase;color:var(--punch,#ff5a2d);text-align:center;margin-bottom:1px}
+  .stance-row{display:flex;gap:14px;justify-content:center}
   .stance-chip{
-    width:clamp(74px,6.4vw,94px);border-radius:13px;padding:8px 4px 6px;
-    display:grid;justify-items:center;gap:2px;cursor:pointer;
-    background:#fff6e3;border:3px solid rgba(23,33,31,.5);color:var(--ink);
+    border-radius:15px;padding:9px 24px 8px;
+    display:flex;align-items:center;gap:10px;cursor:pointer;
+    background:#fff6e3;border:3.5px solid var(--ink);color:var(--ink);
     font-family:Oswald,Arial,sans-serif;
-    box-shadow:0 3px 0 rgba(23,33,31,.28);
+    box-shadow:0 5px 0 rgba(23,33,31,.4);
     transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;
   }
-  .stance-chip i{font-style:normal;font-size:20px;line-height:1}
-  .stance-chip b{font-size:12px;font-weight:700;letter-spacing:.6px}
-  .stance-chip .stance-risk{font-size:8.5px;font-weight:900;letter-spacing:.5px;padding:1px 7px;border-radius:6px;margin-top:1px}
+  .stance-chip i{font-style:normal;font-size:26px;line-height:1}
+  .stance-chip b{font-size:18px;font-weight:800;letter-spacing:.6px}
+  .stance-chip .stance-risk{font-size:10px;font-weight:900;letter-spacing:.5px;padding:2px 9px;border-radius:7px}
   .stance-chip.risk-safe .stance-risk{background:#cfeecd;color:#1e5e2a}
   .stance-chip.risk-steady .stance-risk{background:#e7dcc0;color:#5a4a2a}
   .stance-chip.risk-risky .stance-risk{background:#ffd0c4;color:#8a2a18}
@@ -4837,13 +5003,44 @@
   .stance-explain{font-family:"Work Sans",Inter,sans-serif;font-weight:700;font-size:11px;color:#3a3326;
     text-align:center;margin-top:6px;max-width:300px;line-height:1.32;min-height:14px}
   /* stance dock sits under YOUR card — the strategy step, right at the crease */
-  .you-col{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;position:relative;gap:8px}
-  .you-col .dslot{height:auto}
+  .you-col{display:flex;align-items:center;justify-content:center;min-width:0;height:100%;position:relative}
+  .you-col .dslot{height:100%;width:100%}
   .you-change{
+    position:absolute;top:3px;right:3px;z-index:6;width:27px;height:27px;line-height:1;
     border:2.5px solid var(--ink,#17211f);background:#fff6e3;color:var(--ink,#17211f);
-    border-radius:999px;padding:4px 12px;font-family:"Work Sans",sans-serif;font-weight:800;font-size:11px;
-    letter-spacing:.3px;cursor:pointer;box-shadow:2px 2px 0 rgba(23,33,31,.35);transition:transform .12s,background .12s}
+    border-radius:50%;padding:0;font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;
+    cursor:pointer;box-shadow:2px 2px 0 rgba(23,33,31,.35);transition:transform .12s,background .12s}
   .you-change:hover{background:var(--gold,#ffc93c);transform:translateY(-1px)}
+  /* THE DUEL readout — who challenges, on what stat & number, your answer stat */
+  .chal-banner{display:flex;align-items:center;justify-content:center;gap:9px;flex:0 0 auto;
+    z-index:5;margin:0 auto;padding:3px 15px;border-radius:99px;max-width:96%;
+    background:rgba(255,246,227,.95);border:3px solid var(--ink);box-shadow:3px 3px 0 rgba(23,33,31,.4);
+    font-family:Oswald,Arial,sans-serif;white-space:nowrap}
+  .chal-banner .chal-who{font-weight:800;font-size:12px;letter-spacing:.4px;color:#5a4a2a;text-transform:uppercase}
+  .chal-banner .chal-stat{display:inline-flex;align-items:center;gap:7px;font-family:Anton,Impact,sans-serif;
+    font-style:italic;font-size:14px;letter-spacing:.5px;color:#fff;background:var(--sc,#17211f);
+    border:2.5px solid var(--ink);border-radius:99px;padding:2px 13px}
+  .chal-banner .chal-stat b{font-size:21px}
+  .chal-banner .chal-vs{font-weight:800;font-size:10.5px;color:#8a7752;text-transform:uppercase;letter-spacing:.4px}
+  .chal-banner .chal-resp{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;letter-spacing:.5px;
+    color:var(--sc,#17211f);-webkit-text-stroke:.5px var(--ink);paint-order:stroke}
+  /* stance bar = a glass pill riding the bottom of the field: lead label +
+     the three big chips in ONE row, always above the wheel's bottom edge */
+  .stance-bar{display:flex;align-items:center;justify-content:center;flex:0 0 auto;z-index:7;position:relative;
+    margin:4px auto 2px;gap:14px;width:max-content;max-width:98%;
+    background:rgba(255,253,243,.62);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
+    border:2.5px solid rgba(255,255,255,.85);border-radius:99px;padding:7px 18px;
+    box-shadow:0 5px 18px rgba(23,33,31,.22)}
+  .stance-bar .stance-lead{margin:0;white-space:nowrap}
+  .stance-bar .stance-row{gap:12px}
+  /* tap-to-field cards in the squad overlay (never get stuck) */
+  .scout-card.fieldable{cursor:pointer;transition:transform .12s ease}
+  .scout-card.fieldable:hover{transform:translateY(-6px)}
+  .scout-card.fieldable::after{content:"FIELD";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
+    background:var(--gold);color:#111;font-family:Oswald,sans-serif;font-weight:900;font-size:10px;letter-spacing:1px;
+    padding:2px 10px;border-radius:99px;border:2px solid var(--ink);opacity:0;transition:opacity .12s}
+  .scout-card.fieldable{position:relative}
+  .scout-card.fieldable:hover::after{opacity:1}
   .you-col .stance-dock{
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     padding:8px 12px 9px;border-radius:15px;
@@ -5025,6 +5222,21 @@
     text-shadow:1px 1px 0 rgba(23,33,31,.5);
   }
   .ring-read.result b.ring-token{font-size:clamp(30px,3.2vw,46px)}
+  /* the rival deck queue is redundant with the big rival card in the duel —
+     hide the card strip, keep only the slim header (count + Scout). All the
+     reclaimed height goes to the WHEEL. */
+  #match .av-rivalfan{display:none}
+  #match .av-rivalrow{gap:0;padding:0}
+  #match .av-rivalhead{padding:2px 0}
+  #match .av-rivalrow .av-rivalhead .av-zonetag,#match .av-rivalrow .av-rivalmeta{font-size:10px}
+  #match .av-rivalrowSLIM{gap:2px}
+  #match .av-rivalfan{gap:14px}
+  #match .av-rivalfan .av-pile{width:56px;height:70px}
+  #match .av-rivalfan .av-pile b{font-size:19px}
+  #match .av-rivalfan .av-pile span{font-size:7px;bottom:5px}
+  #match .av-rivalfan .rival-deckstack{width:52px}
+  #match .av-rivalfan .rivhold{width:clamp(46px,4.2vw,62px)}
+  #match .av-rivalfan .rivhold.slot-empty{width:52px}
   /* fan cards drop old grid sizing */
   .av-fan .card,.av-rivalfan .card{height:auto !important;min-height:0 !important}
   /* ---------- scorebug stays broadcast, gains rail badges ---------- */
@@ -5395,37 +5607,64 @@
   </section>
 
   <section id="match" class="screen">
-    <div class="top">
-      <div>
-        <div class="match-title" id="matchName"></div>
-        <div class="sub" id="phaseLabel"></div>
-        <div class="stepper" id="stepper"></div>
-      </div>
-      <div class="top-actions">
-        <div class="coins-tag" id="matchCoinsWrap" title="Your coins — win this match to earn more, then spend them in the Clubhouse"><span class="coin"></span><span id="matchCoins">0</span></div>
-        <button class="btn secondary sm tut-help" id="tutHelpBtn" title="Show the how-to-play tips again">?</button>
-        <button class="btn secondary sm" id="muteBtn" title="Toggle sound">&#128266;</button>
-        <button class="btn secondary sm test-win-btn" id="testWinBtn" title="Testing shortcut: mark this match as won and open the shop">Test Win</button>
+    <!-- slim HUD replaces the old title bar + scorebug strip -->
+    <div class="mhud">
+      <button class="hgear" id="gearBtn" title="Menu">&#9881;</button>
+      <div class="hud-info" id="hudInfo"></div>
+      <button class="hscout" id="scanBtn" title="Scout the rival's full squad">&#128065; SCOUT</button>
+      <button class="hgear" id="fsBtn" title="Fullscreen">&#x26F6;</button>
+      <div class="gear-pop" id="gearPop" hidden>
+        <button class="btn secondary sm tut-help" id="tutHelpBtn" title="Show the how-to-play tips again">? How to play</button>
+        <button class="btn secondary sm" id="muteBtn" title="Toggle sound">&#128266; Sound</button>
+        <button class="btn secondary sm test-win-btn" id="testWinBtn" title="Testing shortcut: mark this match as won">Test Win</button>
         <button class="btn secondary sm" id="homeMatchBtn">Main Menu</button>
         <button class="btn secondary sm" id="restartBtn">Restart Run</button>
       </div>
     </div>
 
-    <div class="match-coachzone" id="matchCoachZone"></div>
-    <div class="av-ground">
-      <div class="av-rivalrow">
-        <div class="av-rivalhead"><span class="av-zonetag">RIVAL DUGOUT</span><span class="av-rivalmeta" id="rivalStripMeta"></span><button class="btn secondary sm" id="scanBtn" title="Scout the rival's full squad">Scout ▸</button></div>
-        <div class="av-rivalfan" id="rivalStrip"></div>
+    <!-- ARENA: your card ⚔ wheel ⚔ rival card, out on a real ground -->
+    <div class="av-ground mfield">
+      <div class="pitch-art" aria-hidden="true">
+        <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid slice">
+          <ellipse cx="600" cy="316" rx="340" ry="196" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="2.5" stroke-dasharray="9 13"/>
+          <g>
+            <rect x="551" y="96" width="98" height="440" rx="9" fill="#dcc98e"/>
+            <rect x="551" y="96" width="98" height="440" rx="9" fill="none" stroke="rgba(23,33,31,.18)" stroke-width="2"/>
+            <rect x="562" y="106" width="76" height="420" fill="rgba(255,255,255,.14)"/>
+            <g stroke="#fffdf0" stroke-width="4">
+              <line x1="557" y1="140" x2="643" y2="140"/><line x1="557" y1="168" x2="643" y2="168"/>
+              <line x1="600" y1="140" x2="600" y2="120"/>
+              <line x1="557" y1="492" x2="643" y2="492"/><line x1="557" y1="464" x2="643" y2="464"/>
+              <line x1="600" y1="492" x2="600" y2="512"/>
+            </g>
+            <g fill="#fff6df" stroke="#17211f" stroke-width="1.6">
+              <rect x="588" y="100" width="4.5" height="26" rx="2"/><rect x="597.7" y="100" width="4.5" height="26" rx="2"/><rect x="607.5" y="100" width="4.5" height="26" rx="2"/>
+              <rect x="588" y="508" width="4.5" height="26" rx="2"/><rect x="597.7" y="508" width="4.5" height="26" rx="2"/><rect x="607.5" y="508" width="4.5" height="26" rx="2"/>
+            </g>
+          </g>
+          <g fill="rgba(23,33,31,.26)">
+            <g transform="translate(238 208)"><circle r="8"/><rect x="-6.5" y="7" width="13" height="27" rx="6.5"/></g>
+            <g transform="translate(960 186)"><circle r="8"/><rect x="-6.5" y="7" width="13" height="27" rx="6.5"/></g>
+            <g transform="translate(158 366)"><circle r="8"/><rect x="-6.5" y="7" width="13" height="27" rx="6.5"/></g>
+            <g transform="translate(1046 372)"><circle r="8"/><rect x="-6.5" y="7" width="13" height="27" rx="6.5"/></g>
+            <g transform="translate(338 486)"><circle r="8"/><rect x="-6.5" y="7" width="13" height="27" rx="6.5"/></g>
+            <g transform="translate(880 498)"><circle r="8"/><rect x="-6.5" y="7" width="13" height="27" rx="6.5"/></g>
+          </g>
+        </svg>
       </div>
       <div class="av-row2">
-        <aside class="av-dock" id="dugout"></aside>
         <div class="av-pitch" id="duel"></div>
-        <aside class="av-dock" id="kitbag"></aside>
       </div>
-      <div class="av-fanwrap"><div class="av-fan" id="hand"></div></div>
     </div>
 
-    <div class="scorebug" id="scorebug"></div>
+    <!-- LOADOUT: everything you control — your cards + deck, coaches, consumables -->
+    <div class="loadout">
+      <div class="loadout-hand"><div class="av-fan" id="hand"></div></div>
+      <div class="loadout-build">
+        <div class="match-coachzone" id="matchCoachZone"></div>
+        <div class="match-kitzone" id="matchKitZone"></div>
+      </div>
+    </div>
 
     <div class="scout-overlay" id="rivalDrawer">
       <div class="scout-panel">
@@ -6469,13 +6708,7 @@ function applyStance(mode,strip,card){
   const subs=effSubs(card,mode);
   const scale=v=>v>=68?2:1; // the powering sub-stat earns a second slot
   if(mode==="bat"){
-    if(st==="def"){
-      stanceSwap(s,["W"],"0",scale(subs.technique));
-      stanceSwap(s,["6"],"1",1);
-    }else if(st==="atk"){
-      stanceSwap(s,["0","1"],subs.power>=60?"6":"4",scale(subs.power));
-      stanceSwap(s,["0","1","2"],"W",1);
-    }
+    // batting stance is already baked into the duel base weights — no strip edit
   }else{
     if(st==="atk"){
       stanceSwap(s,["1","2","0"],"W",scale((subs.movement+subs.pace)/2));
@@ -6668,6 +6901,10 @@ function newChallenge(keepLog=false){
     m.log="No rival cards left to play.";
     return false;
   }
+  // THE CHALLENGE: when you BAT, the rival bowler leads with a stat NOW (revealed
+  // before you pick, so you can answer it). When you BOWL, the stat comes from
+  // YOUR delivery, rolled when you pick your bowler (see selectCard).
+  m.challengeStat=m.phase==="bat"?rollChallengeStat(m.challenge):null;
   dealAnim=true;
   // DELIVERY-FIRST framing. When you BAT, the rival BOWLER delivers first, so
   // his ball already shapes the field before you pick a shot — that public
@@ -6699,6 +6936,9 @@ function selectCard(c,lock=false){
   }
   m.selected=c;
   m.preview=null;
+  // BOWL phase: the challenged stat is YOUR delivery — rolled from the bowler you
+  // just picked. Re-picking a different bowler rolls a fresh challenge.
+  if(m.phase==="bowl"){m.challengeStat=rollChallengeStat(c);m.stripCache={}}
   if(lock)m.selectionLocked=true;
   SFX.play("click");
   render();
@@ -6735,6 +6975,59 @@ const CURVE={
   extraBase:.065,extraPivot:50,extraDecay:.4,extraMax:3
 };
 function edge(a,b){return 1/(1+Math.exp(-(a-b)/CURVE.k))}
+/* ============================================================
+   STAT-CHALLENGE DUEL  (the core mechanic)
+   The bowler CHALLENGES on one named stat; the batter is forced to
+   answer with the PAIRED stat. diff = batterResponse - bowlerChallenge
+   sets the danger; the STANCE (def/push/atk) is the real decision on
+   top. Validated by sim: defend saves the wicket even when out-gunned,
+   attack trades the wicket for runs, one stat buff (coach) swings hard.
+   ============================================================ */
+const CHAL_PAIR={pace:"timing",movement:"technique",deception:"nerve",accuracy:"power"};
+const CHAL_LABEL={pace:"PACE",accuracy:"ACCURACY",movement:"MOVEMENT",deception:"DECEPTION",
+                 power:"POWER",timing:"TIMING",technique:"TECHNIQUE",nerve:"NERVE"};
+const DUEL={
+  K:10, DIFFCAP:13,
+  base:{W:.42,"0":1.20,"1":.95,"2":.30,"4":.78,"6":.42},
+  cDot:.55,c2:.6,c4:1.0,c6:1.0,
+  stance:{
+    def: {W:.34,"0":1.9,"1":.85,"2":.45,"4":.28,"6":.12},
+    push:{W:1,  "0":1,  "1":1,  "2":1,  "4":1,  "6":1  },
+    atk: {W:2.05,"0":.6,"1":.7, "2":1.05,"4":1.85,"6":2.1}
+  }
+};
+function duelControl(diff){const d=clamp(diff,-DUEL.DIFFCAP,DUEL.DIFFCAP);return 1/(1+Math.exp(-d/DUEL.K))}
+function duelWeights(diff,stanceKey){
+  const C=duelControl(diff),b=DUEL.base,s=DUEL.stance[stanceKey]||DUEL.stance.push;
+  const w={
+    W: b.W*Math.max(.04,1-(C-.5)*2),
+    "0":b["0"]*(1-DUEL.cDot*(C-.5)),
+    "1":b["1"],
+    "2":b["2"]*(.5+DUEL.c2*C),
+    "4":b["4"]*(.15+DUEL.c4*C),
+    "6":b["6"]*(.05+DUEL.c6*C*C)
+  };
+  for(const k in w)w[k]=Math.max(.002,w[k]*s[k]);
+  return w;
+}
+// the bowler leads with (usually) a strong stat — weighted random so it's
+// readable but not always the same. Uses coach/trait-modified stats.
+function rollChallengeStat(bowlC){
+  const subs=effSubs(bowlC,"bowl");
+  const ws=BOWL_KEYS.map(k=>Math.pow(Math.max(1,subs[k]),3));
+  let x=Math.random()*ws.reduce((a,b)=>a+b,0);
+  for(let i=0;i<BOWL_KEYS.length;i++){if((x-=ws[i])<=0)return BOWL_KEYS[i]}
+  return BOWL_KEYS[0];
+}
+// which stat is being fought over this ball, and each side's number
+function duelStats(mode,batC,bowlC){
+  const chall=m?.challengeStat||rollChallengeStat(bowlC);
+  const resp=CHAL_PAIR[chall];
+  return {chall,resp,
+    challVal:Math.round(effSubs(bowlC,"bowl")[chall]),
+    respVal:Math.round(effSubs(batC,"bat")[resp]),
+    diff:effSubs(batC,"bat")[resp]-effSubs(bowlC,"bowl")[chall]};
+}
 function traitStatDelta(c,disc){return c.trait?c.trait[disc](ctx(),0):0}
 function isRivalCard(c){return !!(m&&m.rivalDeck&&m.rivalDeck.includes(c))}
 function effSubs(c,disc){
@@ -6756,27 +7049,14 @@ function effSubs(c,disc){
 function outcomeWeights(mode,myCard,theirCard){
   const batterMine=mode==="bat";
   const batC=batterMine?myCard:theirCard,bowlC=batterMine?theirCard:myCard;
-  const B=effSubs(batC,"bat"),L=effSubs(bowlC,"bowl");
-  const x=ctx();
-  const pWkt=edge(L.movement*.6+L.pace*.4,B.technique);
-  const pBound=edge(B.power,L.deception);
-  const pRun=edge(B.timing,L.accuracy);
-  // the number on the card front must matter: overall rating gap tilts
-  // the whole curve on top of the sub-stat texture
-  const batRating=batVal(batC),bowlRating=bowlVal(bowlC);
-  const tilt=edge(batRating,bowlRating);            // .5 = even matchup
-  const batSide=1+CURVE.tiltAmp*(tilt-.5);          // >1 favours the batter
-  const bowlSide=1+CURVE.tiltAmp*(.5-tilt);         // >1 favours the bowler
-  const pressure=(x.left<=2?1:0)+((batterMine?x.yourWk:x.rivalWk)>=1?1:0);
-  const nerve=pressure*CURVE.nerveAmp*((B.nerve-55)/45); // + resists, - crumbles
-  const w={
-    W:Math.max(.01,(CURVE.base.W+CURVE.wkt*pWkt)*bowlSide-nerve),
-    "0":Math.max(.01,(CURVE.base["0"]+CURVE.dot*(1-pRun))*bowlSide-nerve*.5),
-    "1":CURVE.base["1"]+CURVE.run*pRun*(1-pBound*.5),
-    "2":CURVE.base["2"]+CURVE.two*pRun*(1-pBound*.4),
-    "4":(CURVE.base["4"]+CURVE.four*pBound*(1-pWkt*.3))*batSide+Math.max(0,nerve*.5),
-    "6":(CURVE.base["6"]+CURVE.six*pBound*edge(B.power,L.deception+8)*(1-pWkt*.3))*batSide+Math.max(0,nerve*.5)
-  };
+  const L=effSubs(bowlC,"bowl");
+  // THE DUEL: one stat is challenged, the paired stat answers. The batting
+  // stance bakes straight into the base weights (validated model); the bowling
+  // stance still edits slots later in applyStance. When YOU bowl the batter is
+  // the AI rival — it plays a steady (push) shot.
+  const {diff}=duelStats(mode,batC,bowlC);
+  const stanceKey=batterMine?currentStance():"push";
+  const w=duelWeights(diff,stanceKey);
   // free hit: the batter cannot get out
   if(m?.freeHit){
     w["1"]+=w.W*.4;w["4"]+=w.W*.35;w["6"]+=w.W*.25;w.W=0;
@@ -7381,12 +7661,9 @@ function render(pop=false){
     matchScreen.classList.toggle("is-resolving",m.result?.state==="resolving");
     matchScreen.classList.toggle("is-settled",m.result?.state==="settled");
   }
-  $("#matchName").innerHTML=m.def.boss?`🏆 ${escSVG(m.def.cup)} FINAL <span class="boss-vs">vs ${escSVG(m.def.boss.team)}</span>`:escSVG(matchLabel(m.def));
-  $("#phaseLabel").innerHTML=phaseLabelText();
-  $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
   syncCoins({float:false});
-  const mcz=$("#matchCoachZone");if(mcz)mcz.innerHTML=coachStripHTML();
-  renderDuel(pop);renderHand();renderDugout();renderKitbag();renderScorebug();renderRivalStrip();
+  const mcz=$("#matchCoachZone");if(mcz)mcz.innerHTML=coachStripHTML({mini:true});
+  renderDuel(pop);renderHand();renderKitbag();renderHud();
   maybeStartTutorial();
   if(typeof TUT!=="undefined")TUT.reposition();
 }
@@ -7476,6 +7753,27 @@ function heatBarHTML(){
   const lbl=st==="fire"?"ON FIRE 🔥":st==="warm"?"heating up":(m.phase==="bat"?"hit boundaries":"dots & wickets");
   return `<div class="heat-bar">${pips}</div><small class="heat-lbl">${lbl}</small>`;
 }
+/* Slim match HUD (replaces the title bar + scorebug strip). 6 legal-ball pips;
+   a wide/no-ball shows as a "+N" tick beside them, never eating a legal pip. */
+function renderHud(){
+  const el=$("#hudInfo");if(!el)return;
+  const v=bugView();
+  const batting=m.phase==="bat"?v.you:v.rival;
+  const legal=m.def.balls,done=Math.min(legal,m.ball-1);
+  let pips="";
+  for(let i=1;i<=legal;i++)pips+=`<i class="hpip ${i<=done?'done':i===m.ball?'now':''}"></i>`;
+  const ex=m.extrasCount||0;
+  const extraTick=ex>0?`<span class="hpip-x" title="${ex} extra${ex>1?'s':''} — re-bowled, no legal ball lost">+${ex}</span>`:"";
+  const heat=momentumState();
+  const heatEl=heat?`<span class="hheat heat-${heat}" title="Heat building">&#128293;</span>`:"";
+  const fh=(m.freeHit&&!m.result)?`<span class="hfree">FREE HIT</span>`:"";
+  const chase=chaseState();
+  let goal="";
+  if(chase&&chase.need>0)goal=`<span class="hgoal pressure-${chasePressure()||'live'}">Need ${chase.need} &middot; ${chase.left}b</span>`;
+  else if(m.innings===1)goal=`<span class="hgoal soft">${m.phase==="bat"?"Set a target":"Keep them low"}</span>`;
+  el.innerHTML=`<div class="hscore"><b>${batting.runs}/${batting.wk}</b><small>${m.phase==="bat"?"YOU BAT":"RIVAL BATS"}</small></div>
+    <div class="hpips">${pips}${extraTick}</div>${heatEl}${fh}${goal}`;
+}
 function oddsSummary(strip){
   const counts=strip.reduce((a,t)=>(a[t]=(a[t]||0)+1,a),{});
   return ["W","0","1","2","4","6"].filter(t=>counts[t]).map(t=>`${t}:${Math.round(counts[t]/strip.length*100)}%`).join(" ");
@@ -7526,8 +7824,7 @@ function commentaryHTML(){
     return `<div class="commentary-strip live"><span class="c-line l1">${lines[0]}</span><span class="c-line l2">${lines[1]}</span></div>`;
   }
   if(m.result)return `<div class="commentary-strip quiet">${commentaryLines(m.result)[2]}</div>`;
-  if(m.selected)return `<div class="commentary-strip quiet">Locked in. Play the ball when ready. <span class="kbd-hint">1/2/3 stance · Space to play</span></div>`;
-  return `<div class="commentary-strip quiet muted">Pick a card from your hand. <span class="kbd-hint">or press 1–9</span></div>`;
+  return ""; // pre-play: the challenge banner + PLAY button carry the message
 }
 function resultWinner(result){
   const token=ballToken(result.text);
@@ -7577,6 +7874,39 @@ function roleColor(c){return c.role==="bat"?"#1f9b53":c.role==="bowl"?"#c0303f":
 // COACH tab vs an OVR shield, and a "coaching bonus" ribbon (the effect is the
 // hero) vs a stat row. Editions add the premium shine.
 function coachWrap(s,n){const w=(s||"").split(" ");const out=[];let l="";w.forEach(x=>{if((l+" "+x).trim().length>n){if(l)out.push(l.trim());l=x}else l=(l+" "+x).trim()});if(l)out.push(l);return out.slice(0,3)}
+/* Match-loadout coach card: SAME visual recipe as the player card (tier edge,
+   cream frame, full-bleed art, ink name band) so coaches read as part of one
+   deck — plus a lane square when the coach buffs a lane, echoing the player
+   stat squares. Detail text stays on the shop/squad card. */
+function coachMiniSVG(coach){
+  const g="cm"+(svgSeq++),img=coachArt(coach),tier=coach.tier||"common";
+  const edge={common:"#8b969d",uncommon:"#2a9d54",rare:"#3f6fc4",epic:"#9147c4",legendary:"#c79214"}[tier]||"#8b969d";
+  const nm=escSVG((coach.name.length>16?coach.name.slice(0,15)+"…":coach.name).toUpperCase());
+  const subKey=coach.sub?Object.keys(coach.sub)[0]:null;
+  const badge=subKey
+    ?`<rect x="178" y="228" width="54" height="54" rx="13" fill="${STAT_COLOR[subKey]||'#ffc93c'}" stroke="#17211f" stroke-width="3"/>
+      <text x="205" y="252" text-anchor="middle" fill="#fff6e3" font-size="11" font-weight="900">${STAT_FULL[subKey]?STAT_FULL[subKey].slice(0,3):""}</text>
+      <text x="205" y="274" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="24">+${coach.sub[subKey]}</text>`
+    :`<rect x="178" y="228" width="54" height="54" rx="13" fill="#ffc93c" stroke="#17211f" stroke-width="3"/>
+      <path d="M209 240 L194 262 L204 262 L200 272 L216 250 L206 250 Z" fill="#17211f"/>`;
+  return `<svg class="tc coachtc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
+    <defs><clipPath id="${g}w"><rect x="12" y="12" width="226" height="280" rx="13"/></clipPath></defs>
+    <rect x="4" y="4" width="242" height="342" rx="20" fill="${edge}"/>
+    <rect x="8" y="8" width="234" height="334" rx="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/>
+    <g clip-path="url(#${g}w)">
+      <rect x="12" y="12" width="226" height="280" fill="#ffe6b8"/>
+      <radialGradient id="${g}sp" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#fff4d6"/><stop offset="1" stop-color="#f2b45c"/></radialGradient>
+      <rect x="12" y="12" width="226" height="280" fill="url(#${g}sp)"/>
+      <image href="${img}" x="24" y="26" width="202" height="266" preserveAspectRatio="xMidYMax meet"/>
+    </g>
+    <rect x="12" y="12" width="226" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
+    <path d="M12 26 h86 l-8 14 8 14 h-86 Z" fill="#ff5a2d" stroke="#17211f" stroke-width="2.5"/>
+    <text x="48" y="45.5" text-anchor="middle" fill="#fff" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="15" letter-spacing="1.4">COACH</text>
+    ${badge}
+    <rect x="12" y="298" width="226" height="30" rx="9" fill="#17211f"/>
+    <text x="125" y="319" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${nm.length>13?15:18}" letter-spacing=".3">${nm}</text>
+  </svg>`;
+}
 function coachCardSVG(coach){
   const g="cg"+(svgSeq++),img=coachArt(coach),tier=coach.tier||"common",ed=coach.edition;
   const TM={common:["#8b969d","#e9edf0"],uncommon:["#2a9d54","#d7f6e4"],rare:["#3f6fc4","#dcebff"],epic:["#9147c4","#f2ddff"],legendary:["#c79214","#ffeeb0"]}[tier]||["#8b969d","#e9edf0"];
@@ -7606,54 +7936,62 @@ function coachCardSVG(coach){
     ${eff.map((l,i)=>`<text x="49" y="${316+i*11}" fill="#17211f" font-size="9.5" font-weight="800">${escSVG(l)}</text>`).join("")}
   </svg>`;
 }
-function cardSVG(c,batNum,bowlNum,emph,dim,compact){
+/* 4 COLOUR LANES — each bowling stat and its answering batting stat share ONE
+   colour, shown in a fixed left→right order on every card. The card carries ZERO
+   words: art, name, four colour numbers. The bowler lights its lane (the
+   challenge); you scan that colour across your hand and play your answer, whose
+   matched number then lights beside the wheel. Lanes:
+     red    pace / timing      blue   movement / technique
+     amber  accuracy / power   purple deception / nerve   */
+const LANE_COLOR={red:"#e0403f",blue:"#2f8fd0",amber:"#f0a52b",purple:"#8a5cd0"};
+const STAT_COLOR={
+  pace:LANE_COLOR.red, timing:LANE_COLOR.red,
+  movement:LANE_COLOR.blue, technique:LANE_COLOR.blue,
+  accuracy:LANE_COLOR.amber, power:LANE_COLOR.amber,
+  deception:LANE_COLOR.purple, nerve:LANE_COLOR.purple
+};
+// fixed on-card column order (red → blue → amber → purple), paired across roles
+const STAT_ORDER_BAT=["timing","technique","power","nerve"];
+const STAT_ORDER_BOWL=["pace","movement","accuracy","deception"];
+const STAT_FULL={pace:"PACE",timing:"TIMING",movement:"MOVEMENT",technique:"TECHNIQUE",accuracy:"ACCURACY",power:"POWER",deception:"DECEPTION",nerve:"NERVE"};
+/* CARD = art on the LEFT, a vertical RAIL of four stat SQUARES on the right
+   (number in the lane colour, stat name in black below). When a lane is the
+   ball's challenge, its square LIGHTS UP — the fill floods with the lane colour
+   and glows, exactly like a wheel sector. Layout-independent, works everywhere. */
+function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot){
   const g="g"+(svgSeq++);
-  const img=draftArtForCard(c),ovr=ovrVal(c),rc=roleColor(c);
-  const roleShort=c.role==="bat"?"BAT":c.role==="bowl"?"BOWL":"ALL";
+  const img=draftArtForCard(c),rc=roleColor(c);
   const bowlSide=emph==="bowl";
-  if(compact){
-    // Mini budget (hand fan): art + the one stat that decides this ball + name.
-    const nm=escSVG(c.name.split(" ").pop().toUpperCase());
-    const statNum=bowlSide?bowlNum:batNum;
-    return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
-    ${cardShell(g,dim,c.rarity,c.role,true)}
-      <image href="${img}" x="34" y="30" width="182" height="196" preserveAspectRatio="xMidYMax meet" opacity="${dim?.92:1}" filter="url(#${g}shadow)"/>
-    </g>
-    <g filter="url(#${g}shadow)"><rect x="20" y="24" width="58" height="64" rx="10" fill="${rc}" stroke="#17211f" stroke-width="3"/>
-      <text x="49" y="64" text-anchor="middle" fill="#fff" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="34">${statNum}</text>
-      <text x="49" y="80" text-anchor="middle" fill="#fff" font-size="10" font-weight="800" letter-spacing="1.5">${bowlSide?"BOWL":"BAT"}</text></g>
-    ${c.trait?`<g class="trait-gem"><path d="M214 34 l13 15 -13 15 -13 -15 Z" fill="#ffc93c" stroke="#17211f" stroke-width="2.5"/><path d="M214 40 l7 9 -7 9 -7 -9 Z" fill="#fff3bd"/></g>`:""}
-    <rect x="16" y="238" width="218" height="96" rx="12" fill="#fff6e3"/>
-    <rect x="20" y="244" width="210" height="30" rx="7" fill="#17211f"/>
-    <text x="125" y="265" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${nm.length>10?16:20}" letter-spacing=".4">${nm}</text>
-    <text x="125" y="300" text-anchor="middle" fill="${rc}" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="44">${ovr}</text>
-    <text x="125" y="322" text-anchor="middle" fill="#17211f" font-size="10" font-weight="800" letter-spacing="2">${roleShort} · OVR</text>
-  </svg>`;
-  }
-  const name=escSVG((c.name.length>17?c.name.slice(0,16)+"…":c.name).toUpperCase());
-  const headNum=emph?(bowlSide?bowlNum:batNum):ovr;
-  const headLbl=emph?(bowlSide?"BOWL":"BAT"):"OVR";
   const src=bowlSide?c.bowling:c.batting;
-  const cols=bowlSide?[["PAC","pace"],["ACC","accuracy"],["MOV","movement"],["DEC","deception"]]
-                     :[["PWR","power"],["TIM","timing"],["TEC","technique"],["NRV","nerve"]];
-  const trait=c.trait?escSVG(c.trait.name.length>13?c.trait.name.slice(0,12)+"…":c.trait.name).toUpperCase():"";
+  const keys=bowlSide?STAT_ORDER_BOWL:STAT_ORDER_BAT;
+  const edge=(RARITIES[c.rarity]||RARITIES.common).fill||"#cfd6da";
+  const name=escSVG((c.name.length>16?c.name.slice(0,15)+"…":c.name).toUpperCase());
+  const sq=54,sx=176,railTop=14,unit=(292-14)/4;
+  const tiles=keys.map((k,i)=>{
+    const y=railTop+i*unit,cx=sx+sq/2,v=src[k],on=hot&&hot===k,sc=STAT_COLOR[k]||rc;
+    return `
+      <rect ${on?`class="cardsq-lit" style="--lc:${sc}"`:""} x="${sx}" y="${y}" width="${sq}" height="${sq}" rx="13" fill="${on?sc:'#fdf6e6'}" stroke="${sc}" stroke-width="3.5"/>
+      <text x="${cx}" y="${y+sq/2+11}" text-anchor="middle" fill="${on?'#fff6e3':sc}" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="30">${v}</text>
+      <text x="${cx}" y="${y+sq+13.5}" text-anchor="middle" fill="#17211f" font-size="9.5" font-weight="800" letter-spacing=".2">${STAT_FULL[k]}</text>`;
+  }).join("");
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
-    ${cardShell(g,dim,c.rarity,c.role)}
-      <image href="${img}" x="46" y="26" width="158" height="180" preserveAspectRatio="xMidYMax meet" opacity="${dim?.94:1}" filter="url(#${g}shadow)"/>
+    <defs><clipPath id="${g}art"><rect x="12" y="12" width="152" height="280" rx="13"/></clipPath></defs>
+    <rect x="4" y="4" width="242" height="342" rx="20" fill="${edge}"/>
+    <rect x="8" y="8" width="234" height="334" rx="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/>
+    <g clip-path="url(#${g}art)">
+      <rect x="12" y="12" width="152" height="280" fill="#bfe3f2"/>
+      <rect x="12" y="196" width="152" height="96" fill="#7cc24a"/>
+      <image href="${img}" x="12" y="12" width="152" height="280" preserveAspectRatio="xMidYMid slice" opacity="${dim?.9:1}"/>
     </g>
-    <g filter="url(#${g}shadow)"><rect x="22" y="26" width="56" height="66" rx="10" fill="${rc}" stroke="#17211f" stroke-width="3"/>
-      <text x="50" y="66" text-anchor="middle" fill="#fff" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="33">${headNum}</text>
-      <text x="50" y="83" text-anchor="middle" fill="#fff" font-size="10" font-weight="800" letter-spacing="1.2">${headLbl}</text></g>
-    ${c.trait?`<g filter="url(#${g}shadow)"><rect x="120" y="26" width="106" height="22" rx="11" fill="#ffc93c" stroke="#17211f" stroke-width="2.5"/><text x="173" y="41" text-anchor="middle" fill="#17211f" font-size="10.5" font-weight="900" letter-spacing=".4">★ ${trait}</text></g>`:""}
-    <rect x="16" y="220" width="218" height="30" rx="8" fill="#17211f"/>
-    <text x="125" y="241" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>14?15:18}" letter-spacing=".3">${name}</text>
-    <text x="24" y="270" fill="#8a7752" font-size="9" font-weight="900" letter-spacing="1.5">${bowlSide?"BOWLING":"BATTING"}</text>
-    <text x="226" y="270" text-anchor="end" fill="#8a7752" font-size="9" font-weight="800" letter-spacing=".5">${roleName(c).toUpperCase()} · #${c.num}</text>
-    ${cols.map((L,i)=>{const x=41+i*56;const v=src[L[1]];
-      return `<rect x="${x-25}" y="278" width="50" height="48" rx="9" fill="#fbf1d8" stroke="#d8c69a" stroke-width="1.5"/>
-        <text x="${x}" y="296" text-anchor="middle" fill="#17211f" font-size="9.5" font-weight="900" letter-spacing=".5">${L[0]}</text>
-        <text x="${x}" y="318" text-anchor="middle" fill="${rc}" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="20">${v}</text>`;
-    }).join("")}
+    <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
+    ${c.role==="bowl"
+      ?`<circle cx="34" cy="34" r="15" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/><circle cx="34" cy="34" r="8" fill="#ff4155" stroke="#fff6e3" stroke-width="1.8"/><path d="M30.5 29 q5.5 5 0 10 M37.5 29 q-5.5 5 0 10" stroke="#fff6e3" stroke-width="1.4" fill="none"/>`
+      :c.role==="bat"
+      ?`<circle cx="34" cy="34" r="15" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/><g transform="rotate(36 34 34)"><rect x="31" y="24" width="6" height="16" rx="3" fill="#ffc93c"/><rect x="32.6" y="19.5" width="2.8" height="5.5" rx="1.4" fill="#fff6e3"/></g>`
+      :`<circle cx="34" cy="34" r="15" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/><g transform="rotate(36 30 36)"><rect x="27.6" y="27" width="5" height="14" rx="2.5" fill="#ffc93c"/></g><circle cx="40" cy="29.5" r="5.2" fill="#ff4155" stroke="#fff6e3" stroke-width="1.5"/>`}
+    ${tiles}
+    <rect x="12" y="298" width="226" height="30" rx="9" fill="#17211f"/>
+    <text x="125" y="319" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>13?16:19}" letter-spacing=".3">${name}</text>
   </svg>`;
 }
 // a face-down back for deck stacks — summer sticker language
@@ -7692,7 +8030,7 @@ function radialSVG(c){
     <rect x="6" y="5" width="238" height="340" rx="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/>
     <path d="M6 21 a16 16 0 0 1 16-16 h206 a16 16 0 0 1 16 16 v28 h-238 Z" fill="${rc}"/>
     <text x="17" y="34" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="17" fill="#fff" stroke="#17211f" stroke-width="2.5" paint-order="stroke">${escSVG(c.name.toUpperCase())}</text>
-    <text x="125" y="66" text-anchor="middle" font-size="10" font-weight="800" fill="#17211f" letter-spacing=".6">${roleName(c).toUpperCase()} &middot; OVR ${ovrVal(c)} &middot; BAT ${batVal(c)} / BOWL ${bowlVal(c)}</text>
+    <text x="125" y="66" text-anchor="middle" font-size="10" font-weight="800" fill="#17211f" letter-spacing=".6">${roleName(c).toUpperCase()} &middot; #${c.num}</text>
     ${miniRing}
     <text x="125" y="156" text-anchor="middle" font-size="8" font-weight="800" fill="#7a6a4a" letter-spacing="1.5">ITS FIELD &middot; BIGGER SLICE = MORE LIKELY</text>
     ${rows}
@@ -7700,18 +8038,28 @@ function radialSVG(c){
     <text x="125" y="338" text-anchor="middle" font-size="8.5" font-weight="800" fill="#17211f">${traitLine.toUpperCase()}</text>
   </svg>`;
 }
-function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,as="button"}={}){
-  const flip=mini?"":`<div class="cface cback">${radialSVG(c)}</div>`;
-  const chip=mini?"":`<span class="flipchip" title="Click card to flip">&#8635;</span>`;
-  const isFlipped=!mini&&flippedCards.has(dataId||c.id);
+function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,hot,as="button"}={}){
+  // no flip chip / trait gem on the face — the card now says everything up front
+  const flip="";
+  const chip="";
+  const isFlipped=false;
   const tag=as==="div"?"div":"button";
   const roleAttr=tag==="div"?'role="group"':(disabled?'disabled':'');
   return `<${tag} class="card ${mini?'card--mini card--tactical':''} ${duel?'card--duel':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''} ${isFlipped?'flipped':''}" ${roleAttr}
     style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
     <span class="selbadge">✓</span><span class="sheen"></span>
-    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini)}</div>${flip}</div>${chip}</${tag}>`;
+    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini,hot)}</div>${flip}</div>${chip}</${tag}>`;
 }
-function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardHTML(c,{emph,as:"div",duel:true,active:true})}</div>`}
+// which stat lights up on a card THIS ball: the bowler shows the challenged
+// stat; your hand + your batter show the paired answer.
+function hotStatFor(c){
+  if(!m||!m.challengeStat)return null;
+  const isRival=isRivalCard(c);
+  if(m.phase==="bat")return isRival?m.challengeStat:CHAL_PAIR[m.challengeStat];
+  // bowling: your bowler shows the challenge, the rival batter shows the answer
+  return isRival?CHAL_PAIR[m.challengeStat]:m.challengeStat;
+}
+function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardHTML(c,{emph,as:"div",duel:true,active:true,hot:hotStatFor(c)})}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div><div class="placeholder">+</div></div>`}
 /* ---------- THE FIELD RING: 12 sectors of a cricket ground.
    The strip IS the field — the ball lands in a sector. Build changes
@@ -7873,7 +8221,8 @@ function setRingRead(b,s){
 function enterResolve(){
   const d=$("#duel");if(!d)return;
   if(typeof TUT!=="undefined")TUT.notify("play");
-  d.querySelector(".you-col .stance-dock")?.remove();
+  d.querySelector(".stance-bar")?.remove();
+  d.querySelector(".chal-banner")?.remove();
   const a=$("#actions");if(a)a.innerHTML="";
   const rc=$("#ringCenter");
   if(rc){rc.classList.remove("slam");rc.innerHTML=`<div class="ring-read spin"><b>THE BALL</b><span>tap to skip &#9654;</span></div>`}
@@ -7901,7 +8250,7 @@ function startResolveSequence(){
       animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
       SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
       if(b.kind==="coach"){const seat=document.querySelector(`.coachcard[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
-      if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
+      if(b.kind==="tool"){const k=document.querySelector(".kit-slot.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
       if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait"||b.kind==="momentum")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
     t+=540+110*Math.max(0,changes-1); // read each beat's cascade — snappy but legible
@@ -7962,7 +8311,7 @@ function finishLanding(res,target){
   const win=resultWinner(res);
   d?.querySelector(".you-col .dslot")?.classList.toggle("winner",win==="you");
   d?.querySelectorAll(".av-duelrow > .dslot")?.forEach(s=>s.classList.toggle("winner",win==="rival"));
-  renderScorebug();           // reveal the score exactly as it lands
+  renderHud();                // reveal the score exactly as it lands
   const cs=d?.querySelector(".commentary-strip");
   if(cs){cs.className="commentary-strip quiet";cs.textContent=commentaryLines(res)[2]}
   const g=document.querySelector(".av-ground");
@@ -8063,9 +8412,9 @@ function renderDuel(pop=false){
   const youSlot=youCard
     ?duelCardHTML(youCard,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,(m.result?.state==="settled"&&resultWinner(m.result)==="you")?"winner":"")
     :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
-  const stanceDock=(!m.result&&m.selected)?`<div class="stance-dock">${stanceChipsHTML()}</div>`:"";
-  const changeChip=(m.selected&&!m.result)?`<button class="you-change" id="youChange" title="Tap to pick a different card">&#10005; change</button>`:"";
-  const youCol=`<div class="you-col${m.selected&&!m.result?' can-change':''}">${youSlot}${changeChip}${stanceDock}</div>`;
+  const stanceBar=(!m.result&&m.selected)?`<div class="stance-bar">${stanceChipsHTML()}</div>`:"";
+  const changeChip=(m.selected&&!m.result)?`<button class="you-change" id="youChange" title="Tap to pick a different card">&#10005;</button>`:"";
+  const youCol=`<div class="you-col${m.selected&&!m.result?' can-change':''}">${youSlot}${changeChip}</div>`;
   const rivCard=m.result?m.result.rival:m.challenge;
   const rivSlot=rivCard
     ?duelCardHTML(rivCard,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph,`${danger?"danger":""} ${(m.result?.state==="settled"&&resultWinner(m.result)==="rival")?"winner":""}`)
@@ -8089,6 +8438,7 @@ function renderDuel(pop=false){
       <div class="av-ringwrap">${ringHTML}${needle}${centerBits}</div>
       ${rivSlot}
     </div>
+    ${stanceBar}
     ${commentaryHTML()}`;
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
@@ -8188,21 +8538,24 @@ function renderDugout(){
   el.innerHTML="";
 }
 function renderKitbag(){
-  const el=$("#kitbag");if(!el)return;
+  const el=$("#matchKitZone");if(!el)return;
   const tools=(run?.consumables||[]).filter(c=>!c.kind);
-  const items=tools.map(c=>{
+  const esc=s=>String(s||"").replace(/"/g,"&quot;");
+  const slots=tools.map(c=>{
     const armed=m.armedId===c.ownedId;
     const onMode=c.mode==="any"||c.mode===m.phase;
-    const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:"&#9889;";
-    return `<button class="kit-card ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}"
-      title="${c.desc||""}${onMode?"":" — fires when you "+(c.mode==="bat"?"bat":"bowl")}">
-      <span class="kit-ico">${ico}</span>
-      <div class="kit-text"><span class="kit-name">${c.name}</span><span class="kit-eff">${c.desc||""}</span></div>
-      ${armed?'<span class="kit-flag">NEXT BALL</span>':''}
+    const modeClass=c.mode==="bowl"?"mode-bowl":c.mode==="bat"?"mode-bat":"mode-any";
+    const art=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
+    return `<button class="kit-slot ${modeClass} ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}"
+      title="${esc(c.name)} — ${esc(c.desc)}${onMode?"":" · fires when you "+(c.mode==="bat"?"bat":"bowl")}">
+      ${armed?'<span class="kit-armflag">NEXT BALL</span>':''}
+      <span class="kit-art">${art}</span>
+      <span class="kit-plate">${c.name}</span>
     </button>`;
   });
-  const bag=`<svg class="bag-ill" viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg>`;
-  el.innerHTML=`<div class="av-zonetag">KIT BAG</div><div class="kits">${items.join("")||`<div class="kit-empty">${bag}<span class="zone-hint">Buy one-use tools in the Clubhouse, then arm them here</span></div>`}</div>`;
+  const peg=`<span class="kit-slot empty" title="One-use tools from the Clubhouse arm here"><span class="kit-peg"><svg viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg></span></span>`;
+  while(slots.length<2)slots.push(peg);
+  el.innerHTML=`<div class="kit-zone"><div class="kit-zone-head"><b>Kit</b>${tools.length?`<em>&times;${tools.length}</em>`:""}</div><div class="kit-zone-row">${slots.join("")}</div></div>`;
   el.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
 }
 /* The cockpit: stance chips + PLAY, in the middle of the wheel, where
@@ -8224,7 +8577,7 @@ function stanceChipsHTML(){
       <i>${s.icon}</i><b>${s.label}</b><small class="stance-risk">${risk}</small>
     </button>`;
   }).join("");
-  return `<div class="stance-lead">Choose HOW to play it</div><div class="stance-row">${chips}</div><div class="stance-explain" id="stanceExplain">${STANCE_PLAIN[cur]||""}</div>`;
+  return `<div class="stance-lead">${m.phase==="bowl"?"Set your line":"Pick your shot"} &darr;</div><div class="stance-row">${chips}</div>`;
 }
 function renderActions(){
   const a=$("#actions");
@@ -8249,30 +8602,30 @@ function baseStat(c,disc){return disc==="bowl"?c.bowl:c.bat}
 function renderHand(){
   const disc=m.phase==="bowl"?"bowl":"bat";
   const stat=c=>disc==="bowl"?bowlVal(c):batVal(c);
-  const inHand=activeSquad().filter(c=>!c.used&&c!==m.selected).sort((a,b)=>stat(b)-stat(a));
-  const spent=activeSquad().filter(c=>c.used);
+  // phase-relevant only: batters+all-rounders when batting, bowlers+all when
+  // bowling. The 6 best sit ready; the DECK holds everyone else + the bench.
+  const roleOk=c=>m.phase==="bowl"?(c.role==="bowl"||c.role==="all"):(c.role==="bat"||c.role==="all");
+  const avail=activeSquad().filter(c=>!c.used&&c!==m.selected);
+  // 6 best phase-relevant cards; if none are on-role left, fall back to ANY
+  // remaining card so the row is never empty and you can always field a ball.
+  let ready=avail.filter(roleOk).sort((a,b)=>stat(b)-stat(a)).slice(0,6);
+  if(!ready.length)ready=avail.slice().sort((a,b)=>stat(b)-stat(a)).slice(0,6);
   const animate=dealAnim;dealAnim=false;
-  const pile=spent.length
-    ?`<button class="av-pile" id="discardPile" title="${spent.length} card${spent.length>1?"s":""} played this match — click to review">
-        ${spent.slice(-3).map((c,i)=>`<i style="--o:${i}"></i>`).join("")}
-        <b>${spent.length}</b><span>PLAYED</span>
-      </button>`
-    :"";
-  $("#hand").innerHTML=`${pile}
-    <div class="av-handrow">${inHand.map((c,i)=>`
+  const cards=ready.map((c,i)=>`
       <div class="fanhold" data-id="${c.id}" style="--z:${i+1};--d:${i*22}ms">
         ${cardHTML(c,{used:false,disabled:!!m.result,emph:disc,dealin:animate,mini:false,as:"div"})}
-      </div>`).join("")||`<div class="hand-empty">No cards left — the innings runs on</div>`}
-    </div>
-    <button class="btn secondary sm av-scanmine" id="scanMineBtn" title="View your full squad">Squad ▸</button>`;
+      </div>`).join("")||`<div class="hand-empty">No cards left</div>`;
+  const deck=`<button class="hand-deck" id="deckBtn" title="Open your full squad + bench — field or swap any card">
+      <span class="hd-cards"><i></i><i></i><i></i></span><b class="hd-n">${avail.length}</b><span class="hd-lbl">DECK</span>
+    </button>`;
+  $("#hand").innerHTML=`<div class="av-handrow">${cards}${deck}</div>`;
   // events live on the HOLDER: its hitbox never moves (no hover jitter);
   // hover zoom is CSS-only and reveals the card, never the odds
   document.querySelectorAll("#hand .fanhold").forEach(h=>{
     const card=()=>activeSquad().find(c=>c.id===h.dataset.id);
     h.onclick=e=>{e.stopPropagation();if(Date.now()-dragEndedAt<180)return;lockCard(card())};
   });
-  const scan=$("#scanMineBtn");if(scan)scan.onclick=openPlayerDeck;
-  const dp=$("#discardPile");if(dp)dp.onclick=openPlayerDeck;
+  const db=$("#deckBtn");if(db)db.onclick=openPlayerDeck;
 }
 function fanSort(cards){
   const roleOrder={bat:0,all:1,bowl:2};
@@ -8305,7 +8658,17 @@ function renderDeckScout(kind){
     `<div class="scout-group"><h4>${player?"Available":"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value — click a card to flip)</em></h4>
        <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
     + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
-  document.querySelectorAll("#rivalDeckGrid .scout-card .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
+  if(player&&!m.result){
+    // tap any of YOUR cards to field it this ball (bench / off-role included),
+    // so you're never stuck when the ready row runs out of on-role cards.
+    document.querySelectorAll("#rivalDeckGrid .scout-card").forEach(cell=>{
+      const id=cell.querySelector(".card")?.dataset.id;
+      const c=activeSquad().find(x=>x.id===id);
+      if(c&&!c.used){cell.classList.add("fieldable");cell.onclick=()=>{closeRivalDeck();lockCard(c)}}
+    });
+  }else{
+    document.querySelectorAll("#rivalDeckGrid .scout-card .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
+  }
 }
 function openRivalDeck(){if(!m)return;SFX.play("nav");renderDeckScout("rival");$("#rivalDrawer").classList.add("show")}
 function openPlayerDeck(){if(!m)return;SFX.play("nav");renderDeckScout("player");$("#rivalDrawer").classList.add("show")}
@@ -8316,9 +8679,9 @@ function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("
    on every screen so the player always feels "this is what I optimise for".
    Slim horizontal strip: owned coaches (art + name, effect on hover) + empty
    pegs. In the shop it's sellable (tap a coach to sell). */
-function coachCardCell(coach,i,sell){
+function coachCardCell(coach,i,sell,mini){
   return `<div class="coachcard${sell?' sellable':''}" data-coach="${coach.instId||coach.id}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+coach.desc)}${sell?" · tap to sell +"+coachSellValue(coach):""}">
-    ${coachCardSVG(coach)}
+    ${mini?coachMiniSVG(coach):coachCardSVG(coach)}
     ${sell?`<span class="coachcard-sell"><span class="coin"></span>${coachSellValue(coach)}</span>`:""}
   </div>`;
 }
@@ -8329,7 +8692,7 @@ function coachStripHTML(opts={}){
   const active=activeCoaches();
   const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
   const sell=!!opts.sellable;
-  const cards=active.map((c,i)=>coachCardCell(c,i,sell));
+  const cards=active.map((c,i)=>coachCardCell(c,i,sell,!!opts.mini));
   for(let i=0;i<open;i++)cards.push(coachEmptyCell());
   return `<div class="coach-zone${sell?' sellable':''}">
     <div class="coach-zone-head"><b>Coaches</b><em>${usedCoachSlots()} / ${coachSlotLimit()}</em></div>
@@ -8855,7 +9218,7 @@ const TUT=(()=>{
     {tag:"Step 1 — pick",text:"Your team is the fan below. Tap a player to send them out to the middle.",
      target:()=>document.querySelector("#hand"),wait:"pick"},
     {tag:"Step 2 — intent",text:"Choose HOW to play it. Defend is safe, Push is balanced, Attack swings big and reshapes the field.",
-     target:()=>document.querySelector("#duel .stance-dock"),wait:"stance"},
+     target:()=>document.querySelector("#duel .stance-bar"),wait:"stance"},
     {tag:"Step 3 — play",text:"Ready? Hit PLAY and the field decides the ball.",
      target:()=>document.querySelector("#confirmBtn"),wait:"play"},
     {tag:"The ball",text:"Bigger zones = more likely. The needle spins and lands on your real outcome — nothing is rigged.",
@@ -8940,10 +9303,21 @@ const _unlock=()=>{SFX.unlock();MUSIC.setMuted(SFX.muted())};
 document.addEventListener("pointerdown",_unlock,{capture:true,passive:true});
 document.addEventListener("touchstart",_unlock,{capture:true,passive:true});
 document.addEventListener("keydown",_unlock,{capture:true});
-$("#startBtn").onclick=startRun;
-$("#continueBtn").onclick=continueRun;
+// the game wants the whole window — go fullscreen on the start gesture,
+// and offer a toggle in the match HUD (browser cramping was killing the UI)
+function enterFS(){const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().catch(()=>{})}
+function toggleFS(){if(document.fullscreenElement)document.exitFullscreen();else enterFS()}
+const _fsBtn=$("#fsBtn");if(_fsBtn)_fsBtn.onclick=toggleFS;
+$("#startBtn").onclick=()=>{enterFS();startRun()};
+$("#continueBtn").onclick=()=>{enterFS();continueRun()};
 $("#introGo").onclick=startFirstMatch;
 $("#restartBtn").onclick=()=>startRun();
+// gear popover (menu/restart/mute) — replaces the old title bar
+const _gearBtn=$("#gearBtn"),_gearPop=$("#gearPop");
+if(_gearBtn&&_gearPop){
+  _gearBtn.onclick=e=>{e.stopPropagation();_gearPop.hidden=!_gearPop.hidden};
+  document.addEventListener("pointerdown",e=>{if(!_gearPop.hidden&&!_gearPop.contains(e.target)&&e.target!==_gearBtn)_gearPop.hidden=true});
+}
 $("#homeMatchBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
 $("#testWinBtn").onclick=()=>{if(m)completeMatchWin()};
 // dev-only: reveal the Test Win shortcut with ?debug=1 (hidden in the demo)
