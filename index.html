@@ -8218,8 +8218,8 @@ const ROLE_ICON={
    cream body + ink rim traced from the PNG's own alpha (the pack-art look).
    Every pose stays unique; effects read perfectly on the flat shape; a
    deterministic mirror per card doubles the variety. */
-function playerSilhouette(c,dim){
-  const img=draftArtForCard(c);
+function playerSilhouette(c,dim,disc){
+  const img=draftArtForCard(c,disc);
   const f="sf"+(svgSeq++);
   const flip=(Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%2)===1;
   // rarity is readable from the FIGURE: tinted body + rarity rim; legendary glows
@@ -8286,7 +8286,7 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff,hotSoft){
     <g clip-path="url(#${g}art)">
       ${legendRays}
       <ellipse cx="88" cy="278" rx="66" ry="14" fill="rgba(23,33,31,.15)"/>
-      ${playerSilhouette(c,dim)}
+      ${playerSilhouette(c,dim,bowlSide?"bowl":"bat")}
     </g>
     ${c.trait?(()=>{const tn=escSVG(c.trait.name.toUpperCase());const tw=Math.min(150,26+tn.length*7.2);
       return `<g class="traitRibbon"><path d="M12 18 h${tw} l-7 10.5 7 10.5 h-${tw} Z" fill="#fff" stroke="#17211f" stroke-width="2.2"/>
@@ -9308,13 +9308,15 @@ function draftScoutBarsHTML(rivalCards){
   const rows=[["Batting threat",bat],["Bowling threat",bowl],["Flex cards",flex]];
   return rows.map(([label,val])=>`<div class="scout-bar"><span>${label}</span><b>${val}%</b><i style="width:${clamp(val,6,100)}%"></i></div>`).join("");
 }
-function draftArtForCard(c){
-  // pools re-bucketed by the ART's actual pose (audited): all1/all2 are pure
-  // batting, all3 is pure bowling, bowl2 is the pads+ball hybrid = all-rounder.
-  const bat=["assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
-  const bowl=["assets/players/bowl3.png","assets/players/bowl4.png"];
-  const all=["assets/players/bowl2.png"];
-  const pool=c.role==="bat"?bat:c.role==="bowl"?bowl:all;
+function draftArtForCard(c,disc){
+  // THE POSE FOLLOWS THE ACTION SHOWN, not the role — a card displayed as a
+  // bowler always gets a bowling action, as a batter a batting stance (the
+  // all-rounder confusion killer). Pools audited by actual pose; the pads+
+  // ball hybrid (bowl2) was ambiguous and is retired.
+  const batPoses=["assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
+  const bowlPoses=["assets/players/bowl3.png","assets/players/bowl4.png"];
+  const d=disc||(c.role==="bowl"?"bowl":"bat");
+  const pool=d==="bowl"?bowlPoses:batPoses;
   const idx=Math.abs([...c.id].reduce((n,ch)=>n+ch.charCodeAt(0),0))%pool.length;
   return pool[idx];
 }
