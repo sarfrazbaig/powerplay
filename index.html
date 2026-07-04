@@ -4348,6 +4348,29 @@
     background:var(--ink);color:#fff6e3;
     font-size:9.5px;font-weight:800;text-align:center;line-height:1.15;
   }
+  /* filled coach seat = a readable info chip: avatar + name + what it DOES */
+  .seat.filled{
+    display:flex;align-items:center;gap:8px;aspect-ratio:auto;height:auto;max-height:none;flex:0 0 auto;
+    overflow:visible;padding:7px 9px;background:#fff6e3;border:2.5px solid var(--ink);
+    border-radius:12px;box-shadow:3px 3px 0 rgba(23,33,31,.45);text-align:left;
+  }
+  .av-dock .seat.filled{width:100%;max-width:100%}
+  .av-dock .seat.open{
+    flex:0 0 auto;aspect-ratio:auto;height:auto;width:100%;max-width:100%;min-height:0;
+    display:flex;align-items:center;gap:7px;padding:7px 9px;
+  }
+  .av-dock .seat.open svg{width:26px;height:26px}
+  .seat.open .seat-slot{font-size:9.5px;font-weight:800;color:rgba(23,33,31,.5);letter-spacing:.3px}
+  .seat.filled .seat-face{
+    width:42px;height:42px;flex:0 0 auto;border-radius:10px;object-fit:cover;object-position:top;
+    border:2px solid var(--ink);background:linear-gradient(#bfe8f2,#e9f7e2);
+  }
+  .seat.filled .seat-text{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1 1 auto}
+  .seat.filled .seat-name{
+    position:static;background:none;color:var(--ink);padding:0;font-size:11px;font-weight:900;
+    text-align:left;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .seat.filled .seat-eff{font-size:9.5px;font-weight:700;color:#6a5a38;line-height:1.15}
   .seat-ball{
     position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;
     background:var(--gold);color:#111;font-style:normal;font-size:11px;font-weight:900;
@@ -4360,12 +4383,16 @@
   .seat.ed-polychrome{box-shadow:0 0 12px rgba(91,225,136,.6)}
   .seat.ed-negative{filter:invert(1) hue-rotate(180deg)}
   .kit-card{
-    width:min(150px,92%);display:grid;justify-items:center;gap:4px;padding:9px 6px;
-    background:#fff;border:2.5px solid var(--ink);border-radius:12px;cursor:pointer;
+    width:min(160px,96%);display:flex;align-items:center;gap:8px;padding:7px 9px;text-align:left;
+    background:#fff6e3;border:2.5px solid var(--ink);border-radius:12px;cursor:pointer;
     color:var(--ink);font-family:inherit;position:relative;
-    box-shadow:3px 3px 0 rgba(23,33,31,.5);
+    box-shadow:3px 3px 0 rgba(23,33,31,.45);
     transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
   }
+  .av-dock .kit-card{width:100%;max-width:100%}
+  .kit-text{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1 1 auto}
+  .kit-text .kit-name{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kit-eff{font-size:9.5px;font-weight:700;color:#6a5a38;line-height:1.15}
   .kit-card:hover{transform:translateY(-2px)}
   .kit-ico{width:26px;height:26px;display:grid;place-items:center}
   .kit-ico svg{width:24px;height:24px}
@@ -7937,12 +7964,13 @@ function renderDugout(){
   const seats=[];
   active.forEach(coach=>{
     seats.push(`<div class="seat filled ${coach.edition?'ed-'+coach.edition:''}" data-coach="${coach.instId||coach.id}" title="${coach.name} — ${coach.desc}">
-      <img src="${coachArt(coach)}" alt="" loading="lazy"><span class="seat-name">${coach.name}</span>
+      <img class="seat-face" src="${coachArt(coach)}" alt="" loading="lazy">
+      <div class="seat-text"><span class="seat-name">${coach.name}</span><span class="seat-eff">${coach.desc||""}</span></div>
       ${coach.ballTag?`<i class="seat-ball" title="works balls ${coach.ballTag.balls.join(" & ")}">${coach.ballTag.icon}</i>`:""}
     </div>`);
   });
   const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
-  for(let i=0;i<open;i++)seats.push(`<div class="seat open" title="An empty dugout seat — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 60 60"><circle cx="30" cy="22" r="11" fill="currentColor"/><path d="M10 56 Q30 34 50 56 Z" fill="currentColor"/></svg></div>`);
+  for(let i=0;i<open;i++)seats.push(`<div class="seat open" title="An empty dugout seat — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 60 60"><circle cx="30" cy="22" r="11" fill="currentColor"/><path d="M10 56 Q30 34 50 56 Z" fill="currentColor"/></svg><span class="seat-slot">Coach slot — hire in the Clubhouse</span></div>`);
   const hint=active.length?"":`<span class="zone-hint">Hire coaches in the Clubhouse — they bend the wheel every ball</span>`;
   el.innerHTML=`<div class="av-zonetag">DUGOUT</div><div class="seats">${seats.join("")}</div>${hint}`;
 }
@@ -7955,7 +7983,8 @@ function renderKitbag(){
     const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:"&#9889;";
     return `<button class="kit-card ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}"
       title="${c.desc||""}${onMode?"":" — fires when you "+(c.mode==="bat"?"bat":"bowl")}">
-      <span class="kit-ico">${ico}</span><span class="kit-name">${c.name}</span>
+      <span class="kit-ico">${ico}</span>
+      <div class="kit-text"><span class="kit-name">${c.name}</span><span class="kit-eff">${c.desc||""}</span></div>
       ${armed?'<span class="kit-flag">NEXT BALL</span>':''}
     </button>`;
   });
