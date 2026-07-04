@@ -3974,9 +3974,43 @@
   .shopx-v2 .staffx-list{display:flex;flex-direction:row;flex-wrap:wrap;gap:12px}
   .shopx-v2 .shopx-staff .staffx{width:clamp(120px,15vw,168px)}
   .shopx-v2 .shopx-staff .staffx.empty{width:76px;align-self:stretch}
-  .shopx-v2 .shopx-market .singlex{flex:0 0 auto;width:clamp(150px,12vw,182px)}
-  .shopx-v2 .shopx-market .vcard{flex:0 0 auto;width:clamp(160px,14vw,210px);align-self:flex-start}
-  .shopx-v2 .shopx-market .itemx{flex:0 0 auto;width:clamp(150px,12vw,178px)}
+  /* Market Stall: one uniform grid so columns line up cleanly (was ragged) */
+  .shopx-v2 .shopx-marketgrid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,178px));
+    justify-content:center;gap:14px;align-items:start;
+  }
+  .shopx-v2 .shopx-marketgrid .singlex,
+  .shopx-v2 .shopx-marketgrid .vcard,
+  .shopx-v2 .shopx-marketgrid .itemx{width:100%!important;align-self:start}
+  .shopx-v2 .shopx-marketgrid .vcard{align-self:start}
+  /* the persistent coach strip — always at the top, the engine you build */
+  .coach-strip{
+    display:flex;align-items:center;gap:12px;width:100%;
+    background:linear-gradient(180deg,#fffdf4,#fff2d6);border:3px solid var(--ink,#17211f);
+    border-radius:16px;box-shadow:5px 5px 0 rgba(23,33,31,.4);padding:9px 14px;min-height:0;
+  }
+  .cstrip-label{
+    flex:0 0 auto;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;
+    color:var(--punch,#ff5a2d);text-transform:uppercase;letter-spacing:.4px;display:flex;
+    flex-direction:column;line-height:1;gap:2px;
+  }
+  .cstrip-label em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;font-size:11px;color:#7a6a4a}
+  .cstrip-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1 1 auto}
+  .cstrip-coach{
+    display:flex;align-items:center;gap:7px;background:#fff6e3;border:2.5px solid var(--ink,#17211f);
+    border-radius:11px;padding:4px 9px 4px 4px;box-shadow:2px 2px 0 rgba(23,33,31,.35);
+  }
+  .coach-strip.sellable .cstrip-coach{cursor:pointer;transition:transform .12s,box-shadow .12s}
+  .coach-strip.sellable .cstrip-coach:hover{transform:translateY(-2px);box-shadow:2px 4px 0 rgba(23,33,31,.4);border-color:var(--red,#c0303f)}
+  .cstrip-coach img{width:30px;height:30px;border-radius:8px;object-fit:cover;object-position:top;border:2px solid var(--ink,#17211f);background:linear-gradient(#bfe8f2,#e9f7e2)}
+  .cstrip-name{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:var(--ink,#17211f);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
+  .cstrip-sell{font-family:"Work Sans",sans-serif;font-weight:800;font-size:11px;color:#7a5a1a;display:inline-flex;align-items:center;gap:2px}
+  .coach-strip.sellable .cstrip-coach:hover .cstrip-name{color:var(--red,#c0303f)}
+  .cstrip-empty{
+    width:38px;height:38px;flex:0 0 auto;border:2.5px dashed rgba(23,33,31,.3);border-radius:11px;
+    display:grid;place-items:center;color:rgba(23,33,31,.28);
+  }
+  .cstrip-empty svg{width:24px;height:24px;fill:currentColor}
   #shop .shopx-stage,
   #shop .shopx-rail,
   #shop .shopx-foot{
@@ -8202,6 +8236,26 @@ function openRivalDeck(){if(!m)return;SFX.play("nav");renderDeckScout("rival");$
 function openPlayerDeck(){if(!m)return;SFX.play("nav");renderDeckScout("player");$("#rivalDrawer").classList.add("show")}
 function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("show")}
 
+/* ---------- PERSISTENT COACH STRIP ----------
+   Coaches are the engine you build — like Balatro's jokers, they stay VISIBLE
+   on every screen so the player always feels "this is what I optimise for".
+   Slim horizontal strip: owned coaches (art + name, effect on hover) + empty
+   pegs. In the shop it's sellable (tap a coach to sell). */
+function coachStripHTML(opts={}){
+  const active=activeCoaches();
+  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
+  const sell=!!opts.sellable;
+  const chips=active.map((c,i)=>`<div class="cstrip-coach ed-${c.edition||'none'}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(c.name+" — "+c.desc)}${sell?" · tap to sell +"+coachSellValue(c):""}">
+      <img src="${coachArt(c)}" alt="" loading="lazy">
+      <b class="cstrip-name">${c.name}</b>
+      ${sell?`<span class="cstrip-sell"><span class="coin"></span>${coachSellValue(c)}</span>`:""}
+    </div>`);
+  for(let i=0;i<open;i++)chips.push(`<div class="cstrip-empty" title="Empty coaching slot — open a Coach Pack in the Clubhouse"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="14" r="7"/><path d="M5 37 Q20 22 35 37 Z"/></svg></div>`);
+  return `<div class="coach-strip${sell?' sellable':''}">
+    <span class="cstrip-label">Coaches <em>${usedCoachSlots()} / ${coachSlotLimit()}</em></span>
+    <div class="cstrip-row">${chips.join("")}</div>
+  </div>`;
+}
 /* ---------- RENDER: shop ---------- */
 
 
@@ -8294,20 +8348,15 @@ function renderShop(){
   const marketItems=`${(run.shop.singles||[]).map(singleMarkup).join("")}${run.shop.vouchers.map(voucherMarkup).join("")}${consumables||""}`;
   $("#offers").className="shopx-body shopx-v2";
   $("#offers").innerHTML=`
+    ${coachStripHTML({sellable:true})}
     <section class="shopx-shelf shopx-packs">
       <div class="shopx-shelf-head">Rip a pack <span>keep one pull</span></div>
       <div class="packx-row">${run.shop.packs.map(packMarkup).join("")}</div>
     </section>
-    <div class="shopx-lower">
-      <section class="shopx-shelf shopx-market">
-        <div class="shopx-shelf-head">Market Stall</div>
-        <div class="shopx-itemrow">${marketItems||'<div class="railx-empty">Sold out — reroll for more.</div>'}</div>
-      </section>
-      <section class="shopx-shelf shopx-staff">
-        <div class="shopx-shelf-head">Coaching Staff <em>${usedCoachSlots()} / ${coachSlotLimit()}</em></div>
-        <div class="shopx-itemrow staffx-list">${coachSlots}</div>
-      </section>
-    </div>`;
+    <section class="shopx-shelf shopx-market">
+      <div class="shopx-shelf-head">Market Stall</div>
+      <div class="shopx-itemrow shopx-marketgrid">${marketItems||'<div class="railx-empty">Sold out — reroll for more.</div>'}</div>
+    </section>`;
   document.querySelectorAll("#offers [data-open-pack]").forEach(b=>b.onclick=()=>openPack(+b.dataset.openPack));
   document.querySelectorAll("#offers [data-sell-coach]").forEach(b=>b.onclick=()=>sellCoach(+b.dataset.sellCoach));
   document.querySelectorAll("#offers [data-buy-voucher]").forEach(b=>b.onclick=()=>buyVoucher(+b.dataset.buyVoucher));
