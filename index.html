@@ -4755,6 +4755,13 @@
   }
   .fanhold:hover{z-index:60}
   .fanhold:hover .card{transform:translateY(-30%) scale(1.32)}
+  /* narrow phones: shrink + overlap the fan so all 12 cards stay on-screen
+     (a stopgap for portrait — the match is landscape-first). Desktop unaffected. */
+  @media(max-width:680px){
+    .fanhold{width:clamp(72px,18vw,110px);margin-left:calc(clamp(72px,18vw,110px)*-.76)}
+    .fanhold:active .card{transform:translateY(-22%) scale(1.3);z-index:70}
+    .av-fan{gap:6px}
+  }
   .hand-empty{
     align-self:center;font-size:12px;font-weight:800;letter-spacing:1.5px;
     color:rgba(255,255,255,.9);text-shadow:1px 1px 0 rgba(23,33,31,.55);text-transform:uppercase;
