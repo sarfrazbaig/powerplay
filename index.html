@@ -8562,8 +8562,7 @@ function renderDuel(pop=false){
     ?duelCardHTML(youCard,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,(m.result?.state==="settled"&&resultWinner(m.result)==="you")?"winner":"")
     :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
   const stanceBar=(!m.result&&m.selected)?`<div class="stance-bar">${stanceChipsHTML()}</div>`:"";
-  const changeChip=(m.selected&&!m.result)?`<button class="you-change" id="youChange" title="Tap to pick a different card">&#10005;</button>`:"";
-  const youCol=`<div class="you-col${m.selected&&!m.result?' can-change':''}">${youSlot}${changeChip}</div>`;
+  const youCol=`<div class="you-col${m.selected&&!m.result?' can-change':''}">${youSlot}</div>`;
   const rivCard=m.result?m.result.rival:m.challenge;
   const rivSlot=rivCard
     ?duelCardHTML(rivCard,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph,`${danger?"danger":""} ${(m.result?.state==="settled"&&resultWinner(m.result)==="rival")?"winner":""}`)
@@ -8595,8 +8594,6 @@ function renderDuel(pop=false){
   d.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
   // deselect: the ✕ chip OR clicking the picked card returns it to your hand
   if(m.selected&&!m.result){
-    const chip=d.querySelector("#youChange");
-    if(chip)chip.onclick=e=>{e.stopPropagation();cancelSelected()};
     const yCard=d.querySelector(".you-col .card");
     if(yCard){yCard.style.cursor="pointer";yCard.title="Tap to change your pick";yCard.onclick=e=>{e.stopPropagation();cancelSelected()}}
   }
