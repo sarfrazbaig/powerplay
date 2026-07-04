@@ -5431,6 +5431,7 @@
       </div>
       <div class="coins-tag"><span class="coin"></span><span id="squadCoins">0</span></div>
     </div>
+    <div class="screen-coachzone" id="squadCoachZone"></div>
     <div class="squad-room">
       <aside class="setup-panel squad-rail">
         <h3>Roster</h3>
@@ -8484,6 +8485,7 @@ function bindSquadActions(){
 function renderSquadManager(){
   const owned=roster().slice().sort(sortStrong),ids=activeIds(),p=run.pending;
   syncCoins();
+  $("#squadCoachZone").innerHTML=coachStripHTML();
   $("#rosterCount").textContent=owned.length;
   $("#activeCount").textContent=`${activeSquad().length}/12`;
   $("#benchCount").textContent=Math.max(0,owned.length-activeSquad().length);
