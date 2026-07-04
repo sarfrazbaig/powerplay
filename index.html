@@ -8210,6 +8210,9 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
       <ellipse cx="88" cy="278" rx="66" ry="14" fill="rgba(23,33,31,.15)"/>
       ${playerSilhouette(c,dim)}
     </g>
+    ${c.trait?`<g class="traitPennant"><rect x="19" y="9" width="3.5" height="44" rx="1.75" fill="#17211f"/>
+      <path d="M22.5 12 L66 21 L22.5 32 Z" fill="#ffc93c" stroke="#17211f" stroke-width="2.5"/>
+      <path d="M33 18.2 l1.7 3.4 3.7 .5 -2.7 2.6 .6 3.7 -3.3 -1.8 -3.3 1.8 .6 -3.7 -2.7 -2.6 3.7 -.5 Z" fill="#17211f" transform="scale(.82) translate(8 .5)"/></g>`:""}
     ${tiles}
     <rect x="12" y="292" width="226" height="44" rx="10" fill="#17211f"/>
     <g transform="translate(20 301) scale(1.08)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>
