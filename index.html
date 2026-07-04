@@ -4556,8 +4556,9 @@
   /* ---------- end-of-run card: the "play again?" payoff ---------- */
   .over-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;
     padding:34px 40px !important;max-width:540px}
-  .over-badge{font-size:66px;line-height:1;filter:drop-shadow(0 5px 0 rgba(23,33,31,.28));
+  .over-badge{width:96px;height:96px;margin:0 auto;line-height:0;filter:drop-shadow(0 5px 0 rgba(23,33,31,.28));
     animation:overBadgePop .6s cubic-bezier(.2,1.6,.4,1)}
+  .over-badge svg{display:block;width:100%;height:100%}
   @keyframes overBadgePop{0%{transform:scale(.2) rotate(-16deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
   .over-card.win .over-badge{animation:overBadgePop .6s cubic-bezier(.2,1.6,.4,1),overBadgeFloat 2.4s ease-in-out .6s infinite}
   @keyframes overBadgeFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-9px) rotate(3deg)}}
@@ -6823,12 +6824,33 @@ function skipResolve(){
   finishLanding(res,target);
 }
 function addHistory(result,calc){m.history.push({result,calc});m.history=m.history.slice(-9)}
+// Hero emblem for the run-end screen. Inline SVG, NOT an OS emoji — the emoji
+// falls back to a faint monochrome outline on many systems; this stays a bold,
+// gold, on-brand sticker every time.
+function overBadgeSVG(won){
+  if(won) return `<svg viewBox="0 0 100 100" width="100%" height="100%" aria-label="Champions">
+    <g stroke="#17211f" stroke-width="4" stroke-linejoin="round">
+      <path d="M28 16 h44 v14 a22 22 0 0 1 -44 0 Z" fill="#ffc93c"/>
+      <path d="M28 20 h-11 a10 10 0 0 0 10 16" fill="none"/>
+      <path d="M72 20 h11 a10 10 0 0 1 -10 16" fill="none"/>
+      <rect x="45" y="50" width="10" height="14" fill="#ffab2d"/>
+      <path d="M34 78 q0 -14 16 -14 q16 0 16 14 Z" fill="#ff9430"/>
+      <rect x="30" y="78" width="40" height="8" rx="3" fill="#17211f"/>
+    </g>
+    <path d="M38 22 q3 9 9 12" fill="none" stroke="#fff6e3" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+  </svg>`;
+  return `<svg viewBox="0 0 100 100" width="100%" height="100%" aria-label="Run over">
+    <circle cx="50" cy="50" r="30" fill="#c0303f" stroke="#17211f" stroke-width="4"/>
+    <path d="M38 26 q9 24 0 48 M62 26 q-9 24 0 48" fill="none" stroke="#fff6e3" stroke-width="3" stroke-dasharray="3 5" stroke-linecap="round"/>
+    <path d="M40 38 q6 -6 14 -4" fill="none" stroke="#fff6e3" stroke-width="3" stroke-linecap="round" opacity=".85"/>
+  </svg>`;
+}
 function end(title,text,opts={}){
   clearTimeout(settleTimer);
   const won=opts.win??/champ|won|cup/i.test(title);
   $("#overTitle").textContent=title;
   $("#overText").textContent=text;
-  $("#overBadge").textContent=won?"🏆":"🏏";
+  $("#overBadge").innerHTML=overBadgeSVG(won);
   $("#overStats").innerHTML=
     `<span class="stat-pill">Matches won <b>${run?.wins||0}</b></span>`
     +`<span class="stat-pill">Best chase <b>${save?.best||0}</b></span>`
