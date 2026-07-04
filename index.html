@@ -3154,7 +3154,7 @@
   .stagex-head span{font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#7a6a4a}
   .packx-row{
     display:flex;
-    gap:clamp(14px,2.5vw,40px);
+    gap:clamp(12px,1.6vw,22px);
     align-items:center;
     justify-content:center;
     min-height:0;
@@ -3166,13 +3166,16 @@
     gap:10px;
     padding:6px 6px 10px;
     background:transparent;
+    flex:1 1 0;
+    max-width:220px;
+    min-width:0;
     border:0;
     cursor:pointer;
   }
   .packx:disabled{cursor:not-allowed}
   .packx:disabled:not(.picked){filter:saturate(.55) brightness(.85)}
   .packx-tilt{
-    width:min(clamp(168px,14.5vw,225px),36vh);
+    width:100%;max-width:210px;
     perspective:900px;
     transform-style:preserve-3d;
     animation:packFloat 5.5s ease-in-out infinite;
@@ -3944,8 +3947,10 @@
 
   /* Shop: pack counter first, quick buys clearly secondary. */
   #shop .shopx-body{
-    grid-template-columns:minmax(210px,275px) minmax(520px,1fr) minmax(230px,300px) !important;
-    gap:12px !important;
+    /* sides GROW to fill wide screens; the pack column is capped so it never
+       balloons and squishes the shelves (playtest: pack area was too large) */
+    grid-template-columns:minmax(280px,1fr) clamp(430px,38vw,500px) minmax(280px,1fr) !important;
+    gap:14px !important;
   }
   #shop .shopx-stage,
   #shop .shopx-rail,
