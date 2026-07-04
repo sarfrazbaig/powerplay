@@ -6441,7 +6441,7 @@ function weightedCoachPick(pool){
   for(const c of pool){r-=(TIER_WEIGHT[c.tier]||30);if(r<=0)return c}
   return pool[pool.length-1];
 }
-const COACH_ART_POOL=["bat_mentor","bowling_mentor","academy_coach","death_bowler","chase_guru","all_round_coach"].map(n=>"assets/coaches/"+n+".png");
+const COACH_ART_POOL=["Coach_clapping_from_sidelines_24","Coach_gesturing_for_field_change_26","Coach_giving_instructions_27","Coach_holding_cricket_ball_28","Coach_holding_stopwatch_29","Cricket_coach_pointing_field_32","Cricket_coach_standing_with_hips_33"].map(n=>"assets/Background%20Removed/"+n+".png");
 /* ---- HEX CARDS — broken power at a cost (spectral tier) ---- */
 function destroyWeakest(n,exceptId=null){
   let destroyed=0;
@@ -8632,6 +8632,18 @@ function finishLanding(res,target){
   const g=document.querySelector(".av-ground");
   const tk=res.strip[res.roll];
   if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
+  // the card itself celebrates: wicket -> fist-pump leap, six -> the launch
+  (()=>{
+    const tk=res.strip[res.roll];
+    const meWon=(m.phase==="bowl"&&tk==="W")||(m.phase==="bat"&&tk==="6");
+    if(!meWon)return;
+    const img=document.querySelector(".you-col .card image");
+    if(!img)return;
+    const celebs=m.phase==="bowl"
+      ?["assets/Background%20Removed/Fast_bowler_celebrating_wicket_36.png","assets/Background%20Removed/Left-handed_bowler_celebrating_wicket_42.png"]
+      :["assets/Background%20Removed/Batsman_hitting_six_10.png"];
+    img.setAttribute("href",celebs[Math.floor(Math.random()*celebs.length)]);
+  })();
   showOutcomePop(res);        // the dopamine beat — the outcome punches in
   showBallPay();              // beat two: the MONEY stamps in and flies to the purse
   if(m.justIgnited){m.justIgnited=false;setTimeout(()=>showIgnition(),260)} // the engine comes ONLINE
@@ -9313,9 +9325,10 @@ function draftArtForCard(c,disc){
   // bowler always gets a bowling action, as a batter a batting stance (the
   // all-rounder confusion killer). Pools audited by actual pose; the pads+
   // ball hybrid (bowl2) was ambiguous and is retired.
-  const batPoses=["assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
-  const bowlPoses=["assets/players/bowl3.png","assets/players/bowl4.png"];
-  const neutralPoses=["assets/players/bowl2.png"]; // pads + ball raised = "I do both"
+  // THE POSE LIBRARY (37-image set, bucketed by named action)
+  const batPoses=["assets/Background%20Removed/All-rounder_batting_at_crease_01.png","assets/Background%20Removed/All-rounder_batting_at_crease_02.png","assets/Background%20Removed/All-rounder_batting_in_jersey_03.png","assets/Background%20Removed/Batsman_hitting_six_10.png","assets/Background%20Removed/Batsman_in_mid-swing_11.png","assets/Background%20Removed/Batsman_playing_defensive_shot_12.png","assets/Background%20Removed/Batsman_playing_defensive_stroke_13.png","assets/Background%20Removed/Batsman_playing_forward_defensive_14.png","assets/Background%20Removed/Batsman_playing_forward_defensive_15.png","assets/Background%20Removed/Batsman_playing_lofted_drive_17.png","assets/Background%20Removed/Left-handed_batsman_playing_lofted_shot_39.png","assets/Background%20Removed/Left-handed_batsman_playing_square_cut_40.png","assets/Background%20Removed/Left-handed_batsman_playing_sweep_shot_41.png","assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png"];
+  const bowlPoses=["assets/Background%20Removed/All-rounder_bowling_leg_break_05.png","assets/Background%20Removed/Bowler_mid-run_orange_jersey_22.png","assets/Background%20Removed/Bowler_mid-stride_action_23.png","assets/Background%20Removed/Cricket_bowler_in_delivery_stride_31.png","assets/Background%20Removed/Cricket_spinner_releasing_ball_35.png","assets/Background%20Removed/Fast_bowler_running_to_bowl_37.png","assets/Background%20Removed/Left-handed_all-rounder_bowling_38.png","assets/Background%20Removed/Left-handed_bowler_releasing_ball_43.png","assets/Background%20Removed/Leg-spinner_releasing_ball_45.png","assets/players/bowl3.png","assets/players/bowl4.png"];
+  const neutralPoses=["assets/Background%20Removed/All-rounder_fielding_a_ball_08.png","assets/Background%20Removed/Cricket_player_throwing_ball_34.png"];
   // no action context (squad/shop/scout default view): all-rounders stand NEUTRAL
   const d=disc||(c.role==="bowl"?"bowl":c.role==="all"?"neutral":"bat");
   const pool=d==="bowl"?bowlPoses:d==="neutral"?neutralPoses:batPoses;
