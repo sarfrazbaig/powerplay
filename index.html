@@ -5658,9 +5658,10 @@ const SFX=(()=>{
     if(ctx.state==="running"){try{fn()}catch(e){}}
     else{pending.push(fn);requestResume()}
   };
-  // ONLY clean interaction blips are allowed to sound. Every match/crowd/
-  // wheel/outcome cue is ignored — nothing droning or scratchy can play.
-  const UI_SOUNDS=new Set(["click","tick","nav","start","buy","toss"]);
+  // ONLY clean interaction blips + the wheel tick are allowed to sound. Crowd/
+  // outcome cues stay ignored; "clack" is a pure-tone tick (not noise), so the
+  // spinning wheel clicks cleanly without the old droning scratch.
+  const UI_SOUNDS=new Set(["click","tick","nav","start","buy","toss","clack"]);
   return {
     play(n){if(!UI_SOUNDS.has(n))return;const fn=S[n];if(fn)runSound(fn)},
     ambient(){/* disabled — no synth crowd bed */},
@@ -5673,29 +5674,11 @@ const SFX=(()=>{
   };
 })();
 function outcomeSfx(token){SFX.play(token==="W"?"wicket":token==="6"?"six":token==="4"?"four":(token==="wd"||token==="nb")?"extra":(token==="1"||token==="2")?"run":"dot")}
-/* ---------- FILE-BASED MUSIC: drop a copyright-free loop at
-   assets/audio/theme.mp3 (or .ogg / music.mp3) and it plays through the
-   game, ducking under every ball. Silent if no file is present — nothing
-   synthesised, so no scratch. Shares the mute toggle. ---------- */
-const MUSIC=(()=>{
-  let el=null,wanted=false,canPlay=false,baseVol=.42;
-  const ensure=()=>{
-    if(el)return el;
-    el=new Audio();el.loop=true;el.preload="auto";el.volume=baseVol;
-    const srcs=["assets/audio/theme.mp3","assets/audio/theme.ogg","assets/audio/music.mp3"];let i=0;
-    const next=()=>{if(i<srcs.length)el.src=srcs[i++];};
-    el.addEventListener("canplay",()=>{canPlay=true;if(wanted&&!SFX.muted())el.play().catch(()=>{})});
-    el.addEventListener("error",next);
-    next();
-    return el;
-  };
-  return {
-    start(){wanted=true;if(SFX.muted())return;const a=ensure();if(canPlay)a.play().catch(()=>{})},
-    stop(){wanted=false;if(el)el.pause()},
-    duck(on){if(el)el.volume=on?baseVol*.3:baseVol},
-    setMuted(m){if(m){if(el)el.pause()}else if(wanted){const a=ensure();if(canPlay)a.play().catch(()=>{})}}
-  };
-})();
+/* ---------- MUSIC: REMOVED by request. The game runs on interaction sounds
+   + the wheel spin only — no background track is ever loaded or played.
+   Methods kept as no-ops so existing start/stop/duck/setMuted calls stay
+   safe and the mute toggle still governs the interaction/wheel SFX. ---------- */
+const MUSIC={start(){},stop(){},duck(){},setMuted(){}};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const rng=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -7781,7 +7764,10 @@ function startResolveSequence(){
     prev=shape;
   });
   const landAt=t+180;
-  // (no steady clack whir during the spin — it read as a scratch)
+  // WHEEL SPIN sound: discrete pure-tone ticks whir past as the field ring
+  // turns (clean blips, not a drone), then landNeedle's clacks slow them to a
+  // stop — one continuous spinning-wheel arc.
+  for(let st=520;st<landAt-110;st+=100){const at=st;spinTimers.push(setTimeout(()=>SFX.play("clack"),at))}
   spinTimers.push(setTimeout(()=>{setRingRead("&#8230;","the ball is in the air");landNeedle(res)},landAt));
   return landAt+1900;
 }
