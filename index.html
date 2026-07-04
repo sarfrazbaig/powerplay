@@ -8141,11 +8141,9 @@ function playerSilhouette(c,dim){
   const f="sf"+(svgSeq++);
   const flip=(Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%2)===1;
   // rarity is readable from the FIGURE: tinted body + rarity rim; legendary glows
-  const R={common:{body:"#17211f",rim:"#fff6e3"},
-           uncommon:{body:"#0f2e1a",rim:"#8fe6b0"},
-           rare:{body:"#0e2440",rim:"#96c8f8"},
-           epic:{body:"#241040",rim:"#cfa6ff"},
-           legendary:{body:"#2b1f03",rim:"#ffd75e",glow:"#ffc93c"}}[c.rarity]||{body:"#17211f",rim:"#fff6e3"};
+  const R=c.rarity==="legendary"
+    ?{body:"#17211f",rim:"#ffd75e",glow:"#ffc93c"}
+    :{body:"#17211f",rim:"#fff6e3"};
   return `<filter id="${f}" x="-14%" y="-14%" width="128%" height="128%">
       <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="fat"/>
       <feFlood flood-color="${R.rim}" result="rimc"/>
@@ -8180,22 +8178,23 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
       <text x="${cx}" y="${y+sq/2+11}" text-anchor="middle" fill="${on?'#fff6e3':sc}" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="30">${v}</text>
       <text x="${cx}" y="${y+sq+13.5}" text-anchor="middle" fill="#17211f" font-size="9.5" font-weight="800" letter-spacing=".2">${STAT_FULL[k]}</text>`;
   }).join("");
+  // RARITY IS THE CARD: one desaturated field per tier (lane squares stay the
+  // loudest colour), no inner art window — the figure lives on the open field.
+  const FIELD={common:["#f7efdc","#e9dcbb"],uncommon:["#e3f4e6","#c2e4ca"],
+    rare:["#e2edfb","#c0d8f3"],epic:["#ece2fa","#d4c2f0"],
+    legendary:["#fff3cd","#f5d98a"]}[c.rarity]||["#f7efdc","#e9dcbb"];
+  const legendRays=c.rarity==="legendary"
+    ?`<g opacity=".28" transform="translate(88 160)">${Array.from({length:9},(_,i)=>`<path d="M0 0 L${(Math.cos(i*Math.PI/4.5)*240).toFixed(0)} ${(Math.sin(i*Math.PI/4.5)*240).toFixed(0)} L${(Math.cos(i*Math.PI/4.5+.2)*240).toFixed(0)} ${(Math.sin(i*Math.PI/4.5+.2)*240).toFixed(0)} Z" fill="#f0b400"/>`).join("")}</g>`:"";
   return `<svg class="tc" viewBox="0 0 250 350" preserveAspectRatio="xMidYMid meet" font-family="Oswald,Arial,sans-serif">
-    <defs><clipPath id="${g}art"><rect x="12" y="12" width="152" height="280" rx="13"/></clipPath></defs>
+    <defs><clipPath id="${g}art"><rect x="8" y="8" width="234" height="334" rx="16"/></clipPath>
+      <radialGradient id="${g}fld" cx="42%" cy="34%" r="85%"><stop offset="0" stop-color="${FIELD[0]}"/><stop offset="1" stop-color="${FIELD[1]}"/></radialGradient></defs>
     <rect x="4" y="4" width="242" height="342" rx="20" fill="${edge}"/>
-    <rect x="8" y="8" width="234" height="334" rx="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/>
+    <rect x="8" y="8" width="234" height="334" rx="16" fill="url(#${g}fld)" stroke="#17211f" stroke-width="3"/>
     <g clip-path="url(#${g}art)">
-      <linearGradient id="${g}sky" x1="0" y1="0" x2="0" y2="1">${c.role==="bowl"
-        ?'<stop offset="0" stop-color="#ffb765"/><stop offset=".55" stop-color="#ffd79a"/><stop offset="1" stop-color="#ffe9c0"/>'
-        :'<stop offset="0" stop-color="#63caee"/><stop offset=".55" stop-color="#b9e8f6"/><stop offset="1" stop-color="#e3f6ff"/>'}</linearGradient>
-      <rect x="12" y="12" width="152" height="280" fill="url(#${g}sky)"/>
-      <g opacity=".35" transform="translate(88 150)">${Array.from({length:9},(_,i)=>`<path d="M0 0 L${(Math.cos(i*Math.PI/4.5)*220).toFixed(0)} ${(Math.sin(i*Math.PI/4.5)*220).toFixed(0)} L${(Math.cos(i*Math.PI/4.5+.22)*220).toFixed(0)} ${(Math.sin(i*Math.PI/4.5+.22)*220).toFixed(0)} Z" fill="#fff"/>`).join("")}</g>
-      <rect x="12" y="206" width="152" height="86" fill="${c.role==="bowl"?"#8fc44f":"#7cc24a"}"/>
-      <ellipse cx="88" cy="278" rx="66" ry="14" fill="rgba(23,33,31,.16)"/>
+      ${legendRays}
+      <ellipse cx="88" cy="278" rx="66" ry="14" fill="rgba(23,33,31,.15)"/>
       ${playerSilhouette(c,dim)}
     </g>
-    <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
-    
     ${tiles}
     <rect x="12" y="292" width="226" height="44" rx="10" fill="#17211f"/>
     <g transform="translate(20 301) scale(1.08)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>
