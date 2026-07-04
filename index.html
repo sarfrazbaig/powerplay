@@ -376,9 +376,10 @@
   @media(max-width:880px){.scout-grid{grid-template-columns:repeat(3,1fr)}}
 
   /* draft, toss, always-visible rival deck */
-  .screen.active.prep{display:grid;grid-template-areas:"prepTop" "prepBody";grid-template-rows:auto minmax(0,1fr);min-height:calc(100dvh - 28px)}
-  .prep .top{grid-area:prepTop}
-  .draft-layout,.toss-layout{grid-area:prepBody}
+  .screen.active.prep{display:flex;flex-direction:column;min-height:calc(100dvh - 28px)}
+  .prep .top{flex:0 0 auto}
+  .prep .prep-coachzone{flex:0 0 auto;margin-bottom:10px}
+  .draft-layout,.toss-layout{flex:1 1 auto;min-height:0}
   .prep{min-height:calc(100dvh - 46px)}
   .prep .top{margin-bottom:14px}
   .prep-panel{background:rgba(255,253,246,.96);border-radius:18px;padding:22px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.42);
@@ -655,7 +656,7 @@
   .selbadge{background:var(--neon);color:#03130f;z-index:6}
 
   /* --- shared prep shell (draft + toss) --- */
-  .screen.active.prep{display:grid;grid-template-rows:auto minmax(0,1fr);gap:0;height:calc(100dvh - 24px);min-height:0}
+  .screen.active.prep{display:flex;flex-direction:column;gap:0;height:calc(100dvh - 24px);min-height:0}
   .prep .top{grid-row:1}
   .draft-layout,.toss-layout{grid-row:2;height:100%;min-height:0;display:grid;gap:12px}
   .draft-layout{grid-template-columns:minmax(260px,300px) minmax(0,1fr)}
@@ -817,8 +818,8 @@
      Squad selector redesign: arcade poster + horizontal lanes
      ============================================================ */
   #draft.screen.active.squad-prep-screen{
-    display:grid;
-    grid-template-rows:auto minmax(0,1fr);
+    display:flex;
+    flex-direction:column;
     gap:8px;
     height:calc(100dvh - 24px);
     min-height:0;
@@ -826,6 +827,7 @@
     color:#101413;
     font-family:"Work Sans",Inter,system-ui,sans-serif;
   }
+  #draft.squad-prep-screen .draft-layout{min-height:0}
   #draft.squad-prep-screen .top{
     margin:0;
     min-height:44px;
@@ -5320,6 +5322,7 @@
       </div>
       <button class="btn secondary sm" id="draftRestartBtn">Restart</button>
     </div>
+    <div class="screen-coachzone prep-coachzone" id="draftCoachZone"></div>
     <div class="draft-layout">
       <aside class="setup-panel">
         <h3>Squad Setup</h3>
@@ -8553,6 +8556,7 @@ function draftLaneHTML(role,label,cards,ids){
 }
 function renderDraft(){
   run.draftPool=roster().slice().sort(sortStrong);
+  const cz=$("#draftCoachZone");if(cz)cz.innerHTML=coachStripHTML();
   const selected=selectedDraftCards();
   $("#draftTitle").textContent=`Powerplay`;
   $("#draftSub").textContent=`Round ${run.match+1}/${MATCHES.length}`;
