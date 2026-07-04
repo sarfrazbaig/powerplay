@@ -8089,6 +8089,28 @@ const STAT_COLOR={
 const STAT_ORDER_BAT=["timing","technique","power","nerve"];
 const STAT_ORDER_BOWL=["pace","movement","accuracy","deception"];
 
+
+/* Role icons — vector remakes of the user-supplied flat icons:
+   red seamed ball (bowl), gold bat w/ pink-yellow grip (bat), bat+ball (all). */
+const ROLE_ICON={
+  bowl:`<g><circle cx="12" cy="12" r="11" fill="#e8353d"/>
+    <path d="M12 1 a11 11 0 0 1 0 22 a14.5 11 0 0 0 0 -22 Z" fill="#c11f2c"/>
+    <path d="M10.2 1.4 q-3 10.6 0 21.2" stroke="#8f1220" stroke-width="1.7" fill="none"/>
+    <path d="M7.6 2 q-2.7 10 0 20" stroke="#fff" stroke-width="1.1" stroke-dasharray="1.8 1.7" fill="none"/>
+    <path d="M13 1.4 q3 10.6 0 21.2" stroke="#fff" stroke-width="1.1" stroke-dasharray="1.8 1.7" fill="none"/>
+    <ellipse cx="6.4" cy="6.2" rx="2.1" ry="3.4" transform="rotate(28 6.4 6.2)" fill="#ff7d7d" opacity=".85"/></g>`,
+  bat:`<g transform="rotate(45 12 12)"><rect x="8.6" y="-4.2" width="6.8" height="9.4" rx="3" fill="#f4407c"/>
+    <rect x="8.6" y="1.6" width="6.8" height="3.4" fill="#ffe14d"/>
+    <rect x="7.2" y="4.6" width="9.6" height="19.6" rx="4.2" fill="#f0c880"/>
+    <path d="M12 4.6 h4.8 v19.6 a4.2 4.2 0 0 1 -4.2 4.2 h-.6 Z" fill="#d9a84e" transform="translate(0 -4.2)" opacity="0"/>
+    <path d="M12 4.6 h3.6 a1.2 1.2 0 0 1 1.2 1.2 v14.2 a4.2 4.2 0 0 1 -4.2 4.2 h-.6 Z" fill="#d9a84e"/></g>`,
+  all:`<g><circle cx="5.6" cy="5" r="4.6" fill="#ff5722"/>
+    <path d="M2 3.6 q3.6 2.4 7.2 .6" stroke="#e03c0e" stroke-width="1.3" fill="none"/>
+    <g transform="rotate(45 14 14)"><rect x="11" y="2.4" width="5.6" height="7.6" rx="2.4" fill="#1a5276"/>
+    <rect x="9.8" y="9.4" width="8" height="16.4" rx="3.6" fill="#ffc153"/>
+    <path d="M13.8 9.4 h2.8 a1.2 1.2 0 0 1 1.2 1.2 v11.6 a3.6 3.6 0 0 1 -3.6 3.6 h-.4 Z" fill="#f39c12"/></g></g>`
+};
+
 /* SILHOUETTE CARDS: the original character art flattened at render time —
    cream body + ink rim traced from the PNG's own alpha (the pack-art look).
    Every pose stays unique; effects read perfectly on the flat shape; a
@@ -8099,9 +8121,9 @@ function playerSilhouette(c,dim){
   const flip=(Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%2)===1;
   return `<filter id="${f}" x="-12%" y="-12%" width="124%" height="124%">
       <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="fat"/>
-      <feFlood flood-color="#17211f" result="ink"/>
+      <feFlood flood-color="#fff6e3" result="ink"/>
       <feComposite in="ink" in2="fat" operator="in" result="rim"/>
-      <feFlood flood-color="#fff6e3" result="cream"/>
+      <feFlood flood-color="#17211f" result="cream"/>
       <feComposite in="cream" in2="SourceAlpha" operator="in" result="body"/>
       <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
     </filter>
@@ -8145,11 +8167,7 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
       ${playerSilhouette(c,dim)}
     </g>
     <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
-    ${c.role==="bowl"
-      ?`<circle cx="34" cy="34" r="15" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/><circle cx="34" cy="34" r="8" fill="#ff4155" stroke="#fff6e3" stroke-width="1.8"/><path d="M30.5 29 q5.5 5 0 10 M37.5 29 q-5.5 5 0 10" stroke="#fff6e3" stroke-width="1.4" fill="none"/>`
-      :c.role==="bat"
-      ?`<circle cx="34" cy="34" r="15" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/><g transform="rotate(36 34 34)"><rect x="31" y="24" width="6" height="16" rx="3" fill="#ffc93c"/><rect x="32.6" y="19.5" width="2.8" height="5.5" rx="1.4" fill="#fff6e3"/></g>`
-      :`<circle cx="34" cy="34" r="15" fill="#17211f" stroke="#fff6e3" stroke-width="2.5"/><g transform="rotate(36 30 36)"><rect x="27.6" y="27" width="5" height="14" rx="2.5" fill="#ffc93c"/></g><circle cx="40" cy="29.5" r="5.2" fill="#ff4155" stroke="#fff6e3" stroke-width="1.5"/>`}
+    ${`<circle cx="34" cy="34" r="16" fill="#fff6e3" stroke="#17211f" stroke-width="3"/><g transform="translate(22 22)">${ROLE_ICON[c.role]||ROLE_ICON.all}</g>`}
     ${tiles}
     <rect x="12" y="298" width="226" height="30" rx="9" fill="#17211f"/>
     <text x="125" y="319" text-anchor="middle" fill="#fff6e3" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="${name.length>13?16:19}" letter-spacing=".3">${name}</text>
@@ -9114,8 +9132,8 @@ function draftScoutBarsHTML(rivalCards){
 function draftArtForCard(c){
   // pools re-bucketed by the ART's actual pose (audited): all1/all2 are pure
   // batting, all3 is pure bowling, bowl2 is the pads+ball hybrid = all-rounder.
-  const bat=["assets/players/bat1.png","assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
-  const bowl=["assets/players/bowl1.png","assets/players/bowl3.png","assets/players/bowl4.png","assets/players/all3.png"];
+  const bat=["assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
+  const bowl=["assets/players/bowl3.png","assets/players/bowl4.png"];
   const all=["assets/players/bowl2.png"];
   const pool=c.role==="bat"?bat:c.role==="bowl"?bowl:all;
   const idx=Math.abs([...c.id].reduce((n,ch)=>n+ch.charCodeAt(0),0))%pool.length;
