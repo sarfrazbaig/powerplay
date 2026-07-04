@@ -4383,6 +4383,9 @@
   .bag-ill{width:52px;color:rgba(23,33,31,.2)}
   .zone-hint{display:block;margin-top:6px;font-family:"Work Sans",Inter,sans-serif;font-weight:800;font-size:9.5px;
     line-height:1.32;color:rgba(23,33,31,.55);text-align:center;max-width:150px;text-transform:none;letter-spacing:.1px}
+  .kbd-hint{display:inline-block;margin-left:7px;font-family:"Work Sans",Inter,sans-serif;font-size:10px;font-weight:800;
+    color:var(--mutn,#7a6a4a);background:rgba(23,33,31,.07);border:1px solid rgba(23,33,31,.16);border-radius:6px;
+    padding:1px 7px;letter-spacing:.2px;vertical-align:middle;text-transform:none}
   /* ---------- the pitch ---------- */
   #match .av-pitch{ /* the center of the ground — transparent, the GROUND is the surface */
     position:relative;min-height:0;min-width:0;
@@ -7216,8 +7219,8 @@ function commentaryHTML(){
     return `<div class="commentary-strip live"><span class="c-line l1">${lines[0]}</span><span class="c-line l2">${lines[1]}</span></div>`;
   }
   if(m.result)return `<div class="commentary-strip quiet">${commentaryLines(m.result)[2]}</div>`;
-  if(m.selected)return `<div class="commentary-strip quiet">Locked in. Play the ball when ready.</div>`;
-  return `<div class="commentary-strip quiet muted">Pick a card from your hand.</div>`;
+  if(m.selected)return `<div class="commentary-strip quiet">Locked in. Play the ball when ready. <span class="kbd-hint">1/2/3 stance · Space to play</span></div>`;
+  return `<div class="commentary-strip quiet muted">Pick a card from your hand. <span class="kbd-hint">or press 1–9</span></div>`;
 }
 function resultWinner(result){
   const token=ballToken(result.text);
