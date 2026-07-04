@@ -7791,11 +7791,11 @@ function playBallIntro(){
     paintRing(ringSvgEl(),GHOST_FRACS);
     setRingRead(name,"in to bowl");
     SFX.play("whoosh");         // the bowler runs in
-    spinTimers.push(setTimeout(()=>SFX.play("swish"),1000));
-    spinTimers.push(setTimeout(()=>SFX.play("swish"),2300));
-    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half,{stagger:180,dur:480,flash:true})},1000));
-    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their,{stagger:180,dur:480,flash:true})},2300));
-    spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your shot")},3500));
+    spinTimers.push(setTimeout(()=>SFX.play("swish"),620));
+    spinTimers.push(setTimeout(()=>SFX.play("swish"),1500));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);animateRing(fracMap(GHOST_FRACS),half,{stagger:140,dur:400,flash:true})},620));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);animateRing(fracMap(half),their,{stagger:140,dur:400,flash:true})},1500));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,"pick your shot")},2300));
   }else{
     // YOU BOWL: the batsman walks out and takes guard — but the field stays
     // EVEN. Nothing is shaped until YOU deliver. His notes are a THREAT to read
@@ -7803,9 +7803,9 @@ function playBallIntro(){
     paintRing(ringSvgEl(),GHOST_FRACS);
     setRingRead(name,"takes guard");
     SFX.play("whoosh");
-    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);SFX.play("swish")},1100));
-    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);SFX.play("swish")},2400));
-    spinTimers.push(setTimeout(()=>{setRingRead("YOUR BALL","pick your delivery")},3500));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[0]);SFX.play("swish")},650));
+    spinTimers.push(setTimeout(()=>{setRingRead(name,notes[1]);SFX.play("swish")},1500));
+    spinTimers.push(setTimeout(()=>{setRingRead("YOUR BALL","pick your delivery")},2300));
   }
 }
 /* ---------- DUGOUT (coach art, not text) + KIT BAG (armable tools) */
