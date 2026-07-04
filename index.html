@@ -5445,6 +5445,33 @@
   .rec-tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(-2deg);
     background:var(--gold);color:#111;border:2px solid var(--ink);border-radius:99px;
     font-family:"Work Sans",sans-serif;font-weight:900;font-size:9px;letter-spacing:1px;padding:2px 9px;white-space:nowrap}
+  /* ---- SHOP fits ONE screen: coach strip · packs (hero) · market · foot ---- */
+  #shop .shopx-body{min-height:0;height:100%;overflow:hidden;gap:8px;align-self:stretch}
+  #shop .shopx-body>.coach-zone{flex:0 0 auto}
+  #shop .coach-zone-row .coachcard{width:clamp(78px,6.4vw,100px)}
+  #shop .coach-zone{padding:6px 10px}
+  #shop .shopx-shelf{min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  #shop .shopx-packs{flex:1 1 0}
+  #shop .shopx-packs .packx-row,#shop .shopx-packs .shopx-packrow{flex:1 1 0;min-height:0;display:flex;gap:16px;justify-content:center;align-items:stretch}
+  #shop .shopx-packs .packx{height:100%;max-height:100%;min-height:0;width:auto;max-width:260px;
+    display:flex;flex-direction:column;overflow:hidden}
+  #shop .shopx-packs .packx .pack-art{flex:1 1 0;min-height:0;height:auto}
+  #shop .shopx-market{flex:0 0 auto;max-height:268px}
+  #shop .shopx-marketgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,172px));grid-auto-rows:212px;gap:10px;
+    justify-content:center;align-items:stretch;overflow:hidden}
+  #shop .shopx-marketgrid>*{width:100% !important;height:100%;max-height:198px;margin:0;align-self:stretch;overflow:hidden}
+  #shop .shopx-marketgrid .singlex{display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px}
+  #shop .shopx-marketgrid .singlex .card,#shop .shopx-marketgrid .singlex .tc{max-height:132px;width:auto;margin:0 auto}
+  /* naked market items get the sticker frame so nothing looks unfinished */
+  .shopx-marketgrid .chipx{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+    background:#fff6e3;border:3px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 rgba(23,33,31,.4);
+    padding:10px;font-family:Oswald,Arial,sans-serif}
+  .shopx-marketgrid .chipx b{font-size:14px}
+  .shopx-marketgrid .chipx small{font-weight:800;font-size:10px;color:#7a6a4a;letter-spacing:.6px;text-transform:uppercase}
+  .shopx-marketgrid .chipx.bat{border-color:#1f9b53}.shopx-marketgrid .chipx.bowl{border-color:#c0303f}
+  /* squad roster: big readable cards; the grid scrolls instead of cropping */
+  #squadGrid{overflow-y:auto !important;padding-bottom:10px}
   /* ---- meta-progression tracker on the title ---- */
   .unlock-track{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:10px;max-width:540px}
   .perk-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
@@ -8024,7 +8051,7 @@ const STAT_FULL={pace:"PACE",timing:"TIMING",movement:"MOVEMENT",technique:"TECH
    (number in the lane colour, stat name in black below). When a lane is the
    ball's challenge, its square LIGHTS UP — the fill floods with the lane colour
    and glows, exactly like a wheel sector. Layout-independent, works everywhere. */
-function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot){
+function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
   const g="g"+(svgSeq++);
   const img=draftArtForCard(c),rc=roleColor(c);
   const bowlSide=emph==="bowl";
@@ -8034,7 +8061,7 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot){
   const name=escSVG((c.name.length>16?c.name.slice(0,15)+"…":c.name).toUpperCase());
   const sq=54,sx=176,railTop=14,unit=(292-14)/4;
   const tiles=keys.map((k,i)=>{
-    const y=railTop+i*unit,cx=sx+sq/2,v=src[k],on=hot&&hot===k,sc=STAT_COLOR[k]||rc;
+    const y=railTop+i*unit,cx=sx+sq/2,v=eff?Math.round(eff[k]):src[k],on=hot&&hot===k,sc=STAT_COLOR[k]||rc;
     return `
       <rect ${on?`class="cardsq-lit" style="--lc:${sc}"`:""} x="${sx}" y="${y}" width="${sq}" height="${sq}" rx="13" fill="${on?sc:'#fdf6e6'}" stroke="${sc}" stroke-width="3.5"/>
       <text x="${cx}" y="${y+sq/2+11}" text-anchor="middle" fill="${on?'#fff6e3':sc}" font-family="Anton,Impact,sans-serif" font-style="italic" font-size="30">${v}</text>
@@ -8104,7 +8131,7 @@ function radialSVG(c){
     <text x="125" y="338" text-anchor="middle" font-size="8.5" font-weight="800" fill="#17211f">${traitLine.toUpperCase()}</text>
   </svg>`;
 }
-function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,hot,as="button"}={}){
+function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,active,mini,duel,hot,eff,as="button"}={}){
   // no flip chip / trait gem on the face — the card now says everything up front
   const flip="";
   const chip="";
@@ -8114,7 +8141,7 @@ function cardHTML(c,{selected,used,disabled,emph,pickable,dataId,fan,dealin,acti
   return `<${tag} class="card ${mini?'card--mini card--tactical':''} ${duel?'card--duel':''} ${selected?'selected':''} ${used?'used':''} ${pickable?'pickable':''} ${dealin?'dealin':''} ${active?'active':''} ${isFlipped?'flipped':''}" ${roleAttr}
     style="${fan||''}" data-id="${dataId||c.id}" title="${c.name}${c.trait?' — '+c.trait.name+': '+c.trait.text:''}">
     <span class="selbadge">✓</span><span class="sheen"></span>
-    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini,hot)}</div>${flip}</div>${chip}</${tag}>`;
+    <div class="cflip"><div class="cface cfront">${cardSVG(c,batVal(c),bowlVal(c),emph,mini,mini,hot,eff)}</div>${flip}</div>${chip}</${tag}>`;
 }
 // which stat lights up on a card THIS ball: the bowler shows the challenged
 // stat; your hand + your batter show the paired answer.
@@ -8125,7 +8152,7 @@ function hotStatFor(c){
   // bowling: your bowler shows the challenge, the rival batter shows the answer
   return isRival?CHAL_PAIR[m.challengeStat]:m.challengeStat;
 }
-function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardHTML(c,{emph,as:"div",duel:true,active:true,hot:hotStatFor(c)})}</div>`}
+function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div>${cardHTML(c,{emph,as:"div",duel:true,active:true,hot:hotStatFor(c),eff:effSubs(c,emph==="bowl"?"bowl":"bat")})}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="dlabel ${role}">${role==='bowl'?ICON.ball:ICON.bat}<span>${label}</span></div><div class="placeholder">+</div></div>`}
 /* ---------- THE FIELD RING: 12 sectors of a cricket ground.
    The strip IS the field — the ball lands in a sector. Build changes
