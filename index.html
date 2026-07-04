@@ -4668,6 +4668,11 @@
   /* stance dock sits under YOUR card — the strategy step, right at the crease */
   .you-col{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;position:relative;gap:8px}
   .you-col .dslot{height:auto}
+  .you-change{
+    border:2.5px solid var(--ink,#17211f);background:#fff6e3;color:var(--ink,#17211f);
+    border-radius:999px;padding:4px 12px;font-family:"Work Sans",sans-serif;font-weight:800;font-size:11px;
+    letter-spacing:.3px;cursor:pointer;box-shadow:2px 2px 0 rgba(23,33,31,.35);transition:transform .12s,background .12s}
+  .you-change:hover{background:var(--gold,#ffc93c);transform:translateY(-1px)}
   .you-col .stance-dock{
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     padding:8px 12px 9px;border-radius:15px;
@@ -7809,7 +7814,8 @@ function renderDuel(pop=false){
     ?duelCardHTML(youCard,m.phase==="bowl"?"You bowl":"You bat",youEmph,false,youEmph,(m.result?.state==="settled"&&resultWinner(m.result)==="you")?"winner":"")
     :duelPlaceholderHTML(m.phase==="bowl"?"You bowl":"You bat",youEmph);
   const stanceDock=(!m.result&&m.selected)?`<div class="stance-dock">${stanceChipsHTML()}</div>`:"";
-  const youCol=`<div class="you-col">${youSlot}${stanceDock}</div>`;
+  const changeChip=(m.selected&&!m.result)?`<button class="you-change" id="youChange" title="Tap to pick a different card">&#10005; change</button>`:"";
+  const youCol=`<div class="you-col${m.selected&&!m.result?' can-change':''}">${youSlot}${changeChip}${stanceDock}</div>`;
   const rivCard=m.result?m.result.rival:m.challenge;
   const rivSlot=rivCard
     ?duelCardHTML(rivCard,m.phase==="bowl"?"Rival bats":"Rival bowls",rivEmph,deal,rivEmph,`${danger?"danger":""} ${(m.result?.state==="settled"&&resultWinner(m.result)==="rival")?"winner":""}`)
@@ -7838,6 +7844,13 @@ function renderDuel(pop=false){
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
   d.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
+  // deselect: the ✕ chip OR clicking the picked card returns it to your hand
+  if(m.selected&&!m.result){
+    const chip=d.querySelector("#youChange");
+    if(chip)chip.onclick=e=>{e.stopPropagation();cancelSelected()};
+    const yCard=d.querySelector(".you-col .card");
+    if(yCard){yCard.style.cursor="pointer";yCard.title="Tap to change your pick";yCard.onclick=e=>{e.stopPropagation();cancelSelected()}}
+  }
   if(resolving&&!m.result.spinStarted){
     // fallback only — normal entry is enterResolve (in place, no rebuild)
     enterResolve();
