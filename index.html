@@ -2019,7 +2019,9 @@
     background:#ffd91f !important;
     color:#111 !important;
     border-color:#050505 !important;
+    display:none; /* dev-only shortcut — hidden in the demo, shown with ?debug=1 */
   }
+  body.debug .test-win-btn{display:inline-flex}
   @keyframes edgeBandShine{
     from{transform:translateX(-130px)}
     to{transform:translateX(260px)}
@@ -8648,6 +8650,8 @@ $("#introGo").onclick=startFirstMatch;
 $("#restartBtn").onclick=()=>startRun();
 $("#homeMatchBtn").onclick=()=>{SFX.play("nav");renderTitle();show("title")};
 $("#testWinBtn").onclick=()=>{if(m)completeMatchWin()};
+// dev-only: reveal the Test Win shortcut with ?debug=1 (hidden in the demo)
+if(/[?&]debug\b/.test(location.search))document.body.classList.add("debug");
 $("#tutHelpBtn").onclick=()=>{SFX.play("nav");if(m&&m.challenge){localStorage.removeItem("pp_tut_done");TUT.start()}};
 $("#draftRestartBtn").onclick=()=>startRun();
 $("#draftAutoBtn").onclick=autoSelectDraft;
