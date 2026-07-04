@@ -4761,6 +4761,14 @@
     .fanhold{width:clamp(72px,18vw,110px);margin-left:calc(clamp(72px,18vw,110px)*-.76)}
     .fanhold:active .card{transform:translateY(-22%) scale(1.3);z-index:70}
     .av-fan{gap:6px}
+    /* shop & squad stack and scroll vertically on phones (were clipped) */
+    #shop.screen.active,#squad.screen.active{height:auto !important;min-height:calc(100dvh - 24px);overflow-y:auto !important;display:block !important}
+    #shop .shopx-body,#squad .squad-room{display:flex !important;flex-direction:column !important;grid-template-columns:1fr !important;gap:10px !important;height:auto !important}
+    #shop .shopx-rail,#shop .shopx-stage,#squad .squad-rail,#squad .prep-panel,#squad .prep-panel.full{width:auto !important;max-width:100% !important;min-width:0 !important;height:auto !important}
+    #shop .railx-scroll,#squad .roster-row,.roster-groups{overflow-x:auto !important;overflow-y:visible !important;height:auto !important}
+    #shop .packx-row{flex-wrap:wrap !important}
+    #squad .roster-groups{display:flex !important;flex-direction:column !important;gap:10px !important}
+    .over-card,.toss-card2{max-width:94vw !important}
   }
   .hand-empty{
     align-self:center;font-size:12px;font-weight:800;letter-spacing:1.5px;
