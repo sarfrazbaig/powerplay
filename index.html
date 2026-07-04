@@ -6813,7 +6813,7 @@ function skipResolve(){
   clearSpin();
   const res=m.result;
   paintRing(ringSvgEl(),ringFracs(res.strip)); // final field first, so angles are right
-  const target=document.querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
+  const target=(ringSvgEl()||document).querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
   const needle=$("#ringNeedle");
   if(needle&&target){
     const a0=parseFloat(target.dataset.a0),sw=parseFloat(target.dataset.sweep);
@@ -7688,7 +7688,7 @@ function currentRotationDeg(el){
 }
 function landNeedle(res){
   paintRing(ringSvgEl(),ringFracs(res.strip)); // settle the field so angles are final
-  const target=document.querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
+  const target=(ringSvgEl()||document).querySelector(`.ring-sec[data-tk="${res.strip[res.roll]}"]`);
   const needle=$("#ringNeedle");
   if(!needle||!target){finishLanding(res,target);return}
   const a0=parseFloat(target.dataset.a0),sweep=parseFloat(target.dataset.sweep);
