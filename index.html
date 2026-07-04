@@ -6404,7 +6404,7 @@ const CONSUMABLES=[
   {id:"killer_instinct",name:"Killer Instinct",mode:"bowl",desc:"Next bowling ball: go for the kill — the two best run slots become WICKETS.",apply:s=>replaceWorstRun(replaceWorstRun(s,"W"),"W")},
   // --- instant, permanent (build-makers) ---
   {id:"star_session",name:"Star Session",mode:"train",kind:"instant",desc:"Your best card gains +6 BAT and +6 BOWL forever.",
-    use(){const t=roster().slice().sort(sortStrong)[0];if(!t)return "No cards.";boostCard(t,6,6);return `${t.name} +6/+6.`}},
+    use(){const t=roster().slice().sort(sortStrong)[0];if(!t)return "No cards.";boostCard(t,2,2);return `${t.name} +2/+2.`}},
   {id:"rookie_camp",name:"Rookie Camp",mode:"train",kind:"instant",desc:"EVERY Common card gains +4 BAT and +4 BOWL forever.",
     use(){const cs=roster().filter(c=>c.rarity==="common");cs.forEach(c=>boostCard(c,4,4));return `${cs.length} commons trained.`}},
   {id:"specialist_course",name:"Specialist Course",mode:"train",kind:"instant",desc:"Teach a TRAIT to a random card that has none.",
@@ -6469,7 +6469,7 @@ const UNLOCKS=[
   {id:"tactician",name:"Tactician",icon:"🎒",desc:"Start every run with a free one-use tool armed and ready.",
    need:s=>s.furthest>=7,progress:s=>`Reach the 8th match (best: ${s.furthest+1})`,apply:r=>{const t=pick(CONSUMABLES.filter(c=>!c.kind));if(t)(r.consumables=r.consumables||[]).push({...t,ownedId:uid()})}},
   {id:"veteran",name:"Star Signing",icon:"⭐",desc:"Your best card starts each run +6 BAT / +6 BOWL.",
-   need:s=>s.cups>=1,progress:s=>`Win a cup (${s.cups}/1)`,apply:r=>{const b=r.roster.slice().sort(sortStrong)[0];if(b)boostCard(b,6,6)}},
+   need:s=>s.cups>=1,progress:s=>`Win a cup (${s.cups}/1)`,apply:r=>{const b=r.roster.slice().sort(sortStrong)[0];if(b)boostCard(b,2,2)}},
   {id:"legend",name:"Dynasty",icon:"🏆",desc:"Start every run with +10 coins and a free Bowling Coach.",
    need:s=>s.cups>=3,progress:s=>`Win 3 cups (${s.cups}/3)`,apply:r=>{r.coins+=10;const c=COACHES.find(x=>x.id==="bowling_mentor");if(c)(r.coaches=r.coaches||[]).push({...c,instId:uid()})}},
   {id:"hof",name:"Hall of Fame",icon:"👑",desc:"Every card in your starting XI begins +2 BAT / +2 BOWL.",
@@ -6524,7 +6524,7 @@ const BAT_KEYS=["power","timing","technique","nerve"];
 const BOWL_KEYS=["pace","accuracy","movement","deception"];
 function rollSubs(anchor,cap,keys){
   const o={};
-  keys.forEach(k=>o[k]=clamp(anchor+rng(-9,9),12,cap));
+  keys.forEach(k=>o[k]=clamp(anchor+rng(-3,3),1,cap));
   return o;
 }
 function syncRatings(c){
@@ -6543,22 +6543,31 @@ function boostCard(c,batGain,bowlGain){
   syncRatings(c);
 }
 function rerollStats(c){
-  const rarity=RARITIES[c.rarity]||RARITIES.common;
-  c.batting=rollSubs(rarityStat(rarity,c.role,"bat"),99,BAT_KEYS);
-  c.bowling=rollSubs(rarityStat(rarity,c.role,"bowl"),99,BOWL_KEYS);
+  const base=levelAnchor(runLevel())+(RARITY_BONUS[c.rarity]||0);
+  c.batting=rollSubs(clamp(Math.round(base+(c.role!=="bowl"?2:0)),1,99),99,BAT_KEYS);
+  c.bowling=rollSubs(clamp(Math.round(base+(c.role!=="bat"?2:0)),1,99),99,BOWL_KEYS);
   syncRatings(c);
 }
 function cloneCard(b){
   return {...b,batting:{...b.batting},bowling:{...b.bowling},id:uid(),used:false};
 }
+/* PROGRESSION (sim-tuned 2026-07-04): start tiny, build up.
+   Player acquisitions roll at levelAnchor(run.match); rivals at rivalAnchorAt(m)
+   — below you early, past you late. Rarity = a band jump (the pack chase). */
+const RARITY_BONUS={common:0,uncommon:3,rare:6,epic:10,legendary:15};
+function levelAnchor(l){return 5+3.5*(l||0)}                 // shop/scout/packs
+function rivalAnchorAt(m){return 3+3.5*(m||0)}               // opposition curve
+function runLevel(){return (typeof run!=="undefined"&&run)?(run.match||0):0}
 function card(rarityKey="common",roleForce,opts={}){
   const role=roleForce||pick(["bat","bowl","all"]);
   const key=RARITIES[rarityKey]?rarityKey:"common";
   const rarity=RARITIES[key];
-  const shift=opts.shift||0,cap=opts.cap||99;
+  const cap=opts.cap||99;
+  const base=(opts.anchor!=null?opts.anchor:levelAnchor(runLevel()))+(RARITY_BONUS[key]||0)+(opts.shift||0);
   const c={id:uid(),name:person(),num:rng(1,99),team:pick(TEAMS),role,rarity:key,trait:null,used:false,batBoost:0,bowlBoost:0};
-  c.batting=rollSubs(clamp(rarityStat(rarity,role,"bat")+shift,12,cap),cap,BAT_KEYS);
-  c.bowling=rollSubs(clamp(rarityStat(rarity,role,"bowl")+shift,12,cap),cap,BOWL_KEYS);
+  const anchorFor=(disc)=>clamp(Math.round(base+((role==="all"||role===disc)?2:0)),1,cap);
+  c.batting=rollSubs(anchorFor("bat"),cap,BAT_KEYS);
+  c.bowling=rollSubs(anchorFor("bowl"),cap,BOWL_KEYS);
   syncRatings(c);
   if(opts.forceTrait||Math.random()<rarity.trait)c.trait=pickTrait(role);
   return c;
@@ -6567,14 +6576,7 @@ function pickTrait(role){
   const pool=TRAITS.filter(t=>t.role===role||t.role==="all");
   return pick(pool.length?pool:TRAITS);
 }
-function rarityStat(rarity,role,stat){
-  const span=rarity.max-rarity.min,low=rarity.min,high=rarity.max;
-  const primary=role==="all"||role===stat;
-  const min=primary?Math.round(low+span*.45):low;
-  const max=primary?high:Math.round(low+span*.62);
-  return rng(min,max);
-}
-function starter(){return ["bat","bat","bat","bowl","bowl","bowl","all","all","all","all","all","all"].map(role=>card("common",role))}
+function starter(){return ["bat","bat","bat","bowl","bowl","bowl","all","all","all","all","all","all"].map(role=>card("common",role,{anchor:5}))}
 function rarityFromPool(pool){return pick(pool&&pool.length?pool:["common"])}
 const ARCHS=[
   {key:"bat",name:"an aggressive batting side",comp:{bat:5,bowl:2,all:5},tiltBat:5,read:"Stacked with batters — their bowling is thinner. Defend well, then cash in when you bowl."},
@@ -6586,11 +6588,15 @@ const ARCHS=[
 function enemy(def){
   const arch=pick(ARCHS);
   const roles=[];Object.entries(arch.comp).forEach(([r,n])=>{for(let i=0;i<n;i++)roles.push(r)});
-  const opts={shift:def.enemyShift||0,cap:def.enemyCap||99};
+  // rivals ride the tuned difficulty curve: below your shop early, above it late.
+  // The old per-match rarity pools/shifts are replaced by the anchor; a boss
+  // still bites harder (+2) and keeps its every-card-has-a-trait rule.
+  const opts={anchor:rivalAnchorAt(run?.match||0)+(def.boss?2:0),cap:def.enemyCap||99};
   const deck=roles.map(role=>{
-    const c=card(rarityFromPool(def.rarities),role,opts);
-    if(arch.tiltBat&&(role==="bat"||role==="all"))boostCard(c,arch.tiltBat,0);
-    if(arch.tiltBowl&&(role==="bowl"||role==="all"))boostCard(c,0,arch.tiltBowl);
+    const c=card("common",role,opts);
+    const tilt=2; // archetype flavour, rescaled to the 1-10 world
+    if(arch.tiltBat&&(role==="bat"||role==="all"))boostCard(c,tilt,0);
+    if(arch.tiltBowl&&(role==="bowl"||role==="all"))boostCard(c,0,tilt);
     if(def.boss&&!c.trait)c.trait=pickTrait(c.role);   // the champions: every player a star
     else if(def.enemyTraitRate!=null&&c.trait&&Math.random()>def.enemyTraitRate)c.trait=null;
     return c;
@@ -6706,7 +6712,7 @@ function applyStance(mode,strip,card){
   const st=currentStance();
   const s=strip.slice();
   const subs=effSubs(card,mode);
-  const scale=v=>v>=68?2:1; // the powering sub-stat earns a second slot
+  const scale=v=>v>=rivalAnchorAt(run?.match||0)+6?2:1; // out-gunning the level earns a second slot
   if(mode==="bat"){
     // batting stance is already baked into the duel base weights — no strip edit
   }else{
@@ -6972,7 +6978,7 @@ const CURVE={
   wkt:.34,dot:.22,run:.13,two:.10,four:.27,six:.20,
   tiltAmp:.9,                             // how hard the visible OVR gap tilts the whole curve
   nerveAmp:.10,upsetW:1,upsetBoundary:1,  // irreducible upset slots
-  extraBase:.065,extraPivot:50,extraDecay:.4,extraMax:3
+  extraBase:.065,extraDecay:.4,extraMax:3
 };
 function edge(a,b){return 1/(1+Math.exp(-(a-b)/CURVE.k))}
 /* ============================================================
@@ -7030,22 +7036,29 @@ function duelStats(mode,batC,bowlC){
 }
 function traitStatDelta(c,disc){return c.trait?c.trait[disc](ctx(),0):0}
 function isRivalCard(c){return !!(m&&m.rivalDeck&&m.rivalDeck.includes(c))}
+/* The whole coach/trait catalogue was written for the 20-99 stat world; the
+   duel world is 1-10 with a ±13 diff cap. ONE rescale factor here converts
+   every stat effect (+8 Power -> +2, +12 -> +4 ...) while preserving relative
+   design. Ceil so no effect rounds to nothing. */
+const SUB_RESCALE=0.3;
+const rescaleSub=n=>Math.sign(n)*Math.max(1,Math.round(Math.abs(n)*SUB_RESCALE));
 function effSubs(c,disc){
   const src=disc==="bat"?c.batting:c.bowling;
   let flat=(disc==="bat"?c.batBoost:c.bowlBoost)||0;
-  flat+=coachBonus(disc,c)+traitStatDelta(c,disc);
+  flat+=rescaleSub0(coachBonus(disc,c))+rescaleSub0(traitStatDelta(c,disc));
   const mine=!isRivalCard(c);
   const cultEcho=mine&&activeCoaches().some(co=>co.subTraitEcho); // Personality Cult
   const o={};
   for(const key in src){
     let v=src[key]+flat;
-    if(c.trait?.sub?.[key])v+=c.trait.sub[key]*(cultEcho?2:1);  // trait personality (both sides)
-    if(mine)activeCoaches().forEach(co=>{if(co.sub?.[key]&&(!co.subGate||co.subGate(c)))v+=co.sub[key]});
-    else activeCoaches().forEach(co=>{if(co.rivalSub?.[key])v-=co.rivalSub[key]}); // sabotage
+    if(c.trait?.sub?.[key])v+=rescaleSub(c.trait.sub[key])*(cultEcho?2:1);  // trait personality (both sides)
+    if(mine)activeCoaches().forEach(co=>{if(co.sub?.[key]&&(!co.subGate||co.subGate(c)))v+=rescaleSub(co.sub[key])});
+    else activeCoaches().forEach(co=>{if(co.rivalSub?.[key])v-=rescaleSub(co.rivalSub[key])}); // sabotage
     o[key]=v;
   }
   return o;
 }
+function rescaleSub0(n){return n?rescaleSub(n):0}
 function outcomeWeights(mode,myCard,theirCard){
   const batterMine=mode==="bat";
   const batC=batterMine?myCard:theirCard,bowlC=batterMine?theirCard:myCard;
@@ -7066,7 +7079,7 @@ function outcomeWeights(mode,myCard,theirCard){
   let extras=0;
   const extraCap=CURVE.extraMax+(activeCoaches().some(co=>co.extraCapUp)?2:0); // Slow Over Rate
   if((m?.extrasCount||0)<extraCap){
-    extras=CURVE.extraBase*2*(1-edge(L.accuracy,CURVE.extraPivot))*Math.pow(CURVE.extraDecay,m?.extrasCount||0);
+    extras=CURVE.extraBase*2*(1-edge(L.accuracy,rivalAnchorAt(run?.match||0)))*Math.pow(CURVE.extraDecay,m?.extrasCount||0);
     if(batterMine&&activeCoaches().some(co=>co.extrasBoost))extras*=2;   // Umpire's Nightmare
     if(!batterMine&&activeCoaches().some(co=>co.noExtras))extras=0;      // Front-Foot Police
   }
@@ -7630,7 +7643,7 @@ function squadAct(id){
   const c=roster().find(x=>x.id===id);if(!c||!run.pending)return;
   const action=run.pending.type;
   if(run.pending.type==="train"){
-    run.coins-=run.pending.cost;const g=6+(run.trainBoost||0);boostCard(c,run.pending.stat==="bat"?g:0,run.pending.stat==="bowl"?g:0);
+    run.coins-=run.pending.cost;const g=2+(run.trainBoost||0);boostCard(c,run.pending.stat==="bat"?g:0,run.pending.stat==="bowl"?g:0);
   }else if(run.pending.type==="release"){
     if(roster().length<=12){flashHint("Keep at least 12 players for every match.");return}
     if(activeIds().has(id)){flashHint("Only bench cards can be sold.");return}
