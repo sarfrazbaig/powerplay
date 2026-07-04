@@ -4828,8 +4828,12 @@
   /* the ball whipping round the field before it lands */
   .ring-needle.spinning{animation:needleSpin .42s linear infinite}
   @keyframes needleSpin{to{transform:rotate(360deg)}}
-  /* a coach FIRING is an event — the seat erupts */
-  .seat.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
+  /* a coach FIRING is an event — the card erupts */
+  .seat.fired,.coachfx.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1)}
+  /* match dugout: full-art coaches stacked in the left dock */
+  #dugout .dugout-coaches{display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;min-height:0;overflow-y:auto;overflow-x:hidden;padding-top:2px}
+  #dugout .coachfx{width:min(100%,124px);flex:0 0 auto}
+  #dugout.av-dock{background:rgba(255,255,255,.14);border:2.5px dashed rgba(255,255,255,.7)}
   @keyframes seatFire{
     0%{transform:scale(1)}
     25%{transform:scale(1.14) rotate(-2deg);box-shadow:0 0 0 4px var(--gold),0 0 34px rgba(255,201,60,.9)}
@@ -7841,7 +7845,7 @@ function startResolveSequence(){
       setRingRead(b.label,b.note);
       animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
       SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
-      if(b.kind==="coach"){const seat=document.querySelector(`.seat[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
+      if(b.kind==="coach"){const seat=document.querySelector(`.coachfx[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
       if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait"||b.kind==="momentum")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
@@ -8125,18 +8129,17 @@ function playBallIntro(){
 function renderDugout(){
   const el=$("#dugout");if(!el)return;
   const active=activeCoaches();
-  const seats=[];
-  active.forEach(coach=>{
-    seats.push(`<div class="seat filled ${coach.edition?'ed-'+coach.edition:''}" data-coach="${coach.instId||coach.id}" title="${coach.name} — ${coach.desc}">
-      <img class="seat-face" src="${coachArt(coach)}" alt="" loading="lazy">
-      <div class="seat-text"><span class="seat-name">${coach.name}</span><span class="seat-eff">${coach.desc||""}</span></div>
-      ${coach.ballTag?`<i class="seat-ball" title="works balls ${coach.ballTag.balls.join(" & ")}">${coach.ballTag.icon}</i>`:""}
-    </div>`);
-  });
   const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
-  for(let i=0;i<open;i++)seats.push(`<div class="seat open" title="An empty dugout seat — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 60 60"><circle cx="30" cy="22" r="11" fill="currentColor"/><path d="M10 56 Q30 34 50 56 Z" fill="currentColor"/></svg><span class="seat-slot">Coach slot — hire in the Clubhouse</span></div>`);
-  const hint=active.length?"":`<span class="zone-hint">Hire coaches in the Clubhouse — they bend the wheel every ball</span>`;
-  el.innerHTML=`<div class="av-zonetag">DUGOUT</div><div class="seats">${seats.join("")}</div>${hint}`;
+  const cards=active.map(coach=>{
+    const tier=coach.tier||"common",ed=coach.edition;
+    return `<div class="coachfx tier-${tier} ${ed?'ed-'+ed:''}" data-coach="${coach.instId||coach.id}" title="${escSVG(coach.name+" — "+coach.desc)}">
+      <div class="coachfx-art"><img src="${coachArt(coach)}" alt="" loading="lazy"></div>
+      <span class="coachfx-tier chip-${tier}">${ed?EDITIONS[ed].label:tier}</span>
+      <div class="coachfx-name">${coach.name}</div>
+    </div>`;
+  });
+  for(let i=0;i<open;i++)cards.push(`<div class="coachfx empty" title="Empty coaching slot — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 48 56" aria-hidden="true"><circle cx="24" cy="20" r="10"/><path d="M5 54 Q24 32 43 54 Z"/></svg></div>`);
+  el.innerHTML=`<div class="av-zonetag">Coaches ${usedCoachSlots()}/${coachSlotLimit()}</div><div class="dugout-coaches">${cards.join("")}</div>`;
 }
 function renderKitbag(){
   const el=$("#kitbag");if(!el)return;
