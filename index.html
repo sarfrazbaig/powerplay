@@ -4015,6 +4015,14 @@
     display:grid;place-items:center;color:rgba(23,33,31,.24);
   }
   .coachcard.empty .coachcard-empty svg{width:56%;fill:currentColor}
+  .coachcard.fired{animation:seatFire .95s cubic-bezier(.2,1.4,.4,1);z-index:5}
+  /* match coach band: full-art coaches pinned above the board, wheel below */
+  .match-coachzone{flex:0 0 auto;z-index:3}
+  #matchCoachZone .coach-zone{padding:7px 12px}
+  #matchCoachZone .coach-zone-row .coachcard{width:clamp(98px,8.6vw,126px)}
+  #matchCoachZone .coach-zone-head b{color:#fff6e3;text-shadow:1px 1px 0 rgba(23,33,31,.6)}
+  #matchCoachZone .coach-zone{background:linear-gradient(180deg,rgba(255,253,244,.96),rgba(255,242,214,.96))}
+  #dugout:empty{border:none !important;background:none !important;box-shadow:none !important}
   .coachfx{
     position:relative;width:132px;flex:0 0 auto;display:flex;flex-direction:column;
     background:#fff6e3;border:3px solid var(--ink,#17211f);border-radius:13px;
@@ -5403,6 +5411,7 @@
       </div>
     </div>
 
+    <div class="match-coachzone" id="matchCoachZone"></div>
     <div class="av-ground">
       <div class="av-rivalrow">
         <div class="av-rivalhead"><span class="av-zonetag">RIVAL DUGOUT</span><span class="av-rivalmeta" id="rivalStripMeta"></span><button class="btn secondary sm" id="scanBtn" title="Scout the rival's full squad">Scout ▸</button></div>
@@ -7376,6 +7385,7 @@ function render(pop=false){
   $("#phaseLabel").innerHTML=phaseLabelText();
   $("#stepper").innerHTML=MATCHES.map((x,i)=>`<span class="step ${i<run.match?'done':i===run.match?'now':''}" title="${matchLabel(x)}"></span>`).join("");
   syncCoins({float:false});
+  const mcz=$("#matchCoachZone");if(mcz)mcz.innerHTML=coachStripHTML();
   renderDuel(pop);renderHand();renderDugout();renderKitbag();renderScorebug();renderRivalStrip();
   maybeStartTutorial();
   if(typeof TUT!=="undefined")TUT.reposition();
@@ -7890,7 +7900,7 @@ function startResolveSequence(){
       setRingRead(b.label,b.note);
       animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
       SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
-      if(b.kind==="coach"){const seat=document.querySelector(`.coachfx[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
+      if(b.kind==="coach"){const seat=document.querySelector(`.coachcard[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
       if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait"||b.kind==="momentum")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
@@ -8173,18 +8183,9 @@ function playBallIntro(){
 /* ---------- DUGOUT (coach art, not text) + KIT BAG (armable tools) */
 function renderDugout(){
   const el=$("#dugout");if(!el)return;
-  const active=activeCoaches();
-  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
-  const cards=active.map(coach=>{
-    const tier=coach.tier||"common",ed=coach.edition;
-    return `<div class="coachfx tier-${tier} ${ed?'ed-'+ed:''}" data-coach="${coach.instId||coach.id}" title="${escSVG(coach.name+" — "+coach.desc)}">
-      <div class="coachfx-art"><img src="${coachArt(coach)}" alt="" loading="lazy"></div>
-      <span class="coachfx-tier chip-${tier}">${ed?EDITIONS[ed].label:tier}</span>
-      <div class="coachfx-name">${coach.name}</div>
-    </div>`;
-  });
-  for(let i=0;i<open;i++)cards.push(`<div class="coachfx empty" title="Empty coaching slot — hire coaches from packs in the Clubhouse"><svg viewBox="0 0 48 56" aria-hidden="true"><circle cx="24" cy="20" r="10"/><path d="M5 54 Q24 32 43 54 Z"/></svg></div>`);
-  el.innerHTML=`<div class="av-zonetag">Coaches ${usedCoachSlots()}/${coachSlotLimit()}</div><div class="dugout-coaches">${cards.join("")}</div>`;
+  // coaches now live in the top coach band (#matchCoachZone); the left dock is
+  // a clean spacer that keeps the wheel centred against the kit bag on the right
+  el.innerHTML="";
 }
 function renderKitbag(){
   const el=$("#kitbag");if(!el)return;
@@ -8316,7 +8317,7 @@ function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("
    Slim horizontal strip: owned coaches (art + name, effect on hover) + empty
    pegs. In the shop it's sellable (tap a coach to sell). */
 function coachCardCell(coach,i,sell){
-  return `<div class="coachcard${sell?' sellable':''}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+coach.desc)}${sell?" · tap to sell +"+coachSellValue(coach):""}">
+  return `<div class="coachcard${sell?' sellable':''}" data-coach="${coach.instId||coach.id}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+coach.desc)}${sell?" · tap to sell +"+coachSellValue(coach):""}">
     ${coachCardSVG(coach)}
     ${sell?`<span class="coachcard-sell"><span class="coin"></span>${coachSellValue(coach)}</span>`:""}
   </div>`;
