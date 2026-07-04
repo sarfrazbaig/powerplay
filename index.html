@@ -3983,34 +3983,51 @@
   .shopx-v2 .shopx-marketgrid .vcard,
   .shopx-v2 .shopx-marketgrid .itemx{width:100%!important;align-self:start}
   .shopx-v2 .shopx-marketgrid .vcard{align-self:start}
-  /* the persistent coach strip — always at the top, the engine you build */
-  .coach-strip{
-    display:flex;align-items:center;gap:12px;width:100%;
+  /* the persistent COACH ZONE — coaches in full art, the engine you build,
+     visible on every screen. Slim band, big art. */
+  .coach-zone{
+    display:flex;align-items:stretch;gap:12px;width:100%;justify-content:center;
     background:linear-gradient(180deg,#fffdf4,#fff2d6);border:3px solid var(--ink,#17211f);
-    border-radius:16px;box-shadow:5px 5px 0 rgba(23,33,31,.4);padding:9px 14px;min-height:0;
+    border-radius:16px;box-shadow:5px 5px 0 rgba(23,33,31,.4);padding:9px 12px;min-height:0;
   }
-  .cstrip-label{
-    flex:0 0 auto;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;
-    color:var(--punch,#ff5a2d);text-transform:uppercase;letter-spacing:.4px;display:flex;
-    flex-direction:column;line-height:1;gap:2px;
+  .coach-zone-head{
+    flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;gap:2px;
+    padding-right:10px;border-right:2.5px solid rgba(23,33,31,.14);
   }
-  .cstrip-label em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;font-size:11px;color:#7a6a4a}
-  .cstrip-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1 1 auto}
-  .cstrip-coach{
-    display:flex;align-items:center;gap:7px;background:#fff6e3;border:2.5px solid var(--ink,#17211f);
-    border-radius:11px;padding:4px 9px 4px 4px;box-shadow:2px 2px 0 rgba(23,33,31,.35);
+  .coach-zone-head b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;color:var(--punch,#ff5a2d);text-transform:uppercase;letter-spacing:.4px;line-height:1}
+  .coach-zone-head em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;font-size:11px;color:#7a6a4a}
+  .coach-zone-row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;flex:0 1 auto;min-width:0;justify-content:center}
+  .coachfx{
+    position:relative;width:104px;flex:0 0 auto;display:flex;flex-direction:column;
+    background:#fff6e3;border:2.5px solid var(--ink,#17211f);border-radius:12px;
+    box-shadow:2px 3px 0 rgba(23,33,31,.4);overflow:hidden;
   }
-  .coach-strip.sellable .cstrip-coach{cursor:pointer;transition:transform .12s,box-shadow .12s}
-  .coach-strip.sellable .cstrip-coach:hover{transform:translateY(-2px);box-shadow:2px 4px 0 rgba(23,33,31,.4);border-color:var(--red,#c0303f)}
-  .cstrip-coach img{width:30px;height:30px;border-radius:8px;object-fit:cover;object-position:top;border:2px solid var(--ink,#17211f);background:linear-gradient(#bfe8f2,#e9f7e2)}
-  .cstrip-name{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:var(--ink,#17211f);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
-  .cstrip-sell{font-family:"Work Sans",sans-serif;font-weight:800;font-size:11px;color:#7a5a1a;display:inline-flex;align-items:center;gap:2px}
-  .coach-strip.sellable .cstrip-coach:hover .cstrip-name{color:var(--red,#c0303f)}
-  .cstrip-empty{
-    width:38px;height:38px;flex:0 0 auto;border:2.5px dashed rgba(23,33,31,.3);border-radius:11px;
-    display:grid;place-items:center;color:rgba(23,33,31,.28);
+  .coach-zone.sellable .coachfx:not(.empty){cursor:pointer;transition:transform .12s,box-shadow .12s}
+  .coach-zone.sellable .coachfx:not(.empty):hover{transform:translateY(-3px);box-shadow:2px 6px 0 rgba(23,33,31,.45)}
+  .coachfx-art{aspect-ratio:1/.92;overflow:hidden;background:linear-gradient(#63caee 0%,#c7ecf7 48%,#8bcb52 100%);border-bottom:2.5px solid var(--ink,#17211f)}
+  .coachfx-art img{width:100%;height:100%;object-fit:cover;object-position:top}
+  .coachfx-name{
+    font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:11px;color:var(--ink,#17211f);
+    text-align:center;padding:4px 5px;line-height:1.12;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
-  .cstrip-empty svg{width:24px;height:24px;fill:currentColor}
+  .coachfx-tier{
+    position:absolute;top:5px;left:5px;font-family:"Work Sans",sans-serif;font-weight:900;font-size:8.5px;
+    text-transform:uppercase;letter-spacing:.3px;padding:2px 6px;border-radius:999px;border:2px solid var(--ink,#17211f);
+    background:#fff6e3;color:#17211f;line-height:1;
+  }
+  .coachfx-sell{
+    position:absolute;top:5px;right:5px;font-family:"Work Sans",sans-serif;font-weight:900;font-size:10px;
+    color:#4a3300;background:var(--gold,#ffc93c);border:2px solid var(--ink,#17211f);border-radius:999px;
+    padding:1px 6px;display:inline-flex;align-items:center;gap:2px;line-height:1;
+  }
+  .coachfx.empty{
+    border-style:dashed;border-color:rgba(23,33,31,.32);background:rgba(23,33,31,.03);
+    display:grid;place-items:center;color:rgba(23,33,31,.26);min-height:120px;
+  }
+  .coachfx.empty svg{width:46px;height:46px;fill:currentColor}
+  .coachfx.ed-foil{box-shadow:2px 3px 0 rgba(23,33,31,.4),0 0 10px rgba(155,193,255,.6)}
+  .coachfx.ed-holographic{box-shadow:2px 3px 0 rgba(23,33,31,.4),0 0 11px rgba(216,145,255,.6)}
+  .coachfx.ed-polychrome{box-shadow:2px 3px 0 rgba(23,33,31,.4),0 0 12px rgba(91,225,136,.65)}
   #shop .shopx-stage,
   #shop .shopx-rail,
   #shop .shopx-foot{
@@ -8245,15 +8262,19 @@ function coachStripHTML(opts={}){
   const active=activeCoaches();
   const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
   const sell=!!opts.sellable;
-  const chips=active.map((c,i)=>`<div class="cstrip-coach ed-${c.edition||'none'}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(c.name+" — "+c.desc)}${sell?" · tap to sell +"+coachSellValue(c):""}">
-      <img src="${coachArt(c)}" alt="" loading="lazy">
-      <b class="cstrip-name">${c.name}</b>
-      ${sell?`<span class="cstrip-sell"><span class="coin"></span>${coachSellValue(c)}</span>`:""}
-    </div>`);
-  for(let i=0;i<open;i++)chips.push(`<div class="cstrip-empty" title="Empty coaching slot — open a Coach Pack in the Clubhouse"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="14" r="7"/><path d="M5 37 Q20 22 35 37 Z"/></svg></div>`);
-  return `<div class="coach-strip${sell?' sellable':''}">
-    <span class="cstrip-label">Coaches <em>${usedCoachSlots()} / ${coachSlotLimit()}</em></span>
-    <div class="cstrip-row">${chips.join("")}</div>
+  const cards=active.map((c,i)=>{
+    const tier=c.tier||"common",ed=c.edition;
+    return `<div class="coachfx tier-${tier} ${ed?'ed-'+ed:''}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(c.name+" — "+c.desc)}${sell?" · tap to sell +"+coachSellValue(c):""}">
+      <div class="coachfx-art"><img src="${coachArt(c)}" alt="" loading="lazy"></div>
+      <span class="coachfx-tier chip-${tier}">${ed?EDITIONS[ed].label:tier}</span>
+      <div class="coachfx-name">${c.name}</div>
+      ${sell?`<span class="coachfx-sell"><span class="coin"></span>${coachSellValue(c)}</span>`:""}
+    </div>`;
+  });
+  for(let i=0;i<open;i++)cards.push(`<div class="coachfx empty" title="Empty coaching slot — open a Coach Pack in the Clubhouse"><svg viewBox="0 0 48 56" aria-hidden="true"><circle cx="24" cy="20" r="10"/><path d="M5 54 Q24 32 43 54 Z"/></svg></div>`);
+  return `<div class="coach-zone${sell?' sellable':''}">
+    <div class="coach-zone-head"><b>Coaches</b><em>${usedCoachSlots()} / ${coachSlotLimit()}</em></div>
+    <div class="coach-zone-row">${cards.join("")}</div>
   </div>`;
 }
 /* ---------- RENDER: shop ---------- */
