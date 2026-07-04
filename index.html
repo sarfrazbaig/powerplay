@@ -7551,7 +7551,7 @@ function startResolveSequence(){
   const beats=res.beats||[];
   const needle=$("#ringNeedle");
   if(needle){needle.style.transition="none";needle.classList.add("spinning")}
-  let t=520,prev=m.theirShape||GHOST_FRACS;
+  let t=380,prev=m.theirShape||GHOST_FRACS;
   beats.forEach(b=>{
     const shape=ringFracs(b.strip),pv=prev;
     const changes=RING_ORDER.filter(tk=>Math.abs((fracMap(pv)[tk]||0)-(fracMap(shape)[tk]||0))>0.004).length;
@@ -7563,10 +7563,10 @@ function startResolveSequence(){
       if(b.kind==="tool"){const k=document.querySelector(".kit-card.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
       if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait"||b.kind==="momentum")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
-    t+=760+170*Math.max(0,changes-1); // slow enough to read each beat's cascade
+    t+=540+110*Math.max(0,changes-1); // read each beat's cascade — snappy but legible
     prev=shape;
   });
-  const landAt=t+260;
+  const landAt=t+180;
   // (no steady clack whir during the spin — it read as a scratch)
   spinTimers.push(setTimeout(()=>{setRingRead("&#8230;","the ball is in the air");landNeedle(res)},landAt));
   return landAt+1900;
@@ -7591,17 +7591,17 @@ function landNeedle(res){
   needle.style.transform=`rotate(${cur}deg)`;
   void needle.offsetWidth;
   const delta=((land-cur)%360+360)%360;      // shortest forward path
-  needle.style.transition="transform 1750ms cubic-bezier(.09,.62,.11,1)";
-  needle.style.transform=`rotate(${cur+720+delta}deg)`; // two more laps, then settle
+  needle.style.transition="transform 1250ms cubic-bezier(.12,.66,.11,1)";
+  needle.style.transform=`rotate(${cur+360+delta}deg)`; // one more lap, then settle
   // a few soft, clearly-spaced ticks slowing to a stop — not a buzzy stream.
   // On a boundary they stop early and the crowd HUSHES (held breath).
   const tk=res.strip[res.roll],boundary=(tk==="4"||tk==="6");
-  const clackEnd=boundary?900:1500;
-  let tt=120,gap=150;
-  while(tt<clackEnd){const at=tt;spinTimers.push(setTimeout(()=>SFX.play("clack"),at));gap=Math.min(280,gap*1.2+8);tt+=gap}
+  const clackEnd=boundary?680:1080;
+  let tt=110,gap=130;
+  while(tt<clackEnd){const at=tt;spinTimers.push(setTimeout(()=>SFX.play("clack"),at));gap=Math.min(240,gap*1.2+8);tt+=gap}
   if(boundary)spinTimers.push(setTimeout(()=>SFX.duck(950),clackEnd+40));
-  spinTimers.push(setTimeout(()=>SFX.play("clunk"),1720));
-  spinTimers.push(setTimeout(()=>finishLanding(res,target),1780));
+  spinTimers.push(setTimeout(()=>SFX.play("clunk"),1210));
+  spinTimers.push(setTimeout(()=>finishLanding(res,target),1270));
 }
 function finishLanding(res,target){
   m.result.state="settled";
@@ -8425,7 +8425,7 @@ function scheduleAutoNext(){
   // let the outcome land and read, then deal the next ball automatically.
   m.__autoNext=setTimeout(()=>{
     if(m&&m.result&&m.result.state==="settled"&&document.getElementById("match")?.classList.contains("active"))nextBall();
-  },1500);
+  },1150);
 }
 function nextBall(){
   if(!m.result)return;
