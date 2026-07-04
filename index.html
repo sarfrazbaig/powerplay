@@ -4094,6 +4094,18 @@
   #match .scorebug .bug-cell.bug-target span,
   #match .scorebug .bug-cell.bug-target small{color:#4a3d00 !important}
   #match .scorebug .bug-cell.bug-target b{color:#17211f !important}
+  /* the CHASE heats up: the equation cell escalates as it tightens */
+  #match .scorebug .bug-cell.bug-target.pressure-warm{
+    background:linear-gradient(180deg,#ffb23c,#ff8f2d) !important;
+  }
+  #match .scorebug .bug-cell.bug-target.pressure-hot{
+    background:linear-gradient(180deg,#ff5a3c,#e02a2a) !important;
+    animation:eqPulse 0.7s ease-in-out infinite;
+  }
+  #match .scorebug .bug-cell.bug-target.pressure-hot span,
+  #match .scorebug .bug-cell.bug-target.pressure-hot small{color:#ffe6d8 !important}
+  #match .scorebug .bug-cell.bug-target.pressure-hot b{color:#fff !important}
+  @keyframes eqPulse{0%,100%{box-shadow:0 0 0 0 rgba(224,42,42,.0)}50%{box-shadow:0 0 0 3px rgba(224,42,42,.5),0 0 16px rgba(255,90,60,.7)}}
   /* 9a. hierarchy at scale: rails are fixed-cap side columns; the
         CENTER is the hero and takes everything else (fixes 2560px
         screens where 25vw rails starved the duel to 600px) */
@@ -7272,12 +7284,37 @@ function currentOddsInfo(){
   const margin=mine-theirs;
   return {strip:getStripFor(m.phase,card),roll:null,margin,resolving:false};
 }
+// The chase, as cricket lives it: who needs what off how many. Returns null in
+// the 1st innings (no chase yet). `need` is runs to WIN (target+1 - scored).
+function chaseState(){
+  if(m.innings!==2)return null;
+  const left=m.def.balls-m.ball+1;
+  const v=bugView();
+  const chasing=m.phase==="bat";
+  const scored=chasing?v.you.runs:v.rival.runs;
+  const need=Math.max(0,m.target+1-scored);
+  return {need,left,chasing,perBall:need/Math.max(1,left)};
+}
+// Pressure escalates as the CLOCK runs down (the universal cricket tension),
+// with the required rate as a secondary amplifier — so it builds to the death.
+function chasePressure(){
+  const c=chaseState();if(!c||c.need<=0)return "";
+  if(c.left<=1)return "hot";                        // last ball — always white-knuckle
+  if(c.left<=3&&c.perBall>=2)return "hot";          // death overs AND a real ask
+  if(c.left<=3||c.perBall>=2.5)return "warm";       // squeaky-bum time
+  return "live";
+}
 function targetText(){
   const left=m.def.balls-m.ball+1;
   const v=bugView();
   if(m.innings===1)return m.phase==="bowl"?`Keep them low · ball ${m.ball}/${m.def.balls}`:`Set target · ball ${m.ball}/${m.def.balls}`;
-  if(m.phase==="bat")return `Need ${Math.max(0,m.target+1-v.you.runs)} from ${left}`;
-  return `Defend ${m.target} · rival needs ${Math.max(0,m.target+1-v.rival.runs)} from ${left}`;
+  const c=chaseState();
+  if(c.need<=0)return c.chasing?"Chase complete":"All done";
+  // dramatic framing when it's on a knife-edge (subtext already shows balls left)
+  if(c.left===1)return `${c.need} TO WIN!`;
+  if(c.need===1)return "SCORES LEVEL!";
+  const who=c.chasing?"Need":"Rival needs";
+  return `${who} ${c.need} off ${c.left}`;
 }
 function renderScorebug(){
   const left=m.def.balls-m.ball+1;
@@ -7288,7 +7325,7 @@ function renderScorebug(){
     <div class="bug-cell bug-heat heat-${momentumState()||'cold'}"><span>Heat</span>${heatBarHTML()}</div>
     <div class="bug-cell bug-score-you"><span>You</span><b data-run="you">${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
     <div class="bug-cell bug-score-rival"><span>Rival</span><b data-run="rival">${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
-    <div class="bug-cell bug-target"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
+    <div class="bug-cell bug-target pressure-${chasePressure()||'none'}"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
   // "number go up": when a side's score jumps, tick it up + flash the cell
   const you=v.you.runs,rival=v.rival.runs;
   const bump=(sel,from,to,wk)=>{const b=document.querySelector(sel);if(!b)return;countUp(b,from,to,wk);const cell=b.closest(".bug-cell");if(cell){cell.classList.remove("scored");void cell.offsetWidth;cell.classList.add("scored")}};
