@@ -4445,6 +4445,7 @@
   .hcoins{display:inline-flex;align-items:center;gap:6px;background:#fff6e3;border:2.5px solid var(--ink);
     border-radius:99px;padding:3px 12px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:var(--ink)}
   .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
+  #match.you-bowl .you-col .card [data-lane]{cursor:pointer}
   @keyframes coinBump{30%{transform:scale(1.22)}}
   .hfree{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:17px;color:#111;background:var(--gold);
     border:2px solid var(--ink);border-radius:6px;padding:1px 9px;letter-spacing:1px}
@@ -8742,9 +8743,21 @@ function renderDuel(pop=false){
       yCard.style.cursor="pointer";
       yCard.title=m.phase==="bowl"?"Tap a stat square to change your attack lane · tap elsewhere to change bowler":"Tap to change your pick";
       yCard.onclick=e=>{
-        const lane=e.target.closest&&e.target.closest("[data-lane]");
-        if(m.phase==="bowl"&&lane){e.stopPropagation();setChallengeLane(lane.getAttribute("data-lane"));return}
-        e.stopPropagation();cancelSelected();
+        e.stopPropagation();
+        // zone hit-test (no fragile svg targets): the RIGHT RAIL is lane
+        // territory — any click there picks that row's lane; the art half
+        // changes the bowler. Numbers, gaps, borders — all count.
+        if(m.phase==="bowl"){
+          const svg=yCard.querySelector("svg.tc");
+          const r=svg?svg.getBoundingClientRect():yCard.getBoundingClientRect();
+          const xVB=(e.clientX-r.left)/r.width*250, yVB=(e.clientY-r.top)/r.height*350;
+          if(xVB>=165&&yVB<296){
+            const row=Math.max(0,Math.min(3,Math.floor((yVB-14)/69.5)));
+            setChallengeLane(STAT_ORDER_BOWL[row]);
+            return;
+          }
+        }
+        cancelSelected();
       };
     }
   }
