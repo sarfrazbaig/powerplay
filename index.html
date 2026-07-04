@@ -8286,7 +8286,7 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff,hotSoft){
     <g clip-path="url(#${g}art)">
       ${legendRays}
       <ellipse cx="88" cy="278" rx="66" ry="14" fill="rgba(23,33,31,.15)"/>
-      ${playerSilhouette(c,dim,bowlSide?"bowl":"bat")}
+      ${playerSilhouette(c,dim,emph?(bowlSide?"bowl":"bat"):null)}
     </g>
     ${c.trait?(()=>{const tn=escSVG(c.trait.name.toUpperCase());const tw=Math.min(150,26+tn.length*7.2);
       return `<g class="traitRibbon"><path d="M12 18 h${tw} l-7 10.5 7 10.5 h-${tw} Z" fill="#fff" stroke="#17211f" stroke-width="2.2"/>
@@ -9315,8 +9315,10 @@ function draftArtForCard(c,disc){
   // ball hybrid (bowl2) was ambiguous and is retired.
   const batPoses=["assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
   const bowlPoses=["assets/players/bowl3.png","assets/players/bowl4.png"];
-  const d=disc||(c.role==="bowl"?"bowl":"bat");
-  const pool=d==="bowl"?bowlPoses:batPoses;
+  const neutralPoses=["assets/players/bowl2.png"]; // pads + ball raised = "I do both"
+  // no action context (squad/shop/scout default view): all-rounders stand NEUTRAL
+  const d=disc||(c.role==="bowl"?"bowl":c.role==="all"?"neutral":"bat");
+  const pool=d==="bowl"?bowlPoses:d==="neutral"?neutralPoses:batPoses;
   const idx=Math.abs([...c.id].reduce((n,ch)=>n+ch.charCodeAt(0),0))%pool.length;
   return pool[idx];
 }
