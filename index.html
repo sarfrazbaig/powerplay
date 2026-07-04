@@ -8088,6 +8088,27 @@ const STAT_COLOR={
 // fixed on-card column order (red → blue → amber → purple), paired across roles
 const STAT_ORDER_BAT=["timing","technique","power","nerve"];
 const STAT_ORDER_BOWL=["pace","movement","accuracy","deception"];
+
+/* SILHOUETTE CARDS: the original character art flattened at render time —
+   cream body + ink rim traced from the PNG's own alpha (the pack-art look).
+   Every pose stays unique; effects read perfectly on the flat shape; a
+   deterministic mirror per card doubles the variety. */
+function playerSilhouette(c,dim){
+  const img=draftArtForCard(c);
+  const f="sf"+(svgSeq++);
+  const flip=(Math.abs([...String(c.id||"x")].reduce((n,ch)=>n+ch.charCodeAt(0),0))%2)===1;
+  return `<filter id="${f}" x="-12%" y="-12%" width="124%" height="124%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="2.5" result="fat"/>
+      <feFlood flood-color="#17211f" result="ink"/>
+      <feComposite in="ink" in2="fat" operator="in" result="rim"/>
+      <feFlood flood-color="#fff6e3" result="cream"/>
+      <feComposite in="cream" in2="SourceAlpha" operator="in" result="body"/>
+      <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
+    </filter>
+    <g ${flip?'transform="translate(176 0) scale(-1 1)"':""}>
+      <image href="${img}" x="16" y="24" width="144" height="254" preserveAspectRatio="xMidYMax meet" filter="url(#${f})" opacity="${dim?.88:1}"/>
+    </g>`;
+}
 const STAT_FULL={pace:"PACE",timing:"TIMING",movement:"MOVEMENT",technique:"TECHNIQUE",accuracy:"ACCURACY",power:"POWER",deception:"DECEPTION",nerve:"NERVE"};
 /* CARD = art on the LEFT, a vertical RAIL of four stat SQUARES on the right
    (number in the lane colour, stat name in black below). When a lane is the
@@ -8120,8 +8141,8 @@ function cardSVG(c,batNum,bowlNum,emph,dim,compact,hot,eff){
       <rect x="12" y="12" width="152" height="280" fill="url(#${g}sky)"/>
       <g opacity=".35" transform="translate(88 150)">${Array.from({length:9},(_,i)=>`<path d="M0 0 L${(Math.cos(i*Math.PI/4.5)*220).toFixed(0)} ${(Math.sin(i*Math.PI/4.5)*220).toFixed(0)} L${(Math.cos(i*Math.PI/4.5+.22)*220).toFixed(0)} ${(Math.sin(i*Math.PI/4.5+.22)*220).toFixed(0)} Z" fill="#fff"/>`).join("")}</g>
       <rect x="12" y="206" width="152" height="86" fill="${c.role==="bowl"?"#8fc44f":"#7cc24a"}"/>
-      <ellipse cx="88" cy="292" rx="110" ry="30" fill="rgba(23,33,31,.14)"/>
-      <image href="${img}" x="12" y="12" width="152" height="280" preserveAspectRatio="xMidYMid slice" opacity="${dim?.9:1}"/>
+      <ellipse cx="88" cy="278" rx="66" ry="14" fill="rgba(23,33,31,.16)"/>
+      ${playerSilhouette(c,dim)}
     </g>
     <rect x="12" y="12" width="152" height="280" rx="13" fill="none" stroke="#17211f" stroke-width="2.5"/>
     ${c.role==="bowl"
@@ -9091,9 +9112,11 @@ function draftScoutBarsHTML(rivalCards){
   return rows.map(([label,val])=>`<div class="scout-bar"><span>${label}</span><b>${val}%</b><i style="width:${clamp(val,6,100)}%"></i></div>`).join("");
 }
 function draftArtForCard(c){
-  const bat=["assets/players/bat1.png","assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png"];
-  const bowl=["assets/players/bowl1.png","assets/players/bowl2.png","assets/players/bowl3.png","assets/players/bowl4.png"];
-  const all=["assets/players/all1.png","assets/players/all2.png","assets/players/all3.png"];
+  // pools re-bucketed by the ART's actual pose (audited): all1/all2 are pure
+  // batting, all3 is pure bowling, bowl2 is the pads+ball hybrid = all-rounder.
+  const bat=["assets/players/bat1.png","assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png","assets/players/all1.png","assets/players/all2.png"];
+  const bowl=["assets/players/bowl1.png","assets/players/bowl3.png","assets/players/bowl4.png","assets/players/all3.png"];
+  const all=["assets/players/bowl2.png"];
   const pool=c.role==="bat"?bat:c.role==="bowl"?bowl:all;
   const idx=Math.abs([...c.id].reduce((n,ch)=>n+ch.charCodeAt(0),0))%pool.length;
   return pool[idx];
