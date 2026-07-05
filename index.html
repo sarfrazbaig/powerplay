@@ -5191,25 +5191,37 @@
     font-size:15px;cursor:pointer;color:#b9b2a2;transition:transform .12s}
   .sb-fav:hover{transform:scale(1.15)}
   .sb-fav.on{color:#f0a500;box-shadow:0 0 10px rgba(255,201,60,.65)}
+  .sb-layout{display:flex;gap:18px;align-items:flex-start;min-height:0}
+  .sb-side{flex:0 0 218px;position:sticky;top:0;display:flex;flex-direction:column;gap:14px;
+    background:rgba(255,253,244,.96);border:2px solid rgba(23,33,31,.12);border-radius:14px;padding:12px}
+  .sb-main{flex:1 1 auto;min-width:0}
+  .sbf-group h5{margin:0 0 6px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;
+    letter-spacing:.6px;color:#7a6a4a;text-transform:uppercase}
+  .sbf-group{display:flex;flex-direction:column;gap:5px}
+  .sbf-chip{display:flex;align-items:center;gap:7px;border:2px solid var(--ink);background:#fff6e3;border-radius:99px;
+    padding:5px 12px;font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;
+    text-transform:capitalize;transition:transform .1s}
+  .sbf-chip:hover{transform:translateX(3px)}
+  .sbf-chip.on{background:var(--gold,#ffc93c)}
+  .sbf-ico{width:18px;height:18px;flex:0 0 18px}
+  .sbf-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink);flex:0 0 12px}
+  .sbf-flag{width:16px;height:16px;border-radius:50%;flex:0 0 16px;border:1.5px solid var(--ink)}
+  .sbf-natgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .sbf-natgrid .sbf-chip{padding:4px 8px;font-size:11.5px}
+  .sbf-favbtn{justify-content:center}
+  .sb-market{border:2.5px dashed rgba(184,134,11,.55);border-radius:14px;padding:8px 10px 10px;
+    background:linear-gradient(180deg,rgba(255,201,60,.12),transparent)}
+  .sb-market>h4{color:#b8860b;border-bottom:0;margin:0 0 4px;font-size:15px}
+  .sb-market-zone{min-height:110px;display:flex;align-items:center;justify-content:center;border-radius:10px}
+  .sb-market-hint{color:#9a834a;font-weight:800;font-size:12px;text-align:center;line-height:1.5;padding:6px}
+  .sb-market.drop-hot{background:rgba(255,201,60,.3)}
   .sb-fieldrow{background:linear-gradient(180deg,rgba(31,155,83,.14),transparent);border:2.5px dashed rgba(31,155,83,.5);
     border-radius:14px;padding:10px 12px 12px;margin-bottom:22px}
   .sb-fieldrow>h4{color:#1f9b53;border-bottom-color:rgba(31,155,83,.3)}
-  .sb-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 16px;position:sticky;top:0;z-index:6;
-    background:rgba(255,253,244,.94);padding:8px 10px;border-radius:12px;border:2px solid rgba(23,33,31,.12)}
-  .sbf-lbl{font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#7a6a4a}
-  .sbf-chip{border:2px solid var(--ink);background:#fff6e3;border-radius:99px;padding:4px 12px;
-    font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:12px;cursor:pointer;text-transform:capitalize}
-  .sbf-chip.on{background:var(--gold,#ffc93c)}
-  .sbf-sep{width:2px;height:20px;background:rgba(23,33,31,.15);border-radius:2px}
-  .sbf-select{border:2px solid var(--ink);background:#fff6e3;border-radius:10px;padding:4px 8px;
-    font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:12px}
-  .sb-market{border:2.5px dashed rgba(184,134,11,.55);border-radius:14px;padding:10px 12px 12px;
-    background:linear-gradient(180deg,rgba(255,201,60,.12),transparent)}
-  .sb-market>h4{color:#b8860b;border-bottom-color:rgba(184,134,11,.3)}
-  .sb-market-zone{min-height:120px;display:flex;align-items:center;justify-content:center}
-  .sb-market-hint{color:#9a834a;font-weight:800;font-size:13px;text-align:center;line-height:1.5}
-  .sb-market.drop-hot{background:rgba(255,201,60,.28)}
-  .sb-bench-note{font-size:11.5px;font-weight:700;color:#7a6a4a;margin:-4px 0 8px}
+  .sb-card.sb-arrived .card{outline:4px solid var(--gold,#ffc93c);outline-offset:3px;border-radius:14px;
+    animation:sbArrive .9s ease}
+  @keyframes sbArrive{0%{filter:brightness(1.35)}100%{filter:none}}
+  .sb-bench-note{  .sb-bench-note{font-size:11.5px;font-weight:700;color:#7a6a4a;margin:-4px 0 8px}
   .scout-card.fieldable{cursor:pointer;transition:transform .12s ease}
   .scout-card.fieldable:hover{transform:translateY(-6px)}
   .scout-card.fieldable::after{content:"FIELD";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
@@ -9349,17 +9361,15 @@ function benchCards(){const act=activeIds();return roster().filter(c=>!act.has(c
 function sbSort(list){
   return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)||(batVal(b)+bowlVal(b))-(batVal(a)+bowlVal(a)));
 }
-/* the squad-page filter state (session-only) */
-const SB_FILTER={role:"all",rarity:"all",nation:"all",favOnly:false};
+const SB_FILTER={role:"any",rarity:"all",nation:"all",favOnly:false};
 function sbFilterPass(c){
-  if(SB_FILTER.role!=="all"&&c.role!==SB_FILTER.role)return false;
+  if(SB_FILTER.role!=="any"&&c.role!==SB_FILTER.role)return false;
   if(SB_FILTER.rarity!=="all"&&(c.rarity||"common")!==SB_FILTER.rarity)return false;
   if(SB_FILTER.nation!=="all"&&nationFor(c)!==SB_FILTER.nation)return false;
   if(SB_FILTER.favOnly&&!c.fav)return false;
   return true;
 }
 function fieldRowCards(){
-  // the FACE-UP cards: exactly what the hand shows right now
   const disc=m.phase==="bowl"?"bowl":"bat";
   const stat=c=>disc==="bowl"?bowlVal(c):batVal(c);
   const roleOk=c=>m.phase==="bowl"?(c.role==="bowl"||c.role==="all"):(c.role==="bat"||c.role==="all");
@@ -9371,12 +9381,42 @@ function fieldRowCards(){
   if(!ready.length)ready=avail.slice().sort((a,b)=>stat(b)-stat(a)).slice(0,6);
   return ready;
 }
+const RARITY_DOT={common:"#8aa0a8",uncommon:"#34c06a",rare:"#3aa5ee",epic:"#8a55e6",legendary:"#f5c84b"};
+function sbFilterPanelHTML(opts){
+  const roleChip=(v,l,icon)=>`<button class="sbf-chip ${SB_FILTER.role===v?"on":""}" data-sbf-role="${v}">
+    ${icon?`<svg viewBox="0 0 28 28" class="sbf-ico"><g transform="translate(2 2)">${icon}</g></svg>`:""}${l}</button>`;
+  const rarChip=(r,l)=>`<button class="sbf-chip ${SB_FILTER.rarity===r?"on":""}" data-sbf-rarity="${r}">
+    ${r!=="all"?`<i class="sbf-dot" style="background:${RARITY_DOT[r]}"></i>`:""}${l}</button>`;
+  const natChip=(n,l)=>`<button class="sbf-chip sbf-nat ${SB_FILTER.nation===n?"on":""}" data-sbf-nation="${n}">
+    ${n!=="all"?`<svg viewBox="0 0 24 24" class="sbf-flag">${NATION_FLAG[n]||""}</svg>`:""}${l}</button>`;
+  return `<aside class="sb-side">
+    <div class="sbf-group"><h5>Role</h5>
+      ${roleChip("any","All")}${roleChip("bat","Batters",ROLE_ICON.bat)}${roleChip("all","All-rounders",ROLE_ICON.all)}${roleChip("bowl","Bowlers",ROLE_ICON.bowl)}
+    </div>
+    <div class="sbf-group"><h5>Tier</h5>
+      ${rarChip("all","Any")}${rarChip("common","Common")}${rarChip("uncommon","Uncommon")}${rarChip("rare","Rare")}${rarChip("epic","Epic")}${rarChip("legendary","Legendary")}
+    </div>
+    <div class="sbf-group"><h5>Nation</h5>
+      <div class="sbf-natgrid">${natChip("all","All")}${NATIONS.map(n=>natChip(n,n)).join("")}</div>
+    </div>
+    <div class="sbf-group">
+      <button class="sbf-chip sbf-favbtn ${SB_FILTER.favOnly?"on":""}" data-sbf-fav>&#9733; Favourites only</button>
+    </div>
+    ${opts.market?`<div class="sb-section sb-market" data-sb-sec="market">
+      <h4>&#128176; Market</h4>
+      <div class="sb-market-zone"><div class="sb-market-hint">Drag a BENCH card here to sell it</div></div>
+    </div>`:""}
+  </aside>`;
+}
 function squadBoardHTML(opts={}){
   const inMatch=!!opts.match;
   const act=activeSquad();
   const flt=opts.filters?sbFilterPass:(()=>true);
+  const field=inMatch?fieldRowCards():[];
+  const fieldIds=new Set(field.map(c=>c.id));
   const groups=[["bat","Batters"],["all","All-rounders"],["bowl","Bowlers"]]
-    .map(([role,label])=>({role,label,cards:sbSort(act.filter(c=>c.role===role&&flt(c)))}));
+    .map(([role,label])=>({role,label,
+      cards:sbSort(act.filter(c=>c.role===role&&flt(c)&&(!inMatch||!fieldIds.has(c.id))))}));
   const bench=sbSort(benchCards().filter(flt));
   const emph=inMatch?(m.phase==="bowl"?"bowl":"bat"):null;
   const cell=(c,sec)=>`<div class="sb-card ${c.used&&inMatch?'usedc':''}" draggable="${opts.editable||inMatch?'true':'false'}" data-sb-id="${c.id}" data-sec="${sec}">
@@ -9388,37 +9428,40 @@ function squadBoardHTML(opts={}){
       <div class="sb-grid">${cards.map(c=>cell(c,key)).join("")||'<div class="scout-empty">Empty.</div>'}</div>
     </div>`;
   const fieldRow=inMatch?`<div class="sb-section sb-fieldrow" data-sb-sec="field">
-      <h4>&#9654; The Field &middot; face-up cards <em>only these can be sent to the pitch — tap to play one</em></h4>
-      <div class="sb-grid">${fieldRowCards().map(c=>cell(c,"field")).join("")||'<div class="scout-empty">No cards left.</div>'}</div>
+      <h4>&#9654; The Field &middot; face-up <em>only these can play — tap one to send it in</em></h4>
+      <div class="sb-grid">${field.map(c=>cell(c,"field")).join("")||'<div class="scout-empty">No cards left.</div>'}</div>
     </div>`:"";
-  const filterBar=opts.filters?`<div class="sb-filters">
-      <span class="sbf-lbl">Show</span>
-      ${[["all","All"],["bat","Bat"],["all-r","All-round"],["bowl","Bowl"]].map(([v,l])=>
-        `<button class="sbf-chip ${SB_FILTER.role===(v==="all-r"?"all":v)&&(v!=="all"||SB_FILTER.role==="all")?"on":""}" data-sbf-role="${v==="all-r"?"all_role":v}">${l}</button>`).join("")}
-      <span class="sbf-sep"></span>
-      ${["all","common","uncommon","rare","epic","legendary"].map(r=>
-        `<button class="sbf-chip ${SB_FILTER.rarity===r?"on":""}" data-sbf-rarity="${r}">${r==="all"?"Any tier":r}</button>`).join("")}
-      <span class="sbf-sep"></span>
-      <select class="sbf-select" data-sbf-nation>
-        <option value="all">All nations</option>
-        ${NATIONS.map(n=>`<option value="${n}" ${SB_FILTER.nation===n?"selected":""}>${n}</option>`).join("")}
-      </select>
-      <button class="sbf-chip ${SB_FILTER.favOnly?"on":""}" data-sbf-fav>&#9733; Favs</button>
-    </div>`:"";
-  const market=opts.market?`<div class="sb-section sb-market" data-sb-sec="market">
-      <h4>&#128176; Market <em>drag a BENCH card here to sell it</em></h4>
-      <div class="sb-grid sb-market-zone"><div class="sb-market-hint">Drop to sell &middot; bench cards only<br>keeps a legal squad of 12+</div></div>
-    </div>`:"";
-  return filterBar+fieldRow+groups.map(g=>section(g.role,g.label,g.cards,
-      inMatch?"tap a card to SEND IT TO THE FIELD":"drag to bench &middot; star to pin")).join("")
-    + section("bench","Bench",bench,opts.editable?"drag onto a role section to join the XII":"")
-    + market;
+  const main=`<div class="sb-main">${fieldRow}
+    ${groups.map(g=>section(g.role,g.label,g.cards,inMatch?"tap to SEND TO THE FIELD":"drag to bench &middot; star to pin")).join("")}
+    ${section("bench","Bench",bench,inMatch?"locked during a match":"drag onto a role section to join the XII")}
+  </div>`;
+  return `<div class="sb-layout">${opts.filters?sbFilterPanelHTML(opts):""}${main}</div>`;
+}
+/* FLIP: capture every card's rect, repaint, then animate the movers so the
+   eye can FOLLOW who went where (send + the bumped card gliding back). */
+function paintBoardFLIP(host,buildFn,highlightId){
+  const before={};
+  host.querySelectorAll(".sb-card").forEach(el=>{before[el.dataset.sbId]=el.getBoundingClientRect();});
+  buildFn();
+  requestAnimationFrame(()=>{
+    host.querySelectorAll(".sb-card").forEach(el=>{
+      const id=el.dataset.sbId,a=before[id];
+      if(!a)return;
+      const b=el.getBoundingClientRect();
+      const dx=a.left-b.left,dy=a.top-b.top;
+      if(Math.abs(dx)+Math.abs(dy)>4){
+        el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],
+          {duration:420,easing:"cubic-bezier(.2,.9,.3,1)"});
+      }
+      if(id===highlightId){el.classList.add("sb-arrived");setTimeout(()=>el.classList.remove("sb-arrived"),900);}
+    });
+  });
 }
 function wireSquadBoard(host,opts={}){
   host.querySelectorAll("[data-fav]").forEach(st=>st.onclick=e=>{
     e.stopPropagation();
     const c=roster().find(x=>x.id===st.dataset.fav);
-    if(c){c.fav=!c.fav;persistRun();opts.rerender&&opts.rerender();}
+    if(c){c.fav=!c.fav;persistRun();opts.rerender&&opts.rerender(st.dataset.fav);}
   });
   host.querySelectorAll(".sb-card").forEach(cell=>{
     const id=cell.dataset.sbId;
@@ -9427,18 +9470,13 @@ function wireSquadBoard(host,opts={}){
       if(opts.onCard)opts.onCard(id,cell.dataset.sec);
     };
   });
-  // filters
   host.querySelectorAll("[data-sbf-role]").forEach(b=>b.onclick=()=>{
-    const v=b.dataset.sbfRole;SB_FILTER.role=v==="all_role"?"all":v;
-    if(v==="all_role")SB_FILTER.role="all";else if(v==="all")SB_FILTER.role="all";else SB_FILTER.role=v;
-    opts.rerender&&opts.rerender();
+    SB_FILTER.role=b.dataset.sbfRole;opts.rerender&&opts.rerender();
   });
   host.querySelectorAll("[data-sbf-rarity]").forEach(b=>b.onclick=()=>{SB_FILTER.rarity=b.dataset.sbfRarity;opts.rerender&&opts.rerender();});
-  const natSel=host.querySelector("[data-sbf-nation]");
-  if(natSel)natSel.onchange=()=>{SB_FILTER.nation=natSel.value;opts.rerender&&opts.rerender();};
+  host.querySelectorAll("[data-sbf-nation]").forEach(b=>b.onclick=()=>{SB_FILTER.nation=b.dataset.sbfNation;opts.rerender&&opts.rerender();});
   const favBtn=host.querySelector("[data-sbf-fav]");
   if(favBtn)favBtn.onclick=()=>{SB_FILTER.favOnly=!SB_FILTER.favOnly;opts.rerender&&opts.rerender();};
-  // drag & drop
   if(!opts.editable&&!opts.match)return;
   let dragId=null;
   host.querySelectorAll(".sb-card").forEach(cell=>{
@@ -9454,10 +9492,9 @@ function wireSquadBoard(host,opts={}){
       const card=roster().find(c=>c.id===dragId);if(!card)return;
       const target=sec.dataset.sbSec;
       if(opts.match){
-        // in a match only FIELD membership moves: squad->field pins, field->role unpins
         if(target==="field")sendToField(card.id);
         else if((m.fielded||[]).includes(card.id)){m.fielded=m.fielded.filter(x=>x!==card.id);renderHand();}
-        opts.rerender&&opts.rerender();
+        opts.rerender&&opts.rerender(card.id);
         return;
       }
       if(target==="market"){
@@ -9482,23 +9519,24 @@ function wireSquadBoard(host,opts={}){
         run.deck=run.deck.filter(c=>c.id!==card.id);run.deck.unshift(card);
       }
       persistRun();
-      opts.rerender&&opts.rerender();
+      opts.rerender&&opts.rerender(card.id);
     });
   });
 }
 /* SEND TO FIELD: the two-step truth — squad card becomes face-up first */
 function sendToField(id){
-  if(!m)return;
+  if(!m)return false;
   const c=activeSquad().find(x=>x.id===id);
-  if(!c||c.used)return;
+  if(!c||c.used)return false;
   m.fielded=m.fielded||[];
-  if(m.fielded.includes(id))return;
-  if(m.fielded.length>=6){flashHint("The field row is full — recall a card first (drag it back).");return;}
+  if(m.fielded.includes(id))return false;
+  if(m.fielded.length>=6){flashHint("The field row is full — recall a card first (drag it back).");return false;}
   m.fielded.push(id);
   SFX.play("tick");
   renderHand();
+  return true;
 }
-/* ---------- SCOUT: decks ---------- *//* ---------- SCOUT: decks ---------- */
+/* ---------- SCOUT: decks ---------- *//* ---------- SCOUT: decks ---------- *//* ---------- SCOUT: decks ---------- */
 function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
 function deckScoutCell(c,o={},emph){
   return `<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardHTML(c,{emph,as:"div"})}</div>`;
@@ -9518,21 +9556,22 @@ function renderDeckScout(kind){
        <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
     + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
   if(player){
-    // THE SQUAD BOARD: field row on top (face-up cards), categorized XII,
-    // bench. Squad cards go to the FIELD first — never straight to the pitch.
+    // THE SQUAD BOARD: field row on top (face-up cards), reserves below,
+    // filters in the left pane. Sends are FLIP-animated so you SEE the move.
     $("#scoutSub").textContent="— send cards to the FIELD, play from there";
     const host=$("#rivalDeckGrid");
-    const paint=()=>{
-      host.innerHTML=squadBoardHTML({match:true});
+    const build=()=>{
+      host.innerHTML=squadBoardHTML({match:true,filters:true});
       wireSquadBoard(host,{match:true,rerender:paint,onCard:(id,sec)=>{
         const c=activeSquad().find(x=>x.id===id);
         if(!c)return;
         if(sec==="field"&&!c.used&&!m.result){closeRivalDeck();lockCard(c);return;}
-        if(sec!=="field"&&sec!=="bench"&&!c.used&&!m.result){sendToField(id);paint();return;}
+        if(sec!=="field"&&sec!=="bench"&&!c.used&&!m.result){if(sendToField(id))paint(id);return;}
         toggleFlip(id);
       }});
     };
-    paint();
+    const paint=(hl)=>paintBoardFLIP(host,build,hl);
+    build();
   }else{
     document.querySelectorAll("#rivalDeckGrid .scout-card .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
   }
@@ -9793,12 +9832,12 @@ function renderSquadManager(){
   // THE SQUAD BOARD, editable here: categorized XII + bench, favourites,
   // drag between sections (bench<->XII) — full squad management.
   const host=$("#squadGrid");
-  const paint=()=>{
+  const build=()=>{
     host.innerHTML=squadBoardHTML({match:false,editable:!p,filters:true,market:!p});
-    wireSquadBoard(host,{editable:!p,rerender:renderSquadManager,
+    wireSquadBoard(host,{editable:!p,rerender:(hl)=>paintBoardFLIP(host,build,hl),
       onCard:id=>{p?squadAct(id):toggleFlip(id)}});
   };
-  paint();
+  build();
 }
 
 function starterDraft(){
