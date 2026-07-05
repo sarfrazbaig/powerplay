@@ -4514,8 +4514,6 @@
   .match-coachzone .coach-zone{border-right:2.5px dashed rgba(23,33,31,.2) !important;padding-right:16px !important;margin-right:6px}
   .match-kitzone .kit-zone{border-left:2.5px dashed rgba(23,33,31,.2) !important;padding-left:16px !important;margin-left:6px}
   #matchCoachZone .coach-zone-row{flex-wrap:nowrap;height:100%;align-items:center}
-  #matchCoachZone .coachcard.empty{height:92%;aspect-ratio:5/7}
-  #matchCoachZone .coachcard.empty .coachcard-empty{height:100%}
   .loadout-build .coach-zone-head,.loadout-build .kit-zone-head{border-right:0;padding-right:6px}
   /* the 6 ready cards, sized to the band, plus the DECK stack at the end */
   .loadout-hand .av-fan{justify-content:flex-start;gap:0}
@@ -4534,16 +4532,25 @@
   .hand-deck .hd-cards{position:absolute;inset:5px;border:2px dashed rgba(255,255,255,.5);border-radius:8px}
   .hand-deck .hd-n{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:30px;text-shadow:2px 2px 0 rgba(23,33,31,.6);z-index:1}
   .hand-deck .hd-lbl{font-size:9px;font-weight:900;letter-spacing:2px;z-index:1}
-  /* coaches = same height as the player cards; consumables a touch smaller */
-  .loadout-build .coach-zone{padding:6px 10px;align-items:center}
-  .loadout-build .coach-zone-head b{font-size:12px}.loadout-build .coach-zone-head em{font-size:9px}
-  .loadout-build .coach-zone-row{gap:8px;flex-wrap:nowrap;align-items:center;height:100%}
-  .loadout-build #matchCoachZone .coach-zone-row .coachcard{width:auto;height:95%}
-  .loadout-build .coach-zone-row .coachcard svg{width:auto;height:100%}
+  /* ONE sizing system for the whole loadout: width-driven clamps (like the
+     hand cards) so every element scales together at every viewport. */
+  .loadout-build .coach-zone.coach-bigbox{padding:6px 8px;align-items:center;gap:0;height:96%;justify-content:flex-start}
+  .coach-spine{writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(20px,2vw,30px);
+    letter-spacing:3px;color:var(--punch,#ff5a2d);opacity:.9;flex:0 0 auto;
+    border-left:2.5px solid rgba(23,33,31,.14);padding-left:6px;margin-right:8px;align-self:stretch;
+    display:flex;align-items:center;justify-content:center}
+  .loadout-build .coach-zone-row{gap:8px;flex-wrap:nowrap;align-items:center;flex:1 1 auto;min-width:0;justify-content:center}
+  .loadout-build #matchCoachZone .coach-zone-row .coachcard{flex:0 1 clamp(112px,9.5vw,160px);width:auto;height:auto;min-width:0}
+  .loadout-build .coach-zone-row .coachcard svg{width:100%;height:auto;display:block}
+  .coach-ghost{flex:0 1 clamp(100px,8.5vw,150px);aspect-ratio:5/7;border:2.5px dashed rgba(23,33,31,.28);
+    border-radius:14px;display:flex;align-items:center;justify-content:center;color:rgba(23,33,31,.3);
+    font-family:Anton,Impact,sans-serif;font-size:34px}
   .loadout-build .kit-zone{padding:6px 8px;align-items:center}
-  .loadout-build .kit-zone-row{align-items:center;height:100%;gap:8px}
-  .loadout-build .kit-zone-row .kit-slot{width:clamp(74px,5.6vw,100px);height:80%}
+  .loadout-build .kit-zone-row{align-items:center;gap:8px}
+  .loadout-build .kit-zone-row .kit-slot{flex:0 1 clamp(74px,5.6vw,100px);width:auto;height:auto;aspect-ratio:1/1.15;min-width:0}
   .loadout-hand .fanhold{flex:0 1 clamp(150px,12.5vw,215px)}
+  .hand-deck{flex:0 1 clamp(96px,7.8vw,132px) !important;height:auto !important;aspect-ratio:5/7}
   /* legendary card: rays drift, halo breathes — the only animated card face */
   .tc .raySpin{animation:raySpin 26s linear infinite}
   @keyframes raySpin{to{transform:rotate(360deg)}}
@@ -9073,9 +9080,19 @@ function coachEmptyCell(){
 }
 function coachStripHTML(opts={}){
   const active=activeCoaches();
-  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
   const sell=!!opts.sellable;
   const cards=active.map((c,i)=>coachCardCell(c,i,sell,!!opts.mini));
+  if(opts.mini){
+    // MATCH: one big box, vertical COACH spine, cards sized like the hand.
+    // No fixed per-slot empties — the box holds however many you sign (4+
+    // with a negative). Empty = one quiet ghost, not three broken frames.
+    if(!cards.length)cards.push(`<div class="coach-ghost" title="Sign coaches at the Clubhouse"><span>+</span></div>`);
+    return `<div class="coach-zone coach-bigbox">
+      <div class="coach-spine" aria-hidden="true">COACH</div>
+      <div class="coach-zone-row">${cards.join("")}</div>
+    </div>`;
+  }
+  const open=Math.max(0,coachSlotLimit()-usedCoachSlots());
   for(let i=0;i<open;i++)cards.push(coachEmptyCell());
   return `<div class="coach-zone${sell?' sellable':''}">
     <div class="coach-zone-head"><b>Coaches</b><em>${usedCoachSlots()} / ${coachSlotLimit()}</em></div>
