@@ -9189,12 +9189,14 @@ function positionSnapSlot(){
   // the DRAWN card letterboxes inside its element (svg meet, 250:350) —
   // snap to the VISUAL card, not the element box
   const scale=Math.min(er.width/250,er.height/350);
-  const visW=250*scale,visH=350*scale;
-  const visL=er.left+(er.width-visW)/2, visT=er.top+(er.height-visH)/2;
-  snap.style.left=(visL+visW-kr.left-2)+"px"; // flush: borders kiss
-  snap.style.top=(visT-kr.top)+"px";          // EXACT visual top
-  snap.style.height=visH+"px";                // EXACT visual length
-  snap.style.width=(visW/4)+"px";
+  const boxW=250*scale,boxH=350*scale;
+  const offL=er.left+(er.width-boxW)/2, offT=er.top+(er.height-boxH)/2;
+  // the card FRAME is drawn at viewBox (4,4,242,342) — snap to the frame
+  const fL=offL+4*scale, fT=offT+4*scale, fW=242*scale, fH=342*scale;
+  snap.style.left=(fL+fW-kr.left-2)+"px";  // flush: borders kiss
+  snap.style.top=(fT-kr.top)+"px";         // EXACT frame top
+  snap.style.height=fH+"px";               // EXACT frame length
+  snap.style.width=(fW/4)+"px";
 }
 function renderKitbag(){
   const el=$("#matchKitZone");if(!el)return;
