@@ -9184,12 +9184,17 @@ function positionSnapSlot(){
   const card=document.querySelector(".you-col .card");
   const col=document.querySelector(".you-col");
   if(!snap||!card||!col)return;
-  const cr=card.getBoundingClientRect(),kr=col.getBoundingClientRect();
-  if(!cr.width)return;
-  snap.style.left=(cr.right-kr.left-2)+"px";  // flush: borders kiss
-  snap.style.top=(cr.top-kr.top)+"px";        // EXACT card top
-  snap.style.height=cr.height+"px";           // EXACT card length
-  snap.style.width=(cr.width/4)+"px";         // thinner than 1/3
+  const er=card.getBoundingClientRect(),kr=col.getBoundingClientRect();
+  if(!er.width)return;
+  // the DRAWN card letterboxes inside its element (svg meet, 250:350) —
+  // snap to the VISUAL card, not the element box
+  const scale=Math.min(er.width/250,er.height/350);
+  const visW=250*scale,visH=350*scale;
+  const visL=er.left+(er.width-visW)/2, visT=er.top+(er.height-visH)/2;
+  snap.style.left=(visL+visW-kr.left-2)+"px"; // flush: borders kiss
+  snap.style.top=(visT-kr.top)+"px";          // EXACT visual top
+  snap.style.height=visH+"px";                // EXACT visual length
+  snap.style.width=(visW/4)+"px";
 }
 function renderKitbag(){
   const el=$("#matchKitZone");if(!el)return;
