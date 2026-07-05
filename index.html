@@ -9187,19 +9187,17 @@ function positionSnapSlot(){
   const card=document.querySelector(".you-col .card");
   const col=document.querySelector(".you-col");
   if(!snap||!card||!col)return;
-  const er=card.getBoundingClientRect(),kr=col.getBoundingClientRect();
-  if(!er.width)return;
-  // the DRAWN card letterboxes inside its element (svg meet, 250:350) —
-  // snap to the VISUAL card, not the element box
-  const scale=Math.min(er.width/250,er.height/350);
-  const boxW=250*scale,boxH=350*scale;
-  const offL=er.left+(er.width-boxW)/2, offT=er.top+(er.height-boxH)/2;
-  // the card FRAME is drawn at viewBox (4,4,242,342) — snap to the frame
-  const fL=offL+4*scale, fT=offT+4*scale, fW=242*scale, fH=342*scale;
-  snap.style.left=(fL+fW-kr.left-2)+"px";  // flush: borders kiss
-  snap.style.top=(fT-kr.top)+"px";         // EXACT frame top
-  snap.style.height=fH+"px";               // EXACT frame length
-  snap.style.width=(fW/4)+"px";
+  const kr=col.getBoundingClientRect();
+  // no viewBox math — measure the DRAWN frame rect itself (immune to
+  // letterboxing, transforms, padding, whatever the wrappers do)
+  const frameEl=card.querySelector("svg.tc > rect"); // NOT the clipPath rect (defs come first, zero box)
+  if(!frameEl)return;
+  const fr=frameEl.getBoundingClientRect();
+  if(!fr.width)return;
+  snap.style.left=(fr.right-kr.left-2)+"px"; // flush: borders kiss
+  snap.style.top=(fr.top-kr.top)+"px";       // EXACT drawn top
+  snap.style.height=fr.height+"px";          // EXACT drawn length
+  snap.style.width=(fr.width/4)+"px";
 }
 function renderKitbag(){
   const el=$("#matchKitZone");if(!el)return;
