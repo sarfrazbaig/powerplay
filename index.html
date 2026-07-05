@@ -4886,8 +4886,8 @@
   .ring-svg{width:100%;height:100%;display:block}
   .ring-svg.ghost{opacity:.30;filter:saturate(.25)}
   .ring-sec path{transition:filter .18s ease,opacity .18s ease}
-  .ring-sec.sec-up path{filter:brightness(1.45) saturate(1.35) drop-shadow(0 0 8px rgba(255,255,255,.55))}
-  .ring-sec.sec-down path{opacity:.38}
+  .ring-svg.ghosting .ring-sec path{opacity:.82;stroke-dasharray:7 5}
+  .ring-svg.ghosting .ring-sec text{opacity:.85}
   .pv-badge{position:absolute;transform:translate(-50%,-50%);z-index:40;pointer-events:none;
     display:flex;align-items:center;gap:4px;background:#17211f;color:#fff6e3;border:2px solid #fff6e3;
     border-radius:99px;padding:2px 10px;font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:14px;
@@ -7187,8 +7187,8 @@ function selectCard(c,lock=false){
     // stat square on the selected card switches the attack lane.
     const subs=effSubs(c,"bowl");
     m.challengeStat=BOWL_KEYS.reduce((a,k)=>subs[k]>subs[a]?k:a,BOWL_KEYS[0]);
-    m.stripCache={};
   }
+  requestAnimationFrame(syncSelectionRing);
   if(lock)m.selectionLocked=true;
   SFX.play("click");
   render();
@@ -7201,9 +7201,10 @@ function confirmSelected(){
 function setChallengeLane(k){
   if(m.phase!=="bowl"||!m.selected||m.result)return;
   if(!BOWL_KEYS.includes(k)||m.challengeStat===k)return;
-  m.challengeStat=k;m.stripCache={};
+  m.challengeStat=k;
   SFX.play("tick");
   render();
+  requestAnimationFrame(syncSelectionRing);
 }
 function cancelSelected(){SFX.play("click");m.selected=null;m.preview=null;m.selectionLocked=false;render()}
 /* ============================================================
@@ -7440,74 +7441,77 @@ function renderHeatChip(){
   el.innerHTML=`<svg viewBox="0 0 24 24" class="hc-flame"><path d="M12 2 C13 7 17 8.5 17 13 a5 5 0 0 1 -10 0 c0 -2.4 1.2 -3.6 2.2 -5 .8 1.2 1.6 1.8 1.6 1.8 C10.4 7 11.6 4.6 12 2 Z"/></svg>
     ${heatBarHTML()}${st!=="cold"?`<b class="hc-state">${st==="fire"?"ON FIRE":"WARM"}</b>`:""}`;
 }
+/* morph the ring to the current selection state (or back to uniform) */
+function syncSelectionRing(){
+  if(!m||m.result)return;
+  const svg=ringSvgEl();if(!svg)return;
+  const cur=[...svg.querySelectorAll(".ring-sec")].map(g=>({tk:g.dataset.tk,frac:(+g.dataset.sweep||0)}));
+  const tot=cur.reduce((x,c)=>x+c.frac,0)||1;cur.forEach(c=>c.frac=c.frac/tot);
+  const target=(m.selected)?ringFracs(prePlayStrip(m.phase,m.selected).strip):GHOST_FRACS;
+  animateRing(fracMap(cur),target,{stagger:60,dur:340});
+  clearTimeout(m.__emberT);
+  m.__emberT=setTimeout(()=>{
+    const svg2=ringSvgEl();if(!svg2||!m.selected||m.result)return;
+    prePlayStrip(m.phase,m.selected).heatTks.forEach(t=>{
+      const g=svg2.querySelector(`.ring-sec[data-tk="${t}"]`);if(g)g.classList.add("sec-heat");
+    });
+  },420);
+}
 function clearStanceGhost(){
-  const svg=ringSvgEl();if(svg)svg.querySelectorAll(".ring-sec").forEach(g=>g.classList.remove("sec-up","sec-down"));
+  const svg=ringSvgEl();if(svg)svg.classList.remove("ghosting");
   document.querySelectorAll(".pv-badge").forEach(b=>b.remove());
+  if(m&&m.selected&&!m.result)syncSelectionRing();
 }
 function showStanceGhost(k){
-  clearStanceGhost();
   if(!m.selected||m.result||k===currentStance())return;
-  const d=stanceDeltaCounts(k);if(!d)return;
-  const svg=ringSvgEl(),wrap=document.querySelector(".av-ringwrap");
-  if(!svg||!wrap)return;
-  const wr=wrap.getBoundingClientRect();
-  Object.entries(d).forEach(([tk,dv])=>{
-    const g=svg.querySelector(`.ring-sec[data-tk="${tk}"]`);
-    if(g)g.classList.add(dv>0?"sec-up":"sec-down");
-    const badge=document.createElement("div");
-    badge.className="pv-badge "+(dv>0?"up":"down");
-    badge.innerHTML=`<b>${tk==="0"?"&#9679;":tk}</b> ${dv>0?"&#9650;":"&#9660;"}${Math.abs(dv)}`;
-    if(g){const r=g.getBoundingClientRect();
-      badge.style.left=(r.left+r.width/2-wr.left)+"px";badge.style.top=(r.top+r.height/2-wr.top)+"px";}
-    else{badge.style.left="50%";badge.style.top="12%";}
-    wrap.appendChild(badge);
-  });
+  const svg=ringSvgEl();if(!svg)return;
+  svg.classList.add("ghosting");
+  const was=m.stance;m.stance=k;
+  const target=ringFracs(prePlayStrip(m.phase,m.selected).strip);
+  m.stance=was;
+  const cur=[...svg.querySelectorAll(".ring-sec")].map(g=>({tk:g.dataset.tk,frac:(+g.dataset.sweep||0)}));
+  const tot=cur.reduce((x,c)=>x+c.frac,0)||1;cur.forEach(c=>c.frac=c.frac/tot);
+  animateRing(fracMap(cur),target,{stagger:50,dur:300});
 }
 function setStance(st){
   if(m.result)return;
   m.stance=st;
-  m.stripCache={};
+  ringSvgEl()?.classList.remove("ghosting");
   SFX.play("tick");
   // no preview means the wheel doesn't change — just move the highlight,
   // no rebuild (no flash) on the board
   document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
+  document.querySelectorAll(".stance-chip").forEach(b=>b.title=escSVG(stanceTip(b.dataset.stance)||STANCES[m.phase][b.dataset.stance].desc));
   const ex=document.getElementById("stanceExplain");if(ex)ex.textContent=STANCE_PLAIN[st]||"";
+  requestAnimationFrame(syncSelectionRing); // the wheel morphs to the confirmed stance
   if(typeof TUT!=="undefined")TUT.notify("stance");
 }
 /* The full modifier chain, captured as BEATS at roll time — the resolve
    replays these exact strips one by one, so the theater IS the truth.
    Order mirrors applyMatchModifiers: stance -> trait -> coaches -> tool. */
+/* PRE-PLAY strip: everything the player owns at selection time — the duel
+   base, the stance, the card's trait and the current heat — built ONCE per
+   (card, lane, stance) and cached, so the wheel the player builds while
+   selecting is EXACTLY the wheel that spins. Coaches/tools are the only
+   resolve-time edits (they get their beats). */
+function prePlayStrip(mode,card){
+  m.stripCache=m.stripCache||{};
+  const key="pre:"+mode+":"+card.id+":"+(m.challengeStat||"")+":"+currentStance()+":"+(m.freeHit?1:0);
+  if(m.stripCache[key])return m.stripCache[key];
+  let sBase=outcomeStrip(mode,card,m.challenge);
+  let sStance=applyStance(mode,sBase.slice(),card);
+  let sTrait=applyCardStripTrait(mode,sStance.slice(),card);
+  const preHeat=sTrait.slice();
+  const sHot=applyMomentum(mode,sTrait.slice());
+  const cnt=a=>a.reduce((o,t)=>(o[t]=(o[t]||0)+1,o),{});
+  const c1=cnt(preHeat),c2=cnt(sHot),heatTks=[];
+  new Set([...Object.keys(c1),...Object.keys(c2)]).forEach(t=>{if((c1[t]||0)!==(c2[t]||0))heatTks.push(t)});
+  return m.stripCache[key]={strip:sHot,heatTks,traitFired:sTrait.join("|")!==sStance.join("|")&&!!card.trait};
+}
 function stripChain(mode,card){
+  const pre=prePlayStrip(mode,card);
+  let s=pre.strip.slice();
   const beats=[];
-  const myName=card.name.split(" ").pop().toUpperCase();
-  const rivalName=m.challenge.name.split(" ").pop().toUpperCase();
-  // The TRUE contested base (both cards paired) — the modifier chain builds on this.
-  let s=outcomeStrip(mode,card,m.challenge);
-  if(mode==="bowl"){
-    // ACT 1 — YOUR DELIVERY. You are the bowler: your ball shapes the even
-    // field first (your bowling vs a nobody batter), then...
-    const delivery=outcomeStrip("bowl",card,NEUTRAL_CARD);
-    beats.push({label:myName,note:"bangs the ball in",strip:delivery.slice(),kind:"delivery"});
-    // ACT 2 — THE RIVAL BATSMAN READS IT and drags the field toward the real
-    // contest. This second act is the batsman's answer to your delivery.
-    beats.push({label:rivalName,note:"reads it, counters",strip:s.slice(),kind:"react"});
-  }else{
-    // BATTING: the rival bowler's delivery ALREADY shaped the field (m.theirShape).
-    // Your shot is the answer — it's the first thing that moves the field.
-    beats.push({label:myName,note:"plays the shot",strip:s.slice(),kind:"card"});
-  }
-  const st=currentStance();
-  const s2=applyStance(mode,s,card);
-  if(s2.join("|")!==s.join("|")){
-    const sd=STANCES[mode][st];
-    beats.push({label:sd.label,note:sd.note,strip:s2.slice(),kind:"stance"});
-  }
-  s=s2;
-  const s3=applyCardStripTrait(mode,s,card);
-  if(s3.join("|")!==s.join("|")&&card.trait){
-    beats.push({label:card.trait.name.toUpperCase(),note:"the trait kicks in",strip:s3.slice(),kind:"trait"});
-  }
-  s=s3;
   const x=ctx();
   activeCoaches().forEach(co=>{
     let cs=co.strip?co.strip(mode,s.slice(),x,card):s.slice();
@@ -7523,13 +7527,7 @@ function stripChain(mode,card){
     beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
   }
   s=s4;
-  // MOMENTUM applies last — when you're hot, the heat reshapes the field.
-  const s5=applyMomentum(mode,s);
-  if(s5.join("|")!==s.join("|")){
-    const st=momentumState();
-    beats.push({label:st==="fire"?"🔥 ON FIRE":"⚡ MOMENTUM",note:st==="fire"?"the heat takes over":"the streak pays off",strip:s5.slice(),kind:"momentum"});
-  }
-  return {final:s5,beats};
+  return {final:s,beats,preStrip:pre.strip,heatTks:pre.heatTks};
 }
 // armed strip consumables burn only on a legal delivery
 function consumeArmed(mode){
@@ -7588,7 +7586,7 @@ function resolveBowl(c){
   ballPay("bowl",out,c);
   updateMomentum("bowl",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats,preStrip:chain.preStrip,heatTks:chain.heatTks};
   m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
     :`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -7616,7 +7614,7 @@ function resolveBat(c){
   ballPay("bat",out,c);
   updateMomentum("bat",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats,preStrip:chain.preStrip,heatTks:chain.heatTks};
   m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
     :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -8756,12 +8754,15 @@ function enterResolve(){
 function startResolveSequence(){
   clearSpin();
   const res=m.result;
-  // make sure the wheel currently shows THEIR shape (where the story starts)
-  paintRing(ringSvgEl(),m.theirShape||GHOST_FRACS);
+  // the wheel ALREADY shows what the player built (base+stance+trait+heat).
+  // Resolve only adds the build's surprises: coach calls and kit tools.
+  const preFracs=ringFracs(res.preStrip||res.strip);
+  paintRing(ringSvgEl(),preFracs);
+  emberMarkHeatSlots(res);
   const beats=res.beats||[];
   const needle=$("#ringNeedle");
   if(needle){needle.style.transition="none";needle.classList.add("spinning")}
-  let t=380,prev=m.theirShape||GHOST_FRACS;
+  let t=380,prev=preFracs;
   beats.forEach(b=>{
     const shape=ringFracs(b.strip),pv=prev;
     const changes=RING_ORDER.filter(tk=>Math.abs((fracMap(pv)[tk]||0)-(fracMap(shape)[tk]||0))>0.004).length;
@@ -8894,17 +8895,11 @@ function showHeatMoment(){
 /* Ember edges: mark the sectors whose slots the MOMENTUM beat changed, so
    the player SEES what the heat did to the wheel this ball. */
 function emberMarkHeatSlots(res){
-  const beats=res&&res.beats;if(!beats)return;
-  const mi=beats.findIndex(b=>b.kind==="momentum");
-  if(mi<1)return;
-  const count=a=>a.reduce((o,t)=>(o[t]=(o[t]||0)+1,o),{});
-  const a=count(beats[mi-1].strip),b=count(beats[mi].strip);
+  const tks=res&&res.heatTks;if(!tks||!tks.length)return;
   const svg=ringSvgEl();if(!svg)return;
-  new Set([...Object.keys(a),...Object.keys(b)]).forEach(t=>{
-    if((b[t]||0)!==(a[t]||0)){
-      const g=svg.querySelector(`.ring-sec[data-tk="${t}"]`);
-      if(g)g.classList.add("sec-heat");
-    }
+  tks.forEach(t=>{
+    const g=svg.querySelector(`.ring-sec[data-tk="${t}"]`);
+    if(g)g.classList.add("sec-heat");
   });
 }
 /* Beat two of the settle: "+$N" slams in under the outcome word, hangs a
@@ -9004,9 +8999,9 @@ function renderDuel(pop=false){
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
   const deal=challengeAnim;challengeAnim=false;
   const danger=!m.result&&dangerRead()==="danger";
-  // the field ALWAYS shows their shape pre-play (public info — their card
-  // is face-up). YOUR answer is what stays a gamble until the ball flies.
-  const idleFracs=m.introPending?GHOST_FRACS:(m.theirShape||GHOST_FRACS);
+  // WHEEL STATES: idle = uniform sectors; a selected card cuts the wheel to
+  // the real built odds (stance/trait/heat included) and it STAYS.
+  const idleFracs=(m.selected&&!m.result)?ringFracs(prePlayStrip(m.phase,m.selected).strip):GHOST_FRACS;
   const ringHTML=m.result
     ?fieldRingSVG(null,{fracs:m.result.state==="settled"?ringFracs(m.result.strip):(m.theirShape||GHOST_FRACS)})
     :fieldRingSVG(null,{fracs:idleFracs});
@@ -9046,7 +9041,7 @@ function renderDuel(pop=false){
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
   d.querySelectorAll("[data-stance]").forEach(b=>{
-    b.onclick=e=>{e.stopPropagation();clearStanceGhost();setStance(b.dataset.stance)};
+    b.onclick=e=>{e.stopPropagation();ringSvgEl()?.classList.remove("ghosting");setStance(b.dataset.stance)};
     b.onmouseenter=()=>showStanceGhost(b.dataset.stance);
     b.onmouseleave=clearStanceGhost;
   });
@@ -9086,8 +9081,7 @@ function renderDuel(pop=false){
       if(n)n.style.transform=`rotate(${m.result.needleAt??el.dataset.mid}deg)`;
     }
   }else if(!m.result&&m.introPending){
-    m.introPending=false;
-    playBallIntro();
+    m.introPending=false; // state 1: the wheel idles uniform — no intro morph
   }
   // the picked card SLIDES from your hand to the crease (FLIP)
   if(m.__dealFrom&&m.selected&&!m.result){
