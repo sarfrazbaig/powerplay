@@ -5191,6 +5191,33 @@
     font-size:15px;cursor:pointer;color:#b9b2a2;transition:transform .12s}
   .sb-fav:hover{transform:scale(1.15)}
   .sb-fav.on{color:#f0a500;box-shadow:0 0 10px rgba(255,201,60,.65)}
+  /* title: emblem wheel is unlabelled; menu column; corners for lang/socials */
+  #heroMark .ring-sec text{display:none}
+  .hero-menu{display:flex;flex-direction:column;gap:12px;align-items:center}
+  .hero-menu .btn.xl{min-width:280px}
+  .title-lang{position:absolute;top:18px;right:18px;z-index:8;width:46px;height:46px;border-radius:50%;
+    background:#fff6e3;border:3px solid var(--ink);box-shadow:3px 3px 0 rgba(23,33,31,.4);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;padding:9px;transition:transform .12s}
+  .title-lang:hover{transform:scale(1.08)}
+  .title-socials{position:absolute;bottom:16px;right:18px;z-index:8;display:flex;gap:10px}
+  .title-socials button{width:42px;height:42px;border-radius:12px;background:#fff6e3;border:3px solid var(--ink);
+    box-shadow:3px 3px 0 rgba(23,33,31,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:8px;transition:transform .12s}
+  .title-socials button:hover{transform:translateY(-4px)}
+  .collection-overlay{position:fixed;inset:0;background:rgba(23,33,31,.55);z-index:60;display:none;
+    align-items:center;justify-content:center}
+  .collection-overlay.show{display:flex}
+  .collection-panel{width:min(92vw,760px);max-height:86vh;overflow-y:auto;background:#fff6e3;
+    border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(23,33,31,.45);padding:18px 22px}
+  .collection-panel .col-sub{font-size:13px;color:#7a6a4a;font-weight:700}
+  .col-item{display:flex;align-items:center;gap:14px;padding:12px 10px;border-bottom:2px solid rgba(23,33,31,.1)}
+  .col-item:last-child{border-bottom:0}
+  .col-item .ci-badge{width:44px;height:44px;border-radius:50%;flex:0 0 44px;display:flex;align-items:center;justify-content:center;
+    font-size:20px;background:var(--gold);border:2.5px solid var(--ink)}
+  .col-item.locked .ci-badge{background:#d8d2c2;filter:grayscale(1)}
+  .col-item.locked{opacity:.6}
+  .col-item b{font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.4px;font-size:16px}
+  .col-item small{display:block;font-weight:700;color:#7a6a4a;font-size:12px}
   .sb-layout{display:flex;gap:18px;align-items:flex-start;min-height:0}
   .sb-side{flex:0 0 218px;position:sticky;top:0;display:flex;flex-direction:column;gap:14px;
     background:rgba(255,253,244,.96);border:2px solid rgba(23,33,31,.12);border-radius:14px;padding:12px}
@@ -5776,29 +5803,51 @@
         <!-- the maidan ground -->
         <path d="M0 720 Q 720 660 1440 720 V 900 H0 Z" fill="#6fae3a" opacity=".55"/>
         <path d="M0 760 Q 720 706 1440 760 V 900 H0 Z" fill="#5c9a2e" opacity=".5"/>
-        <!-- street cricket silhouettes -->
-        <g fill="#17211f" opacity=".82">
-          <!-- stumps -->
-          <g transform="translate(720 690)"><rect x="-2" y="0" width="4" height="60"/><rect x="-12" y="0" width="4" height="60"/><rect x="8" y="0" width="4" height="60"/><rect x="-14" y="-4" width="30" height="4"/></g>
-          <!-- batsman -->
-          <g transform="translate(600 660)"><circle cx="0" cy="-6" r="15"/><path d="M-10 6 h20 l6 60 h-32 Z"/><path d="M8 12 l40 -34 l10 8 l-42 40 Z"/><rect x="46" y="-34" width="10" height="46" rx="4"/><rect x="-12" y="64" width="9" height="40"/><rect x="4" y="64" width="9" height="40"/></g>
-          <!-- bowler running in -->
-          <g transform="translate(900 656)"><circle cx="0" cy="-6" r="15"/><path d="M-9 6 h18 l4 56 h-26 Z"/><path d="M-4 14 l-34 -26 l-9 9 l32 30 Z"/><path d="M6 62 l26 34 l-11 7 l-25 -33 Z"/><path d="M-6 62 l-24 30 l11 8 l24 -32 Z"/><circle cx="-44" cy="-20" r="7"/></g>
+        <!-- THE PITCH on the maidan, with the game's own silhouettes -->
+        <g class="ts-pitch">
+          <rect x="100" y="780" width="360" height="58" rx="12" fill="#e8d5a8" stroke="#d9c28c" stroke-width="3"/>
+          <rect x="128" y="787" width="3" height="44" fill="#fffdf4" opacity=".8"/>
+          <rect x="429" y="787" width="3" height="44" fill="#fffdf4" opacity=".8"/>
+          <g fill="#17211f"><rect x="138" y="752" width="4" height="30"/><rect x="146" y="752" width="4" height="30"/><rect x="154" y="752" width="4" height="30"/></g>
+          <g fill="#17211f"><rect x="402" y="752" width="4" height="30"/><rect x="410" y="752" width="4" height="30"/><rect x="418" y="752" width="4" height="30"/></g>
         </g>
-        <!-- a ball in the air -->
-        <circle class="ts-ball" cx="770" cy="600" r="9" fill="#ff4155" stroke="#17211f" stroke-width="2"/>
+        <filter id="tsSil" x="-14%" y="-14%" width="128%" height="128%">
+          <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="fat"/>
+          <feFlood flood-color="#fff6e3" result="rimc"/>
+          <feComposite in="rimc" in2="fat" operator="in" result="rim"/>
+          <feFlood flood-color="#17211f" result="bodyc"/>
+          <feComposite in="bodyc" in2="SourceAlpha" operator="in" result="body"/>
+          <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
+        </filter>
+        <image href="assets/players/bat3.png" x="30" y="620" width="185" height="185" preserveAspectRatio="xMidYMax meet" filter="url(#tsSil)"/>
+        <image href="assets/players/bowl3.png" x="385" y="620" width="185" height="185" preserveAspectRatio="xMidYMax meet" filter="url(#tsSil)" transform="translate(955 0) scale(-1 1)"/>
       </svg>
     </div>
     <div class="hero">
       <div class="hero-mark" id="heroMark"></div>
       <h1 class="hero-logo">POWER<span>PLAY</span></h1>
       <div class="hero-hook">Build your street XI &middot; spin the field &middot; lift the cup.</div>
-      <div class="hero-cta">
+      <div class="hero-cta hero-menu">
         <button class="btn xl" id="startBtn">PLAY</button>
-        <button class="btn secondary xl" id="continueBtn" style="display:none">Continue Run</button>
+        <button class="btn secondary xl" id="continueBtn" style="display:none">CONTINUE</button>
+        <button class="btn secondary xl" id="collectionBtn">COLLECTION</button>
+        <button class="btn secondary xl" id="quitBtn">QUIT</button>
       </div>
       <div class="pill-row hero-stats" id="titleStats"></div>
-      <div class="unlock-track" id="unlockTrack"></div>
+    </div>
+    <button class="title-lang" id="langBtn" title="Language — coming soon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#17211f" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+    </button>
+    <div class="title-socials" id="titleSocials">
+      <button data-social="discord" title="Discord — link coming soon"><svg viewBox="0 0 24 24" fill="#17211f"><path d="M19 5.5A16 16 0 0 0 15.2 4l-.5 1a13 13 0 0 0-5.4 0L8.8 4A16 16 0 0 0 5 5.5C2.6 9 2 12.4 2.3 15.8A16 16 0 0 0 7 18l1-1.6a10 10 0 0 1-1.6-.8l.4-.3a11.4 11.4 0 0 0 10.4 0l.4.3c-.5.3-1 .6-1.6.8L17 18a16 16 0 0 0 4.7-2.2c.4-4-.6-7.3-2.7-10.3ZM9.3 13.7c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm5.4 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z"/></svg></button>
+      <button data-social="x" title="X — link coming soon"><svg viewBox="0 0 24 24" fill="#17211f"><path d="M17.7 3H21l-7.1 8.1L22 21h-6.7l-4.7-6.1L5.2 21H2l7.6-8.7L2.3 3H9l4.2 5.6L17.7 3Zm-1.2 16h1.8L7.1 4.9H5.2L16.5 19Z"/></svg></button>
+      <button data-social="youtube" title="YouTube — link coming soon"><svg viewBox="0 0 24 24" fill="#17211f"><path d="M22 12s0-3.3-.4-4.9a2.6 2.6 0 0 0-1.8-1.8C18.2 4.9 12 4.9 12 4.9s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7C2 8.7 2 12 2 12s0 3.3.4 4.9c.2.9.9 1.6 1.8 1.8 1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8c.4-1.6.4-4.9.4-4.9ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg></button>
+    </div>
+    <div class="collection-overlay" id="collectionOverlay">
+      <div class="collection-panel">
+        <div class="scout-head"><h3>Collection <span class="col-sub">— unlocks you've earned and the road ahead</span></h3><button class="btn secondary sm" id="closeCollection">Close</button></div>
+        <div id="collectionBody"></div>
+      </div>
     </div>
   </section>
 
@@ -10230,7 +10279,6 @@ function renderUnlockTrack(){
 function renderTitle(){
   const hm=$("#heroMark");if(hm)hm.innerHTML=fieldRingSVG(null,{fracs:["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}))}); // the LOGO stays the clean six
   $("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`;
-  renderUnlockTrack();
   const cb=$("#continueBtn"),sv=savedRun();
   if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run · Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
 }
@@ -10244,6 +10292,22 @@ function enterFS(){const d=document.documentElement;if(!document.fullscreenEleme
 function toggleFS(){if(document.fullscreenElement)document.exitFullscreen();else enterFS()}
 const _fsBtn=$("#fsBtn");if(_fsBtn)_fsBtn.onclick=toggleFS;
 $("#startBtn").onclick=()=>{enterFS();startRun()};
+function renderCollection(){
+  const body=$("#collectionBody");if(!body)return;
+  body.innerHTML=UNLOCKS.map(u=>{
+    const got=u.need(save);
+    return `<div class="col-item ${got?"":"locked"}">
+      <div class="ci-badge">${u.icon}</div>
+      <div><b>${u.name}</b><small>${got?u.desc:u.progress(save)+" — "+u.desc}</small></div>
+    </div>`;
+  }).join("");
+}
+$("#collectionBtn").onclick=()=>{SFX.play("nav");renderCollection();$("#collectionOverlay").classList.add("show")};
+$("#closeCollection").onclick=()=>{SFX.play("click");$("#collectionOverlay").classList.remove("show")};
+$("#collectionOverlay").onclick=e=>{if(e.target.id==="collectionOverlay")$("#collectionOverlay").classList.remove("show")};
+$("#quitBtn").onclick=()=>{SFX.play("click");window.close();setTimeout(()=>flashHint("Close the tab to quit — thanks for playing!"),120)};
+$("#langBtn").onclick=()=>flashHint("Language options — coming soon.");
+document.querySelectorAll("#titleSocials button").forEach(b=>b.onclick=()=>flashHint("Community links coming soon — stay tuned!"));
 $("#continueBtn").onclick=()=>{enterFS();continueRun()};
 $("#introGo").onclick=startFirstMatch;
 $("#restartBtn").onclick=()=>startRun();
