@@ -7188,7 +7188,10 @@ function selectCard(c,lock=false){
     const subs=effSubs(c,"bowl");
     m.challengeStat=BOWL_KEYS.reduce((a,k)=>subs[k]>subs[a]?k:a,BOWL_KEYS[0]);
   }
-  requestAnimationFrame(syncSelectionRing);
+  // a beat: the card slides to the crease first, THEN the wheel answers it
+  m.__ringPending=true;
+  clearTimeout(m.__ringBeat);
+  m.__ringBeat=setTimeout(()=>{m.__ringPending=false;syncSelectionRing()},430);
   if(lock)m.selectionLocked=true;
   SFX.play("click");
   render();
@@ -7206,7 +7209,8 @@ function setChallengeLane(k){
   render();
   requestAnimationFrame(syncSelectionRing);
 }
-function cancelSelected(){SFX.play("click");m.selected=null;m.preview=null;m.selectionLocked=false;render()}
+function cancelSelected(){
+  clearTimeout(m&&m.__ringBeat);if(m)m.__ringPending=false;SFX.play("click");m.selected=null;m.preview=null;m.selectionLocked=false;render()}
 /* ============================================================
    CONTINUOUS PROBABILITY ENGINE
    Four sub-stat pairings shape the outcome weights via logistic
@@ -7513,6 +7517,13 @@ function stripChain(mode,card){
   let s=pre.strip.slice();
   const beats=[];
   const x=ctx();
+  // the user's resolve order: the KIT TOOL reshapes first, then the coaches
+  const s4=applyOwnedConsumableStrip(mode,s);
+  if(s4.join("|")!==s.join("|")){
+    const owned=nextConsumable(mode);
+    beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
+  }
+  s=s4;
   activeCoaches().forEach(co=>{
     let cs=co.strip?co.strip(mode,s.slice(),x,card):s.slice();
     if(co.edition==="holographic"||co.edition==="polychrome")cs=replaceBadSlot(cs,mode,"0");
@@ -7521,12 +7532,6 @@ function stripChain(mode,card){
     }
     s=cs;
   });
-  const s4=applyOwnedConsumableStrip(mode,s);
-  if(s4.join("|")!==s.join("|")){
-    const owned=nextConsumable(mode);
-    beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
-  }
-  s=s4;
   return {final:s,beats,preStrip:pre.strip,heatTks:pre.heatTks};
 }
 // armed strip consumables burn only on a legal delivery
@@ -8612,7 +8617,7 @@ function fieldRingSVG(strip,opts={}){
     ${secs}
   </svg>`;
 }
-const GHOST_FRACS=["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}));
+const GHOST_FRACS=[...["W","0","1","2","4","6"].map(t=>({tk:t,frac:0.93/6})),{tk:"WD",frac:0.045},{tk:"NB",frac:0.025}];
 /* ---------- IN-PLACE wheel painting: mutate the existing SVG nodes,
    never rebuild. One sector = one stable <g>; animation just moves the
    path d + label. This kills the per-frame DOM thrash that made sectors
@@ -9001,7 +9006,7 @@ function renderDuel(pop=false){
   const danger=!m.result&&dangerRead()==="danger";
   // WHEEL STATES: idle = uniform sectors; a selected card cuts the wheel to
   // the real built odds (stance/trait/heat included) and it STAYS.
-  const idleFracs=(m.selected&&!m.result)?ringFracs(prePlayStrip(m.phase,m.selected).strip):GHOST_FRACS;
+  const idleFracs=(m.selected&&!m.result&&!m.__ringPending)?ringFracs(prePlayStrip(m.phase,m.selected).strip):GHOST_FRACS;
   const ringHTML=m.result
     ?fieldRingSVG(null,{fracs:m.result.state==="settled"?ringFracs(m.result.strip):(m.theirShape||GHOST_FRACS)})
     :fieldRingSVG(null,{fracs:idleFracs});
