@@ -9190,7 +9190,7 @@ function positionSnapSlot(){
   const kr=col.getBoundingClientRect();
   // no viewBox math — measure the DRAWN frame rect itself (immune to
   // letterboxing, transforms, padding, whatever the wrappers do)
-  const frameEl=card.querySelector("svg.tc > rect"); // NOT the clipPath rect (defs come first, zero box)
+  const frameEl=card.querySelectorAll("svg.tc > rect")[1]||card.querySelector("svg.tc > rect"); // the INK-BORDERED inner rect = the card the eye sees
   if(!frameEl)return;
   const fr=frameEl.getBoundingClientRect();
   if(!fr.width)return;
