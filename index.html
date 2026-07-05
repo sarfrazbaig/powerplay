@@ -4459,6 +4459,28 @@
     50%{transform:scale(1.1);filter:drop-shadow(0 0 12px rgba(255,178,20,.9))}}
   .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
   /* the payout stamp: gold +$N under the outcome word, then flies to the purse */
+  .heat-chip{position:absolute;top:1.5%;left:50%;transform:translateX(-50%);z-index:30;
+    display:flex;align-items:center;gap:7px;background:#fff6e3;border:2.5px solid var(--ink);
+    border-radius:99px;padding:3px 12px;pointer-events:auto;cursor:help;transition:box-shadow .3s}
+  .heat-chip .hc-flame{width:17px;height:17px;fill:#b9b2a2}
+  .heat-chip.heat-warm .hc-flame{fill:#ff8a2b}
+  .heat-chip.heat-fire .hc-flame{fill:#ff4d1c;filter:drop-shadow(0 0 4px rgba(255,77,28,.8));animation:heatFlick .55s ease-in-out infinite alternate}
+  .heat-chip.heat-fire{box-shadow:0 0 16px rgba(255,77,28,.65)}
+  .heat-chip .hc-state{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;color:#ff4d1c;letter-spacing:.5px}
+  .heat-chip.heat-warm .hc-state{color:#ff8a2b}
+  .heat-chip .heat-bar{display:flex;gap:3px}
+  .heat-chip .heat-bar i{width:11px;height:11px;border-radius:3px;background:rgba(23,33,31,.14);border:1.5px solid rgba(23,33,31,.25)}
+  .heat-chip .heat-bar i.on{background:#ffb03a;border-color:#17211f}
+  .heat-chip.heat-warm .heat-bar i.on{background:#ff8a2b}
+  .heat-chip.heat-fire .heat-bar i.on{background:#ff4d1c;box-shadow:0 0 5px rgba(255,77,28,.85)}
+  .ring-sec.sec-heat path{stroke:#ff7a1c;stroke-width:4.5;filter:drop-shadow(0 0 7px rgba(255,110,20,.75))}
+  .state-pop{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);z-index:42;pointer-events:none;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:34px;letter-spacing:1px;
+    padding:6px 22px;border-radius:99px;border:3px solid var(--ink);
+    box-shadow:0 5px 0 rgba(23,33,31,.4);animation:payIn .3s cubic-bezier(.2,1.6,.4,1) both,statePopOut .35s ease 1.25s forwards}
+  .state-pop.sp-fire{background:#ff4d1c;color:#fff6e3;text-shadow:0 2px 0 rgba(23,33,31,.5);box-shadow:0 5px 0 rgba(23,33,31,.4),0 0 30px rgba(255,77,28,.8)}
+  .state-pop.sp-lost{background:#5c6b66;color:#fff6e3}
+  @keyframes statePopOut{to{opacity:0;transform:translate(-50%,-80%) scale(.8)}}
   .pay-pop{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:41;pointer-events:none;
     display:flex;align-items:center;gap:8px;background:#fff6e3;border:3px solid var(--ink);border-radius:99px;
     padding:5px 18px;box-shadow:0 5px 0 rgba(23,33,31,.4),0 0 26px rgba(255,201,60,.65);
@@ -4863,7 +4885,17 @@
   }
   .ring-svg{width:100%;height:100%;display:block}
   .ring-svg.ghost{opacity:.30;filter:saturate(.25)}
-  .ring-sec path{transition:filter .18s ease}
+  .ring-sec path{transition:filter .18s ease,opacity .18s ease}
+  .ring-sec.sec-up path{filter:brightness(1.45) saturate(1.35) drop-shadow(0 0 8px rgba(255,255,255,.55))}
+  .ring-sec.sec-down path{opacity:.38}
+  .pv-badge{position:absolute;transform:translate(-50%,-50%);z-index:40;pointer-events:none;
+    display:flex;align-items:center;gap:4px;background:#17211f;color:#fff6e3;border:2px solid #fff6e3;
+    border-radius:99px;padding:2px 10px;font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:14px;
+    animation:pvIn .18s ease both}
+  .pv-badge b{font-family:Anton,Impact,sans-serif;font-style:italic}
+  .pv-badge.up{background:#1f9b53}
+  .pv-badge.down{background:#5c6b66;opacity:.92}
+  @keyframes pvIn{from{transform:translate(-50%,-50%) scale(.6);opacity:0}}
   .ring-sec.lit path{filter:brightness(1.9) saturate(1.2)}
   .ring-sec.landed path{
     stroke:#17211f;stroke-width:5;
@@ -6864,16 +6896,34 @@ function applyOwnedConsumableStrip(mode,strip){
    who ignores stances plays exactly the old game. */
 const STANCES={
   bat:{
-    def:{label:"DEFEND",icon:"&#128737;",rule:"W&#9660;&#9660; &nbsp;6&#9660;",desc:"Bat for survival: wicket slots melt away (Technique-powered), big shots dampen.",note:"drops the anchor — the W zone melts"},
-    push:{label:"PUSH",icon:"&#127939;",rule:"balanced",desc:"Play it straight: the natural matchup, nothing risked, nothing forced.",note:"plays it straight"},
-    atk:{label:"ATTACK",icon:"&#128165;",rule:"4/6&#9650;&#9650; &nbsp;W&#9650;",desc:"Swing hard: boundary zones swell (Power-powered) but the wicket zone grows too.",note:"opens the shoulders — boundary zones swell"}
+    def:{label:"DEFEND",icon:"&#128737;",rule:"W&#9660;&#9660; &nbsp;6&#9660;",desc:"Block it out: the W zone shrinks to a third — but boundary zones nearly vanish too. Survival, not scoring.",note:"drops the anchor — the W zone melts"},
+    push:{label:"PUSH",icon:"&#127939;",rule:"balanced",desc:"Play it straight: the pure matchup, exactly as the numbers fall.",note:"plays it straight"},
+    atk:{label:"ATTACK",icon:"&#128165;",rule:"4/6&#9650;&#9650; &nbsp;W&#9650;",desc:"Swing hard: boundary zones double — and so does the W zone. The crowd pays for attack boundaries.",note:"opens the shoulders — boundary zones swell"}
   },
   bowl:{
-    atk:{label:"ATTACK",icon:"&#127919;",rule:"W&#9650;&#9650; &nbsp;4&#9650;",desc:"Hunt the stumps: wicket slots grow (Pace/Movement-powered) but loose balls leak runs.",note:"charges in — the W zone grows"},
-    line:{label:"LINE",icon:"&#9878;",rule:"balanced",desc:"Bowl the natural line: the pure matchup.",note:"holds the line"},
-    bait:{label:"BAIT",icon:"&#129702;",rule:"6&#9650; &nbsp;W&#9650;&#9650;",desc:"Toss it up: gift a big-shot slot to buy wicket slots (Deception-powered). A trap.",note:"tosses it up — the trap is set"}
+    atk:{label:"ATTACK",icon:"&#127919;",rule:"W&#9650;&#9650; &nbsp;4&#9650;",desc:"",note:"charges in — the W zone grows"},
+    line:{label:"LINE",icon:"&#9878;",rule:"balanced",desc:"Bowl the natural line: the pure matchup, exactly as the numbers fall.",note:"holds the line"},
+    bait:{label:"BAIT",icon:"&#129702;",rule:"6&#9650; &nbsp;W&#9650;&#9650;",desc:"",note:"tosses it up — the trap is set"}
   }
 };
+/* honest, COMPUTED stance tips — the numbers are the ones applyStance will
+   actually use for the selected bowler (thresholds included). */
+function stanceTip(k){
+  const st=STANCES[m.phase][k];
+  if(st.desc)return st.desc;
+  const c=m.selected;if(!c)return "";
+  const subs=effSubs(c,"bowl");
+  const thr=rivalAnchorAt(run?.match||0)+6;
+  if(k==="atk"){
+    const v=Math.round((subs.movement+subs.pace)/2), n=v>=thr?2:1;
+    return "Hunt the stumps: "+n+" scoring slot"+(n>1?"s become":" becomes")+" W — powered by pace+movement (yours: "+v+(n>1?", max power":", reach "+thr+" for 2 slots")+"). One dot leaks into a 4.";
+  }
+  if(k==="bait"){
+    const v=Math.round(subs.deception), n=v>=thr?2:1;
+    return "Toss it up: gift him a 6-slot to convert "+n+" scoring slot"+(n>1?"s":"")+" into W — powered by deception (yours: "+v+(n>1?", max power":", reach "+thr+" for 2 slots")+"). A trap.";
+  }
+  return "";
+}
 function stanceDefault(){return m.phase==="bat"?"push":"line"}
 function currentStance(){return m.stance||stanceDefault()}
 // replace `from` tokens with `to`, up to n slots, scanning from the end
@@ -6934,7 +6984,9 @@ function applyMomentum(mode,strip){
 function updateMomentum(mode,out){
   if(out.extra)return;               // extras don't move the heat
   const bank=activeCoaches().some(c=>c.heatBank);     // Slow Burn: a break only HALVES the heat
-  const brk=()=>{m.momentum=bank?Math.floor((m.momentum||0)/2):0};
+  const preN=m.momentum||0;
+  m.justBroke=false;
+  const brk=()=>{m.justBroke=preN>=MOM_WARM;m.momentum=bank?Math.floor(preN/2):0};
   const wasFire=momentumState()==="fire";
   // a "good" ball for YOU: a boundary batting / a dot or wicket bowling
   const good=mode==="bat"?out.runs>=4:(out.wicket||out.runs===0);
@@ -7335,6 +7387,81 @@ function getStripFor(mode,card){
   const key=mode+":"+card.id+":"+currentStance();
   if(!m.stripCache[key])m.stripCache[key]=applyMatchModifiers(mode,outcomeStrip(mode,card,m.challenge),card);
   return m.stripCache[key];
+}
+/* STANCE PREVIEW: hovering a chip marks, on the live ring, exactly which
+   zones that stance would grow (bright + badge) or shrink (dim). Counts are
+   the deterministic stance-edit deltas — no spoiling of the staged resolve. */
+function stanceDeltaCounts(k){
+  const c=m.selected;if(!c)return null;
+  const count=a=>a.reduce((o,t)=>(o[t]=(o[t]||0)+1,o),{});
+  if(m.phase==="bowl"){
+    const key="pv:base:"+c.id+":"+(m.challengeStat||"");
+    m.stripCache=m.stripCache||{};
+    if(!m.stripCache[key])m.stripCache[key]=outcomeStrip("bowl",c,m.challenge);
+    const base=m.stripCache[key];
+    const was=m.stance;m.stance=k;
+    const edited=applyStance("bowl",base.slice(),c);
+    m.stance=was;
+    const a=count(base),b=count(edited),d={};
+    new Set([...Object.keys(a),...Object.keys(b)]).forEach(t=>{const dv=(b[t]||0)-(a[t]||0);if(dv)d[t]=dv});
+    return d;
+  }
+  // batting: stances shift the WEIGHTS — compare expected 12-slot quotas
+  const quota=st=>{
+    const {diff}=duelStats("bat",c,m.challenge);
+    const w=duelWeights(diff,st),tks=Object.keys(w),tot=tks.reduce((x,t)=>x+w[t],0);
+    const q=tks.map(t=>({t,q:w[t]/tot*12})),out={};
+    q.forEach(({t,q:v})=>out[t]=Math.floor(v));
+    q.sort((x,y)=>(y.q-Math.floor(y.q))-(x.q-Math.floor(x.q)));
+    let left=12-Object.values(out).reduce((x,v)=>x+v,0),i=0;
+    while(left>0){out[q[i%q.length].t]++;left--;i++}
+    return out;
+  };
+  const a=quota(currentStance()),b=quota(k),d={};
+  new Set([...Object.keys(a),...Object.keys(b)]).forEach(t=>{const dv=(b[t]||0)-(a[t]||0);if(dv)d[t]=dv});
+  return d;
+}
+/* THE HEAT WEARS THE WHEEL: a flame chip at the ring's crown shows the
+   momentum meter where the eyes already live; its tooltip is the one-line
+   rule for the current innings. */
+function heatChipTitle(){
+  const base=m.phase==="bat"
+    ?"MOMENTUM - boundaries build it, a dot cools it, a wicket kills it."
+    :"PRESSURE - dots & wickets build it, a boundary conceded kills it.";
+  return base+" WARM = 1 wheel slot upgrades in your favour. ON FIRE = 2.";
+}
+function renderHeatChip(){
+  const wrap=document.querySelector("#match .av-ringwrap");if(!wrap)return;
+  let el=wrap.querySelector("#heatChip");
+  if(!el){el=document.createElement("div");el.id="heatChip";wrap.appendChild(el);}
+  const st=momentumState()||"cold";
+  el.className="heat-chip heat-"+st;
+  el.title=heatChipTitle();
+  el.innerHTML=`<svg viewBox="0 0 24 24" class="hc-flame"><path d="M12 2 C13 7 17 8.5 17 13 a5 5 0 0 1 -10 0 c0 -2.4 1.2 -3.6 2.2 -5 .8 1.2 1.6 1.8 1.6 1.8 C10.4 7 11.6 4.6 12 2 Z"/></svg>
+    ${heatBarHTML()}${st!=="cold"?`<b class="hc-state">${st==="fire"?"ON FIRE":"WARM"}</b>`:""}`;
+}
+function clearStanceGhost(){
+  const svg=ringSvgEl();if(svg)svg.querySelectorAll(".ring-sec").forEach(g=>g.classList.remove("sec-up","sec-down"));
+  document.querySelectorAll(".pv-badge").forEach(b=>b.remove());
+}
+function showStanceGhost(k){
+  clearStanceGhost();
+  if(!m.selected||m.result||k===currentStance())return;
+  const d=stanceDeltaCounts(k);if(!d)return;
+  const svg=ringSvgEl(),wrap=document.querySelector(".av-ringwrap");
+  if(!svg||!wrap)return;
+  const wr=wrap.getBoundingClientRect();
+  Object.entries(d).forEach(([tk,dv])=>{
+    const g=svg.querySelector(`.ring-sec[data-tk="${tk}"]`);
+    if(g)g.classList.add(dv>0?"sec-up":"sec-down");
+    const badge=document.createElement("div");
+    badge.className="pv-badge "+(dv>0?"up":"down");
+    badge.innerHTML=`<b>${tk==="0"?"&#9679;":tk}</b> ${dv>0?"&#9650;":"&#9660;"}${Math.abs(dv)}`;
+    if(g){const r=g.getBoundingClientRect();
+      badge.style.left=(r.left+r.width/2-wr.left)+"px";badge.style.top=(r.top+r.height/2-wr.top)+"px";}
+    else{badge.style.left="50%";badge.style.top="12%";}
+    wrap.appendChild(badge);
+  });
 }
 function setStance(st){
   if(m.result)return;
@@ -7913,6 +8040,7 @@ function render(pop=false){
   const mcz=$("#matchCoachZone");if(mcz)mcz.innerHTML=coachStripHTML({mini:true});
   requestAnimationFrame(layoutLoadoutOverlap);
   renderDuel(pop);renderHand();renderKitbag();renderHud();
+  renderHeatChip();
   maybeStartTutorial();
   if(typeof TUT!=="undefined")TUT.reposition();
 }
@@ -7972,7 +8100,7 @@ function renderScorebug(){
   const v=bugView();
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
     <div class="bug-cell bug-over"><span>This over</span>${renderOverStrip()}</div>
-    <div class="bug-cell bug-heat heat-${momentumState()||'cold'}"><span>Heat</span>${heatBarHTML()}</div>
+
     <div class="bug-cell bug-score-you"><span>You</span><b data-run="you">${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
     <div class="bug-cell bug-score-rival"><span>Rival</span><b data-run="rival">${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
     <div class="bug-cell bug-target pressure-${chasePressure()||'none'}"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
@@ -8519,6 +8647,7 @@ function ensureSector(svg,tk){
 }
 function paintRing(svg,fracs){
   if(!svg)return;
+  svg.querySelectorAll(".ring-sec.sec-heat,.ring-sec.sec-up,.ring-sec.sec-down").forEach(g=>g.classList.remove("sec-heat","sec-up","sec-down"));
   const {cx,cy,r0,r1}=RING_GEO,lr=(r0+r1)/2,lay=ringLayout(fracs),seen=new Set();
   for(const s of lay){
     seen.add(s.tk);
@@ -8728,6 +8857,9 @@ function finishLanding(res,target){
   })();
   showOutcomePop(res);        // the dopamine beat — the outcome punches in
   showBallPay();              // beat two: the MONEY stamps in and flies to the purse
+  showHeatMoment();           // beat three: ignition / heat lost, stamped
+  emberMarkHeatSlots(res);    // the slots the heat upgraded glow on the ring
+  renderHeatChip();
   if(m.justIgnited){m.justIgnited=false;setTimeout(()=>showIgnition(),260)} // the engine comes ONLINE
   maybeExplainHeat();         // teach the heat mechanic once, in context
   if(typeof TUT!=="undefined")TUT.notify("land");
@@ -8745,6 +8877,36 @@ function showIgnition(){
 }
 /* The juice: a big sticker word slams in on the outcome, and the board shakes
    for the game-changing ones (SIX / WICKET). Cricket's highs and lows, felt. */
+/* Beat three of the settle: momentum state changes are MOMENTS. */
+function showHeatMoment(){
+  if(!m.justBroke)return; // ignition has its own banner (showIgnition)
+  const host=document.querySelector("#match .av-ringwrap");if(!host)return;
+  setTimeout(()=>{
+    if(!m)return;
+    const el=document.createElement("div");
+    el.className="state-pop sp-lost";
+    el.textContent="HEAT LOST";
+    host.appendChild(el);
+    SFX.play("tick");
+    setTimeout(()=>el.remove(),1600);
+  },1050);
+}
+/* Ember edges: mark the sectors whose slots the MOMENTUM beat changed, so
+   the player SEES what the heat did to the wheel this ball. */
+function emberMarkHeatSlots(res){
+  const beats=res&&res.beats;if(!beats)return;
+  const mi=beats.findIndex(b=>b.kind==="momentum");
+  if(mi<1)return;
+  const count=a=>a.reduce((o,t)=>(o[t]=(o[t]||0)+1,o),{});
+  const a=count(beats[mi-1].strip),b=count(beats[mi].strip);
+  const svg=ringSvgEl();if(!svg)return;
+  new Set([...Object.keys(a),...Object.keys(b)]).forEach(t=>{
+    if((b[t]||0)!==(a[t]||0)){
+      const g=svg.querySelector(`.ring-sec[data-tk="${t}"]`);
+      if(g)g.classList.add("sec-heat");
+    }
+  });
+}
 /* Beat two of the settle: "+$N" slams in under the outcome word, hangs a
    moment, then flies into the HUD purse — which bumps and counts up. Money
    earned is never subtle. */
@@ -8883,7 +9045,11 @@ function renderDuel(pop=false){
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
-  d.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
+  d.querySelectorAll("[data-stance]").forEach(b=>{
+    b.onclick=e=>{e.stopPropagation();clearStanceGhost();setStance(b.dataset.stance)};
+    b.onmouseenter=()=>showStanceGhost(b.dataset.stance);
+    b.onmouseleave=clearStanceGhost;
+  });
   // deselect: the ✕ chip OR clicking the picked card returns it to your hand
   if(m.selected&&!m.result){
     const yCard=d.querySelector(".you-col .card");
@@ -9031,7 +9197,7 @@ function stanceChipsHTML(){
   const set=STANCES[m.phase],cur=currentStance();
   const chips=Object.keys(set).map(k=>{
     const s=set[k],risk=STANCE_RISK[k]||"";
-    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" title="${s.desc}">
+    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" title="${escSVG(stanceTip(k)||s.desc)}">
       <i>${s.icon}</i><b>${s.label}</b><small class="stance-risk">${risk}</small>
     </button>`;
   }).join("");
@@ -9709,7 +9875,7 @@ const TUT=(()=>{
     {tag:"The ball",text:"Bigger zones = more likely. The needle spins and lands on your real outcome — nothing is rigged.",
      target:()=>document.querySelector("#duel .av-ringwrap"),wait:"land"},
     {tag:"Build HEAT",text:"Keep hitting boundaries to build HEAT (watch the meter below). A hot streak grows your boundary zones — but a wicket resets it. Cash in or protect it.",
-     target:()=>document.querySelector("#scorebug .bug-heat"),button:"Got it"},
+     target:()=>document.querySelector("#heatChip"),button:"Got it"},
     {tag:"You're set",text:"Win matches to earn coins, then spend them in the Clubhouse on coaches, tools & training to build your engine. Good luck!",
      target:null,button:"Let's go"}
   ];
