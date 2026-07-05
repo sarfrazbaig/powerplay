@@ -4442,8 +4442,24 @@
   .hpip-x{font-family:"Work Sans",sans-serif;font-weight:900;font-size:12px;color:#8a5cd0;background:#f3e8ff;
     border:2px solid #8a5cd0;border-radius:8px;padding:0 6px;margin-left:2px}
   .hheat{font-size:17px}
-  /* field-side panels under the stands: PURSE left, CONDITIONS right — the
-     money owns a whole board on the ground, weighted like it matters */
+  /* THE EDGE LANES: stands + field boards share ONE budget (--laneW on
+     #match) that the duel row pads around — the four systems that used to
+     collide on MacBook-sized windows (stands, played cards, purse, weather)
+     now physically cannot overlap. */
+  /* ONE card size for the whole match screen: the arena reads the same
+     --cardw as the loadout, so the card you play is the size you held */
+  #match{--laneW:clamp(76px,9.5vw,170px);
+    --cardh:calc(clamp(230px,33vh,368px) - 52px);
+    --cardw:min(clamp(150px,12.5vw,215px),calc(var(--cardh)*5/7))}
+  .stand-lane{position:absolute;top:50%;transform:translateY(-50%);width:var(--laneW);z-index:1;
+    display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.4vh,16px);
+    max-height:94%;pointer-events:none}
+  .stand-lane.left{left:clamp(6px,.8vw,18px)}
+  .stand-lane.right{right:clamp(6px,.8vw,18px)}
+  .stand-lane svg{width:100%;height:auto;flex:0 1 auto;min-height:0;display:block}
+  .stand-lane .field-panel{position:static;width:100%;height:auto;min-height:54px;padding:6px 8px;pointer-events:auto}
+  /* field boards: PURSE under the left stand, CONDITIONS under the right —
+     the money owns a whole board on the ground, weighted like it matters */
   .field-panel{position:absolute;bottom:2.5%;width:clamp(120px,10vw,180px);height:clamp(64px,8.5vh,96px);
     display:flex;align-items:center;justify-content:center;gap:10px;z-index:6;
     background:rgba(255,255,255,.10);border:2.5px solid rgba(255,255,255,.38);border-radius:16px}
@@ -4582,7 +4598,9 @@
   .loadout-build #matchCoachZone .coach-zone-row .coachcard+.coachcard{margin-left:var(--covl,8px) !important}
   .loadout-build .coach-zone-row .coachcard svg{width:var(--cardw);height:auto;display:block;
     transition:transform .16s ease;transform-origin:50% 100%}
-  #matchCoachZone .coachcard:hover{z-index:55}
+  /* !important: the nth-child stacking rules below outrank :hover at equal
+     specificity — same fix the hand needed, or the popped coach stays buried */
+  #matchCoachZone .coachcard:hover{z-index:55 !important}
   #matchCoachZone .coachcard:hover svg{transform:translateY(-26%) scale(1.3);filter:drop-shadow(0 10px 14px rgba(23,33,31,.35))}
   .loadout-build .coach-zone-row .coachcard:hover{z-index:50}
   .coach-ghost{flex:0 0 calc(var(--cardw)/3);width:calc(var(--cardw)/3);height:calc(var(--cardw)*7/5);
@@ -4705,14 +4723,15 @@
   .av-ground.hit-wicket{animation:groundShake .55s cubic-bezier(.3,.9,.4,1)}
   .av-ground.hit-six{animation:groundBlaze .8s ease}
   .av-ground.hit-four{animation:groundFlash .7s ease}
-  /* the stands ERUPT on a boundary — fans jump in a wave, shirts flash gold */
-  .pitch-art .fanb{transform-box:fill-box;transform-origin:50% 100%;transform:translateY(0)}
-  .av-ground.hit-four .pitch-art .fanb,.av-ground.hit-six .pitch-art .fanb{animation:fanJump .4s ease 2 alternate}
-  .av-ground.hit-six .pitch-art .fanb{animation-duration:.32s;animation-iteration-count:3}
-  .av-ground.hit-four .pitch-art .fanb circle{fill:#ffc93c}
-  .av-ground.hit-six .pitch-art .fanb circle{fill:#ff9430}
-  .av-ground.hit-four .pitch-art .crowd g:nth-of-type(3n) .fanb,.av-ground.hit-six .pitch-art .crowd g:nth-of-type(3n) .fanb{animation-delay:.06s}
-  .av-ground.hit-four .pitch-art .crowd g:nth-of-type(3n+1) .fanb,.av-ground.hit-six .pitch-art .crowd g:nth-of-type(3n+1) .fanb{animation-delay:.12s}
+  /* the stands ERUPT on a boundary — fans jump in a wave, shirts flash gold
+     (fans live in the .stand-lane svgs now; .av-ground still scopes them) */
+  .av-ground .fanb{transform-box:fill-box;transform-origin:50% 100%;transform:translateY(0)}
+  .av-ground.hit-four .fanb,.av-ground.hit-six .fanb{animation:fanJump .4s ease 2 alternate}
+  .av-ground.hit-six .fanb{animation-duration:.32s;animation-iteration-count:3}
+  .av-ground.hit-four .fanb circle{fill:#ffc93c}
+  .av-ground.hit-six .fanb circle{fill:#ff9430}
+  .av-ground.hit-four .crowd g:nth-of-type(3n) .fanb,.av-ground.hit-six .crowd g:nth-of-type(3n) .fanb{animation-delay:.06s}
+  .av-ground.hit-four .crowd g:nth-of-type(3n+1) .fanb,.av-ground.hit-six .crowd g:nth-of-type(3n+1) .fanb{animation-delay:.12s}
   @keyframes fanJump{from{transform:translateY(0)}to{transform:translateY(-10px)}}
   @keyframes groundShake{
     0%,100%{transform:translate(0,0)}
@@ -4827,8 +4846,11 @@
   .av-duelrow{
     display:grid;grid-template-columns:minmax(120px,280px) minmax(240px,520px) minmax(120px,280px);
     grid-template-rows:minmax(0,1fr);
-    align-items:stretch;justify-content:center;gap:clamp(28px,9vw,250px);
+    align-items:stretch;justify-content:center;gap:clamp(16px,3.5vw,90px);
+    /* the duel budgets around the stand lanes — cards can never reach them */
+    padding-inline:calc(var(--laneW,120px) + clamp(8px,1vw,20px));
     width:100%;max-width:min(1640px,96%);margin-inline:auto;min-height:0;position:relative;z-index:2;
+    box-sizing:border-box;
   }
   .av-duelrow>.dslot,.av-duelrow>.you-col{min-width:0;min-height:0;height:100%}
   .av-duelrow .dslot{display:flex;align-items:center;justify-content:center;position:relative}
@@ -4836,7 +4858,7 @@
      height — so YOUR card and the rival's are always the same size. */
   #match .av-duelrow .dslot .card{
     width:100% !important;height:auto !important;
-    max-height:100% !important;max-width:min(240px,100%) !important;
+    max-height:100% !important;max-width:min(var(--cardw,215px),100%) !important;
     aspect-ratio:5/7;min-width:0 !important;min-height:0 !important;margin:0 auto;
   }
   /* the flanking cards must never be taller than the wheel's row */
@@ -4847,14 +4869,14 @@
   /* who bats / who bowls: the CROWD says it — the batting side's stand waves
      bats, the bowling side's holds up balls (props live on fans, so they jump
      in the eruption too). Wired via #match.you-bat / .you-bowl. */
-  .pitch-art .prop{display:none}
+  .av-ground .prop{display:none}
   #match.you-bat .stand-l .prop-bat{display:block}
   #match.you-bat .stand-r .prop-ball{display:block}
   #match.you-bowl .stand-l .prop-ball{display:block}
   #match.you-bowl .stand-r .prop-bat{display:block}
   #match .av-duelrow .placeholder{
     height:100% !important;width:auto !important;
-    max-height:430px !important;max-width:100% !important;
+    max-height:calc(var(--cardw,215px)*7/5) !important;max-width:min(var(--cardw,215px),100%) !important;
     aspect-ratio:5/7;border-radius:14px;
     border:3px dashed rgba(255,255,255,.75) !important;display:grid;place-items:center;
     color:rgba(255,255,255,.85);font-size:34px;background:rgba(255,255,255,.10) !important;
@@ -4883,7 +4905,8 @@
   /* ---------- the field ring ---------- */
   /* the wheel sizes to the height that actually exists for its row:
      viewport minus top bar, rival bench, hand, scorebug and chrome */
-  .av-ringwrap{position:relative;height:100%;max-height:100%;aspect-ratio:1;width:auto;max-width:100%;margin:0 auto;align-self:center;justify-self:center}
+  .av-ringwrap{position:relative;height:100%;max-height:100%;aspect-ratio:1;width:auto;max-width:100%;margin:0 auto;align-self:center;justify-self:center;
+    container-type:size} /* hub contents size in cqmin = % of the wheel's real diameter */
   #match .av-pitch .commentary-strip{max-height:26px;overflow:hidden;font-size:12.5px !important;padding:2px 0 !important}
   .ring-svg.idle{opacity:.85;filter:saturate(.8)}
   /* real CTAs: fixed dock, bottom-right of the pitch — never inside the wheel */
@@ -4921,7 +4944,7 @@
     justify-content:center;align-items:center;
     width:max-content;margin:0 !important;padding:0 !important;transform:none !important;
   }
-  #match .ring-center .actions .btn{padding:7px 18px;font-size:12px}
+  #match .ring-center .actions .btn{padding:clamp(4px,1.6cqmin,7px) clamp(10px,4cqmin,18px);font-size:clamp(9px,2.8cqmin,12px)}
   .ring-center .actions:empty{display:none}
   .ring-nextcue{
     margin-top:8px;font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:13px;
@@ -4929,12 +4952,13 @@
     background:rgba(255,246,227,.9);border:2.5px solid var(--ink);border-radius:99px;padding:4px 14px;
     animation:cuePulse 1.15s ease-in-out infinite;
   }
-  /* the duel distilled: your number vs theirs, in the lane colour, over PLAY */
-  .duel-read{display:flex;align-items:baseline;gap:9px;font-family:Anton,Impact,sans-serif;font-style:italic;
-    background:rgba(255,246,227,.92);border:3px solid var(--lc,#17211f);border-radius:99px;padding:2px 18px;
+  /* the duel distilled: your number vs theirs, in the lane colour, over PLAY —
+     cqmin-sized so the pill shrinks WITH the wheel on short screens */
+  .duel-read{display:flex;align-items:baseline;gap:clamp(5px,2.4cqmin,9px);font-family:Anton,Impact,sans-serif;font-style:italic;
+    background:rgba(255,246,227,.92);border:3px solid var(--lc,#17211f);border-radius:99px;padding:clamp(1px,.6cqmin,2px) clamp(10px,4.8cqmin,18px);
     box-shadow:0 3px 0 rgba(23,33,31,.3)}
-  .duel-read b{font-size:29px;color:var(--lc,#17211f)}
-  .duel-read span{font-size:12px;font-weight:800;color:#6a5a3a;font-family:"Work Sans",sans-serif;font-style:normal}
+  .duel-read b{font-size:clamp(14px,7cqmin,29px);color:var(--lc,#17211f)}
+  .duel-read span{font-size:clamp(8px,2.9cqmin,12px);font-weight:800;color:#6a5a3a;font-family:"Work Sans",sans-serif;font-style:normal}
   @keyframes cuePulse{0%,100%{opacity:.45}50%{opacity:1}}
   /* ---------- OUTCOME POP: the dopamine beat on every ball ---------- */
   .outcome-pop{position:absolute;top:41%;left:50%;transform:translate(-50%,-50%);z-index:40;
@@ -5038,7 +5062,6 @@
   .over-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
   .confetti-burst{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:2}
   /* ---------- toss: a clean, centred coin moment ---------- */
-  .toss-card2{display:flex;flex-direction:column;align-items:center;gap:18px;padding:32px 44px !important;max-width:600px}
   .toss-head{text-align:center;display:flex;flex-direction:column;gap:5px}
   .toss-head b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(34px,4.4vw,52px);color:var(--punch,#ff5a2d) !important;text-shadow:2.5px 2.5px 0 var(--ink,#17211f);line-height:1}
   .toss-head span{font-weight:700;font-size:14px;color:#5a4a2a !important}
@@ -5052,15 +5075,10 @@
     font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(44px,5vw,58px) !important;color:#5a3d00 !important}
   #toss .coin-flip.spin .coin-face{animation:coinSpin .9s ease both}
   .toss-rival{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-  .toss-read-chip{border:2.5px solid var(--ink,#17211f);border-radius:999px;padding:4px 13px;font-family:"Work Sans",sans-serif;font-weight:800;font-size:11px;letter-spacing:.3px}
-  .toss-read-chip.you{background:#e8f8ee;color:#0b3b22}
-  .toss-read-chip.rival{background:#fdecec;color:#4a1418}
   #toss #tossChoices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
   .toss-lost{width:100%;text-align:center;font-weight:800;color:#5a4a2a;margin-bottom:2px}
   .toss-restart{margin-top:2px;opacity:.85}
   /* boss / cup-final framing — the run's climax */
-  .toss-card2.is-final{border-color:#c0303f !important;box-shadow:6px 6px 0 rgba(192,48,63,.32) !important}
-  .toss-card2.is-final .toss-head b{color:#c0303f !important}
   .toss-boss{width:100%;text-align:center;background:linear-gradient(180deg,#fff3d6,#ffe4a2);
     border:3px solid #17211f;border-radius:12px;padding:9px 14px;margin-bottom:4px;box-shadow:0 3px 0 rgba(23,33,31,.3)}
   .toss-boss b{display:block;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:22px;color:#c0303f;text-shadow:1.5px 1.5px 0 var(--ink,#17211f);line-height:1.1}
@@ -5072,9 +5090,9 @@
   }
   .ring-read b{
     font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.8px;
-    font-size:clamp(18px,1.9vw,27px);color:var(--chalk);line-height:1.05;
+    font-size:clamp(13px,6.3cqmin,27px);color:var(--chalk);line-height:1.05;
   }
-  .ring-read span{font-size:11px;font-weight:800;color:var(--mutn);letter-spacing:.8px;text-transform:uppercase;max-width:180px;line-height:1.35}
+  .ring-read span{font-size:clamp(8.5px,3cqmin,11px);font-weight:800;color:var(--mutn);letter-spacing:.8px;text-transform:uppercase;max-width:min(180px,62cqmin);line-height:1.35}
   .ring-cap{
     position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
     font-size:9.5px;font-weight:800;letter-spacing:2px;white-space:nowrap;
@@ -5088,12 +5106,14 @@
     filter:drop-shadow(0 1px 2px rgba(23,33,31,.5));
   }
   .ring-needle svg{width:100%;height:100%;display:block}
-  /* THE button: round, gold, dead center — eyes never leave the wheel */
+  /* THE button: round, gold, dead center — eyes never leave the wheel.
+     Sized in cqmin (fractions of the WHEEL, not the viewport) so it keeps
+     its proportion when short screens shrink the wheel. */
   .ring-go{
-    width:clamp(88px,9.5vw,124px);aspect-ratio:1;border-radius:50%;
+    width:clamp(64px,29cqmin,124px);aspect-ratio:1;border-radius:50%;
     background:radial-gradient(circle at 34% 30%, #ffe089, var(--gold) 58%, #f0b400);
     border:3.5px solid var(--ink);color:#111;cursor:pointer;
-    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(19px,1.9vw,25px);
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(13px,5.8cqmin,25px);
     letter-spacing:1.5px;line-height:1.05;
     box-shadow:0 6px 0 var(--ink),0 0 28px rgba(255,201,60,.45);
     transition:transform .12s ease,box-shadow .12s ease;
@@ -5102,26 +5122,27 @@
   .ring-go:hover{transform:translateY(-3px);box-shadow:0 9px 0 var(--ink),0 0 34px rgba(255,201,60,.6)}
   .ring-go:active{transform:translateY(2px);box-shadow:0 3px 0 var(--ink)}
   .ring-go.next{
-    width:clamp(72px,7.5vw,96px);font-size:clamp(13px,1.3vw,16px);
+    width:clamp(54px,26cqmin,96px);font-size:clamp(10px,4.4cqmin,16px);
     background:radial-gradient(circle at 34% 30%, #fff, #f2ece0 60%, #d9d2c0);
   }
   .ring-center{gap:6px}
   .ring-center .actions{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:9px}
-  /* stance chips: the second verb — the per-ball skill choice, made legible */
-  .stance-lead{font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:12.5px;letter-spacing:1.4px;
+  /* stance chips: the second verb — the per-ball skill choice, made legible.
+     vh-clamped so the pill tracks the same vertical budget as the wheel. */
+  .stance-lead{font-family:"Work Sans",Inter,sans-serif;font-weight:900;font-size:clamp(9.5px,1.4vh,12.5px);letter-spacing:1.4px;
     text-transform:uppercase;color:var(--punch,#ff5a2d);text-align:center;margin-bottom:1px}
-  .stance-row{display:flex;gap:14px;justify-content:center}
+  .stance-row{display:flex;gap:clamp(8px,1.6vh,14px);justify-content:center}
   .stance-chip{
-    border-radius:15px;padding:9px 24px 8px;
-    display:flex;align-items:center;gap:10px;cursor:pointer;
+    border-radius:15px;padding:clamp(5px,1vh,9px) clamp(13px,2.7vh,24px) clamp(4px,.9vh,8px);
+    display:flex;align-items:center;gap:clamp(6px,1.1vh,10px);cursor:pointer;
     background:#fff6e3;border:3.5px solid var(--ink);color:var(--ink);
     font-family:Oswald,Arial,sans-serif;
     box-shadow:0 5px 0 rgba(23,33,31,.4);
     transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease;
   }
-  .stance-chip i{font-style:normal;font-size:26px;line-height:1}
-  .stance-chip b{font-size:18px;font-weight:800;letter-spacing:.6px}
-  .stance-chip .stance-risk{font-size:10px;font-weight:900;letter-spacing:.5px;padding:2px 9px;border-radius:7px}
+  .stance-chip i{font-style:normal;font-size:clamp(17px,2.9vh,26px);line-height:1}
+  .stance-chip b{font-size:clamp(12.5px,2vh,18px);font-weight:800;letter-spacing:.6px}
+  .stance-chip .stance-risk{font-size:clamp(8px,1.15vh,10px);font-weight:900;letter-spacing:.5px;padding:2px clamp(6px,1vh,9px);border-radius:7px}
   .stance-chip.risk-safe .stance-risk{background:#cfeecd;color:#1e5e2a}
   .stance-chip.risk-steady .stance-risk{background:#e7dcc0;color:#5a4a2a}
   .stance-chip.risk-risky .stance-risk{background:#ffd0c4;color:#8a2a18}
@@ -5131,7 +5152,7 @@
     border-color:var(--ink);background:var(--gold);
     box-shadow:0 4px 0 var(--ink),0 0 16px rgba(255,201,60,.4);
   }
-  .stance-explain{font-family:"Work Sans",Inter,sans-serif;font-weight:700;font-size:11px;color:#3a3326;
+  .stance-explain{font-family:"Work Sans",Inter,sans-serif;font-weight:700;font-size:clamp(9px,1.25vh,11px);color:#3a3326;
     text-align:center;margin-top:6px;max-width:300px;line-height:1.32;min-height:14px}
   /* stance dock sits under YOUR card — the strategy step, right at the crease */
   .you-col{display:flex;align-items:center;justify-content:center;min-width:0;height:100%;position:relative}
@@ -5143,24 +5164,26 @@
     cursor:pointer;box-shadow:2px 2px 0 rgba(23,33,31,.35);transition:transform .12s,background .12s}
   .you-change:hover{background:var(--gold,#ffc93c);transform:translateY(-1px)}
   /* THE DUEL readout — who challenges, on what stat & number, your answer stat */
-  .chal-banner{display:flex;align-items:center;justify-content:center;gap:9px;flex:0 0 auto;
-    z-index:5;margin:0 auto;padding:3px 15px;border-radius:99px;max-width:96%;
+  /* the vs pill scales on vh — the same vertical budget that sizes the
+     wheel — so short screens shrink them TOGETHER */
+  .chal-banner{display:flex;align-items:center;justify-content:center;gap:clamp(5px,1vh,9px);flex:0 0 auto;
+    z-index:5;margin:0 auto;padding:clamp(2px,.4vh,3px) clamp(9px,1.7vh,15px);border-radius:99px;max-width:96%;
     background:rgba(255,246,227,.95);border:3px solid var(--ink);box-shadow:3px 3px 0 rgba(23,33,31,.4);
     font-family:Oswald,Arial,sans-serif;white-space:nowrap}
-  .chal-banner .chal-who{font-weight:800;font-size:12px;letter-spacing:.4px;color:#5a4a2a;text-transform:uppercase}
-  .chal-banner .chal-stat{display:inline-flex;align-items:center;gap:7px;font-family:Anton,Impact,sans-serif;
-    font-style:italic;font-size:14px;letter-spacing:.5px;color:#fff;background:var(--sc,#17211f);
-    border:2.5px solid var(--ink);border-radius:99px;padding:2px 13px}
-  .chal-banner .chal-stat b{font-size:21px}
-  .chal-banner .chal-vs{font-weight:800;font-size:10.5px;color:#8a7752;text-transform:uppercase;letter-spacing:.4px}
-  .chal-banner .chal-resp{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:15px;letter-spacing:.5px;
+  .chal-banner .chal-who{font-weight:800;font-size:clamp(9px,1.4vh,12px);letter-spacing:.4px;color:#5a4a2a;text-transform:uppercase}
+  .chal-banner .chal-stat{display:inline-flex;align-items:center;gap:clamp(4px,.8vh,7px);font-family:Anton,Impact,sans-serif;
+    font-style:italic;font-size:clamp(10px,1.6vh,14px);letter-spacing:.5px;color:#fff;background:var(--sc,#17211f);
+    border:2.5px solid var(--ink);border-radius:99px;padding:2px clamp(8px,1.5vh,13px)}
+  .chal-banner .chal-stat b{font-size:clamp(14px,2.4vh,21px)}
+  .chal-banner .chal-vs{font-weight:800;font-size:clamp(8px,1.2vh,10.5px);color:#8a7752;text-transform:uppercase;letter-spacing:.4px}
+  .chal-banner .chal-resp{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(11px,1.7vh,15px);letter-spacing:.5px;
     color:var(--sc,#17211f);-webkit-text-stroke:.5px var(--ink);paint-order:stroke}
   /* stance bar = a glass pill riding the bottom of the field: lead label +
      the three big chips in ONE row, always above the wheel's bottom edge */
   .stance-bar{display:flex;align-items:center;justify-content:center;flex:0 0 auto;z-index:7;position:relative;
-    margin:4px auto 2px;gap:14px;width:max-content;max-width:98%;
+    margin:4px auto 2px;gap:clamp(8px,1.6vh,14px);width:max-content;max-width:98%;
     background:rgba(255,253,243,.62);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);
-    border:2.5px solid rgba(255,255,255,.85);border-radius:99px;padding:7px 18px;
+    border:2.5px solid rgba(255,255,255,.85);border-radius:99px;padding:clamp(4px,.8vh,7px) clamp(11px,2vh,18px);
     box-shadow:0 5px 18px rgba(23,33,31,.22)}
   .stance-bar .stance-lead{margin:0;white-space:nowrap}
   .stance-bar .stance-row{gap:12px}
@@ -5359,7 +5382,7 @@
     #shop .railx-scroll,#squad .roster-row,.roster-groups{overflow-x:auto !important;overflow-y:visible !important;height:auto !important}
     #shop .packx-row{flex-wrap:wrap !important}
     #squad .roster-groups{display:flex !important;flex-direction:column !important;gap:10px !important}
-    .over-card,.toss-card2{max-width:94vw !important}
+    .over-card{max-width:94vw !important}
   }
   /* gentle rotate nudge — only on a narrow PORTRAIT phone while in a match */
   #rotateHint{display:none}
@@ -5775,6 +5798,89 @@
   .coins-tag{background:var(--gold) !important;color:#4a3300 !important;border:3px solid var(--ink) !important;
     border-radius:999px !important;box-shadow:0 3px 0 var(--ink) !important;font-family:Anton,Impact,sans-serif;font-style:italic}
   .coins-tag .coin{filter:none}
+
+  /* ============ VS SCREEN v2 — the match-day poster (screen 2 pass) ============ */
+  #toss.vs2.active{display:grid;place-items:center;position:relative;overflow:hidden}
+  #toss.vs2 .vs-scene{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.95}
+  #toss.vs2 .vs-scene svg{width:100%;height:100%;display:block}
+  /* edge-pinned duellists: batsman guards the left, bowler tears in from the right */
+  #toss.vs2 .vs-sil{position:absolute;bottom:clamp(4px,3vh,40px);height:clamp(240px,44vh,460px);width:auto}
+  #toss.vs2 .vs-sil.you{left:clamp(-30px,1vw,60px);transform:scaleX(-1)}
+  #toss.vs2 .vs-sil.rival{right:clamp(-30px,1vw,60px)}
+  #toss.vs2 .vs-stage{position:relative;z-index:1;width:min(1100px,96vw);
+    display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.8vh,20px);
+    padding:clamp(8px,2.5vh,26px) 12px}
+  #toss.vs2 .toss-head span{text-shadow:0 1px 0 rgba(255,246,227,.8)}
+  /* the duel row: YOU plate · coin · THEM plate */
+  #toss.vs2 .vs-duel{display:grid;grid-template-columns:minmax(185px,235px) minmax(300px,1fr) minmax(185px,235px);
+    gap:clamp(12px,2.6vw,40px);align-items:center;width:100%}
+  #toss.vs2 .vs-centre{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.6vh,16px)}
+  /* side plates: the cream sticker recipe, tilted like poster bills */
+  #toss.vs2 .vs-plate{position:relative;background:var(--cream,#fff6e3);border:3px solid var(--ink,#17211f);
+    border-radius:14px;box-shadow:5px 5px 0 var(--ink,#17211f);
+    display:flex;flex-direction:column;align-items:center;gap:9px;padding:20px 12px 13px}
+  #toss.vs2 .vs-plate.you{transform:rotate(-1.4deg)}
+  #toss.vs2 .vs-plate.rival{transform:rotate(1.4deg)}
+  #toss.vs2 .vsp-tab{position:absolute;top:-13px;left:50%;transform:translateX(-50%) rotate(-2deg);
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:14px;letter-spacing:2px;line-height:1;
+    padding:4px 16px 3px;border:2.5px solid var(--ink,#17211f);border-radius:99px;color:#fff6e3;
+    box-shadow:0 2.5px 0 var(--ink,#17211f)}
+  #toss.vs2 .vs-plate.you .vsp-tab{background:#1f9b53}
+  #toss.vs2 .vs-plate.rival .vsp-tab{background:#c0303f}
+  #toss.vs2 .vsp-lean{display:flex;align-items:center;gap:5px;min-height:22px}
+  #toss.vs2 .vsp-lean em{font-style:normal;font-weight:900;font-size:10.5px;letter-spacing:.8px;color:#5a4a2a}
+  #toss.vs2 .vsp-ico{width:19px;height:19px;flex:0 0 auto}
+  #toss.vs2 .vsp-stats{display:flex;gap:10px}
+  #toss.vs2 .vsp-sq{width:clamp(56px,4.6vw,68px);padding:7px 0 5px;background:#fffdf4;
+    border:2.5px solid var(--ink,#17211f);border-radius:10px;box-shadow:0 3px 0 rgba(23,33,31,.28);
+    display:flex;flex-direction:column;align-items:center;gap:1px}
+  #toss.vs2 .vsp-sq b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(22px,2.1vw,28px);line-height:1}
+  #toss.vs2 .vsp-sq.bat b{color:#1f9b53}
+  #toss.vs2 .vsp-sq.bowl b{color:#c0303f}
+  #toss.vs2 .vsp-sq span{font-size:9px;font-weight:900;letter-spacing:1.2px;color:var(--ink,#17211f)}
+  #toss.vs2 .toss-rival{width:100%;max-width:640px}
+  #toss.vs2 .toss-restart{opacity:.8}
+  /* cup-final framing rides the stage now, not the old card */
+  #toss.vs2 .vs-stage.is-final .toss-head b{color:#c0303f !important}
+  #toss.vs2 .vs-stage.is-final .vsp-tab{box-shadow:0 2.5px 0 var(--ink,#17211f),0 0 18px rgba(192,48,63,.45)}
+  /* narrow: coin first, plates share a row beneath, scene calms down */
+  @media(max-width:860px){
+    #toss.vs2 .vs-duel{grid-template-columns:1fr 1fr;row-gap:26px}
+    #toss.vs2 .vs-centre{grid-column:1/-1;grid-row:1}
+    #toss.vs2 .vs-plate.you{grid-row:2;grid-column:1;justify-self:end;max-width:235px;width:100%}
+    #toss.vs2 .vs-plate.rival{grid-row:2;grid-column:2;justify-self:start;max-width:235px;width:100%}
+    #toss.vs2 .vs-scene{opacity:.5}
+  }
+
+  /* ============ FOUNDING PACK — new-run onboarding: rip -> meet your squad ============ */
+  #founding .fp-stage{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.6vh,18px);
+    width:min(1300px,97vw);max-height:calc(100dvh - 26px);padding:clamp(6px,1.6vh,20px) 8px}
+  #founding .fp-head span{text-shadow:0 1px 0 rgba(255,246,227,.8)}
+  #founding .fp-packwrap{display:grid;justify-items:center;gap:16px;padding:clamp(8px,3vh,34px) 0}
+  #founding .fp-packwrap[hidden],#founding .fp-boardwrap[hidden],#founding .fp-go[hidden]{display:none}
+  #founding .fp-pack{position:relative;width:min(300px,36vh);background:none;border:0;padding:0;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;animation:fpBreath 1.9s ease-in-out infinite}
+  #founding .fp-pack:hover{transform:translateY(-4px) rotate(-1deg)}
+  #founding .fp-pack .pack-art{width:100%}
+  #founding .fp-tear{position:absolute;inset:0;clip-path:inset(0 0 78% 0)}
+  #founding .fp-packwrap.rip .fp-pack{animation:none;cursor:default}
+  #founding .fp-packwrap.rip .fp-pack-body{animation:povShake 1s ease-in-out both}
+  #founding .fp-packwrap.rip .fp-tear{animation:povShake 1s ease-in-out both,povTear .5s ease-in .52s forwards}
+  #founding .fp-packwrap.rip .fp-hint{opacity:0}
+  #founding .fp-hint{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;letter-spacing:2.5px;
+    color:#fff6e3;background:var(--ink,#17211f);border-radius:99px;padding:5px 18px 4px;
+    box-shadow:0 3px 0 rgba(23,33,31,.35);transition:opacity .3s}
+  #founding .fp-boardwrap{width:100%;min-height:0;flex:1 1 auto;overflow:auto;
+    background:rgba(255,253,243,.6);backdrop-filter:blur(6px);
+    border:3px solid var(--ink,#17211f);border-radius:16px;box-shadow:5px 5px 0 var(--ink,#17211f);
+    padding:10px 12px;overflow-anchor:none}
+  #founding .sb-card{animation:fpDeal .5s cubic-bezier(.2,.9,.3,1) backwards}
+  #founding .fp-go{flex:0 0 auto}
+  @keyframes fpBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+  @keyframes fpDeal{from{opacity:0;transform:translateY(28px) scale(.68)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    #founding .fp-pack,#founding .fp-pack-body,#founding .fp-tear,#founding .sb-card{animation:none !important}
+  }
 </style>
 </head>
 <body>
@@ -5845,6 +5951,24 @@
     </div>
   </section>
 
+  <!-- FOUNDING PACK: a new run begins the way every cricket childhood did —
+       ripping a fresh pack. The cards land straight on the squad board, so the
+       player meets pack-opening AND squad management in one beat, no lecture. -->
+  <section id="founding" class="screen title">
+    <div class="fp-stage">
+      <div class="toss-head fp-head"><b id="fpTitle">Your Founding Pack</b><span id="fpSub"></span></div>
+      <div class="fp-packwrap" id="fpPackWrap">
+        <button class="fp-pack" id="fpPackBtn" title="Rip it open">
+          <div class="fp-pack-body" id="fpPackBody"></div>
+          <div class="fp-tear" id="fpTear"></div>
+        </button>
+        <div class="fp-hint">TAP THE PACK</div>
+      </div>
+      <div class="fp-boardwrap" id="fpBoard" hidden></div>
+      <button class="btn xl vs-play fp-go" id="fpGo" hidden>TO THE TOSS &#9654;</button>
+    </div>
+  </section>
+
   <section id="intro" class="screen">
     <div class="intro-wrap">
       <div class="ds-title intro-h">Your Kit Bag</div>
@@ -5895,12 +6019,50 @@
     </div>
   </section>
 
-  <section id="toss" class="screen title">
-    <div class="title-inner toss-card2">
+  <section id="toss" class="screen title vs2">
+    <!-- match-day scene: the two silhouettes square off across the whole ground -->
+    <div class="vs-scene" aria-hidden="true">
+      <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="vsHalo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffcf5e" stop-opacity=".5"/>
+            <stop offset="45%" stop-color="#ff9a4d" stop-opacity=".22"/>
+            <stop offset="100%" stop-color="#ffb066" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="vsSil" x="-14%" y="-14%" width="128%" height="128%">
+            <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="fat"/>
+            <feFlood flood-color="#fff6e3" result="rimc"/>
+            <feComposite in="rimc" in2="fat" operator="in" result="rim"/>
+            <feFlood flood-color="#17211f" result="bodyc"/>
+            <feComposite in="bodyc" in2="SourceAlpha" operator="in" result="body"/>
+            <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
+          </filter>
+        </defs>
+        <!-- golden-hour glow behind the coin -->
+        <circle cx="720" cy="440" r="330" fill="url(#vsHalo)"/>
+        <!-- distant rooftops, same skyline family as the title -->
+        <g fill="#e88b3a" opacity=".38"><path d="M0 660 h180 v-38 l40 -30 l40 30 v38 h210 v-52 h130 v52 h280 v-44 h150 v44 h410 v240 H0 Z"/></g>
+        <!-- the maidan -->
+        <path d="M0 700 Q 720 640 1440 700 V 900 H0 Z" fill="#6fae3a" opacity=".55"/>
+        <path d="M0 745 Q 720 692 1440 745 V 900 H0 Z" fill="#5c9a2e" opacity=".5"/>
+        <ellipse cx="720" cy="810" rx="560" ry="86" fill="none" stroke="rgba(255,253,244,.55)" stroke-width="3" stroke-dasharray="10 14"/>
+      </svg>
+      <!-- the two silhouettes pin to the REAL screen edges (HTML, not viewBox,
+           so odd window shapes never crop them away) -->
+      <img class="vs-sil you" src="assets/players/bat3.png" alt="" style="filter:url(#vsSil)">
+      <img class="vs-sil rival" src="assets/players/bowl4.png" alt="" style="filter:url(#vsSil)">
+    </div>
+    <div class="vs-stage" id="tossCard">
       <div class="toss-head"><b id="tossTitle">The Toss</b><span id="tossSub">Call the coin — the winner picks bat or bowl.</span></div>
-      <div class="coin-stage"><div class="coin-flip" id="coinFlip"></div></div>
+      <div class="vs-duel">
+        <div class="vs-plate you" id="vsYouPlate"></div>
+        <div class="vs-centre">
+          <div class="coin-stage"><div class="coin-flip" id="coinFlip"></div></div>
+          <div id="tossChoices"></div>
+        </div>
+        <div class="vs-plate rival" id="vsRivalPlate"></div>
+      </div>
       <div class="toss-rival" id="tossRival"></div>
-      <div id="tossChoices"></div>
       <button class="btn secondary sm toss-restart" id="tossRestartBtn">Restart Run</button>
     </div>
   </section>
@@ -5941,17 +6103,26 @@
               <rect x="588" y="508" width="4.5" height="26" rx="2"/><rect x="597.7" y="508" width="4.5" height="26" rx="2"/><rect x="607.5" y="508" width="4.5" height="26" rx="2"/>
             </g>
           </g>
-          <g class="crowd"><g class="stand-l"><rect x="14" y="146" width="134" height="296" rx="16" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.35)" stroke-width="2.5"/><rect x="21" y="198" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="242" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="286" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="330" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="374" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="418" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><g transform="translate(36 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(66 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(96 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(126 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(43 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(73 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(103 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(133 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(36 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(66 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(96 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(126 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(43 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(73 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(103 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(133 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(36 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(66 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(96 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(126 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(43 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(73 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(103 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(133 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g></g><g class="stand-r"><rect x="1052" y="146" width="134" height="296" rx="16" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.35)" stroke-width="2.5"/><rect x="1059" y="198" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="242" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="286" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="330" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="374" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="418" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><g transform="translate(1074 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1104 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1134 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1164 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1081 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1111 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1141 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1171 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1074 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1104 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1134 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1164 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1081 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1111 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1141 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1171 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1074 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1104 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1134 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1164 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1081 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1111 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1141 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1171 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g></g></g>
+          
         </svg>
+      </div>
+      <!-- THE STANDS live OUTSIDE the cropped field svg: edge lanes that the
+           duel row budgets around (--laneW), with the money + conditions
+           boards docked beneath — overlap is now structurally impossible. -->
+      <div class="stand-lane left" aria-hidden="false">
+        <svg viewBox="8 140 148 310" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g class="crowd"><g class="stand-l"><rect x="14" y="146" width="134" height="296" rx="16" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.35)" stroke-width="2.5"/><rect x="21" y="198" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="242" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="286" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="330" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="374" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="418" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><g transform="translate(36 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(66 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(96 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(126 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(43 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(73 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(103 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(133 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(36 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(66 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(96 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(126 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(43 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(73 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(103 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(133 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(36 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(66 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(96 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(126 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(43 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(73 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(103 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(133 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g></g></g></svg>
+        <div class="field-panel field-purse" title="Your coins — earned ball by ball, spent in the Clubhouse">
+        <span class="coin"></span><b id="matchCoins">0</b>
+      </div>
+      </div>
+      <div class="stand-lane right" aria-hidden="false">
+        <svg viewBox="1046 140 148 310" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g class="crowd"><g class="stand-r"><rect x="1052" y="146" width="134" height="296" rx="16" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.35)" stroke-width="2.5"/><rect x="1059" y="198" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="242" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="286" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="330" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="374" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="418" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><g transform="translate(1074 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1104 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1134 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1164 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1081 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1111 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1141 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1171 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1074 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1104 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1134 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1164 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1081 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1111 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1141 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1171 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1074 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1104 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1134 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1164 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1081 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1111 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1141 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1171 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g></g></g></svg>
+        <div class="field-panel field-cond" title="Match conditions — coming soon">
+        <svg viewBox="0 0 48 32" aria-hidden="true"><circle cx="15" cy="13" r="8" fill="#ffd34e" opacity=".8"/><path d="M14 24 a7 7 0 0 1 6.5 -9 a8 8 0 0 1 15 3 a5.5 5.5 0 0 1 -1 11 h-19 a5.5 5.5 0 0 1 -1.5 -5" fill="#fffdf4" opacity=".85" stroke="rgba(23,33,31,.3)" stroke-width="1.5"/></svg>
+      </div>
       </div>
       <div class="av-row2">
         <div class="av-pitch" id="duel"></div>
-      </div>
-      <div class="field-panel field-purse" title="Your coins — earned ball by ball, spent in the Clubhouse">
-        <span class="coin"></span><b id="matchCoins">0</b>
-      </div>
-      <div class="field-panel field-cond" title="Match conditions — coming soon">
-        <svg viewBox="0 0 48 32" aria-hidden="true"><circle cx="15" cy="13" r="8" fill="#ffd34e" opacity=".8"/><path d="M14 24 a7 7 0 0 1 6.5 -9 a8 8 0 0 1 15 3 a5.5 5.5 0 0 1 -1 11 h-19 a5.5 5.5 0 0 1 -1.5 -5" fill="#fffdf4" opacity=".85" stroke="rgba(23,33,31,.3)" stroke-width="1.5"/></svg>
       </div>
     </div>
 
@@ -7217,10 +7388,56 @@ function startRun(){
   const startingRoster=starterDraft();
   run={roster:startingRoster,deck:[],draftPool:startingRoster.slice(),draftSelected:new Set(),match:0,coins:4,refreshes:2,wins:0,pending:null,coaches:[],consumables:[],voucherIds:[]};
   applyUnlocks(run);   // permanent boons earned across runs
-  // FIRST run ever: no kit-bag lecture — straight to the VS moment with an
-  // auto-formed XI; the in-match coach-marks teach lanes/stance/wheel live.
-  if(!localStorage.getItem("pp_seen_intro")){startFirstMatch();return}
-  goVs();
+  // Every new run opens with the FOUNDING PACK — rip it, meet your squad on
+  // the board, then to the toss. Teaches packs + squad management by doing.
+  showFounding();
+}
+/* FOUNDING PACK screen: beat 1 = one breathing pack (the pack IS the button),
+   beat 2 = the cards land on the real squad board (XII formed, spares on the
+   bench) with ONE glowing exit. Continue runs never come through here. */
+function showFounding(){
+  // auto-form the strongest XII now so the board opens already valid
+  run.draftSelected=new Set(roster().slice().sort(sortStrong).slice(0,12).map(c=>c.id));
+  run.deck=selectedDraftCards();
+  const art=packArt("player",null,{sparkle:true});
+  $("#fpPackBody").innerHTML=art;
+  $("#fpTear").innerHTML=art;
+  $("#fpPackWrap").classList.remove("rip");
+  $("#fpPackWrap").hidden=false;
+  $("#fpBoard").hidden=true;$("#fpBoard").innerHTML="";
+  $("#fpGo").hidden=true;
+  $("#fpTitle").textContent="Your Founding Pack";
+  $("#fpSub").innerHTML="Every street legend starts with one pack — <b>rip it open.</b>";
+  // honest label: this pack IS the starting squad, not a gamble
+  document.querySelectorAll("#founding .pack-name").forEach(el=>el.textContent="FOUNDING PACK");
+  document.querySelectorAll("#founding .pack-teaser").forEach(el=>el.textContent=`${roster().length} PLAYERS · YOUR STARTING SQUAD`);
+  show("founding");
+}
+function ripFounding(){
+  const wrap=$("#fpPackWrap");
+  if(wrap.classList.contains("rip"))return;
+  SFX.play("pack");
+  wrap.classList.add("rip");
+  setTimeout(()=>{
+    SFX.play("swish");
+    wrap.hidden=true;
+    paintFoundingBoard();
+    $("#fpBoard").hidden=false;
+    $("#fpBoard").scrollTop=0;
+    // the squad deals onto the board one card at a time
+    document.querySelectorAll("#fpBoard .sb-card").forEach((el,i)=>el.style.animationDelay=`${120+i*70}ms`);
+    $("#fpTitle").textContent="Meet Your Squad";
+    $("#fpSub").innerHTML=benchCards().length
+      ?"Your strongest <b>XII take the field</b> — the rest wait on the <b>bench</b>. Drag to swap, star a favourite."
+      :"Your first <b>XII</b> — players you sign later wait on the <b>bench</b>. Star a favourite to pin them first.";
+    $("#fpGo").hidden=false;
+  },1150);
+}
+function paintFoundingBoard(hl){
+  const host=$("#fpBoard");
+  const build=()=>{host.innerHTML=squadBoardHTML({editable:true});
+    wireSquadBoard(host,{editable:true,rerender:paintFoundingBoard});};
+  if(host.innerHTML)paintBoardFLIP(host,build,hl);else build();
 }
 function renderIntro(){
   const cards=roster().slice().sort(sortStrong);
@@ -9245,22 +9462,42 @@ function snapSlotHTML(){
     <span class="kit-plate">${escSVG(owned.name)}</span>
   </div>`;
 }
+/* Pin the armed-tool strip flush to the arena card's drawn ink frame.
+   The card ARRIVES LATE (the 430ms select beat) and lands via a deal-in
+   animation, so a one-shot measure either finds no card or a mid-flight
+   rect. This tracks every frame: waits for the card to exist, follows it
+   through the flight, and stops once the rect holds still. */
 function positionSnapSlot(){
-  const snap=document.querySelector(".you-col .snap-slot");
-  const card=document.querySelector(".you-col .card");
-  const col=document.querySelector(".you-col");
-  if(!snap||!card||!col)return;
-  const kr=col.getBoundingClientRect();
-  // no viewBox math — measure the DRAWN frame rect itself (immune to
-  // letterboxing, transforms, padding, whatever the wrappers do)
-  const frameEl=card.querySelectorAll("svg.tc > rect")[1]||card.querySelector("svg.tc > rect"); // the INK-BORDERED inner rect = the card the eye sees
-  if(!frameEl)return;
-  const fr=frameEl.getBoundingClientRect();
-  if(!fr.width)return;
-  snap.style.left=(fr.right-kr.left-2)+"px"; // flush: borders kiss
-  snap.style.top=(fr.top-kr.top)+"px";       // EXACT drawn top
-  snap.style.height=fr.height+"px";          // EXACT drawn length
-  snap.style.width=(fr.width/4)+"px";
+  const apply=()=>{
+    const snap=document.querySelector(".you-col .snap-slot");
+    const card=document.querySelector(".you-col .card");
+    const col=document.querySelector(".you-col");
+    if(!snap||!card||!col)return false;
+    const kr=col.getBoundingClientRect();
+    // no viewBox math — measure the DRAWN frame rect itself (immune to
+    // letterboxing, transforms, padding, whatever the wrappers do)
+    const frameEl=card.querySelectorAll("svg.tc > rect")[1]||card.querySelector("svg.tc > rect"); // the INK-BORDERED inner rect = the card the eye sees
+    if(!frameEl)return false;
+    const fr=frameEl.getBoundingClientRect();
+    if(!fr.width)return false;
+    snap.style.left=(fr.right-kr.left-2)+"px"; // flush: borders kiss
+    snap.style.top=(fr.top-kr.top)+"px";       // EXACT drawn top
+    snap.style.height=fr.height+"px";          // EXACT drawn length
+    snap.style.width=(fr.width/4)+"px";
+    return fr;
+  };
+  cancelAnimationFrame(positionSnapSlot.__raf);
+  let last=null,still=0,tries=0;
+  const tick=()=>{
+    const fr=apply();
+    if(fr){
+      if(last&&Math.abs(fr.top-last.top)<.5&&Math.abs(fr.left-last.left)<.5)still++;else still=0;
+      last={top:fr.top,left:fr.left};
+      if(still>=3)return;              // settled — strip is pinned
+    }
+    if(++tries<=150)positionSnapSlot.__raf=requestAnimationFrame(tick); // ~2.5s cap
+  };
+  tick();
 }
 function renderKitbag(){
   const el=$("#matchKitZone");if(!el)return;
@@ -9854,7 +10091,8 @@ function renderSquadManager(){
 }
 
 function starterDraft(){
-  return ["bat","bat","bat","bat","bowl","bowl","bowl","bowl","all","all","all","all","all","all","all"].map(role=>card("common",role)).sort(sortStrong);
+  // exactly 12: the founding pack IS your XII — no leftovers to explain
+  return ["bat","bat","bat","bat","bowl","bowl","bowl","bowl","all","all","all","all"].map(role=>card("common",role)).sort(sortStrong);
 }
 function compactCompareHTML(yourCards,rivalCards){
   const roles=[["bat","Bat"],["bowl","Bowl"],["all","AR"]],max=8;
@@ -10027,11 +10265,27 @@ function tossSummaryHTML(){
     ${tossRecommendationHTML(yBat,yBowl,rBat,rBowl)}
   </div>`;
 }
+/* lean glyphs for the VS plates — inline SVG, never OS emoji */
+function vsLeanIconSVG(lean){
+  const bat=`<svg viewBox="0 0 24 24" class="vsp-ico"><rect x="10.2" y="2" width="3.6" height="13" rx="1.6" fill="#1f9b53" stroke="#17211f" stroke-width="1.4" transform="rotate(24 12 8)"/><rect x="9.4" y="14.6" width="5.2" height="7" rx="2.2" fill="#c88a3d" stroke="#17211f" stroke-width="1.4" transform="rotate(24 12 18)"/></svg>`;
+  const ball=`<svg viewBox="0 0 24 24" class="vsp-ico"><circle cx="12" cy="12" r="8.6" fill="#c0303f" stroke="#17211f" stroke-width="1.6"/><path d="M8.4 4.8 C 11 9 11 15 8.4 19.2 M15.6 4.8 C 13 9 13 15 15.6 19.2" fill="none" stroke="#fff6e3" stroke-width="1.5" stroke-dasharray="2.4 1.7"/></svg>`;
+  if(lean==="batting heavy")return bat;
+  if(lean==="bowling heavy")return ball;
+  return bat+ball; // balanced / all-rounder heavy: both disciplines
+}
+function vsPlateHTML(side,lean,bat,bowl){
+  return `<span class="vsp-tab">${side==="you"?"YOU":"THEM"}</span>
+    <div class="vsp-lean">${vsLeanIconSVG(lean)}<em>${escSVG(lean.toUpperCase())}</em></div>
+    <div class="vsp-stats">
+      <div class="vsp-sq bat"><b>${bat}</b><span>BAT</span></div>
+      <div class="vsp-sq bowl"><b>${bowl}</b><span>BOWL</span></div>
+    </div>`;
+}
 function renderToss(){
   // THE VS MOMENT: who you face, one giant PLAY. Coin + innings flow inline.
   const boss=m.def.boss;
   $("#tossTitle").innerHTML=boss?`🏆 ${escSVG(m.def.cup)} FINAL`:`<i class="vs-of">MATCH ${run.match+1}/${MATCHES.length}</i><span class="vs-vs">VS</span> ${escSVG(m.def.name)}`;
-  const tc=$("#tossCard")||$("#toss .toss-card2");if(tc)tc.classList.toggle("is-final",!!boss);
+  const tc=$("#tossCard");if(tc)tc.classList.toggle("is-final",!!boss);
   const yBat=avgStat(activeSquad(),"bat"),yBowl=avgStat(activeSquad(),"bowl");
   const rBat=avgStat(m.rivalDeck,"bat"),rBowl=avgStat(m.rivalDeck,"bowl");
   $("#coinFlip").classList.toggle("spin",!!m.tossCall);
@@ -10052,10 +10306,9 @@ function renderToss(){
     $("#tossSub").innerHTML=`Rival won the toss — they <b>${m.rivalBatsFirst?"bat":"bowl"} first</b>.`;
     $("#tossChoices").innerHTML=`<button class="btn xl" id="startLost">START &#9654;</button>`;
   }
-  const bossBanner=boss?`<div class="toss-boss"><b>${boss.team}</b><span>${boss.desc}</span></div>`:"";
-  $("#tossRival").innerHTML=bossBanner
-    +`<span class="toss-read-chip you">YOU · BAT ${yBat} / BOWL ${yBowl}</span>`
-    +`<span class="toss-read-chip rival">THEM · ${deckLean(m.rivalDeck).toUpperCase()} · BAT ${rBat} / BOWL ${rBowl}</span>`;
+  $("#tossRival").innerHTML=boss?`<div class="toss-boss"><b>${boss.team}</b><span>${boss.desc}</span></div>`:"";
+  $("#vsYouPlate").innerHTML=vsPlateHTML("you",deckLean(activeSquad()),yBat,yBowl);
+  $("#vsRivalPlate").innerHTML=vsPlateHTML("rival",deckLean(m.rivalDeck),rBat,rBowl);
   const vp=$("#vsPlay");if(vp)vp.onclick=()=>callToss();
   const ve=$("#vsEdit");if(ve)ve.onclick=()=>{SFX.play("nav");beginSquadSelection()};
   $("#tossChoices").querySelectorAll("[data-innings]").forEach(b=>b.onclick=()=>{clearTimeout(m.__tossAuto);chooseInnings(b.dataset.innings)});
@@ -10115,6 +10368,9 @@ function finish(){
 }
 function scheduleAutoNext(){
   clearTimeout(m.__autoNext);
+  // tutorial reading time is sacred: no auto-advance while tips are up —
+  // the player continues by tap / NEXT BALL, and TUT.finish() resumes us
+  if(typeof TUT!=="undefined"&&TUT.isActive())return;
   // let the outcome land and read, then deal the next ball automatically.
   // a payout is a MOMENT — hold the next ball until the coin has landed
   m.__autoNext=setTimeout(()=>{
@@ -10161,30 +10417,36 @@ function nextBall(){
 const TUT=(()=>{
   let active=false,step=0;
   const STEPS=[
-    {tag:"How to play",text:"On the right is your rival, face-up. Tap any card to flip it and read what its numbers do.",
-     target:()=>document.querySelector("#duel .av-duelrow > .dslot"),wait:"flip"},
-    {tag:"Step 1 — pick",text:"Your team is the fan below. Tap a player to send them out to the middle.",
+    {tag:"The duel",text:()=>m&&m.phase==="bowl"
+      ?"That's the rival's batter, out on the pitch face-up. You're BOWLING — after you pick a bowler, YOU choose the stat to attack them with (tap a stat lane on your card)."
+      :"That's the rival's card, out on the pitch face-up. The LIT square is the stat their bowler is attacking with — answer it.",
+     target:()=>document.querySelector("#duel .av-duelrow > .dslot"),button:"Got it"},
+    {tag:"Step 1 — pick",text:"Your hand waits below. Tap a player to send them out to the middle.",
      target:()=>document.querySelector("#hand"),wait:"pick"},
-    {tag:"Step 2 — intent",text:"Choose HOW to play it. Defend is safe, Push is balanced, Attack swings big and reshapes the field.",
+    {tag:"Step 2 — intent",text:"Now choose HOW to play it — safe, steady or aggressive. Hover an option and watch the wheel reshape; tap to commit.",
      target:()=>document.querySelector("#duel .stance-bar"),wait:"stance"},
-    {tag:"Step 3 — play",text:"Ready? Hit PLAY and the field decides the ball.",
+    {tag:"Step 3 — play",text:"The wheel is the ball's fate — bigger zones, more likely. The pointer is NOT a prediction: when you hit PLAY it SPINS, and wherever it stops is the result.",
      target:()=>document.querySelector("#confirmBtn"),wait:"play"},
-    {tag:"The ball",text:"Bigger zones = more likely. The needle spins and lands on your real outcome — nothing is rigged.",
+    {tag:"The ball",text:"Watch it spin — the needle lands on your real outcome. Nothing is rigged.",
      target:()=>document.querySelector("#duel .av-ringwrap"),wait:"land"},
-    {tag:"Build HEAT",text:"Keep hitting boundaries to build HEAT (watch the meter below). A hot streak grows your boundary zones — but a wicket resets it. Cash in or protect it.",
-     target:()=>document.querySelector("#match .mhud"),button:"Got it"},
-    {tag:"You're set",text:"Win matches to earn coins, then spend them in the Clubhouse on coaches, tools & training to build your engine. Good luck!",
-     target:null,button:"Let's go"}
+    {tag:"Build HEAT",text:"String boundaries together and your card catches FIRE — hot zones grow on the wheel while the streak lives. A wicket snuffs it out.",
+     target:null,button:"Got it"},
+    {tag:"Your deck",text:"Need a specialist? Tap the red DECK to open your squad and send anyone to your field row — only face-up cards can play a ball.",
+     target:()=>document.querySelector(".hand-deck"),button:"Got it"},
+    {tag:"The purse",text:"Every ball can pay. Boundaries and wickets earn coins — and winning a duel with the WEAKER number pays an underdog bounty. It all lives in the purse under the stands; spend it in the Clubhouse.",
+     target:()=>document.querySelector(".field-purse"),button:"Let's go"}
   ];
   const el=id=>document.getElementById(id);
-  function waitLabel(w){return w==="flip"?"tap a card to flip":w==="pick"?"tap a player":w==="stance"?"choose an intent":w==="play"?"hit PLAY":"watching…"}
+  function waitLabel(w){return w==="pick"?"tap a player":w==="stance"?"choose an option":w==="play"?"hit PLAY":"watching…"}
   function body(s){
     const btn=s.button?`<button class="tut-next" id="tutNext">${s.button} ▸</button>`
       :`<span class="tut-wait">→ ${waitLabel(s.wait)}</span>`;
+    const txt=typeof s.text==="function"?s.text():s.text; // phase-aware copy
     return `<div class="tut-step">${s.tag} &middot; ${step+1}/${STEPS.length}</div>
-      <div class="tut-text">${s.text}</div>
+      <div class="tut-text">${txt}</div>
       <div class="tut-row"><button class="tut-skip" id="tutSkip">Skip tips</button>${btn}</div>`;
   }
+  let placeRetry=-1;
   function place(){
     if(!active)return;
     const s=STEPS[step];if(!s){finish();return}
@@ -10192,6 +10454,9 @@ const TUT=(()=>{
     if(!layer||!hole||!bub)return;
     layer.classList.add("on");
     const t=s.target&&s.target(),r=t&&t.getBoundingClientRect();
+    // a between-ball re-render can momentarily detach the target — retry once
+    // before giving up the spotlight for a centered bubble
+    if(s.target&&(!r||!r.width)&&placeRetry!==step){placeRetry=step;setTimeout(place,400);return}
     const vw=innerWidth,vh=innerHeight;
     bub.innerHTML=body(s);
     if(r&&r.width){
@@ -10221,10 +10486,13 @@ const TUT=(()=>{
   function advance(){step++;if(step>=STEPS.length){finish();return}place()}
   function notify(action){
     if(!active)return;const s=STEPS[step];if(!s||s.wait!==action)return;
-    setTimeout(advance,action==="flip"?250:action==="land"?700:180);
+    // breathe: let the player's move visibly land BEFORE the next tip swaps in
+    setTimeout(advance,action==="land"?1600:action==="play"?600:800);
   }
   function start(){active=true;step=0;addEventListener("resize",place);place()}
-  function finish(){active=false;localStorage.setItem("pp_tut_done","1");removeEventListener("resize",place);const l=el("tutLayer");if(l)l.classList.remove("on")}
+  function finish(){active=false;localStorage.setItem("pp_tut_done","1");removeEventListener("resize",place);const l=el("tutLayer");if(l)l.classList.remove("on");
+    // the auto-advance was held while tips were up — resume the game's pulse
+    if(typeof m!=="undefined"&&m&&m.result&&m.result.state==="settled")scheduleAutoNext();}
   return {start,notify,finish,reposition:()=>{if(active)place()},isActive:()=>active};
 })();
 function maybeStartTutorial(){
@@ -10256,6 +10524,14 @@ function enterFS(){const d=document.documentElement;if(!document.fullscreenEleme
 function toggleFS(){if(document.fullscreenElement)document.exitFullscreen();else enterFS()}
 const _fsBtn=$("#fsBtn");if(_fsBtn)_fsBtn.onclick=toggleFS;
 $("#startBtn").onclick=()=>{enterFS();startRun()};
+$("#fpPackBtn").onclick=ripFounding;
+$("#fpGo").onclick=()=>{
+  if(activeSquad().length!==12){flashHint("Your XII needs exactly 12 — drag cards between the field sections and the bench.");return}
+  localStorage.setItem("pp_seen_intro","1"); // the founding pack IS the intro now
+  SFX.play("nav");
+  run.draftSelected=new Set(activeSquad().map(c=>c.id));
+  setupToss();
+};
 function renderCollection(){
   const body=$("#collectionBody");if(!body)return;
   body.innerHTML=UNLOCKS.map(u=>{
