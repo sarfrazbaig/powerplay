@@ -5172,6 +5172,26 @@
   .stance-bar .stance-lead{margin:0;white-space:nowrap}
   .stance-bar .stance-row{gap:12px}
   /* tap-to-field cards in the squad overlay (never get stuck) */
+  /* SQUAD BOARD — the one management surface (match overlay + squad page) */
+  .scout-overlay .scout-panel{width:min(96vw,1800px);max-width:96vw;height:92vh;max-height:92vh;display:flex;flex-direction:column}
+  .scout-overlay #rivalDeckGrid{flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:6px}
+  .sb-section{margin:0 0 18px}
+  .sb-section>h4{margin:0 0 8px;font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.5px;
+    color:var(--punch,#ff5a2d);font-size:17px;text-transform:uppercase;border-bottom:2px solid rgba(23,33,31,.15);padding-bottom:4px}
+  .sb-section>h4 em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:700;font-size:11.5px;color:#7a6a4a;text-transform:none;letter-spacing:0}
+  .sb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(170px,13vw,225px),1fr));gap:14px;min-height:70px}
+  .sb-section.drop-hot .sb-grid{outline:3px dashed rgba(255,90,45,.5);outline-offset:6px;border-radius:12px}
+  .sb-card{position:relative;cursor:grab}
+  .sb-card:active{cursor:grabbing}
+  .sb-card .card{width:100%}
+  .sb-card.dragging{opacity:.35}
+  .sb-card.usedc{opacity:.55}
+  .sb-fav{position:absolute;top:6px;left:6px;z-index:5;width:30px;height:30px;border-radius:50%;
+    background:#fff6e3;border:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center;
+    font-size:15px;cursor:pointer;color:#b9b2a2;transition:transform .12s}
+  .sb-fav:hover{transform:scale(1.15)}
+  .sb-fav.on{color:#f0a500;box-shadow:0 0 10px rgba(255,201,60,.65)}
+  .sb-bench-note{font-size:11.5px;font-weight:700;color:#7a6a4a;margin:-4px 0 8px}
   .scout-card.fieldable{cursor:pointer;transition:transform .12s ease}
   .scout-card.fieldable:hover{transform:translateY(-6px)}
   .scout-card.fieldable::after{content:"FIELD";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
@@ -9301,6 +9321,76 @@ function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,a
   return cardHTML(c,{selected,used,disabled,emph,dealin:animate,mini:tactical||rival,fan:fanStyle(i,total,rival ? .78 : 1.05)});
 }
 
+/* ---------- SQUAD BOARD (reusable) ---------- */
+function benchCards(){const act=activeIds();return roster().filter(c=>!act.has(c.id));}
+function sbSort(list){
+  return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)||(batVal(b)+bowlVal(b))-(batVal(a)+bowlVal(a)));
+}
+function squadBoardHTML(opts={}){
+  const inMatch=!!opts.match;
+  const act=activeSquad();
+  const groups=[["bat","Batters"],["all","All-rounders"],["bowl","Bowlers"]]
+    .map(([role,label])=>({role,label,cards:sbSort(act.filter(c=>c.role===role))}));
+  const bench=sbSort(benchCards());
+  const emph=inMatch?(m.phase==="bowl"?"bowl":"bat"):null;
+  const cell=(c,sec)=>`<div class="sb-card ${c.used&&inMatch?'usedc':''}" draggable="${opts.editable?'true':'false'}" data-sb-id="${c.id}" data-sec="${sec}">
+      <span class="sb-fav ${c.fav?'on':''}" data-fav="${c.id}" title="${c.fav?'Unfavourite':'Mark favourite'}">&#9733;</span>
+      ${cardHTML(c,{emph,as:"div"})}
+    </div>`;
+  const section=(key,label,cards,note)=>`<div class="sb-section" data-sb-sec="${key}">
+      <h4>${label} &middot; ${cards.length} ${note?`<em>${note}</em>`:""}</h4>
+      ${key==="bench"&&!opts.editable?`<div class="sb-bench-note">Bench is locked during a match — manage your XII between games.</div>`:""}
+      <div class="sb-grid">${cards.map(c=>cell(c,key)).join("")||'<div class="scout-empty">Empty.</div>'}</div>
+    </div>`;
+  return groups.map(g=>section(g.role,g.label,g.cards,inMatch?"tap a card to field it":"drag to bench &middot; star to pin")).join("")
+    + section("bench",`Bench`,bench,opts.editable?"drag onto a role section to join the XII":"");
+}
+function wireSquadBoard(host,opts={}){
+  // favourites
+  host.querySelectorAll("[data-fav]").forEach(st=>st.onclick=e=>{
+    e.stopPropagation();
+    const c=roster().find(x=>x.id===st.dataset.fav);
+    if(c){c.fav=!c.fav;persistRun();opts.rerender&&opts.rerender();}
+  });
+  // field / flip on card click
+  host.querySelectorAll(".sb-card").forEach(cell=>{
+    const id=cell.dataset.sbId;
+    cell.onclick=e=>{
+      if(e.target.closest("[data-fav]"))return;
+      if(opts.onCard)opts.onCard(id);
+    };
+  });
+  if(!opts.editable)return;
+  // drag & drop: reorder + active<->bench
+  let dragId=null;
+  host.querySelectorAll(".sb-card").forEach(cell=>{
+    cell.addEventListener("dragstart",e=>{dragId=cell.dataset.sbId;cell.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
+    cell.addEventListener("dragend",()=>{dragId=null;cell.classList.remove("dragging");host.querySelectorAll(".sb-section").forEach(x=>x.classList.remove("drop-hot"));});
+  });
+  host.querySelectorAll(".sb-section").forEach(sec=>{
+    sec.addEventListener("dragover",e=>{e.preventDefault();sec.classList.add("drop-hot");});
+    sec.addEventListener("dragleave",()=>sec.classList.remove("drop-hot"));
+    sec.addEventListener("drop",e=>{
+      e.preventDefault();sec.classList.remove("drop-hot");
+      if(!dragId)return;
+      const card=roster().find(c=>c.id===dragId);if(!card)return;
+      const target=sec.dataset.sbSec;
+      const inXII=activeIds().has(card.id);
+      if(target==="bench"&&inXII){
+        run.deck=run.deck.filter(c=>c.id!==card.id);          // bench him
+      }else if(target!=="bench"&&!inXII){
+        if(run.deck.length>=12){flashHint("XII is full — bench someone first.");return;}
+        if(card.role!==target&&target!==card.role){/* role sections accept only own role visually */}
+        run.deck.push(card);                                   // into the XII
+      }else{
+        // same-zone drop: move card to front of its group order (simple re-arrange)
+        if(inXII){run.deck=run.deck.filter(c=>c.id!==card.id);run.deck.unshift(card);}
+      }
+      persistRun();
+      opts.rerender&&opts.rerender();
+    });
+  });
+}
 /* ---------- SCOUT: decks ---------- */
 function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
 function deckScoutCell(c,o={},emph){
@@ -9316,18 +9406,23 @@ function renderDeckScout(kind){
   const used=deck.filter(c=>c.used);
   $("#scoutTitle").textContent=player?"Your squad":"Rival squad";
   $("#scoutSub").textContent=player?`— your available ${statLbl} options`:`— they ${m.phase==="bowl"?"bat":"bowl"} their best ${statLbl} card first`;
-  $("#rivalDeckGrid").innerHTML=
-    `<div class="scout-group"><h4>${player?"Available":"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value — click a card to flip)</em></h4>
+  if(!player)$("#rivalDeckGrid").innerHTML=
+    `<div class="scout-group"><h4>${"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value — click a card to flip)</em></h4>
        <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
     + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
-  if(player&&!m.result){
-    // tap any of YOUR cards to field it this ball (bench / off-role included),
-    // so you're never stuck when the ready row runs out of on-role cards.
-    document.querySelectorAll("#rivalDeckGrid .scout-card").forEach(cell=>{
-      const id=cell.querySelector(".card")?.dataset.id;
-      const c=activeSquad().find(x=>x.id===id);
-      if(c&&!c.used){cell.classList.add("fieldable");cell.onclick=()=>{closeRivalDeck();lockCard(c)}}
-    });
+  if(player){
+    // THE SQUAD BOARD: categorized XII + bench, favourites, big grid.
+    $("#scoutSub").textContent="— your squad, categorized · star favourites";
+    const host=$("#rivalDeckGrid");
+    const paint=()=>{
+      host.innerHTML=squadBoardHTML({match:true,editable:false});
+      wireSquadBoard(host,{rerender:paint,onCard:id=>{
+        const c=activeSquad().find(x=>x.id===id);
+        if(c&&!c.used&&!m.result){closeRivalDeck();lockCard(c);}
+        else toggleFlip(id);
+      }});
+    };
+    paint();
   }else{
     document.querySelectorAll("#rivalDeckGrid .scout-card .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
   }
@@ -9585,13 +9680,15 @@ function renderSquadManager(){
   $("#squadManageHint").textContent=p?(p.type==="train"?"→ tap a player to train":"→ tap a BENCH card to sell"):"TRAIN or SELL → tap a card";
   $("#squadManageActions").innerHTML=squadActionHTML();
   bindSquadActions();
-  const groups=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]];
-  $("#squadGrid").innerHTML=groups.map(([role,label])=>{
-    const cards=owned.filter(c=>c.role===role);
-    const body=cards.map((c,i)=>cardHTML(c,{pickable:!!p,active:ids.has(c.id),emph:p?.type==="train"?p.stat:null,dealin:false,fan:`--d:${i*12}ms`})).join("");
-    return `<section class="roster-group"><h3>${label} (${cards.length})</h3><div class="roster-row">${body||'<div class="scout-empty">No cards</div>'}</div></section>`;
-  }).join("");
-  document.querySelectorAll("#squadGrid .card").forEach(b=>b.onclick=p?()=>squadAct(b.dataset.id):()=>toggleFlip(b.dataset.id));
+  // THE SQUAD BOARD, editable here: categorized XII + bench, favourites,
+  // drag between sections (bench<->XII) — full squad management.
+  const host=$("#squadGrid");
+  const paint=()=>{
+    host.innerHTML=squadBoardHTML({match:false,editable:!p});
+    wireSquadBoard(host,{editable:!p,rerender:renderSquadManager,
+      onCard:id=>{p?squadAct(id):toggleFlip(id)}});
+  };
+  paint();
 }
 
 function starterDraft(){
