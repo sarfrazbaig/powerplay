@@ -8632,7 +8632,13 @@ function finishLanding(res,target){
   if(cs){cs.className="commentary-strip quiet";cs.textContent=commentaryLines(res)[2]}
   const g=document.querySelector(".av-ground");
   const tk=res.strip[res.roll];
-  if(g){const cls=tk==="W"?"hit-wicket":tk==="6"?"hit-six":tk==="4"?"hit-four":null;if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}}
+  if(g){
+    // it's YOUR home crowd — they cheer YOUR boundaries (batting) and YOUR
+    // wickets (bowling). The rival's boundaries and your dismissals get silence.
+    const myMoment=(m.phase==="bat"&&(tk==="4"||tk==="6"))||(m.phase==="bowl"&&tk==="W");
+    const cls=!myMoment?null:tk==="W"?"hit-six":tk==="6"?"hit-six":"hit-four";
+    if(cls){g.classList.add(cls);setTimeout(()=>g.classList.remove(cls),950)}
+  }
   // the card itself celebrates: wicket -> fist-pump leap, six -> the launch
   (()=>{
     const tk=res.strip[res.roll];
