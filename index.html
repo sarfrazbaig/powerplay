@@ -8513,10 +8513,11 @@ function ringCenterRead(){
   return `<div class="ring-read wait"><b>${head}</b><span>${sub}</span></div>`;
 }
 function ringResultHTML(){
-  // token only — the words live in the commentary line below the wheel
+  // no big token here — the outcome POP says it once. The centre keeps only
+  // the celebration confetti and the next-ball affordance.
   const token=ballToken(m.result.text);
   const cls=token==="W"?"wicket":(token==="4"||token==="6"?"boundary":(token==="wd"||token==="nb"?"extra":"run"));
-  return `<div class="ring-read result ${cls}"><b class="ring-token">${token.toUpperCase()}</b>${shouldCelebrate(m.result)?confettiHTML():""}</div>`;
+  return `<div class="ring-read result ${cls}">${shouldCelebrate(m.result)?confettiHTML():""}</div>`;
 }
 let spinTimers=[];
 function clearSpin(){spinTimers.forEach(clearTimeout);spinTimers=[];cancelAnimationFrame(morphRAF)}
@@ -9564,7 +9565,7 @@ function scheduleAutoNext(){
   // a payout is a MOMENT — hold the next ball until the coin has landed
   m.__autoNext=setTimeout(()=>{
     if(m&&m.result&&m.result.state==="settled"&&document.getElementById("match")?.classList.contains("active"))nextBall();
-  },1150+(m.__ballPay?2100:0));
+  },2400+(m.__ballPay?1200:0));
 }
 function nextBall(){
   if(!m.result)return;
