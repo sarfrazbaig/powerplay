@@ -4462,9 +4462,11 @@
   /* the consumable snap-on: the KIT SLOT component, riding the card edge */
   .you-col{position:relative}
   .snap-slot{position:absolute;z-index:3;margin:0}
-  .snap-slot.kit-slot{display:flex;flex-direction:column;border-radius:0 12px 12px 0;border-left-width:1.5px;
-    padding:0;overflow:hidden;transform:none}
-  .snap-slot.kit-slot:hover{transform:none;box-shadow:0 0 0 2px var(--gold),0 0 16px rgba(255,210,63,.5)}
+  .snap-slot.kit-slot,.snap-slot.kit-slot.armed{display:flex;flex-direction:column;border-radius:0 12px 12px 0;
+    border:3px solid var(--ink);border-left-width:1.5px;
+    padding:0;overflow:hidden;transform:none;box-shadow:none}
+  .snap-slot.kit-slot:hover{transform:none;box-shadow:none}
+  .snap-slot.kit-slot .kit-armflag{display:none}
   .snap-slot.kit-slot .kit-plate{writing-mode:vertical-rl;transform:rotate(180deg);flex:1 1 auto;
     min-height:0;font-size:10px;letter-spacing:.5px}
   .snap-slot.kit-slot .kit-art{flex:0 0 34%;min-height:0;border-bottom-width:2px}
@@ -4472,8 +4474,8 @@
   .snap-slot.fired{animation:snapFired .9s ease}
   @keyframes snapFired{20%{transform:scale(1.1);box-shadow:0 0 24px rgba(255,201,60,.95)}}
   /* heat states on the arena: your card (or empty slot) burns */
-  #match.heat-warm .you-col .card{box-shadow:0 0 14px 3px rgba(255,138,43,.55);border-radius:14px}
-  #match.heat-fire .you-col .card{box-shadow:0 0 22px 6px rgba(255,77,28,.75);border-radius:14px;
+  #match.heat-warm .you-col .card,#match.heat-warm .you-col .snap-slot:not(.empty){box-shadow:0 0 14px 3px rgba(255,138,43,.55);border-radius:14px}
+  #match.heat-fire .you-col .card,#match.heat-fire .you-col .snap-slot:not(.empty){box-shadow:0 0 22px 6px rgba(255,77,28,.75);border-radius:14px;
     animation:cardBurn .6s ease-in-out infinite alternate}
   #match.heat-warm .you-col .dslot:empty,#match.heat-warm .you-col .dslot.empty{box-shadow:inset 0 0 18px rgba(255,138,43,.4)}
   #match.heat-fire .you-col .dslot:empty,#match.heat-fire .you-col .dslot.empty{box-shadow:inset 0 0 26px rgba(255,77,28,.55)}
