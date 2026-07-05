@@ -4386,9 +4386,9 @@
   }
   body{
     background:
-      radial-gradient(700px 380px at 85% -6%, rgba(255,236,150,.85), transparent 60%),
-      radial-gradient(1400px 700px at 50% -12%, #9fe4f2, transparent 70%),
-      linear-gradient(#58c8e4 0%, #a9e4ee 34%, #f2e3b8 60%, #e8c97a 100%) !important;
+      radial-gradient(760px 420px at 78% 66%, rgba(255,170,90,.5), transparent 62%),
+      radial-gradient(1400px 700px at 50% -12%, #8fd8ec, transparent 70%),
+      linear-gradient(#6cc5e0 0%, #a9dfe8 30%, #ffd9a0 58%, #f2b56a 78%, #e8a35c 100%) !important;
     background-attachment:fixed !important;
   }
   .screen, .screen.active{background:transparent !important}
@@ -4459,6 +4459,36 @@
     50%{transform:scale(1.1);filter:drop-shadow(0 0 12px rgba(255,178,20,.9))}}
   .hcoins.bump{animation:coinBump .5s cubic-bezier(.2,1.6,.4,1)}
   /* the payout stamp: gold +$N under the outcome word, then flies to the purse */
+  /* the consumable snap-on: the KIT SLOT component, riding the card edge */
+  .you-col{position:relative}
+  .snap-slot{position:absolute;z-index:3;margin:0}
+  .snap-slot.kit-slot,.snap-slot.kit-slot.armed{display:flex;flex-direction:column;border-radius:0 12px 12px 0;
+    border:0;
+    padding:0;overflow:hidden;transform:none;box-shadow:none}
+  .snap-slot.kit-slot:hover{transform:none;box-shadow:none}
+  .snap-slot.kit-slot .kit-armflag{display:none}
+  .snap-slot.kit-slot .kit-plate{writing-mode:vertical-rl;transform:rotate(180deg);flex:1 1 auto;
+    min-height:0;font-size:10px;letter-spacing:.5px}
+  .snap-slot.kit-slot .kit-art{flex:0 0 34%;min-height:0;border-bottom-width:2px}
+  .snap-slot.empty{background:none;border:0;box-shadow:none;pointer-events:none}
+  .snap-slot.fired{animation:snapFired .9s ease}
+  @keyframes snapFired{20%{transform:scale(1.1);box-shadow:0 0 24px rgba(255,201,60,.95)}}
+  /* heat states on the arena: your card (or empty slot) burns */
+  /* the NAVBAR burns with your heat — warm ember underglow, ON FIRE blazes */
+  #match.heat-warm .mhud{box-shadow:0 4px 20px rgba(255,138,43,.55),inset 0 -3px 0 rgba(255,138,43,.75)}
+  #match.heat-fire .mhud{box-shadow:0 5px 30px rgba(255,77,28,.8),inset 0 -3px 0 rgba(255,77,28,.95);
+    background:linear-gradient(180deg,rgba(255,247,232,.72),rgba(255,224,190,.66));
+    animation:navBurn .6s ease-in-out infinite alternate}
+  @keyframes navBurn{from{box-shadow:0 5px 24px rgba(255,77,28,.65),inset 0 -3px 0 rgba(255,77,28,.9)}
+    to{box-shadow:0 6px 40px rgba(255,110,20,.95),inset 0 -3px 0 rgba(255,110,20,1)}}
+  .ring-sec.sec-heat path{stroke:#ff7a1c;stroke-width:4.5;filter:drop-shadow(0 0 7px rgba(255,110,20,.75))}
+  .state-pop{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);z-index:42;pointer-events:none;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:34px;letter-spacing:1px;
+    padding:6px 22px;border-radius:99px;border:3px solid var(--ink);
+    box-shadow:0 5px 0 rgba(23,33,31,.4);animation:payIn .3s cubic-bezier(.2,1.6,.4,1) both,statePopOut .35s ease 1.25s forwards}
+  .state-pop.sp-fire{background:#ff4d1c;color:#fff6e3;text-shadow:0 2px 0 rgba(23,33,31,.5);box-shadow:0 5px 0 rgba(23,33,31,.4),0 0 30px rgba(255,77,28,.8)}
+  .state-pop.sp-lost{background:#5c6b66;color:#fff6e3}
+  @keyframes statePopOut{to{opacity:0;transform:translate(-50%,-80%) scale(.8)}}
   .pay-pop{position:absolute;top:58%;left:50%;transform:translate(-50%,-50%);z-index:41;pointer-events:none;
     display:flex;align-items:center;gap:8px;background:#fff6e3;border:3px solid var(--ink);border-radius:99px;
     padding:5px 18px;box-shadow:0 5px 0 rgba(23,33,31,.4),0 0 26px rgba(255,201,60,.65);
@@ -4863,7 +4893,10 @@
   }
   .ring-svg{width:100%;height:100%;display:block}
   .ring-svg.ghost{opacity:.30;filter:saturate(.25)}
-  .ring-sec path{transition:filter .18s ease}
+  .ring-sec path{transition:filter .18s ease,opacity .18s ease}
+  .ring-svg.ghosting .ring-sec path{opacity:.82;stroke-dasharray:7 5}
+  .ring-svg.ghosting .ring-sec text{opacity:.85}
+
   .ring-sec.lit path{filter:brightness(1.9) saturate(1.2)}
   .ring-sec.landed path{
     stroke:#17211f;stroke-width:5;
@@ -5132,6 +5165,86 @@
   .stance-bar .stance-lead{margin:0;white-space:nowrap}
   .stance-bar .stance-row{gap:12px}
   /* tap-to-field cards in the squad overlay (never get stuck) */
+  /* SQUAD BOARD — the one management surface (match overlay + squad page) */
+  .scout-overlay .scout-panel{width:min(96vw,1800px);max-width:96vw;height:92vh;max-height:92vh;display:flex;flex-direction:column}
+  .scout-overlay #rivalDeckGrid{flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:6px}
+  .sb-section{margin:0 0 18px}
+  .sb-section>h4{margin:0 0 8px;font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.5px;
+    color:var(--punch,#ff5a2d);font-size:17px;text-transform:uppercase;border-bottom:2px solid rgba(23,33,31,.15);padding-bottom:4px}
+  .sb-section>h4 em{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:700;font-size:11.5px;color:#7a6a4a;text-transform:none;letter-spacing:0}
+  .sb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(clamp(170px,13vw,225px),1fr));gap:14px;min-height:70px}
+  .sb-section.drop-hot .sb-grid{outline:3px dashed rgba(255,90,45,.5);outline-offset:6px;border-radius:12px}
+  .sb-card{position:relative;cursor:grab}
+  .sb-card:active{cursor:grabbing}
+  .sb-card .card{width:100%}
+  .sb-card.dragging{opacity:.35}
+  .sb-card.usedc{opacity:.55}
+  .sb-fav{position:absolute;top:6px;left:6px;z-index:5;width:30px;height:30px;border-radius:50%;
+    background:#fff6e3;border:2.5px solid var(--ink);display:flex;align-items:center;justify-content:center;
+    font-size:15px;cursor:pointer;color:#b9b2a2;transition:transform .12s}
+  .sb-fav:hover{transform:scale(1.15)}
+  .sb-fav.on{color:#f0a500;box-shadow:0 0 10px rgba(255,201,60,.65)}
+  /* title: emblem wheel is unlabelled; menu column; corners for lang/socials */
+  #heroMark .ring-sec text{display:none}
+  .hero-menu{display:flex;flex-direction:column;gap:12px;align-items:center}
+  .hero-menu .btn.xl{min-width:280px}
+  .title-lang{position:absolute;top:18px;right:18px;z-index:8;width:46px;height:46px;border-radius:50%;
+    background:#fff6e3;border:3px solid var(--ink);box-shadow:3px 3px 0 rgba(23,33,31,.4);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;padding:9px;transition:transform .12s}
+  .title-lang:hover{transform:scale(1.08)}
+  .title-socials{position:absolute;bottom:16px;right:18px;z-index:8;display:flex;gap:10px}
+  .title-socials button{width:42px;height:42px;border-radius:12px;background:#fff6e3;border:3px solid var(--ink);
+    box-shadow:3px 3px 0 rgba(23,33,31,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:8px;transition:transform .12s}
+  .title-socials button:hover{transform:translateY(-4px)}
+  .collection-overlay{position:fixed;inset:0;background:rgba(23,33,31,.55);z-index:60;display:none;
+    align-items:center;justify-content:center}
+  .collection-overlay.show{display:flex}
+  .collection-panel{width:min(92vw,760px);max-height:86vh;overflow-y:auto;background:#fff6e3;
+    border:3px solid var(--ink);border-radius:18px;box-shadow:8px 8px 0 rgba(23,33,31,.45);padding:18px 22px}
+  .collection-panel{color:var(--ink)}
+  .collection-panel .col-sub{font-size:13px;color:#7a6a4a;font-weight:700}
+  .col-item b{color:var(--punch,#ff5a2d) !important;text-shadow:none !important}
+  .col-item small{color:#7a6a4a !important}
+  .col-item{display:flex;align-items:center;gap:14px;padding:12px 10px;border-bottom:2px solid rgba(23,33,31,.1)}
+  .col-item:last-child{border-bottom:0}
+  .col-item .ci-badge{width:44px;height:44px;border-radius:50%;flex:0 0 44px;display:flex;align-items:center;justify-content:center;
+    font-size:20px;background:var(--gold);border:2.5px solid var(--ink)}
+  .col-item.locked .ci-badge{background:#d8d2c2;filter:grayscale(1)}
+  .col-item.locked{opacity:.6}
+  .col-item b{font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.4px;font-size:16px}
+  .col-item small{display:block;font-weight:700;color:#7a6a4a;font-size:12px}
+  .sb-layout{display:flex;gap:18px;align-items:flex-start;min-height:0}
+  .sb-side{flex:0 0 218px;position:sticky;top:0;display:flex;flex-direction:column;gap:14px;
+    background:rgba(255,253,244,.96);border:2px solid rgba(23,33,31,.12);border-radius:14px;padding:12px}
+  .sb-main{flex:1 1 auto;min-width:0}
+  .sbf-group h5{margin:0 0 6px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;
+    letter-spacing:.6px;color:#7a6a4a;text-transform:uppercase}
+  .sbf-group{display:flex;flex-direction:column;gap:5px}
+  .sbf-chip{display:flex;align-items:center;gap:7px;border:2px solid var(--ink);background:#fff6e3;border-radius:99px;
+    padding:5px 12px;font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:12.5px;cursor:pointer;
+    text-transform:capitalize;transition:transform .1s}
+  .sbf-chip:hover{transform:translateX(3px)}
+  .sbf-chip.on{background:var(--gold,#ffc93c)}
+  .sbf-ico{width:18px;height:18px;flex:0 0 18px}
+  .sbf-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--ink);flex:0 0 12px}
+  .sbf-flag{width:16px;height:16px;border-radius:50%;flex:0 0 16px;border:1.5px solid var(--ink)}
+  .sbf-natgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .sbf-natgrid .sbf-chip{padding:4px 8px;font-size:11.5px}
+  .sbf-favbtn{justify-content:center}
+  .sb-market{border:2.5px dashed rgba(184,134,11,.55);border-radius:14px;padding:8px 10px 10px;
+    background:linear-gradient(180deg,rgba(255,201,60,.12),transparent)}
+  .sb-market>h4{color:#b8860b;border-bottom:0;margin:0 0 4px;font-size:15px}
+  .sb-market-zone{min-height:110px;display:flex;align-items:center;justify-content:center;border-radius:10px}
+  .sb-market-hint{color:#9a834a;font-weight:800;font-size:12px;text-align:center;line-height:1.5;padding:6px}
+  .sb-market.drop-hot{background:rgba(255,201,60,.3)}
+  .sb-fieldrow{background:linear-gradient(180deg,rgba(31,155,83,.14),transparent);border:2.5px dashed rgba(31,155,83,.5);
+    border-radius:14px;padding:10px 12px 12px;margin-bottom:22px}
+  .sb-fieldrow>h4{color:#1f9b53;border-bottom-color:rgba(31,155,83,.3)}
+  .sb-card.sb-arrived .card{outline:4px solid var(--gold,#ffc93c);outline-offset:3px;border-radius:14px;
+    animation:sbArrive .9s ease}
+  @keyframes sbArrive{0%{filter:brightness(1.35)}100%{filter:none}}
+  .sb-bench-note{font-size:11.5px;font-weight:700;color:#7a6a4a;margin:-4px 0 8px}
   .scout-card.fieldable{cursor:pointer;transition:transform .12s ease}
   .scout-card.fieldable:hover{transform:translateY(-6px)}
   .scout-card.fieldable::after{content:"FIELD";position:absolute;left:50%;bottom:6px;transform:translateX(-50%);
@@ -5480,7 +5593,7 @@
   .title-scene{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9}
   #over .title-inner,#over .over-card{position:relative;z-index:2}
   .title-scene svg{width:100%;height:100%;display:block}
-  .title-scene .ts-sun{transform-box:view-box;transform-origin:1180px 150px;animation:tsSun 7s ease-in-out infinite}
+  .title-scene .ts-sun{transform-box:view-box;transform-origin:1120px 640px;animation:tsSun 9s ease-in-out infinite}
   @keyframes tsSun{0%,100%{opacity:.92;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
   .title-scene .ts-ball{transform-box:view-box;animation:tsBall 3.6s ease-in-out infinite}
   @keyframes tsBall{0%{transform:translate(0,0)}45%{transform:translate(70px,-46px)}55%{transform:translate(78px,-44px)}100%{transform:translate(0,0)}}
@@ -5489,11 +5602,12 @@
   .title-scene .ts-flags path:nth-child(3n){animation-delay:1.1s}
   @keyframes tsFlag{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
   .hero{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;position:relative;z-index:2;max-width:640px}
-  .hero-mark{width:clamp(150px,20vw,220px);aspect-ratio:1;margin-bottom:-8px;filter:drop-shadow(4px 6px 0 rgba(23,33,31,.35));animation:heroSpin 44s linear infinite}
-  .hero-mark svg{width:100%;height:100%;display:block}
+  .hero-mark-o{display:inline-block;width:1.02em;height:1.02em;vertical-align:-.13em;margin:0 -.15em 0 .035em;
+    filter:drop-shadow(3px 4px 0 rgba(23,33,31,.35));animation:heroSpin 40s linear infinite}
+  .hero-mark-o svg{width:100%;height:100%;display:block}
   @keyframes heroSpin{to{transform:rotate(360deg)}}
   .hero-logo{
-    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(52px,9vw,104px);line-height:.82;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(64px,9.6vw,140px);line-height:.86;white-space:nowrap;
     letter-spacing:1px;margin:0;color:var(--gold);
     text-shadow:4px 4px 0 var(--ink),8px 8px 0 rgba(23,33,31,.25);
     -webkit-text-stroke:2px var(--ink);
@@ -5670,45 +5784,64 @@
     <div class="title-scene" aria-hidden="true">
       <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
         <!-- warm sun -->
-        <g class="ts-sun"><circle cx="1180" cy="150" r="82" fill="#ffd23f"/><circle cx="1180" cy="150" r="110" fill="#ffd23f" opacity=".22"/><circle cx="1180" cy="150" r="150" fill="#ffd23f" opacity=".1"/></g>
-        <!-- bunting -->
-        <g stroke="#17211f" stroke-width="3" fill="none" opacity=".8"><path d="M-20 70 Q 360 190 720 90 T 1460 110"/></g>
-        <g class="ts-flags">
-          <path d="M40 96 l40 6 -32 34 Z" fill="#ff5a2d"/><path d="M150 118 l42 2 -28 38 Z" fill="#2fb98b"/>
-          <path d="M280 128 l42 -2 -22 40 Z" fill="#ffc93c"/><path d="M410 122 l42 -6 -18 40 Z" fill="#b98cff"/>
-          <path d="M545 104 l42 -8 -14 41 Z" fill="#ff4155"/><path d="M690 90 l42 -6 -16 41 Z" fill="#3aa5ee"/>
-          <path d="M900 96 l42 6 -30 36 Z" fill="#2fb98b"/><path d="M1040 108 l42 4 -26 38 Z" fill="#ff5a2d"/>
-          <path d="M1180 112 l42 0 -22 40 Z" fill="#ffc93c"/><path d="M1320 112 l42 -2 -20 40 Z" fill="#ff4155"/>
+        <g class="ts-sun">
+          <circle cx="1120" cy="640" r="200" fill="#ffb066" opacity=".18"/>
+          <circle cx="1120" cy="640" r="140" fill="#ff9a4d" opacity=".28"/>
+          <circle cx="1120" cy="640" r="92" fill="#ffcf5e"/>
+          <circle cx="1120" cy="640" r="92" fill="#ff9a3d" opacity=".45"/>
         </g>
+        <!-- bunting -->
+
         <!-- distant rooftops -->
         <g fill="#e88b3a" opacity=".55"><path d="M0 640 h140 v-70 l50 -40 l50 40 v70 h120 v-110 h150 v110 h1000 v260 H0 Z"/></g>
         <g fill="#d9772a" opacity=".5"><rect x="70" y="600" width="18" height="24"/><rect x="360" y="560" width="18" height="24"/></g>
         <!-- the maidan ground -->
         <path d="M0 720 Q 720 660 1440 720 V 900 H0 Z" fill="#6fae3a" opacity=".55"/>
         <path d="M0 760 Q 720 706 1440 760 V 900 H0 Z" fill="#5c9a2e" opacity=".5"/>
-        <!-- street cricket silhouettes -->
-        <g fill="#17211f" opacity=".82">
-          <!-- stumps -->
-          <g transform="translate(720 690)"><rect x="-2" y="0" width="4" height="60"/><rect x="-12" y="0" width="4" height="60"/><rect x="8" y="0" width="4" height="60"/><rect x="-14" y="-4" width="30" height="4"/></g>
-          <!-- batsman -->
-          <g transform="translate(600 660)"><circle cx="0" cy="-6" r="15"/><path d="M-10 6 h20 l6 60 h-32 Z"/><path d="M8 12 l40 -34 l10 8 l-42 40 Z"/><rect x="46" y="-34" width="10" height="46" rx="4"/><rect x="-12" y="64" width="9" height="40"/><rect x="4" y="64" width="9" height="40"/></g>
-          <!-- bowler running in -->
-          <g transform="translate(900 656)"><circle cx="0" cy="-6" r="15"/><path d="M-9 6 h18 l4 56 h-26 Z"/><path d="M-4 14 l-34 -26 l-9 9 l32 30 Z"/><path d="M6 62 l26 34 l-11 7 l-25 -33 Z"/><path d="M-6 62 l-24 30 l11 8 l24 -32 Z"/><circle cx="-44" cy="-20" r="7"/></g>
+        <!-- THE PITCH on the maidan, with the game's own silhouettes -->
+        <g class="ts-pitch">
+          <rect x="150" y="782" width="1140" height="60" rx="14" fill="#e8d5a8" stroke="#d9c28c" stroke-width="3"/>
+          <rect x="205" y="790" width="3" height="44" fill="#fffdf4" opacity=".8"/>
+          <rect x="1232" y="790" width="3" height="44" fill="#fffdf4" opacity=".8"/>
+          <g fill="#17211f"><rect x="215" y="754" width="4" height="30"/><rect x="223" y="754" width="4" height="30"/><rect x="231" y="754" width="4" height="30"/></g>
+          <g fill="#17211f"><rect x="1205" y="754" width="4" height="30"/><rect x="1213" y="754" width="4" height="30"/><rect x="1221" y="754" width="4" height="30"/></g>
         </g>
-        <!-- a ball in the air -->
-        <circle class="ts-ball" cx="770" cy="600" r="9" fill="#ff4155" stroke="#17211f" stroke-width="2"/>
+        <filter id="tsSil" x="-14%" y="-14%" width="128%" height="128%">
+          <feMorphology in="SourceAlpha" operator="dilate" radius="2" result="fat"/>
+          <feFlood flood-color="#fff6e3" result="rimc"/>
+          <feComposite in="rimc" in2="fat" operator="in" result="rim"/>
+          <feFlood flood-color="#17211f" result="bodyc"/>
+          <feComposite in="bodyc" in2="SourceAlpha" operator="in" result="body"/>
+          <feMerge><feMergeNode in="rim"/><feMergeNode in="body"/></feMerge>
+        </filter>
+        <image href="assets/players/bowl4.png" x="330" y="585" width="220" height="220" preserveAspectRatio="xMidYMax meet" filter="url(#tsSil)" transform="translate(880 0) scale(-1 1)"/>
+        <image href="assets/players/bat3.png" x="875" y="565" width="240" height="240" preserveAspectRatio="xMidYMax meet" filter="url(#tsSil)"/>
       </svg>
     </div>
     <div class="hero">
-      <div class="hero-mark" id="heroMark"></div>
-      <h1 class="hero-logo">POWER<span>PLAY</span></h1>
+      <h1 class="hero-logo">P<span class="hero-mark-o" id="heroMark" aria-hidden="true"></span>WER<span>PLAY</span></h1>
       <div class="hero-hook">Build your street XI &middot; spin the field &middot; lift the cup.</div>
-      <div class="hero-cta">
+      <div class="hero-cta hero-menu">
         <button class="btn xl" id="startBtn">PLAY</button>
-        <button class="btn secondary xl" id="continueBtn" style="display:none">Continue Run</button>
+        <button class="btn secondary xl" id="continueBtn" style="display:none">CONTINUE</button>
+        <button class="btn secondary xl" id="collectionBtn">COLLECTION</button>
+        <button class="btn secondary xl" id="quitBtn">QUIT</button>
       </div>
       <div class="pill-row hero-stats" id="titleStats"></div>
-      <div class="unlock-track" id="unlockTrack"></div>
+    </div>
+    <button class="title-lang" id="langBtn" title="Language — coming soon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#17211f" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9S14.5 18.4 12 21c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/></svg>
+    </button>
+    <div class="title-socials" id="titleSocials">
+      <button data-social="discord" title="Discord — link coming soon"><svg viewBox="0 0 24 24" fill="#17211f"><path d="M19 5.5A16 16 0 0 0 15.2 4l-.5 1a13 13 0 0 0-5.4 0L8.8 4A16 16 0 0 0 5 5.5C2.6 9 2 12.4 2.3 15.8A16 16 0 0 0 7 18l1-1.6a10 10 0 0 1-1.6-.8l.4-.3a11.4 11.4 0 0 0 10.4 0l.4.3c-.5.3-1 .6-1.6.8L17 18a16 16 0 0 0 4.7-2.2c.4-4-.6-7.3-2.7-10.3ZM9.3 13.7c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm5.4 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z"/></svg></button>
+      <button data-social="x" title="X — link coming soon"><svg viewBox="0 0 24 24" fill="#17211f"><path d="M17.7 3H21l-7.1 8.1L22 21h-6.7l-4.7-6.1L5.2 21H2l7.6-8.7L2.3 3H9l4.2 5.6L17.7 3Zm-1.2 16h1.8L7.1 4.9H5.2L16.5 19Z"/></svg></button>
+      <button data-social="youtube" title="YouTube — link coming soon"><svg viewBox="0 0 24 24" fill="#17211f"><path d="M22 12s0-3.3-.4-4.9a2.6 2.6 0 0 0-1.8-1.8C18.2 4.9 12 4.9 12 4.9s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7C2 8.7 2 12 2 12s0 3.3.4 4.9c.2.9.9 1.6 1.8 1.8 1.6.4 7.8.4 7.8.4s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8c.4-1.6.4-4.9.4-4.9ZM10 15.5v-7l6 3.5-6 3.5Z"/></svg></button>
+    </div>
+    <div class="collection-overlay" id="collectionOverlay">
+      <div class="collection-panel">
+        <div class="scout-head"><h3>Collection <span class="col-sub">— unlocks you've earned and the road ahead</span></h3><button class="btn secondary sm" id="closeCollection">Close</button></div>
+        <div id="collectionBody"></div>
+      </div>
     </div>
   </section>
 
@@ -6864,16 +6997,34 @@ function applyOwnedConsumableStrip(mode,strip){
    who ignores stances plays exactly the old game. */
 const STANCES={
   bat:{
-    def:{label:"DEFEND",icon:"&#128737;",rule:"W&#9660;&#9660; &nbsp;6&#9660;",desc:"Bat for survival: wicket slots melt away (Technique-powered), big shots dampen.",note:"drops the anchor — the W zone melts"},
-    push:{label:"PUSH",icon:"&#127939;",rule:"balanced",desc:"Play it straight: the natural matchup, nothing risked, nothing forced.",note:"plays it straight"},
-    atk:{label:"ATTACK",icon:"&#128165;",rule:"4/6&#9650;&#9650; &nbsp;W&#9650;",desc:"Swing hard: boundary zones swell (Power-powered) but the wicket zone grows too.",note:"opens the shoulders — boundary zones swell"}
+    def:{label:"DEFEND",icon:"&#128737;",rule:"W&#9660;&#9660; &nbsp;6&#9660;",desc:"Block it out: the W zone shrinks to a third — but boundary zones nearly vanish too. Survival, not scoring.",note:"drops the anchor — the W zone melts"},
+    push:{label:"PUSH",icon:"&#127939;",rule:"balanced",desc:"Play it straight: the pure matchup, exactly as the numbers fall.",note:"plays it straight"},
+    atk:{label:"ATTACK",icon:"&#128165;",rule:"4/6&#9650;&#9650; &nbsp;W&#9650;",desc:"Swing hard: boundary zones double — and so does the W zone. The crowd pays for attack boundaries.",note:"opens the shoulders — boundary zones swell"}
   },
   bowl:{
-    atk:{label:"ATTACK",icon:"&#127919;",rule:"W&#9650;&#9650; &nbsp;4&#9650;",desc:"Hunt the stumps: wicket slots grow (Pace/Movement-powered) but loose balls leak runs.",note:"charges in — the W zone grows"},
-    line:{label:"LINE",icon:"&#9878;",rule:"balanced",desc:"Bowl the natural line: the pure matchup.",note:"holds the line"},
-    bait:{label:"BAIT",icon:"&#129702;",rule:"6&#9650; &nbsp;W&#9650;&#9650;",desc:"Toss it up: gift a big-shot slot to buy wicket slots (Deception-powered). A trap.",note:"tosses it up — the trap is set"}
+    atk:{label:"ATTACK",icon:"&#127919;",rule:"W&#9650;&#9650; &nbsp;4&#9650;",desc:"",note:"charges in — the W zone grows"},
+    line:{label:"LINE",icon:"&#9878;",rule:"balanced",desc:"Bowl the natural line: the pure matchup, exactly as the numbers fall.",note:"holds the line"},
+    bait:{label:"BAIT",icon:"&#129702;",rule:"6&#9650; &nbsp;W&#9650;&#9650;",desc:"",note:"tosses it up — the trap is set"}
   }
 };
+/* honest, COMPUTED stance tips — the numbers are the ones applyStance will
+   actually use for the selected bowler (thresholds included). */
+function stanceTip(k){
+  const st=STANCES[m.phase][k];
+  if(st.desc)return st.desc;
+  const c=m.selected;if(!c)return "";
+  const subs=effSubs(c,"bowl");
+  const thr=rivalAnchorAt(run?.match||0)+6;
+  if(k==="atk"){
+    const v=Math.round((subs.movement+subs.pace)/2), n=v>=thr?2:1;
+    return "Hunt the stumps: "+n+" scoring slot"+(n>1?"s become":" becomes")+" W — powered by pace+movement (yours: "+v+(n>1?", max power":", reach "+thr+" for 2 slots")+"). One dot leaks into a 4.";
+  }
+  if(k==="bait"){
+    const v=Math.round(subs.deception), n=v>=thr?2:1;
+    return "Toss it up: gift him a 6-slot to convert "+n+" scoring slot"+(n>1?"s":"")+" into W — powered by deception (yours: "+v+(n>1?", max power":", reach "+thr+" for 2 slots")+"). A trap.";
+  }
+  return "";
+}
 function stanceDefault(){return m.phase==="bat"?"push":"line"}
 function currentStance(){return m.stance||stanceDefault()}
 // replace `from` tokens with `to`, up to n slots, scanning from the end
@@ -6934,7 +7085,13 @@ function applyMomentum(mode,strip){
 function updateMomentum(mode,out){
   if(out.extra)return;               // extras don't move the heat
   const bank=activeCoaches().some(c=>c.heatBank);     // Slow Burn: a break only HALVES the heat
-  const brk=()=>{m.momentum=bank?Math.floor((m.momentum||0)/2):0};
+  const preN=m.momentum||0;
+  m.justBroke=false;
+  const brk=()=>{
+    const next=bank?Math.floor(preN/2):0;
+    m.justBroke=preN>=MOM_WARM&&next<MOM_WARM; // Slow Burn to still-warm is not a loss
+    m.momentum=next;
+  };
   const wasFire=momentumState()==="fire";
   // a "good" ball for YOU: a boundary batting / a dot or wicket bowling
   const good=mode==="bat"?out.runs>=4:(out.wicket||out.runs===0);
@@ -7135,8 +7292,11 @@ function selectCard(c,lock=false){
     // stat square on the selected card switches the attack lane.
     const subs=effSubs(c,"bowl");
     m.challengeStat=BOWL_KEYS.reduce((a,k)=>subs[k]>subs[a]?k:a,BOWL_KEYS[0]);
-    m.stripCache={};
   }
+  // a beat: the card slides to the crease first, THEN the wheel answers it
+  m.__ringPending=true;
+  clearTimeout(m.__ringBeat);
+  m.__ringBeat=setTimeout(()=>{m.__ringPending=false;syncSelectionRing()},430);
   if(lock)m.selectionLocked=true;
   SFX.play("click");
   render();
@@ -7149,11 +7309,13 @@ function confirmSelected(){
 function setChallengeLane(k){
   if(m.phase!=="bowl"||!m.selected||m.result)return;
   if(!BOWL_KEYS.includes(k)||m.challengeStat===k)return;
-  m.challengeStat=k;m.stripCache={};
+  m.challengeStat=k;
   SFX.play("tick");
   render();
+  requestAnimationFrame(syncSelectionRing);
 }
-function cancelSelected(){SFX.play("click");m.selected=null;m.preview=null;m.selectionLocked=false;render()}
+function cancelSelected(){
+  clearTimeout(m&&m.__ringBeat);if(m)m.__ringPending=false;SFX.play("click");m.selected=null;m.preview=null;m.selectionLocked=false;render()}
 /* ============================================================
    CONTINUOUS PROBABILITY ENGINE
    Four sub-stat pairings shape the outcome weights via logistic
@@ -7336,52 +7498,102 @@ function getStripFor(mode,card){
   if(!m.stripCache[key])m.stripCache[key]=applyMatchModifiers(mode,outcomeStrip(mode,card,m.challenge),card);
   return m.stripCache[key];
 }
+/* STANCE PREVIEW: hovering a chip marks, on the live ring, exactly which
+   zones that stance would grow (bright + badge) or shrink (dim). Counts are
+   the deterministic stance-edit deltas — no spoiling of the staged resolve. */
+/* morph the ring to the current selection state (or back to uniform) */
+function syncSelectionRing(){
+  if(!m||m.result)return;
+  const svg=ringSvgEl();if(!svg)return;
+  const cur=[...svg.querySelectorAll(".ring-sec")].map(g=>({tk:g.dataset.tk,frac:(+g.dataset.sweep||0)}));
+  const tot=cur.reduce((x,c)=>x+c.frac,0)||1;cur.forEach(c=>c.frac=c.frac/tot);
+  const target=(m.selected)?ringFracs(prePlayStrip(m.phase,m.selected).strip):GHOST_FRACS;
+  animateRing(fracMap(cur),target,{stagger:60,dur:340});
+  clearTimeout(m.__emberT);
+  m.__emberT=setTimeout(()=>{
+    const svg2=ringSvgEl();if(!svg2||!m.selected||m.result)return;
+    prePlayStrip(m.phase,m.selected).heatTks.forEach(t=>{
+      const g=svg2.querySelector(`.ring-sec[data-tk="${t}"]`);if(g)g.classList.add("sec-heat");
+    });
+  },420);
+}
+/* THE HEAT WEARS THE PLAYER'S SCREEN: no meter — the navbar burns. */
+function heatChipTitle(){
+  const base=m.phase==="bat"
+    ?"MOMENTUM - boundaries build it, a dot cools it, a wicket kills it."
+    :"PRESSURE - dots & wickets build it, a boundary conceded kills it.";
+  return base+" WARM = 1 wheel slot upgrades in your favour. ON FIRE = 2.";
+}
+function renderHeatChip(){
+  const ms=document.getElementById("match");if(!ms)return;
+  const st=momentumState();
+  ms.classList.toggle("heat-warm",st==="warm");
+  ms.classList.toggle("heat-fire",st==="fire");
+  const yc=document.querySelector(".you-col");
+  if(yc)yc.title=st?heatChipTitle():"";
+}
+function clearStanceGhost(){
+  const svg=ringSvgEl();if(svg)svg.classList.remove("ghosting");
+  if(m&&m.selected&&!m.result)syncSelectionRing();
+}
+function showStanceGhost(k){
+  if(!m.selected||m.result||k===currentStance())return;
+  const svg=ringSvgEl();if(!svg)return;
+  svg.classList.add("ghosting");
+  const was=m.stance;m.stance=k;
+  const target=ringFracs(prePlayStrip(m.phase,m.selected).strip);
+  m.stance=was;
+  const cur=[...svg.querySelectorAll(".ring-sec")].map(g=>({tk:g.dataset.tk,frac:(+g.dataset.sweep||0)}));
+  const tot=cur.reduce((x,c)=>x+c.frac,0)||1;cur.forEach(c=>c.frac=c.frac/tot);
+  animateRing(fracMap(cur),target,{stagger:50,dur:300});
+}
 function setStance(st){
   if(m.result)return;
   m.stance=st;
-  m.stripCache={};
+  ringSvgEl()?.classList.remove("ghosting");
   SFX.play("tick");
   // no preview means the wheel doesn't change — just move the highlight,
   // no rebuild (no flash) on the board
   document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
+  document.querySelectorAll(".stance-chip").forEach(b=>b.title=escSVG(stanceTip(b.dataset.stance)||STANCES[m.phase][b.dataset.stance].desc));
   const ex=document.getElementById("stanceExplain");if(ex)ex.textContent=STANCE_PLAIN[st]||"";
+  requestAnimationFrame(syncSelectionRing); // the wheel morphs to the confirmed stance
   if(typeof TUT!=="undefined")TUT.notify("stance");
 }
 /* The full modifier chain, captured as BEATS at roll time — the resolve
    replays these exact strips one by one, so the theater IS the truth.
    Order mirrors applyMatchModifiers: stance -> trait -> coaches -> tool. */
+/* PRE-PLAY strip: everything the player owns at selection time — the duel
+   base, the stance, the card's trait and the current heat — built ONCE per
+   (card, lane, stance) and cached, so the wheel the player builds while
+   selecting is EXACTLY the wheel that spins. Coaches/tools are the only
+   resolve-time edits (they get their beats). */
+function prePlayStrip(mode,card){
+  m.stripCache=m.stripCache||{};
+  const key="pre:"+mode+":"+card.id+":"+(m.challengeStat||"")+":"+currentStance()+":"+(m.freeHit?1:0);
+  if(m.stripCache[key])return m.stripCache[key];
+  let sBase=outcomeStrip(mode,card,m.challenge);
+  let sStance=applyStance(mode,sBase.slice(),card);
+  let sTrait=applyCardStripTrait(mode,sStance.slice(),card);
+  const preHeat=sTrait.slice();
+  const sHot=applyMomentum(mode,sTrait.slice());
+  const cnt=a=>a.reduce((o,t)=>(o[t]=(o[t]||0)+1,o),{});
+  const c1=cnt(preHeat),c2=cnt(sHot),heatTks=[];
+  new Set([...Object.keys(c1),...Object.keys(c2)]).forEach(t=>{if((c1[t]||0)!==(c2[t]||0))heatTks.push(t)});
+  return m.stripCache[key]={strip:sHot,heatTks,traitFired:sTrait.join("|")!==sStance.join("|")&&!!card.trait};
+}
 function stripChain(mode,card){
+  const pre=prePlayStrip(mode,card);
+  let s=pre.strip.slice();
   const beats=[];
-  const myName=card.name.split(" ").pop().toUpperCase();
-  const rivalName=m.challenge.name.split(" ").pop().toUpperCase();
-  // The TRUE contested base (both cards paired) — the modifier chain builds on this.
-  let s=outcomeStrip(mode,card,m.challenge);
-  if(mode==="bowl"){
-    // ACT 1 — YOUR DELIVERY. You are the bowler: your ball shapes the even
-    // field first (your bowling vs a nobody batter), then...
-    const delivery=outcomeStrip("bowl",card,NEUTRAL_CARD);
-    beats.push({label:myName,note:"bangs the ball in",strip:delivery.slice(),kind:"delivery"});
-    // ACT 2 — THE RIVAL BATSMAN READS IT and drags the field toward the real
-    // contest. This second act is the batsman's answer to your delivery.
-    beats.push({label:rivalName,note:"reads it, counters",strip:s.slice(),kind:"react"});
-  }else{
-    // BATTING: the rival bowler's delivery ALREADY shaped the field (m.theirShape).
-    // Your shot is the answer — it's the first thing that moves the field.
-    beats.push({label:myName,note:"plays the shot",strip:s.slice(),kind:"card"});
-  }
-  const st=currentStance();
-  const s2=applyStance(mode,s,card);
-  if(s2.join("|")!==s.join("|")){
-    const sd=STANCES[mode][st];
-    beats.push({label:sd.label,note:sd.note,strip:s2.slice(),kind:"stance"});
-  }
-  s=s2;
-  const s3=applyCardStripTrait(mode,s,card);
-  if(s3.join("|")!==s.join("|")&&card.trait){
-    beats.push({label:card.trait.name.toUpperCase(),note:"the trait kicks in",strip:s3.slice(),kind:"trait"});
-  }
-  s=s3;
   const x=ctx();
+  // the user's resolve order: the KIT TOOL reshapes first, then the coaches
+  const s4=applyOwnedConsumableStrip(mode,s);
+  if(s4.join("|")!==s.join("|")){
+    const owned=nextConsumable(mode);
+    beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
+  }
+  s=s4;
   activeCoaches().forEach(co=>{
     let cs=co.strip?co.strip(mode,s.slice(),x,card):s.slice();
     if(co.edition==="holographic"||co.edition==="polychrome")cs=replaceBadSlot(cs,mode,"0");
@@ -7390,19 +7602,7 @@ function stripChain(mode,card){
     }
     s=cs;
   });
-  const s4=applyOwnedConsumableStrip(mode,s);
-  if(s4.join("|")!==s.join("|")){
-    const owned=nextConsumable(mode);
-    beats.push({label:(owned?.name||"TOOL").toUpperCase(),note:"from the kit bag!",strip:s4.slice(),kind:"tool"});
-  }
-  s=s4;
-  // MOMENTUM applies last — when you're hot, the heat reshapes the field.
-  const s5=applyMomentum(mode,s);
-  if(s5.join("|")!==s.join("|")){
-    const st=momentumState();
-    beats.push({label:st==="fire"?"🔥 ON FIRE":"⚡ MOMENTUM",note:st==="fire"?"the heat takes over":"the streak pays off",strip:s5.slice(),kind:"momentum"});
-  }
-  return {final:s5,beats};
+  return {final:s,beats,preStrip:pre.strip,heatTks:pre.heatTks};
 }
 // armed strip consumables burn only on a legal delivery
 function consumeArmed(mode){
@@ -7461,7 +7661,7 @@ function resolveBowl(c){
   ballPay("bowl",out,c);
   updateMomentum("bowl",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats,preStrip:chain.preStrip,heatTks:chain.heatTks};
   m.log=out.extra?`<b>${out.text}!</b> +1 to the rival — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT for them next!</b>":""}`
     :`<b>${out.text}</b> — your BOWL ${mine} vs rival BAT ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -7489,7 +7689,7 @@ function resolveBat(c){
   ballPay("bat",out,c);
   updateMomentum("bat",out);
   m.selected=null;m.preview=null;m.selectionLocked=false;
-  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats};
+  m.result={you:c,rival:m.challenge,mine,theirs,text:out.text,strip,roll:out.index,state:"resolving",extra:out.extra||null,snap,beats:chain.beats,preStrip:chain.preStrip,heatTks:chain.heatTks};
   m.log=out.extra?`<b>${out.text}!</b> +1 run free${out.bonusRun?" <b>(+1 more — Wide Boy)</b>":""} — the ball is re-bowled.${out.extra==="noball"?" <b>FREE HIT next ball!</b>":""}`
     :`<b>${out.text}</b> — your BAT ${mine} vs rival BOWL ${theirs}.`;
   if(m.toolNote){m.log+=` <b>${m.toolNote}</b>`;m.toolNote=null}
@@ -7913,6 +8113,8 @@ function render(pop=false){
   const mcz=$("#matchCoachZone");if(mcz)mcz.innerHTML=coachStripHTML({mini:true});
   requestAnimationFrame(layoutLoadoutOverlap);
   renderDuel(pop);renderHand();renderKitbag();renderHud();
+  renderHeatChip();
+  requestAnimationFrame(positionSnapSlot);
   maybeStartTutorial();
   if(typeof TUT!=="undefined")TUT.reposition();
 }
@@ -7972,7 +8174,7 @@ function renderScorebug(){
   const v=bugView();
   $("#scorebug").innerHTML=`<div class="bug-cell bug-phase"><span>${m.innings===1?"1st innings":"2nd innings"}</span><b>${phase}</b><small>Ball ${m.ball}/${m.def.balls}</small></div>
     <div class="bug-cell bug-over"><span>This over</span>${renderOverStrip()}</div>
-    <div class="bug-cell bug-heat heat-${momentumState()||'cold'}"><span>Heat</span>${heatBarHTML()}</div>
+
     <div class="bug-cell bug-score-you"><span>You</span><b data-run="you">${v.you.runs}/${v.you.wk}</b><small>${m.def.wickets-v.you.wk} wkts left</small></div>
     <div class="bug-cell bug-score-rival"><span>Rival</span><b data-run="rival">${v.rival.runs}/${v.rival.wk}</b><small>${m.def.wickets-v.rival.wk} wkts left</small></div>
     <div class="bug-cell bug-target pressure-${chasePressure()||'none'}"><span>Equation</span><b>${targetText()}</b><small>${left} ball${left===1?"":"s"} left</small></div>`;
@@ -8042,7 +8244,7 @@ function layoutLoadoutOverlap(){
     bigbox.style.width=Math.ceil(spineW+rowW+26)+"px";
   }
 }
-let __loRsz;window.addEventListener("resize",()=>{clearTimeout(__loRsz);__loRsz=setTimeout(layoutLoadoutOverlap,120)});
+let __loRsz;window.addEventListener("resize",()=>{clearTimeout(__loRsz);__loRsz=setTimeout(()=>{layoutLoadoutOverlap();positionSnapSlot()},120)});
 function renderHud(){
   const el=$("#hudInfo");if(!el)return;
   const v=bugView();
@@ -8440,7 +8642,7 @@ function hotStatFor(c){
   return isRival?CHAL_PAIR[m.challengeStat]:m.challengeStat;
 }
 function hotIsSoft(){return false} // weak-spot pulse retired (lane choice covers it)
-function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}">${cardHTML(c,{emph,as:"div",duel:true,active:true,hot:hotStatFor(c),hotSoft:hotIsSoft(),eff:effSubs(c,emph==="bowl"?"bowl":"bat")})}</div>`}
+function duelCardHTML(c,label,emph,deal,role,extraClass=""){return `<div class="dslot ${deal?'frompile':''} ${extraClass}">${cardHTML(c,{emph,as:"div",duel:true,active:true,hot:hotStatFor(c),hotSoft:hotIsSoft(),eff:effSubs(c,emph==="bowl"?"bowl":"bat")})}${c===m.selected?snapSlotHTML():""}</div>`}
 function duelPlaceholderHTML(label,role){return `<div class="dslot empty-slot"><div class="placeholder">+</div></div>`}
 /* ---------- THE FIELD RING: 12 sectors of a cricket ground.
    The strip IS the field — the ball lands in a sector. Build changes
@@ -8486,7 +8688,7 @@ function fieldRingSVG(strip,opts={}){
     ${secs}
   </svg>`;
 }
-const GHOST_FRACS=["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}));
+const GHOST_FRACS=[...["W","0","1","2","4","6"].map(t=>({tk:t,frac:0.93/6})),{tk:"WD",frac:0.045},{tk:"NB",frac:0.025}];
 /* ---------- IN-PLACE wheel painting: mutate the existing SVG nodes,
    never rebuild. One sector = one stable <g>; animation just moves the
    path d + label. This kills the per-frame DOM thrash that made sectors
@@ -8519,6 +8721,7 @@ function ensureSector(svg,tk){
 }
 function paintRing(svg,fracs){
   if(!svg)return;
+  svg.querySelectorAll(".ring-sec.sec-heat,.ring-sec.sec-up,.ring-sec.sec-down").forEach(g=>g.classList.remove("sec-heat","sec-up","sec-down"));
   const {cx,cy,r0,r1}=RING_GEO,lr=(r0+r1)/2,lay=ringLayout(fracs),seen=new Set();
   for(const s of lay){
     seen.add(s.tk);
@@ -8627,12 +8830,15 @@ function enterResolve(){
 function startResolveSequence(){
   clearSpin();
   const res=m.result;
-  // make sure the wheel currently shows THEIR shape (where the story starts)
-  paintRing(ringSvgEl(),m.theirShape||GHOST_FRACS);
+  // the wheel ALREADY shows what the player built (base+stance+trait+heat).
+  // Resolve only adds the build's surprises: coach calls and kit tools.
+  const preFracs=ringFracs(res.preStrip||res.strip);
+  paintRing(ringSvgEl(),preFracs);
+  emberMarkHeatSlots(res);
   const beats=res.beats||[];
   const needle=$("#ringNeedle");
   if(needle){needle.style.transition="none";needle.classList.add("spinning")}
-  let t=380,prev=m.theirShape||GHOST_FRACS;
+  let t=380,prev=preFracs;
   beats.forEach(b=>{
     const shape=ringFracs(b.strip),pv=prev;
     const changes=RING_ORDER.filter(tk=>Math.abs((fracMap(pv)[tk]||0)-(fracMap(shape)[tk]||0))>0.004).length;
@@ -8641,7 +8847,7 @@ function startResolveSequence(){
       animateRing(fracMap(pv),shape,{stagger:170,dur:440,flash:true});
       SFX.play(b.kind==="coach"||b.kind==="tool"?"coach":b.kind==="delivery"?"whoosh":"swish");
       if(b.kind==="coach"){const seat=document.querySelector(`.coachcard[data-coach="${b.coachId}"]`);if(seat){seat.classList.add("fired");setTimeout(()=>seat.classList.remove("fired"),950)}}
-      if(b.kind==="tool"){const k=document.querySelector(".kit-slot.armed");if(k){k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)}}
+      if(b.kind==="tool"){document.querySelectorAll(".kit-slot.armed,.snap-slot:not(.empty)").forEach(k=>{k.classList.add("fired");setTimeout(()=>k.classList.remove("fired"),950)})}
       if(b.kind==="coach"||b.kind==="tool"||b.kind==="trait"||b.kind==="momentum")showBuildTrigger(b.label,b.kind); // your build FIRES — make it felt
     },t));
     t+=540+110*Math.max(0,changes-1); // read each beat's cascade — snappy but legible
@@ -8728,6 +8934,9 @@ function finishLanding(res,target){
   })();
   showOutcomePop(res);        // the dopamine beat — the outcome punches in
   showBallPay();              // beat two: the MONEY stamps in and flies to the purse
+  showHeatMoment();           // beat three: ignition / heat lost, stamped
+  emberMarkHeatSlots(res);    // the slots the heat upgraded glow on the ring
+  renderHeatChip();
   if(m.justIgnited){m.justIgnited=false;setTimeout(()=>showIgnition(),260)} // the engine comes ONLINE
   maybeExplainHeat();         // teach the heat mechanic once, in context
   if(typeof TUT!=="undefined")TUT.notify("land");
@@ -8745,6 +8954,30 @@ function showIgnition(){
 }
 /* The juice: a big sticker word slams in on the outcome, and the board shakes
    for the game-changing ones (SIX / WICKET). Cricket's highs and lows, felt. */
+/* Beat three of the settle: momentum state changes are MOMENTS. */
+function showHeatMoment(){
+  if(!m.justBroke)return; // ignition has its own banner (showIgnition)
+  const host=document.querySelector("#match .av-ringwrap");if(!host)return;
+  setTimeout(()=>{
+    if(!m)return;
+    const el=document.createElement("div");
+    el.className="state-pop sp-lost";
+    el.textContent="HEAT LOST";
+    host.appendChild(el);
+    SFX.play("tick");
+    setTimeout(()=>el.remove(),1600);
+  },1050);
+}
+/* Ember edges: mark the sectors whose slots the MOMENTUM beat changed, so
+   the player SEES what the heat did to the wheel this ball. */
+function emberMarkHeatSlots(res){
+  const tks=res&&res.heatTks;if(!tks||!tks.length)return;
+  const svg=ringSvgEl();if(!svg)return;
+  tks.forEach(t=>{
+    const g=svg.querySelector(`.ring-sec[data-tk="${t}"]`);
+    if(g)g.classList.add("sec-heat");
+  });
+}
 /* Beat two of the settle: "+$N" slams in under the outcome word, hangs a
    moment, then flies into the HUD purse — which bumps and counts up. Money
    earned is never subtle. */
@@ -8842,9 +9075,9 @@ function renderDuel(pop=false){
   const youEmph=m.phase==="bowl"?"bowl":"bat",rivEmph=m.phase==="bowl"?"bat":"bowl";
   const deal=challengeAnim;challengeAnim=false;
   const danger=!m.result&&dangerRead()==="danger";
-  // the field ALWAYS shows their shape pre-play (public info — their card
-  // is face-up). YOUR answer is what stays a gamble until the ball flies.
-  const idleFracs=m.introPending?GHOST_FRACS:(m.theirShape||GHOST_FRACS);
+  // WHEEL STATES: idle = uniform sectors; a selected card cuts the wheel to
+  // the real built odds (stance/trait/heat included) and it STAYS.
+  const idleFracs=(m.selected&&!m.result&&!m.__ringPending)?ringFracs(prePlayStrip(m.phase,m.selected).strip):GHOST_FRACS;
   const ringHTML=m.result
     ?fieldRingSVG(null,{fracs:m.result.state==="settled"?ringFracs(m.result.strip):(m.theirShape||GHOST_FRACS)})
     :fieldRingSVG(null,{fracs:idleFracs});
@@ -8883,7 +9116,11 @@ function renderDuel(pop=false){
   d.classList.toggle("resolving",resolving);
   d.classList.toggle("settled",m.result?.state==="settled");
   d.classList.remove("ball-landed");
-  d.querySelectorAll("[data-stance]").forEach(b=>b.onclick=e=>{e.stopPropagation();setStance(b.dataset.stance)});
+  d.querySelectorAll("[data-stance]").forEach(b=>{
+    b.onclick=e=>{e.stopPropagation();ringSvgEl()?.classList.remove("ghosting");setStance(b.dataset.stance)};
+    b.onmouseenter=()=>showStanceGhost(b.dataset.stance);
+    b.onmouseleave=clearStanceGhost;
+  });
   // deselect: the ✕ chip OR clicking the picked card returns it to your hand
   if(m.selected&&!m.result){
     const yCard=d.querySelector(".you-col .card");
@@ -8920,8 +9157,7 @@ function renderDuel(pop=false){
       if(n)n.style.transform=`rotate(${m.result.needleAt??el.dataset.mid}deg)`;
     }
   }else if(!m.result&&m.introPending){
-    m.introPending=false;
-    playBallIntro();
+    m.introPending=false; // state 1: the wheel idles uniform — no intro morph
   }
   // the picked card SLIDES from your hand to the crease (FLIP)
   if(m.__dealFrom&&m.selected&&!m.result){
@@ -8995,6 +9231,37 @@ function renderDugout(){
   // a clean spacer that keeps the wheel centred against the kit bag on the right
   el.innerHTML="";
 }
+/* CONSUMABLE SNAP-ON: the armed tool attaches to your arena card as a 1/3
+   strip — the player "holds" it (mongoose-bat feel). Empty = an invisible
+   reserved container; nothing armed, nothing shown. */
+function snapSlotHTML(){
+  const owned=nextConsumable(m.phase);
+  if(!owned)return `<div class="snap-slot empty" aria-hidden="true"></div>`;
+  const modeClass=owned.mode==="bowl"?"mode-bowl":owned.mode==="bat"?"mode-bat":"mode-any";
+  const art=owned.mode==="bowl"?ICON.ball:owned.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
+  // SAME visual as the kit-zone slot — it just rides the card now
+  return `<div class="kit-slot snap-slot armed ${modeClass}" title="${escSVG(owned.name)} — ${escSVG(dispDesc(owned.desc))} (fires this ball)">
+    <span class="kit-art">${art}</span>
+    <span class="kit-plate">${escSVG(owned.name)}</span>
+  </div>`;
+}
+function positionSnapSlot(){
+  const snap=document.querySelector(".you-col .snap-slot");
+  const card=document.querySelector(".you-col .card");
+  const col=document.querySelector(".you-col");
+  if(!snap||!card||!col)return;
+  const kr=col.getBoundingClientRect();
+  // no viewBox math — measure the DRAWN frame rect itself (immune to
+  // letterboxing, transforms, padding, whatever the wrappers do)
+  const frameEl=card.querySelectorAll("svg.tc > rect")[1]||card.querySelector("svg.tc > rect"); // the INK-BORDERED inner rect = the card the eye sees
+  if(!frameEl)return;
+  const fr=frameEl.getBoundingClientRect();
+  if(!fr.width)return;
+  snap.style.left=(fr.right-kr.left-2)+"px"; // flush: borders kiss
+  snap.style.top=(fr.top-kr.top)+"px";       // EXACT drawn top
+  snap.style.height=fr.height+"px";          // EXACT drawn length
+  snap.style.width=(fr.width/4)+"px";
+}
 function renderKitbag(){
   const el=$("#matchKitZone");if(!el)return;
   const tools=(run?.consumables||[]).filter(c=>!c.kind);
@@ -9031,7 +9298,7 @@ function stanceChipsHTML(){
   const set=STANCES[m.phase],cur=currentStance();
   const chips=Object.keys(set).map(k=>{
     const s=set[k],risk=STANCE_RISK[k]||"";
-    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" title="${s.desc}">
+    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" title="${escSVG(stanceTip(k)||s.desc)}">
       <i>${s.icon}</i><b>${s.label}</b><small class="stance-risk">${risk}</small>
     </button>`;
   }).join("");
@@ -9066,7 +9333,12 @@ function renderHand(){
   const avail=activeSquad().filter(c=>!c.used&&c!==m.selected);
   // 6 best phase-relevant cards; if none are on-role left, fall back to ANY
   // remaining card so the row is never empty and you can always field a ball.
-  let ready=avail.filter(roleOk).sort((a,b)=>stat(b)-stat(a)).slice(0,6);
+  // FIELDED cards (sent from the squad board) hold their spots first,
+  // then the best on-role cards fill the rest of the six.
+  const fieldedIds=m.fielded||[];
+  const pinned=fieldedIds.map(id=>avail.find(c=>c.id===id)).filter(Boolean);
+  const rest=avail.filter(c=>!fieldedIds.includes(c.id));
+  let ready=pinned.concat(rest.filter(roleOk).sort((a,b)=>stat(b)-stat(a))).slice(0,6);
   if(!ready.length)ready=avail.slice().sort((a,b)=>stat(b)-stat(a)).slice(0,6);
   const animate=dealAnim;dealAnim=false;
   const cards=ready.map((c,i)=>`
@@ -9097,7 +9369,187 @@ function fanCard(c,i,total,{selected=false,used=false,disabled=false,emph=null,a
   return cardHTML(c,{selected,used,disabled,emph,dealin:animate,mini:tactical||rival,fan:fanStyle(i,total,rival ? .78 : 1.05)});
 }
 
-/* ---------- SCOUT: decks ---------- */
+/* ---------- SQUAD BOARD (reusable) ---------- */
+function benchCards(){const act=activeIds();return roster().filter(c=>!act.has(c.id));}
+function sbSort(list){
+  return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)||(batVal(b)+bowlVal(b))-(batVal(a)+bowlVal(a)));
+}
+const SB_FILTER={role:"any",rarity:"all",nation:"all",favOnly:false};
+function sbFilterPass(c){
+  if(SB_FILTER.role!=="any"&&c.role!==SB_FILTER.role)return false;
+  if(SB_FILTER.rarity!=="all"&&(c.rarity||"common")!==SB_FILTER.rarity)return false;
+  if(SB_FILTER.nation!=="all"&&nationFor(c)!==SB_FILTER.nation)return false;
+  if(SB_FILTER.favOnly&&!c.fav)return false;
+  return true;
+}
+function fieldRowCards(){
+  const disc=m.phase==="bowl"?"bowl":"bat";
+  const stat=c=>disc==="bowl"?bowlVal(c):batVal(c);
+  const roleOk=c=>m.phase==="bowl"?(c.role==="bowl"||c.role==="all"):(c.role==="bat"||c.role==="all");
+  const avail=activeSquad().filter(c=>!c.used&&c!==m.selected);
+  const fieldedIds=m.fielded||[];
+  const pinned=fieldedIds.map(id=>avail.find(c=>c.id===id)).filter(Boolean);
+  const rest=avail.filter(c=>!fieldedIds.includes(c.id));
+  let ready=pinned.concat(rest.filter(roleOk).sort((a,b)=>stat(b)-stat(a))).slice(0,6);
+  if(!ready.length)ready=avail.slice().sort((a,b)=>stat(b)-stat(a)).slice(0,6);
+  return ready;
+}
+const RARITY_DOT={common:"#8aa0a8",uncommon:"#34c06a",rare:"#3aa5ee",epic:"#8a55e6",legendary:"#f5c84b"};
+function sbFilterPanelHTML(opts){
+  const roleChip=(v,l,icon)=>`<button class="sbf-chip ${SB_FILTER.role===v?"on":""}" data-sbf-role="${v}">
+    ${icon?`<svg viewBox="0 0 28 28" class="sbf-ico"><g transform="translate(2 2)">${icon}</g></svg>`:""}${l}</button>`;
+  const rarChip=(r,l)=>`<button class="sbf-chip ${SB_FILTER.rarity===r?"on":""}" data-sbf-rarity="${r}">
+    ${r!=="all"?`<i class="sbf-dot" style="background:${RARITY_DOT[r]}"></i>`:""}${l}</button>`;
+  const natChip=(n,l)=>`<button class="sbf-chip sbf-nat ${SB_FILTER.nation===n?"on":""}" data-sbf-nation="${n}">
+    ${n!=="all"?`<svg viewBox="0 0 24 24" class="sbf-flag">${NATION_FLAG[n]||""}</svg>`:""}${l}</button>`;
+  return `<aside class="sb-side">
+    <div class="sbf-group"><h5>Role</h5>
+      ${roleChip("any","All")}${roleChip("bat","Batters",ROLE_ICON.bat)}${roleChip("all","All-rounders",ROLE_ICON.all)}${roleChip("bowl","Bowlers",ROLE_ICON.bowl)}
+    </div>
+    <div class="sbf-group"><h5>Tier</h5>
+      ${rarChip("all","Any")}${rarChip("common","Common")}${rarChip("uncommon","Uncommon")}${rarChip("rare","Rare")}${rarChip("epic","Epic")}${rarChip("legendary","Legendary")}
+    </div>
+    <div class="sbf-group"><h5>Nation</h5>
+      <div class="sbf-natgrid">${natChip("all","All")}${NATIONS.map(n=>natChip(n,n)).join("")}</div>
+    </div>
+    <div class="sbf-group">
+      <button class="sbf-chip sbf-favbtn ${SB_FILTER.favOnly?"on":""}" data-sbf-fav>&#9733; Favourites only</button>
+    </div>
+    ${opts.market?`<div class="sb-section sb-market" data-sb-sec="market">
+      <h4>&#128176; Market</h4>
+      <div class="sb-market-zone"><div class="sb-market-hint">Drag a BENCH card here to sell it</div></div>
+    </div>`:""}
+  </aside>`;
+}
+function squadBoardHTML(opts={}){
+  const inMatch=!!opts.match;
+  const act=activeSquad();
+  const flt=opts.filters?sbFilterPass:(()=>true);
+  const field=inMatch?fieldRowCards():[];
+  const fieldIds=new Set(field.map(c=>c.id));
+  const groups=[["bat","Batters"],["all","All-rounders"],["bowl","Bowlers"]]
+    .map(([role,label])=>({role,label,
+      cards:sbSort(act.filter(c=>c.role===role&&flt(c)&&(!inMatch||!fieldIds.has(c.id))))}));
+  const bench=sbSort(benchCards().filter(flt));
+  const emph=inMatch?(m.phase==="bowl"?"bowl":"bat"):null;
+  const cell=(c,sec)=>`<div class="sb-card ${c.used&&inMatch?'usedc':''}" draggable="${opts.editable||inMatch?'true':'false'}" data-sb-id="${c.id}" data-sec="${sec}">
+      <span class="sb-fav ${c.fav?'on':''}" data-fav="${c.id}" title="${c.fav?'Unfavourite':'Mark favourite'}">&#9733;</span>
+      ${cardHTML(c,{emph,as:"div"})}
+    </div>`;
+  const section=(key,label,cards,note)=>`<div class="sb-section" data-sb-sec="${key}">
+      <h4>${label} &middot; ${cards.length} ${note?`<em>${note}</em>`:""}</h4>
+      <div class="sb-grid">${cards.map(c=>cell(c,key)).join("")||'<div class="scout-empty">Empty.</div>'}</div>
+    </div>`;
+  const fieldRow=inMatch?`<div class="sb-section sb-fieldrow" data-sb-sec="field">
+      <h4>&#9654; The Field &middot; face-up <em>only these can play — tap one to send it in</em></h4>
+      <div class="sb-grid">${field.map(c=>cell(c,"field")).join("")||'<div class="scout-empty">No cards left.</div>'}</div>
+    </div>`:"";
+  const main=`<div class="sb-main">${fieldRow}
+    ${groups.map(g=>section(g.role,g.label,g.cards,inMatch?"tap to SEND TO THE FIELD":"drag to bench &middot; star to pin")).join("")}
+    ${section("bench","Bench",bench,inMatch?"locked during a match":"drag onto a role section to join the XII")}
+  </div>`;
+  return `<div class="sb-layout">${opts.filters?sbFilterPanelHTML(opts):""}${main}</div>`;
+}
+/* FLIP: capture every card's rect, repaint, then animate the movers so the
+   eye can FOLLOW who went where (send + the bumped card gliding back). */
+function paintBoardFLIP(host,buildFn,highlightId){
+  const before={};
+  host.querySelectorAll(".sb-card").forEach(el=>{before[el.dataset.sbId]=el.getBoundingClientRect();});
+  buildFn();
+  requestAnimationFrame(()=>{
+    host.querySelectorAll(".sb-card").forEach(el=>{
+      const id=el.dataset.sbId,a=before[id];
+      if(!a)return;
+      const b=el.getBoundingClientRect();
+      const dx=a.left-b.left,dy=a.top-b.top;
+      if(Math.abs(dx)+Math.abs(dy)>4){
+        el.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:"none"}],
+          {duration:420,easing:"cubic-bezier(.2,.9,.3,1)"});
+      }
+      if(id===highlightId){el.classList.add("sb-arrived");setTimeout(()=>el.classList.remove("sb-arrived"),900);}
+    });
+  });
+}
+function wireSquadBoard(host,opts={}){
+  host.querySelectorAll("[data-fav]").forEach(st=>st.onclick=e=>{
+    e.stopPropagation();
+    const c=roster().find(x=>x.id===st.dataset.fav);
+    if(c){c.fav=!c.fav;persistRun();opts.rerender&&opts.rerender(st.dataset.fav);}
+  });
+  host.querySelectorAll(".sb-card").forEach(cell=>{
+    const id=cell.dataset.sbId;
+    cell.onclick=e=>{
+      if(e.target.closest("[data-fav]"))return;
+      if(opts.onCard)opts.onCard(id,cell.dataset.sec);
+    };
+  });
+  host.querySelectorAll("[data-sbf-role]").forEach(b=>b.onclick=()=>{
+    SB_FILTER.role=b.dataset.sbfRole;opts.rerender&&opts.rerender();
+  });
+  host.querySelectorAll("[data-sbf-rarity]").forEach(b=>b.onclick=()=>{SB_FILTER.rarity=b.dataset.sbfRarity;opts.rerender&&opts.rerender();});
+  host.querySelectorAll("[data-sbf-nation]").forEach(b=>b.onclick=()=>{SB_FILTER.nation=b.dataset.sbfNation;opts.rerender&&opts.rerender();});
+  const favBtn=host.querySelector("[data-sbf-fav]");
+  if(favBtn)favBtn.onclick=()=>{SB_FILTER.favOnly=!SB_FILTER.favOnly;opts.rerender&&opts.rerender();};
+  if(!opts.editable&&!opts.match)return;
+  let dragId=null;
+  host.querySelectorAll(".sb-card").forEach(cell=>{
+    cell.addEventListener("dragstart",e=>{dragId=cell.dataset.sbId;cell.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
+    cell.addEventListener("dragend",()=>{dragId=null;cell.classList.remove("dragging");host.querySelectorAll(".sb-section").forEach(x=>x.classList.remove("drop-hot"));});
+  });
+  host.querySelectorAll(".sb-section").forEach(sec=>{
+    sec.addEventListener("dragover",e=>{e.preventDefault();sec.classList.add("drop-hot");});
+    sec.addEventListener("dragleave",()=>sec.classList.remove("drop-hot"));
+    sec.addEventListener("drop",e=>{
+      e.preventDefault();sec.classList.remove("drop-hot");
+      if(!dragId)return;
+      const card=roster().find(c=>c.id===dragId);if(!card)return;
+      const target=sec.dataset.sbSec;
+      if(opts.match){
+        if(target==="field")sendToField(card.id);
+        else if((m.fielded||[]).includes(card.id)){m.fielded=m.fielded.filter(x=>x!==card.id);renderHand();}
+        opts.rerender&&opts.rerender(card.id);
+        return;
+      }
+      if(target==="market"){
+        if(activeIds().has(card.id)){flashHint("Only BENCH cards can be sold — bench him first.");return;}
+        if(roster().length<=12){flashHint("Keep at least 12 players for every match.");return;}
+        const v=sellValue(card);
+        run.coins+=v;
+        run.roster=roster().filter(x=>x.id!==card.id);
+        run.deck=activeSquad().filter(x=>x.id!==card.id);
+        SFX.play("buy");flashHint(`Sold ${card.name} — +${v} coins.`);
+        persistRun();syncCoins({float:true});
+        opts.rerender&&opts.rerender();
+        return;
+      }
+      const inXII=activeIds().has(card.id);
+      if(target==="bench"&&inXII){
+        run.deck=run.deck.filter(c=>c.id!==card.id);
+      }else if(target!=="bench"&&!inXII){
+        if(run.deck.length>=12){flashHint("XII is full — bench someone first.");return;}
+        run.deck.push(card);
+      }else if(inXII){
+        run.deck=run.deck.filter(c=>c.id!==card.id);run.deck.unshift(card);
+      }
+      persistRun();
+      opts.rerender&&opts.rerender(card.id);
+    });
+  });
+}
+/* SEND TO FIELD: the two-step truth — squad card becomes face-up first */
+function sendToField(id){
+  if(!m)return false;
+  const c=activeSquad().find(x=>x.id===id);
+  if(!c||c.used)return false;
+  m.fielded=m.fielded||[];
+  if(m.fielded.includes(id))return false;
+  if(m.fielded.length>=6){flashHint("The field row is full — recall a card first (drag it back).");return false;}
+  m.fielded.push(id);
+  SFX.play("tick");
+  renderHand();
+  return true;
+}
+/* ---------- SCOUT: decks ---------- *//* ---------- SCOUT: decks ---------- *//* ---------- SCOUT: decks ---------- */
 function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
 function deckScoutCell(c,o={},emph){
   return `<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardHTML(c,{emph,as:"div"})}</div>`;
@@ -9112,18 +9564,27 @@ function renderDeckScout(kind){
   const used=deck.filter(c=>c.used);
   $("#scoutTitle").textContent=player?"Your squad":"Rival squad";
   $("#scoutSub").textContent=player?`— your available ${statLbl} options`:`— they ${m.phase==="bowl"?"bat":"bowl"} their best ${statLbl} card first`;
-  $("#rivalDeckGrid").innerHTML=
-    `<div class="scout-group"><h4>${player?"Available":"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value — click a card to flip)</em></h4>
+  if(!player)$("#rivalDeckGrid").innerHTML=
+    `<div class="scout-group"><h4>${"Still to come"} · ${remaining.length} <em>(sorted by ${statLbl} value — click a card to flip)</em></h4>
        <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
     + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
-  if(player&&!m.result){
-    // tap any of YOUR cards to field it this ball (bench / off-role included),
-    // so you're never stuck when the ready row runs out of on-role cards.
-    document.querySelectorAll("#rivalDeckGrid .scout-card").forEach(cell=>{
-      const id=cell.querySelector(".card")?.dataset.id;
-      const c=activeSquad().find(x=>x.id===id);
-      if(c&&!c.used){cell.classList.add("fieldable");cell.onclick=()=>{closeRivalDeck();lockCard(c)}}
-    });
+  if(player){
+    // THE SQUAD BOARD: field row on top (face-up cards), reserves below,
+    // filters in the left pane. Sends are FLIP-animated so you SEE the move.
+    $("#scoutSub").textContent="— send cards to the FIELD, play from there";
+    const host=$("#rivalDeckGrid");
+    const build=()=>{
+      host.innerHTML=squadBoardHTML({match:true,filters:true});
+      wireSquadBoard(host,{match:true,rerender:paint,onCard:(id,sec)=>{
+        const c=activeSquad().find(x=>x.id===id);
+        if(!c)return;
+        if(sec==="field"&&!c.used&&!m.result){closeRivalDeck();lockCard(c);return;}
+        if(sec!=="field"&&sec!=="bench"&&!c.used&&!m.result){if(sendToField(id))paint(id);return;}
+        toggleFlip(id);
+      }});
+    };
+    const paint=(hl)=>paintBoardFLIP(host,build,hl);
+    build();
   }else{
     document.querySelectorAll("#rivalDeckGrid .scout-card .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
   }
@@ -9381,13 +9842,15 @@ function renderSquadManager(){
   $("#squadManageHint").textContent=p?(p.type==="train"?"→ tap a player to train":"→ tap a BENCH card to sell"):"TRAIN or SELL → tap a card";
   $("#squadManageActions").innerHTML=squadActionHTML();
   bindSquadActions();
-  const groups=[["bat","Batsmen"],["bowl","Bowlers"],["all","All-rounders"]];
-  $("#squadGrid").innerHTML=groups.map(([role,label])=>{
-    const cards=owned.filter(c=>c.role===role);
-    const body=cards.map((c,i)=>cardHTML(c,{pickable:!!p,active:ids.has(c.id),emph:p?.type==="train"?p.stat:null,dealin:false,fan:`--d:${i*12}ms`})).join("");
-    return `<section class="roster-group"><h3>${label} (${cards.length})</h3><div class="roster-row">${body||'<div class="scout-empty">No cards</div>'}</div></section>`;
-  }).join("");
-  document.querySelectorAll("#squadGrid .card").forEach(b=>b.onclick=p?()=>squadAct(b.dataset.id):()=>toggleFlip(b.dataset.id));
+  // THE SQUAD BOARD, editable here: categorized XII + bench, favourites,
+  // drag between sections (bench<->XII) — full squad management.
+  const host=$("#squadGrid");
+  const build=()=>{
+    host.innerHTML=squadBoardHTML({match:false,editable:!p,filters:true,market:!p});
+    wireSquadBoard(host,{editable:!p,rerender:(hl)=>paintBoardFLIP(host,build,hl),
+      onCard:id=>{p?squadAct(id):toggleFlip(id)}});
+  };
+  build();
 }
 
 function starterDraft(){
@@ -9419,7 +9882,7 @@ function draftArtForCard(c,disc){
   // ball hybrid (bowl2) was ambiguous and is retired.
   // THE POSE LIBRARY (37-image set, bucketed by named action)
   const batPoses=["assets/Background%20Removed/All-rounder_batting_at_crease_01.png","assets/Background%20Removed/All-rounder_batting_at_crease_02.png","assets/Background%20Removed/All-rounder_batting_in_jersey_03.png","assets/Background%20Removed/Batsman_hitting_six_10.png","assets/Background%20Removed/Batsman_in_mid-swing_11.png","assets/Background%20Removed/Batsman_playing_defensive_shot_12.png","assets/Background%20Removed/Batsman_playing_defensive_stroke_13.png","assets/Background%20Removed/Batsman_playing_forward_defensive_14.png","assets/Background%20Removed/Batsman_playing_forward_defensive_15.png","assets/Background%20Removed/Batsman_playing_lofted_drive_17.png","assets/Background%20Removed/Left-handed_batsman_playing_lofted_shot_39.png","assets/Background%20Removed/Left-handed_batsman_playing_square_cut_40.png","assets/Background%20Removed/Left-handed_batsman_playing_sweep_shot_41.png","assets/players/bat2.png","assets/players/bat3.png","assets/players/bat4.png"];
-  const bowlPoses=["assets/Background%20Removed/All-rounder_bowling_leg_break_05.png","assets/Background%20Removed/Bowler_mid-run_orange_jersey_22.png","assets/Background%20Removed/Bowler_mid-stride_action_23.png","assets/Background%20Removed/Cricket_bowler_in_delivery_stride_31.png","assets/Background%20Removed/Cricket_spinner_releasing_ball_35.png","assets/Background%20Removed/Fast_bowler_running_to_bowl_37.png","assets/Background%20Removed/Left-handed_all-rounder_bowling_38.png","assets/Background%20Removed/Left-handed_bowler_releasing_ball_43.png","assets/Background%20Removed/Leg-spinner_releasing_ball_45.png","assets/players/bowl3.png","assets/players/bowl4.png"];
+  const bowlPoses=["assets/Background%20Removed/All-rounder_bowling_leg_break_05.png","assets/Background%20Removed/Bowler_mid-run_orange_jersey_22.png","assets/Background%20Removed/Bowler_mid-stride_action_23.png","assets/players/bowl4.png","assets/Background%20Removed/Cricket_spinner_releasing_ball_35.png","assets/Background%20Removed/Fast_bowler_running_to_bowl_37.png","assets/Background%20Removed/Left-handed_all-rounder_bowling_38.png","assets/Background%20Removed/Left-handed_bowler_releasing_ball_43.png","assets/Background%20Removed/Leg-spinner_releasing_ball_45.png","assets/players/bowl3.png","assets/players/bowl4.png"];
   const neutralPoses=["assets/Background%20Removed/All-rounder_fielding_a_ball_08.png","assets/Background%20Removed/Cricket_player_throwing_ball_34.png"];
   // no action context (squad/shop/scout default view): all-rounders stand NEUTRAL
   const d=disc||(c.role==="bowl"?"bowl":c.role==="all"?"neutral":"bat");
@@ -9508,7 +9971,7 @@ function prepNextRival(){
 function createMatchShell(def){
   run.deck.forEach(c=>c.used=false);
   const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
-  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,momentum:0,streak:0,wktStreak:0,justIgnited:false,stripCache:{},log:"Scout the rival and choose your innings."};
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,fielded:[],momentum:0,streak:0,wktStreak:0,justIgnited:false,stripCache:{},log:"Scout the rival and choose your innings."};
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
@@ -9709,7 +10172,7 @@ const TUT=(()=>{
     {tag:"The ball",text:"Bigger zones = more likely. The needle spins and lands on your real outcome — nothing is rigged.",
      target:()=>document.querySelector("#duel .av-ringwrap"),wait:"land"},
     {tag:"Build HEAT",text:"Keep hitting boundaries to build HEAT (watch the meter below). A hot streak grows your boundary zones — but a wicket resets it. Cash in or protect it.",
-     target:()=>document.querySelector("#scorebug .bug-heat"),button:"Got it"},
+     target:()=>document.querySelector("#match .mhud"),button:"Got it"},
     {tag:"You're set",text:"Win matches to earn coins, then spend them in the Clubhouse on coaches, tools & training to build your engine. Good luck!",
      target:null,button:"Let's go"}
   ];
@@ -9778,9 +10241,8 @@ function renderUnlockTrack(){
   el.innerHTML=(got.length?`<div class="perk-row">${gotChips}</div>`:"")+nextChip;
 }
 function renderTitle(){
-  const hm=$("#heroMark");if(hm)hm.innerHTML=fieldRingSVG(null,{fracs:GHOST_FRACS});
+  const hm=$("#heroMark");if(hm)hm.innerHTML=fieldRingSVG(null,{fracs:["W","0","1","2","4","6"].map(t=>({tk:t,frac:1/6}))}); // the LOGO stays the clean six
   $("#titleStats").innerHTML=`<span class="stat-pill">Best chase <b>${save.best}</b></span><span class="stat-pill">Cups won <b>${save.cups}</b></span>`;
-  renderUnlockTrack();
   const cb=$("#continueBtn"),sv=savedRun();
   if(cb){cb.style.display=sv?"":"none";if(sv)cb.textContent=`Continue Run · Match ${Math.min(sv.match+1,MATCHES.length)}/${MATCHES.length}`}
 }
@@ -9794,6 +10256,22 @@ function enterFS(){const d=document.documentElement;if(!document.fullscreenEleme
 function toggleFS(){if(document.fullscreenElement)document.exitFullscreen();else enterFS()}
 const _fsBtn=$("#fsBtn");if(_fsBtn)_fsBtn.onclick=toggleFS;
 $("#startBtn").onclick=()=>{enterFS();startRun()};
+function renderCollection(){
+  const body=$("#collectionBody");if(!body)return;
+  body.innerHTML=UNLOCKS.map(u=>{
+    const got=u.need(save);
+    return `<div class="col-item ${got?"":"locked"}">
+      <div class="ci-badge">${u.icon}</div>
+      <div><b>${u.name}</b><small>${got?u.desc:u.progress(save)+" — "+u.desc}</small></div>
+    </div>`;
+  }).join("");
+}
+$("#collectionBtn").onclick=()=>{SFX.play("nav");renderCollection();$("#collectionOverlay").classList.add("show")};
+$("#closeCollection").onclick=()=>{SFX.play("click");$("#collectionOverlay").classList.remove("show")};
+$("#collectionOverlay").onclick=e=>{if(e.target.id==="collectionOverlay")$("#collectionOverlay").classList.remove("show")};
+$("#quitBtn").onclick=()=>{SFX.play("click");window.close();setTimeout(()=>flashHint("Close the tab to quit — thanks for playing!"),120)};
+$("#langBtn").onclick=()=>flashHint("Language options — coming soon.");
+document.querySelectorAll("#titleSocials button").forEach(b=>b.onclick=()=>flashHint("Community links coming soon — stay tuned!"));
 $("#continueBtn").onclick=()=>{enterFS();continueRun()};
 $("#introGo").onclick=startFirstMatch;
 $("#restartBtn").onclick=()=>startRun();
