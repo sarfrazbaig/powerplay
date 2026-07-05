@@ -5191,6 +5191,24 @@
     font-size:15px;cursor:pointer;color:#b9b2a2;transition:transform .12s}
   .sb-fav:hover{transform:scale(1.15)}
   .sb-fav.on{color:#f0a500;box-shadow:0 0 10px rgba(255,201,60,.65)}
+  .sb-fieldrow{background:linear-gradient(180deg,rgba(31,155,83,.14),transparent);border:2.5px dashed rgba(31,155,83,.5);
+    border-radius:14px;padding:10px 12px 12px;margin-bottom:22px}
+  .sb-fieldrow>h4{color:#1f9b53;border-bottom-color:rgba(31,155,83,.3)}
+  .sb-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 16px;position:sticky;top:0;z-index:6;
+    background:rgba(255,253,244,.94);padding:8px 10px;border-radius:12px;border:2px solid rgba(23,33,31,.12)}
+  .sbf-lbl{font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#7a6a4a}
+  .sbf-chip{border:2px solid var(--ink);background:#fff6e3;border-radius:99px;padding:4px 12px;
+    font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:12px;cursor:pointer;text-transform:capitalize}
+  .sbf-chip.on{background:var(--gold,#ffc93c)}
+  .sbf-sep{width:2px;height:20px;background:rgba(23,33,31,.15);border-radius:2px}
+  .sbf-select{border:2px solid var(--ink);background:#fff6e3;border-radius:10px;padding:4px 8px;
+    font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:12px}
+  .sb-market{border:2.5px dashed rgba(184,134,11,.55);border-radius:14px;padding:10px 12px 12px;
+    background:linear-gradient(180deg,rgba(255,201,60,.12),transparent)}
+  .sb-market>h4{color:#b8860b;border-bottom-color:rgba(184,134,11,.3)}
+  .sb-market-zone{min-height:120px;display:flex;align-items:center;justify-content:center}
+  .sb-market-hint{color:#9a834a;font-weight:800;font-size:13px;text-align:center;line-height:1.5}
+  .sb-market.drop-hot{background:rgba(255,201,60,.28)}
   .sb-bench-note{font-size:11.5px;font-weight:700;color:#7a6a4a;margin:-4px 0 8px}
   .scout-card.fieldable{cursor:pointer;transition:transform .12s ease}
   .scout-card.fieldable:hover{transform:translateY(-6px)}
@@ -9290,7 +9308,12 @@ function renderHand(){
   const avail=activeSquad().filter(c=>!c.used&&c!==m.selected);
   // 6 best phase-relevant cards; if none are on-role left, fall back to ANY
   // remaining card so the row is never empty and you can always field a ball.
-  let ready=avail.filter(roleOk).sort((a,b)=>stat(b)-stat(a)).slice(0,6);
+  // FIELDED cards (sent from the squad board) hold their spots first,
+  // then the best on-role cards fill the rest of the six.
+  const fieldedIds=m.fielded||[];
+  const pinned=fieldedIds.map(id=>avail.find(c=>c.id===id)).filter(Boolean);
+  const rest=avail.filter(c=>!fieldedIds.includes(c.id));
+  let ready=pinned.concat(rest.filter(roleOk).sort((a,b)=>stat(b)-stat(a))).slice(0,6);
   if(!ready.length)ready=avail.slice().sort((a,b)=>stat(b)-stat(a)).slice(0,6);
   const animate=dealAnim;dealAnim=false;
   const cards=ready.map((c,i)=>`
@@ -9326,42 +9349,97 @@ function benchCards(){const act=activeIds();return roster().filter(c=>!act.has(c
 function sbSort(list){
   return list.slice().sort((a,b)=>(b.fav?1:0)-(a.fav?1:0)||(batVal(b)+bowlVal(b))-(batVal(a)+bowlVal(a)));
 }
+/* the squad-page filter state (session-only) */
+const SB_FILTER={role:"all",rarity:"all",nation:"all",favOnly:false};
+function sbFilterPass(c){
+  if(SB_FILTER.role!=="all"&&c.role!==SB_FILTER.role)return false;
+  if(SB_FILTER.rarity!=="all"&&(c.rarity||"common")!==SB_FILTER.rarity)return false;
+  if(SB_FILTER.nation!=="all"&&nationFor(c)!==SB_FILTER.nation)return false;
+  if(SB_FILTER.favOnly&&!c.fav)return false;
+  return true;
+}
+function fieldRowCards(){
+  // the FACE-UP cards: exactly what the hand shows right now
+  const disc=m.phase==="bowl"?"bowl":"bat";
+  const stat=c=>disc==="bowl"?bowlVal(c):batVal(c);
+  const roleOk=c=>m.phase==="bowl"?(c.role==="bowl"||c.role==="all"):(c.role==="bat"||c.role==="all");
+  const avail=activeSquad().filter(c=>!c.used&&c!==m.selected);
+  const fieldedIds=m.fielded||[];
+  const pinned=fieldedIds.map(id=>avail.find(c=>c.id===id)).filter(Boolean);
+  const rest=avail.filter(c=>!fieldedIds.includes(c.id));
+  let ready=pinned.concat(rest.filter(roleOk).sort((a,b)=>stat(b)-stat(a))).slice(0,6);
+  if(!ready.length)ready=avail.slice().sort((a,b)=>stat(b)-stat(a)).slice(0,6);
+  return ready;
+}
 function squadBoardHTML(opts={}){
   const inMatch=!!opts.match;
   const act=activeSquad();
+  const flt=opts.filters?sbFilterPass:(()=>true);
   const groups=[["bat","Batters"],["all","All-rounders"],["bowl","Bowlers"]]
-    .map(([role,label])=>({role,label,cards:sbSort(act.filter(c=>c.role===role))}));
-  const bench=sbSort(benchCards());
+    .map(([role,label])=>({role,label,cards:sbSort(act.filter(c=>c.role===role&&flt(c)))}));
+  const bench=sbSort(benchCards().filter(flt));
   const emph=inMatch?(m.phase==="bowl"?"bowl":"bat"):null;
-  const cell=(c,sec)=>`<div class="sb-card ${c.used&&inMatch?'usedc':''}" draggable="${opts.editable?'true':'false'}" data-sb-id="${c.id}" data-sec="${sec}">
+  const cell=(c,sec)=>`<div class="sb-card ${c.used&&inMatch?'usedc':''}" draggable="${opts.editable||inMatch?'true':'false'}" data-sb-id="${c.id}" data-sec="${sec}">
       <span class="sb-fav ${c.fav?'on':''}" data-fav="${c.id}" title="${c.fav?'Unfavourite':'Mark favourite'}">&#9733;</span>
       ${cardHTML(c,{emph,as:"div"})}
     </div>`;
   const section=(key,label,cards,note)=>`<div class="sb-section" data-sb-sec="${key}">
       <h4>${label} &middot; ${cards.length} ${note?`<em>${note}</em>`:""}</h4>
-      ${key==="bench"&&!opts.editable?`<div class="sb-bench-note">Bench is locked during a match — manage your XII between games.</div>`:""}
       <div class="sb-grid">${cards.map(c=>cell(c,key)).join("")||'<div class="scout-empty">Empty.</div>'}</div>
     </div>`;
-  return groups.map(g=>section(g.role,g.label,g.cards,inMatch?"tap a card to field it":"drag to bench &middot; star to pin")).join("")
-    + section("bench",`Bench`,bench,opts.editable?"drag onto a role section to join the XII":"");
+  const fieldRow=inMatch?`<div class="sb-section sb-fieldrow" data-sb-sec="field">
+      <h4>&#9654; The Field &middot; face-up cards <em>only these can be sent to the pitch — tap to play one</em></h4>
+      <div class="sb-grid">${fieldRowCards().map(c=>cell(c,"field")).join("")||'<div class="scout-empty">No cards left.</div>'}</div>
+    </div>`:"";
+  const filterBar=opts.filters?`<div class="sb-filters">
+      <span class="sbf-lbl">Show</span>
+      ${[["all","All"],["bat","Bat"],["all-r","All-round"],["bowl","Bowl"]].map(([v,l])=>
+        `<button class="sbf-chip ${SB_FILTER.role===(v==="all-r"?"all":v)&&(v!=="all"||SB_FILTER.role==="all")?"on":""}" data-sbf-role="${v==="all-r"?"all_role":v}">${l}</button>`).join("")}
+      <span class="sbf-sep"></span>
+      ${["all","common","uncommon","rare","epic","legendary"].map(r=>
+        `<button class="sbf-chip ${SB_FILTER.rarity===r?"on":""}" data-sbf-rarity="${r}">${r==="all"?"Any tier":r}</button>`).join("")}
+      <span class="sbf-sep"></span>
+      <select class="sbf-select" data-sbf-nation>
+        <option value="all">All nations</option>
+        ${NATIONS.map(n=>`<option value="${n}" ${SB_FILTER.nation===n?"selected":""}>${n}</option>`).join("")}
+      </select>
+      <button class="sbf-chip ${SB_FILTER.favOnly?"on":""}" data-sbf-fav>&#9733; Favs</button>
+    </div>`:"";
+  const market=opts.market?`<div class="sb-section sb-market" data-sb-sec="market">
+      <h4>&#128176; Market <em>drag a BENCH card here to sell it</em></h4>
+      <div class="sb-grid sb-market-zone"><div class="sb-market-hint">Drop to sell &middot; bench cards only<br>keeps a legal squad of 12+</div></div>
+    </div>`:"";
+  return filterBar+fieldRow+groups.map(g=>section(g.role,g.label,g.cards,
+      inMatch?"tap a card to SEND IT TO THE FIELD":"drag to bench &middot; star to pin")).join("")
+    + section("bench","Bench",bench,opts.editable?"drag onto a role section to join the XII":"")
+    + market;
 }
 function wireSquadBoard(host,opts={}){
-  // favourites
   host.querySelectorAll("[data-fav]").forEach(st=>st.onclick=e=>{
     e.stopPropagation();
     const c=roster().find(x=>x.id===st.dataset.fav);
     if(c){c.fav=!c.fav;persistRun();opts.rerender&&opts.rerender();}
   });
-  // field / flip on card click
   host.querySelectorAll(".sb-card").forEach(cell=>{
     const id=cell.dataset.sbId;
     cell.onclick=e=>{
       if(e.target.closest("[data-fav]"))return;
-      if(opts.onCard)opts.onCard(id);
+      if(opts.onCard)opts.onCard(id,cell.dataset.sec);
     };
   });
-  if(!opts.editable)return;
-  // drag & drop: reorder + active<->bench
+  // filters
+  host.querySelectorAll("[data-sbf-role]").forEach(b=>b.onclick=()=>{
+    const v=b.dataset.sbfRole;SB_FILTER.role=v==="all_role"?"all":v;
+    if(v==="all_role")SB_FILTER.role="all";else if(v==="all")SB_FILTER.role="all";else SB_FILTER.role=v;
+    opts.rerender&&opts.rerender();
+  });
+  host.querySelectorAll("[data-sbf-rarity]").forEach(b=>b.onclick=()=>{SB_FILTER.rarity=b.dataset.sbfRarity;opts.rerender&&opts.rerender();});
+  const natSel=host.querySelector("[data-sbf-nation]");
+  if(natSel)natSel.onchange=()=>{SB_FILTER.nation=natSel.value;opts.rerender&&opts.rerender();};
+  const favBtn=host.querySelector("[data-sbf-fav]");
+  if(favBtn)favBtn.onclick=()=>{SB_FILTER.favOnly=!SB_FILTER.favOnly;opts.rerender&&opts.rerender();};
+  // drag & drop
+  if(!opts.editable&&!opts.match)return;
   let dragId=null;
   host.querySelectorAll(".sb-card").forEach(cell=>{
     cell.addEventListener("dragstart",e=>{dragId=cell.dataset.sbId;cell.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
@@ -9375,23 +9453,52 @@ function wireSquadBoard(host,opts={}){
       if(!dragId)return;
       const card=roster().find(c=>c.id===dragId);if(!card)return;
       const target=sec.dataset.sbSec;
+      if(opts.match){
+        // in a match only FIELD membership moves: squad->field pins, field->role unpins
+        if(target==="field")sendToField(card.id);
+        else if((m.fielded||[]).includes(card.id)){m.fielded=m.fielded.filter(x=>x!==card.id);renderHand();}
+        opts.rerender&&opts.rerender();
+        return;
+      }
+      if(target==="market"){
+        if(activeIds().has(card.id)){flashHint("Only BENCH cards can be sold — bench him first.");return;}
+        if(roster().length<=12){flashHint("Keep at least 12 players for every match.");return;}
+        const v=sellValue(card);
+        run.coins+=v;
+        run.roster=roster().filter(x=>x.id!==card.id);
+        run.deck=activeSquad().filter(x=>x.id!==card.id);
+        SFX.play("buy");flashHint(`Sold ${card.name} — +${v} coins.`);
+        persistRun();syncCoins({float:true});
+        opts.rerender&&opts.rerender();
+        return;
+      }
       const inXII=activeIds().has(card.id);
       if(target==="bench"&&inXII){
-        run.deck=run.deck.filter(c=>c.id!==card.id);          // bench him
+        run.deck=run.deck.filter(c=>c.id!==card.id);
       }else if(target!=="bench"&&!inXII){
         if(run.deck.length>=12){flashHint("XII is full — bench someone first.");return;}
-        if(card.role!==target&&target!==card.role){/* role sections accept only own role visually */}
-        run.deck.push(card);                                   // into the XII
-      }else{
-        // same-zone drop: move card to front of its group order (simple re-arrange)
-        if(inXII){run.deck=run.deck.filter(c=>c.id!==card.id);run.deck.unshift(card);}
+        run.deck.push(card);
+      }else if(inXII){
+        run.deck=run.deck.filter(c=>c.id!==card.id);run.deck.unshift(card);
       }
       persistRun();
       opts.rerender&&opts.rerender();
     });
   });
 }
-/* ---------- SCOUT: decks ---------- */
+/* SEND TO FIELD: the two-step truth — squad card becomes face-up first */
+function sendToField(id){
+  if(!m)return;
+  const c=activeSquad().find(x=>x.id===id);
+  if(!c||c.used)return;
+  m.fielded=m.fielded||[];
+  if(m.fielded.includes(id))return;
+  if(m.fielded.length>=6){flashHint("The field row is full — recall a card first (drag it back).");return;}
+  m.fielded.push(id);
+  SFX.play("tick");
+  renderHand();
+}
+/* ---------- SCOUT: decks ---------- *//* ---------- SCOUT: decks ---------- */
 function rivalRelevant(c){return m.phase==="bowl"?batVal(c):bowlVal(c)}
 function deckScoutCell(c,o={},emph){
   return `<div class="scout-card ${o.next?'next':''} ${o.used?'usedc':''}">${o.next?'<span class="next-badge">NEXT</span>':''}${cardHTML(c,{emph,as:"div"})}</div>`;
@@ -9411,15 +9518,18 @@ function renderDeckScout(kind){
        <div class="scout-grid">${remaining.length?remaining.map((c,i)=>deckScoutCell(c,{next:!player&&i===0},emph)).join(""):'<div class="scout-empty">No cards left.</div>'}</div></div>`
     + (used.length?`<div class="scout-group"><h4>Already used · ${used.length}</h4><div class="scout-grid">${used.map(c=>deckScoutCell(c,{used:true},emph)).join("")}</div></div>`:"");
   if(player){
-    // THE SQUAD BOARD: categorized XII + bench, favourites, big grid.
-    $("#scoutSub").textContent="— your squad, categorized · star favourites";
+    // THE SQUAD BOARD: field row on top (face-up cards), categorized XII,
+    // bench. Squad cards go to the FIELD first — never straight to the pitch.
+    $("#scoutSub").textContent="— send cards to the FIELD, play from there";
     const host=$("#rivalDeckGrid");
     const paint=()=>{
-      host.innerHTML=squadBoardHTML({match:true,editable:false});
-      wireSquadBoard(host,{rerender:paint,onCard:id=>{
+      host.innerHTML=squadBoardHTML({match:true});
+      wireSquadBoard(host,{match:true,rerender:paint,onCard:(id,sec)=>{
         const c=activeSquad().find(x=>x.id===id);
-        if(c&&!c.used&&!m.result){closeRivalDeck();lockCard(c);}
-        else toggleFlip(id);
+        if(!c)return;
+        if(sec==="field"&&!c.used&&!m.result){closeRivalDeck();lockCard(c);return;}
+        if(sec!=="field"&&sec!=="bench"&&!c.used&&!m.result){sendToField(id);paint();return;}
+        toggleFlip(id);
       }});
     };
     paint();
@@ -9684,7 +9794,7 @@ function renderSquadManager(){
   // drag between sections (bench<->XII) — full squad management.
   const host=$("#squadGrid");
   const paint=()=>{
-    host.innerHTML=squadBoardHTML({match:false,editable:!p});
+    host.innerHTML=squadBoardHTML({match:false,editable:!p,filters:true,market:!p});
     wireSquadBoard(host,{editable:!p,rerender:renderSquadManager,
       onCard:id=>{p?squadAct(id):toggleFlip(id)}});
   };
@@ -9809,7 +9919,7 @@ function prepNextRival(){
 function createMatchShell(def){
   run.deck.forEach(c=>c.used=false);
   const nr=(run.nextRival&&run.nextRival.def===def)?run.nextRival:prepNextRival();
-  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,momentum:0,streak:0,wktStreak:0,justIgnited:false,stripCache:{},log:"Scout the rival and choose your innings."};
+  return {def,arch:nr.arch,phase:null,innings:0,firstChoice:null,ball:1,you:{runs:0,wk:0,anchor:false},rival:{runs:0,wk:0},target:null,rivalDeck:nr.deck,challenge:null,result:null,selected:null,preview:null,selectionLocked:false,squadOpen:false,history:[],chain:0,boundaries:0,hotHand:false,hotBat:false,dotsBowled:0,wicketsTaken:0,luckyTick:false,extrasCount:0,freeHit:false,fielded:[],momentum:0,streak:0,wktStreak:0,justIgnited:false,stripCache:{},log:"Scout the rival and choose your innings."};
 }
 function setupToss(){
   if(activeSquad().length!==12){beginSquadSelection();return}
