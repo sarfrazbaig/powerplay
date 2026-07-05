@@ -4518,6 +4518,7 @@
   /* the 6 ready cards, sized to the band, plus the DECK stack at the end */
   .loadout-hand .av-fan{justify-content:flex-start;gap:0}
   .loadout-hand .av-handrow{display:flex;gap:8px;align-items:center;justify-content:center;height:100%;width:100%;overflow:visible}
+  .loadout-hand .fanhold .card,.loadout-hand .fanhold .tc{max-height:none}
   .loadout-hand .fanhold{flex:0 1 128px;min-width:0;width:auto !important;margin-left:0 !important;transform:none !important;
     height:auto;max-height:100%;display:flex;align-items:center;transition:transform .14s ease}
   .loadout-hand .fanhold:hover{transform:translateY(-10px) !important;z-index:6}
@@ -4532,25 +4533,45 @@
   .hand-deck .hd-cards{position:absolute;inset:5px;border:2px dashed rgba(255,255,255,.5);border-radius:8px}
   .hand-deck .hd-n{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:30px;text-shadow:2px 2px 0 rgba(23,33,31,.6);z-index:1}
   .hand-deck .hd-lbl{font-size:9px;font-weight:900;letter-spacing:2px;z-index:1}
-  /* ONE sizing system for the whole loadout: width-driven clamps (like the
-     hand cards) so every element scales together at every viewport. */
-  .loadout-build .coach-zone.coach-bigbox{padding:6px 8px;align-items:center;gap:0;height:96%;justify-content:flex-start}
+  /* ===== LOADOUT TRUTHS (user-locked): ONE card size for players, coaches
+     and the DECK; kit = full card height x 1/3 width. NEVER shrink a card —
+     when space runs out cards OVERLAP (art side covered, the 4 stat squares
+     stay visible; hover pops a card to the top). Everything derives from
+     --cardw so the truths hold at every viewport. ===== */
+  .loadout{--cardh:calc(clamp(230px,33vh,368px) - 52px);
+    --cardw:min(clamp(150px,12.5vw,215px),calc(var(--cardh)*5/7))}
+  .loadout-build .coach-zone.coach-bigbox{padding:6px 8px;align-items:center;gap:0;height:96%;justify-content:flex-start;overflow:visible}
   .coach-spine{writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;
     font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(20px,2vw,30px);
     letter-spacing:3px;color:var(--punch,#ff5a2d);opacity:.9;flex:0 0 auto;
     border-left:2.5px solid rgba(23,33,31,.14);padding-left:6px;margin-right:8px;align-self:stretch;
     display:flex;align-items:center;justify-content:center}
-  .loadout-build .coach-zone-row{gap:8px;flex-wrap:nowrap;align-items:center;flex:1 1 auto;min-width:0;justify-content:center}
-  .loadout-build #matchCoachZone .coach-zone-row .coachcard{flex:0 1 clamp(112px,9.5vw,160px);width:auto;height:auto;min-width:0}
-  .loadout-build .coach-zone-row .coachcard svg{width:100%;height:auto;display:block}
-  .coach-ghost{flex:0 1 clamp(100px,8.5vw,150px);aspect-ratio:5/7;border:2.5px dashed rgba(23,33,31,.28);
+  .loadout-build .coach-zone-row{gap:8px;flex-wrap:nowrap;align-items:center;flex:1 1 auto;min-width:0;justify-content:center;overflow:visible}
+  /* coach card = PLAYER card size; box may shrink (overlap), the card never does */
+  .loadout-build #matchCoachZone .coach-zone-row .coachcard{flex:0 1 var(--cardw);min-width:calc(var(--cardw)*.3);width:auto;height:auto;position:relative}
+  .loadout-build .coach-zone-row .coachcard svg{width:var(--cardw);height:auto;display:block}
+  .loadout-build .coach-zone-row .coachcard:hover{z-index:50}
+  .coach-ghost{flex:0 0 var(--cardw);aspect-ratio:5/7;border:2.5px dashed rgba(23,33,31,.28);
     border-radius:14px;display:flex;align-items:center;justify-content:center;color:rgba(23,33,31,.3);
     font-family:Anton,Impact,sans-serif;font-size:34px}
   .loadout-build .kit-zone{padding:6px 8px;align-items:center}
   .loadout-build .kit-zone-row{align-items:center;gap:8px}
-  .loadout-build .kit-zone-row .kit-slot{flex:0 1 clamp(74px,5.6vw,100px);width:auto;height:auto;aspect-ratio:1/1.15;min-width:0}
-  .loadout-hand .fanhold{flex:0 1 clamp(150px,12.5vw,215px)}
-  .hand-deck{flex:0 1 clamp(96px,7.8vw,132px) !important;height:auto !important;aspect-ratio:5/7}
+  /* consumable slot = full card height, 1/3 card width (the user's spec) */
+  .loadout-build .kit-zone-row .kit-slot{flex:0 0 calc(var(--cardw)/3);width:calc(var(--cardw)/3);height:calc(var(--cardw)*7/5);aspect-ratio:auto;min-width:0}
+  /* player cards: fixed card, shrinking box -> overlap keeps the RIGHT stat
+     rail of every card visible (left card sits on top) */
+  .loadout-hand .fanhold{flex:0 1 var(--cardw);min-width:calc(var(--cardw)*.36);position:relative}
+  .loadout-hand .fanhold .card{width:var(--cardw);flex:0 0 var(--cardw);min-width:var(--cardw);max-width:none}
+  .loadout-hand .fanhold:hover{z-index:60 !important}
+  .loadout-hand .fanhold:nth-child(1){z-index:9}.loadout-hand .fanhold:nth-child(2){z-index:8}
+  .loadout-hand .fanhold:nth-child(3){z-index:7}.loadout-hand .fanhold:nth-child(4){z-index:6}
+  .loadout-hand .fanhold:nth-child(5){z-index:5}.loadout-hand .fanhold:nth-child(6){z-index:4}
+  .loadout-hand .fanhold:nth-child(7){z-index:3}.loadout-hand .fanhold:nth-child(8){z-index:2}
+  #matchCoachZone .coachcard:nth-child(1){z-index:9}#matchCoachZone .coachcard:nth-child(2){z-index:8}
+  #matchCoachZone .coachcard:nth-child(3){z-index:7}#matchCoachZone .coachcard:nth-child(4){z-index:6}
+  #matchCoachZone .coachcard:nth-child(5){z-index:5}#matchCoachZone .coachcard:nth-child(6){z-index:4}
+  /* the DECK is the same deck -> the same card size */
+  .hand-deck{flex:0 0 var(--cardw) !important;width:var(--cardw);height:auto !important;aspect-ratio:5/7}
   /* legendary card: rays drift, halo breathes — the only animated card face */
   .tc .raySpin{animation:raySpin 26s linear infinite}
   @keyframes raySpin{to{transform:rotate(360deg)}}
