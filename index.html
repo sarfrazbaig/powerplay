@@ -4552,9 +4552,10 @@
   .loadout-build #matchCoachZone .coach-zone-row .coachcard+.coachcard{margin-left:var(--covl,8px) !important}
   .loadout-build .coach-zone-row .coachcard svg{width:var(--cardw);height:auto;display:block}
   .loadout-build .coach-zone-row .coachcard:hover{z-index:50}
-  .coach-ghost{flex:0 0 var(--cardw);aspect-ratio:5/7;border:2.5px dashed rgba(23,33,31,.28);
+  .coach-ghost{flex:0 0 calc(var(--cardw)/3);width:calc(var(--cardw)/3);height:calc(var(--cardw)*7/5);
+    border:2.5px dashed rgba(23,33,31,.28);
     border-radius:14px;display:flex;align-items:center;justify-content:center;color:rgba(23,33,31,.3);
-    font-family:Anton,Impact,sans-serif;font-size:34px}
+    font-family:Anton,Impact,sans-serif;font-size:30px}
   .loadout-build .kit-zone{padding:6px 8px;align-items:center}
   .loadout-build .kit-zone-row{align-items:center;gap:8px}
   /* consumable slot = full card height, 1/3 card width (the user's spec) */
@@ -8001,42 +8002,44 @@ function heatBarHTML(){
 /* Slim match HUD (replaces the title bar + scorebug strip). 6 legal-ball pips;
    a wide/no-ball shows as a "+N" tick beside them, never eating a legal pip. */
 /* LOADOUT TRUTH enforcement: cards never shrink and never spill their group.
-   One pass budgets the WHOLE band: fixed items (spine, deck, kit) are
-   measured, the remaining width is split across the coach and hand groups by
-   solving a single per-card exposure, floored at each group's rail guard.
-   The coach box gets an explicit width so groups keep an obvious gap. */
+   One pass budgets the WHOLE band from the real .loadout box (NOT the
+   display:contents wrapper, which measures 0 width): fixed items are
+   subtracted, one per-card exposure is solved for both card groups, capped
+   at a full 8px gap (big screens = NO overlap, cards spread out) and floored
+   at the rail guard (small screens = overlap, stats stay visible). */
 function layoutLoadoutOverlap(){
-  const lo=document.querySelector("#match .loadout .loadout-build")||document.querySelector("#match .loadout");
+  const lo=document.querySelector("#match .loadout");
   const hr=document.querySelector(".loadout-hand .av-handrow");
   const cr=document.querySelector("#matchCoachZone .coach-zone-row");
   const bigbox=document.querySelector("#matchCoachZone .coach-bigbox");
   const anyCard=document.querySelector(".loadout-hand .fanhold .card, #matchCoachZone .coachcard svg");
   if(!lo||!hr||!anyCard)return;
   const cw=anyCard.getBoundingClientRect().width;if(!cw)return;
+  const cs=getComputedStyle(lo);
+  const loW=lo.clientWidth-parseFloat(cs.paddingLeft||"0")-parseFloat(cs.paddingRight||"0");
+  if(!loW)return;
   const hands=[...hr.querySelectorAll(".fanhold")], deck=hr.querySelector(".hand-deck");
   const coaches=cr?[...cr.querySelectorAll(".coachcard")]:[];
   const hN=hands.length, cN=coaches.length;
   const kit=document.querySelector("#match .kit-zone");
   const spine=document.querySelector("#matchCoachZone .coach-spine");
-  const loW=lo.getBoundingClientRect().width;
-  const fixed=(deck?cw+14:0)+(kit?kit.getBoundingClientRect().width:0)
-    +(spine?spine.getBoundingClientRect().width+8:0)
-    +(bigbox?26:0)+40; // box padding + zone gaps/slack
-  const avail=loW-fixed;
-  const groups=(hN?1:0)+(cN?1:0);
+  const spineW=spine?spine.getBoundingClientRect().width+8:0;
+  // fixed: coach-box chrome + first card of each group (ghost counts), deck, kit, slack
+  const fixedAll=spineW+26+(kit?kit.getBoundingClientRect().width:0)
+    +(deck?cw+14:0)+(hN?cw:0)+(cN?cw:cw/3)+28;
   const seats=Math.max(0,hN-1)+Math.max(0,cN-1);
-  let e=seats>0?(avail-groups*cw)/seats:cw+8;
-  e=Math.min(cw+8,e);
-  let eH=Math.max(e,cw*0.36), eC=Math.max(e,cw*0.30);
-  if(hr)hr.style.setProperty("--hovl",(Math.min(8,eH-cw))+"px");
+  let e=seats>0?(loW-fixedAll)/seats:cw+8;
+  e=Math.min(cw+8,e);                        // roomy: full cards + 8px gaps
+  const eH=Math.max(e,cw*0.36), eC=Math.max(e,cw*0.30);
+  hr.style.setProperty("--hovl",(Math.min(8,eH-cw))+"px");
   if(cr)cr.style.setProperty("--covl",(Math.min(8,eC-cw))+"px");
   if(bigbox){
-    const spineW=spine?spine.getBoundingClientRect().width+8:0;
-    const rowW=cN?cw+Math.max(0,cN-1)*eC:(cw); // ghost = one card
+    const rowW=cN?cw+Math.max(0,cN-1)*Math.min(eC,cw+8):cw/3;
     bigbox.style.flex="0 0 auto";
     bigbox.style.width=Math.ceil(spineW+rowW+26)+"px";
   }
 }
+let __loRsz;window.addEventListener("resize",()=>{clearTimeout(__loRsz);__loRsz=setTimeout(layoutLoadoutOverlap,120)});
 function renderHud(){
   const el=$("#hudInfo");if(!el)return;
   const v=bugView();
