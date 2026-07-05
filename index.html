@@ -4896,14 +4896,7 @@
   .ring-sec path{transition:filter .18s ease,opacity .18s ease}
   .ring-svg.ghosting .ring-sec path{opacity:.82;stroke-dasharray:7 5}
   .ring-svg.ghosting .ring-sec text{opacity:.85}
-  .pv-badge{position:absolute;transform:translate(-50%,-50%);z-index:40;pointer-events:none;
-    display:flex;align-items:center;gap:4px;background:#17211f;color:#fff6e3;border:2px solid #fff6e3;
-    border-radius:99px;padding:2px 10px;font-family:Oswald,Arial,sans-serif;font-weight:800;font-size:14px;
-    animation:pvIn .18s ease both}
-  .pv-badge b{font-family:Anton,Impact,sans-serif;font-style:italic}
-  .pv-badge.up{background:#1f9b53}
-  .pv-badge.down{background:#5c6b66;opacity:.92}
-  @keyframes pvIn{from{transform:translate(-50%,-50%) scale(.6);opacity:0}}
+
   .ring-sec.lit path{filter:brightness(1.9) saturate(1.2)}
   .ring-sec.landed path{
     stroke:#17211f;stroke-width:5;
@@ -7094,7 +7087,11 @@ function updateMomentum(mode,out){
   const bank=activeCoaches().some(c=>c.heatBank);     // Slow Burn: a break only HALVES the heat
   const preN=m.momentum||0;
   m.justBroke=false;
-  const brk=()=>{m.justBroke=preN>=MOM_WARM;m.momentum=bank?Math.floor(preN/2):0};
+  const brk=()=>{
+    const next=bank?Math.floor(preN/2):0;
+    m.justBroke=preN>=MOM_WARM&&next<MOM_WARM; // Slow Burn to still-warm is not a loss
+    m.momentum=next;
+  };
   const wasFire=momentumState()==="fire";
   // a "good" ball for YOU: a boundary batting / a dot or wicket bowling
   const good=mode==="bat"?out.runs>=4:(out.wicket||out.runs===0);
@@ -7504,54 +7501,6 @@ function getStripFor(mode,card){
 /* STANCE PREVIEW: hovering a chip marks, on the live ring, exactly which
    zones that stance would grow (bright + badge) or shrink (dim). Counts are
    the deterministic stance-edit deltas — no spoiling of the staged resolve. */
-function stanceDeltaCounts(k){
-  const c=m.selected;if(!c)return null;
-  const count=a=>a.reduce((o,t)=>(o[t]=(o[t]||0)+1,o),{});
-  if(m.phase==="bowl"){
-    const key="pv:base:"+c.id+":"+(m.challengeStat||"");
-    m.stripCache=m.stripCache||{};
-    if(!m.stripCache[key])m.stripCache[key]=outcomeStrip("bowl",c,m.challenge);
-    const base=m.stripCache[key];
-    const was=m.stance;m.stance=k;
-    const edited=applyStance("bowl",base.slice(),c);
-    m.stance=was;
-    const a=count(base),b=count(edited),d={};
-    new Set([...Object.keys(a),...Object.keys(b)]).forEach(t=>{const dv=(b[t]||0)-(a[t]||0);if(dv)d[t]=dv});
-    return d;
-  }
-  // batting: stances shift the WEIGHTS — compare expected 12-slot quotas
-  const quota=st=>{
-    const {diff}=duelStats("bat",c,m.challenge);
-    const w=duelWeights(diff,st),tks=Object.keys(w),tot=tks.reduce((x,t)=>x+w[t],0);
-    const q=tks.map(t=>({t,q:w[t]/tot*12})),out={};
-    q.forEach(({t,q:v})=>out[t]=Math.floor(v));
-    q.sort((x,y)=>(y.q-Math.floor(y.q))-(x.q-Math.floor(x.q)));
-    let left=12-Object.values(out).reduce((x,v)=>x+v,0),i=0;
-    while(left>0){out[q[i%q.length].t]++;left--;i++}
-    return out;
-  };
-  const a=quota(currentStance()),b=quota(k),d={};
-  new Set([...Object.keys(a),...Object.keys(b)]).forEach(t=>{const dv=(b[t]||0)-(a[t]||0);if(dv)d[t]=dv});
-  return d;
-}
-/* THE HEAT WEARS THE PLAYER: no extra meter — your card slot burns.
-   WARM = ember glow on your arena card (or the empty slot inviting a pick);
-   ON FIRE = full flame aura + flicker. The wheel's ember slots show WHAT the
-   heat changed; the card shows THAT you are hot. */
-function heatChipTitle(){
-  const base=m.phase==="bat"
-    ?"MOMENTUM - boundaries build it, a dot cools it, a wicket kills it."
-    :"PRESSURE - dots & wickets build it, a boundary conceded kills it.";
-  return base+" WARM = 1 wheel slot upgrades in your favour. ON FIRE = 2.";
-}
-function renderHeatChip(){
-  const ms=document.getElementById("match");if(!ms)return;
-  const st=momentumState();
-  ms.classList.toggle("heat-warm",st==="warm");
-  ms.classList.toggle("heat-fire",st==="fire");
-  const yc=document.querySelector(".you-col");
-  if(yc)yc.title=st?heatChipTitle():"";
-}
 /* morph the ring to the current selection state (or back to uniform) */
 function syncSelectionRing(){
   if(!m||m.result)return;
@@ -7568,9 +7517,23 @@ function syncSelectionRing(){
     });
   },420);
 }
+/* THE HEAT WEARS THE PLAYER'S SCREEN: no meter — the navbar burns. */
+function heatChipTitle(){
+  const base=m.phase==="bat"
+    ?"MOMENTUM - boundaries build it, a dot cools it, a wicket kills it."
+    :"PRESSURE - dots & wickets build it, a boundary conceded kills it.";
+  return base+" WARM = 1 wheel slot upgrades in your favour. ON FIRE = 2.";
+}
+function renderHeatChip(){
+  const ms=document.getElementById("match");if(!ms)return;
+  const st=momentumState();
+  ms.classList.toggle("heat-warm",st==="warm");
+  ms.classList.toggle("heat-fire",st==="fire");
+  const yc=document.querySelector(".you-col");
+  if(yc)yc.title=st?heatChipTitle():"";
+}
 function clearStanceGhost(){
   const svg=ringSvgEl();if(svg)svg.classList.remove("ghosting");
-  document.querySelectorAll(".pv-badge").forEach(b=>b.remove());
   if(m&&m.selected&&!m.result)syncSelectionRing();
 }
 function showStanceGhost(k){
@@ -10209,7 +10172,7 @@ const TUT=(()=>{
     {tag:"The ball",text:"Bigger zones = more likely. The needle spins and lands on your real outcome — nothing is rigged.",
      target:()=>document.querySelector("#duel .av-ringwrap"),wait:"land"},
     {tag:"Build HEAT",text:"Keep hitting boundaries to build HEAT (watch the meter below). A hot streak grows your boundary zones — but a wicket resets it. Cash in or protect it.",
-     target:()=>document.querySelector("#heatChip"),button:"Got it"},
+     target:()=>document.querySelector("#match .mhud"),button:"Got it"},
     {tag:"You're set",text:"Win matches to earn coins, then spend them in the Clubhouse on coaches, tools & training to build your engine. Good luck!",
      target:null,button:"Let's go"}
   ];
