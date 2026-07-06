@@ -3330,7 +3330,9 @@
     color:#ffd91f;
     text-shadow:3px 3px 0 #050505;
   }
-  .pov-head span{font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#cfe0d4}
+  .pov-head span{display:inline-block;font-weight:800;font-size:11.5px;text-transform:uppercase;letter-spacing:1.2px;
+    color:#fff6e3;background:rgba(23,33,31,.82);border:2px solid rgba(255,246,227,.35);border-radius:99px;
+    padding:4px 16px;margin-top:6px}
   .pov-row{
     display:flex;
     align-items:stretch;
@@ -5759,10 +5761,12 @@
   /* panels & rails -> cream stickers */
   .title-inner,.scout-panel,.scout-head,.setup-panel,.prep-panel,.squad-room,
   .railx-head,.railx-scroll,.deck-title,.staffx,.singlex,.vcard,.chipx-list,
-  .stagex-head,.toss-summary,.coin-msg,.pov-head,.pov-actions,.pack-open-copy,
+  .stagex-head,.toss-summary,.coin-msg,.pack-open-copy,
   #shop .shopx-body,.roster-group,.setup-box{
     background:var(--cream) !important;border-color:var(--ink) !important;color:var(--ink) !important;
   }
+  /* the pack-reveal head + actions float on the DARK overlay — never cream boxes */
+  .pov-head,.pov-actions{background:none !important;border:0 !important;box-shadow:none !important}
   /* shop/squad/draft section headers -> summer chalk signs (orange on cream, ink underline) */
   .railx-head,.deck-title,.stagex-head,.draft-lane-head{
     background:transparent !important;color:var(--punch) !important;
@@ -5880,6 +5884,265 @@
   @keyframes fpDeal{from{opacity:0;transform:translateY(28px) scale(.68)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){
     #founding .fp-pack,#founding .fp-pack-body,#founding .fp-tear,#founding .sb-card{animation:none !important}
+  }
+
+  /* ============ SHOP v3 — four stalls + the loadout truth (screen 4 pass) ============ */
+  #shop .shopx-body.shopx-v4{display:flex;flex-direction:column;gap:10px;min-height:0;height:100%;overflow:hidden;
+    grid-template-columns:none}
+  /* row 1: three buying stalls — packs take the width the notice board freed */
+  #shop .stall-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.55fr) minmax(0,.5fr);
+    gap:10px;flex:1.3 1 0;min-height:0;--mcw:clamp(140px,12vw,190px)}
+  /* row 2: THE BENCH — no box, just your coaches at full size + MANAGE SQUAD.
+     Fixed card width, shrinking holders: cards OVERLAP, never shrink. */
+  .bench-row{--bcw:min(clamp(150px,13.5vw,235px),calc(34vh*5/7));
+    flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:flex-start;
+    padding:6px 10px 2px;overflow:visible}
+  .bench-row .squad-mega{flex:0 0 var(--bcw);width:var(--bcw);margin-right:16px;
+    cursor:pointer;border:0;transition:transform .14s ease}
+  .bench-row .squad-mega:hover{transform:translateY(-5px)}
+  .bench-row .squad-mega .hd-lbl{font-size:11px;letter-spacing:1.6px;line-height:1.3;text-align:center}
+  .bench-row .coachcard{flex:0 1 var(--bcw);min-width:calc(var(--bcw)*.42);position:relative;
+    cursor:pointer;transition:transform .14s ease,filter .14s ease}
+  .bench-row .coachcard svg{width:var(--bcw);height:auto;display:block}
+  .bench-row .coachcard:nth-of-type(1){z-index:9}.bench-row .coachcard:nth-of-type(2){z-index:8}
+  .bench-row .coachcard:nth-of-type(3){z-index:7}.bench-row .coachcard:nth-of-type(4){z-index:6}
+  .bench-row .coachcard:nth-of-type(5){z-index:5}.bench-row .coachcard:nth-of-type(6){z-index:4}
+  .bench-row .coachcard:nth-of-type(7){z-index:3}.bench-row .coachcard:nth-of-type(8){z-index:2}
+  .bench-row .coachcard:hover{z-index:50 !important;transform:translateY(-6px)}
+  .bench-row .coachcard.empty{flex:0 0 calc(var(--bcw)*.62);height:calc(var(--bcw)*7/5*.92);
+    align-self:center}
+  .bench-row .coachcard-sell{display:none}
+  /* the match's COACH spine, verbatim — the anchor that says "these are mine" */
+  .bench-row .coach-spine{flex:0 0 auto;align-self:stretch;display:flex;align-items:center;justify-content:center;
+    font-size:clamp(15px,1.6vw,24px);letter-spacing:3px;margin:6px 12px 6px 2px}
+  /* the notice board docks at the bench's right end */
+  .bench-row .stall-notice{margin-left:auto;flex:0 0 clamp(230px,21vw,300px);align-self:stretch;min-height:0;
+    display:flex;flex-direction:column}
+  /* selected bench coach — gold ring (shop + pack) */
+  .bench-row .coachcard.sel{filter:drop-shadow(0 0 12px rgba(255,201,60,.95)) drop-shadow(0 4px 6px rgba(23,33,31,.3));
+    transform:translateY(-6px) scale(1.04);z-index:60 !important}
+
+  /* THE CLUBHOUSE ROOM: a warm dressing-room scene behind the shop + pack
+     panels so nothing floats on flat sky. Panels go glassy to let it read. */
+  #shop,#pack{position:relative}
+  #shop.screen.active,#pack.screen.active{isolation:isolate}
+  .club-scene{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:14px}
+  .club-scene svg{width:100%;height:100%;display:block}
+  #shop>*:not(.club-scene),#pack>*:not(.club-scene){position:relative;z-index:1}
+
+  /* ============ PACK OPEN SCREEN (v5) — a real place, two panels ============ */
+  #pack.screen.active{display:flex;flex-direction:column;gap:12px;height:calc(100dvh - 24px);min-height:0}
+  #pack .pack-stage{position:relative;flex:1.55 1 0;min-height:0;box-sizing:border-box;
+    background:rgba(255,251,238,.66);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border:3px solid var(--ink,#17211f);border-radius:16px;
+    box-shadow:6px 6px 0 var(--ink,#17211f);padding:14px 18px;display:flex;overflow:hidden}
+  #pack .pack-inner{position:relative;flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:clamp(14px,2vw,44px)}
+  /* THE CELEBRATION: a warm ray-burst blooms behind the reveal on open, then a
+     confetti pop — the "you cracked a pack!" beat. */
+  #pack .pack-burstwrap{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible;display:grid;place-items:center}
+  #pack .pack-rays{width:135%;aspect-ratio:1;border-radius:50%;opacity:0;
+    background:repeating-conic-gradient(from 0deg,rgba(255,201,60,.30) 0deg 9deg,transparent 9deg 18deg);
+    -webkit-mask:radial-gradient(circle,#000 12%,transparent 62%);mask:radial-gradient(circle,#000 12%,transparent 62%)}
+  #pack .pack-stage.burst .pack-rays{animation:packRaysIn .7s ease-out both,packRaysSpin 26s linear infinite .7s}
+  @keyframes packRaysIn{from{opacity:0;transform:scale(.4) rotate(-40deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+  @keyframes packRaysSpin{to{transform:rotate(360deg)}}
+  #pack .pack-stage.burst .pack-herocol,#pack .pack-stage.burst .pack-picks{position:relative;z-index:2}
+  /* the opened pack + its SKIP REWARD CTA sit on the left */
+  #pack .pack-herocol{flex:0 0 auto;position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
+    gap:12px;width:clamp(120px,11vw,184px)}
+  #pack .pack-hero{position:relative;width:100%;display:flex;flex-direction:column;align-items:center;
+    animation:packHeroPop .6s cubic-bezier(.2,1.5,.4,1) both}
+  #pack .pack-hero .pack-art{width:100%;height:auto;filter:drop-shadow(0 8px 18px rgba(23,33,31,.35))}
+  @keyframes packHeroPop{0%{transform:scale(.6) rotate(-8deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(-2deg);opacity:1}}
+  /* the torn-open flag stamped across the pack */
+  #pack .pack-openflag{position:absolute;top:34%;left:50%;transform:translate(-50%,-50%) rotate(-9deg);
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(15px,1.6vw,21px);letter-spacing:1px;
+    color:#17211f;background:var(--gold,#ffc93c);border:3px solid var(--ink,#17211f);border-radius:8px;
+    padding:3px 12px 2px;box-shadow:0 3px 0 rgba(23,33,31,.4);white-space:nowrap;
+    animation:packFlagPop .5s cubic-bezier(.2,1.7,.4,1) .28s both}
+  @keyframes packFlagPop{0%{transform:translate(-50%,-50%) rotate(-9deg) scale(0)}100%{transform:translate(-50%,-50%) rotate(-9deg) scale(1)}}
+  /* SKIP REWARD — a real CTA now, not a whisper */
+  #pack .pack-skip{width:100%;font-family:Anton,Impact,sans-serif !important;font-style:italic;letter-spacing:1.4px;
+    font-size:clamp(12px,1.2vw,15px) !important;padding:9px 6px !important;border-radius:12px !important;
+    border:3px solid var(--ink,#17211f) !important;box-shadow:0 4px 0 var(--ink,#17211f) !important}
+  #pack .pack-skip:hover{transform:translateY(-2px)}
+  /* the reveal — full-scale cards, one line, the card IS the button */
+  #pack .pack-picks{flex:1 1 auto;min-width:0;display:flex;align-items:center;justify-content:center;
+    gap:clamp(12px,2vw,36px);--pcard:min(clamp(168px,18.5vw,258px),calc(46vh*5/7))}
+  #pack .pchoice{perspective:1200px;cursor:pointer;transition:transform .14s ease,filter .14s ease}
+  #pack .pchoice:hover{transform:translateY(-8px);filter:drop-shadow(0 12px 16px rgba(23,33,31,.32))}
+  #pack .pack-picks.reveal .pflip{animation:pflipIn .6s cubic-bezier(.2,.75,.3,1.05) var(--d,180ms) both}
+  /* one-truth sizes, at reading scale */
+  #pack .p-player .pface.front .card{width:var(--pcard)}
+  #pack .p-player .pface.front svg.tc{width:100%;height:auto;display:block}
+  #pack .p-coach .pface.front svg.coachtc{width:var(--pcard);height:auto;display:block}
+  #pack .p-tool .reveal-tool{width:calc(var(--pcard)/2.55);height:calc(var(--pcard)*7/5);flex:none;
+    display:flex;flex-direction:column;border-radius:13px;overflow:hidden}
+  #pack .p-tool .reveal-tool .kit-plate{writing-mode:vertical-rl;transform:rotate(180deg);flex:1 1 auto;
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;letter-spacing:.5px}
+  #pack .p-tool .reveal-tool .kit-art{flex:0 0 30%;display:flex;align-items:center;justify-content:center}
+  #pack .p-tool .reveal-tool .kit-art svg{width:56%;height:auto}
+  #pack .p-hex .hexx{width:clamp(190px,17vw,232px)}
+  #pack .p-train .trainx{width:clamp(150px,13vw,186px)}
+  /* coins + sell chips float top-right of the stage panel */
+  #pack .pack-coins{position:absolute;top:12px;right:14px;z-index:6}
+  #pack .pack-sell{position:absolute;top:12px;right:118px;z-index:6}
+  #pack .pack-sell[hidden]{display:none}
+  /* the bench panel below — same recipe, its own cream box */
+  #pack .pack-bench{flex:1 1 0;min-height:0;box-sizing:border-box;
+    background:rgba(255,251,238,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border:3px solid var(--ink,#17211f);border-radius:16px;
+    box-shadow:6px 6px 0 var(--ink,#17211f);padding:8px 16px;overflow:visible}
+  /* NO SPACE: the whole bench shakes to say "sell one first" */
+  #pack .pack-bench.no-space .coachcard{animation:benchShake .5s cubic-bezier(.36,.07,.19,.97) both}
+  @keyframes benchShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
+    30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
+  @media (prefers-reduced-motion:reduce){
+    #pack .pack-picks.reveal .pflip,#pack .pack-bench.no-space .coachcard,
+    #pack .pack-stage.burst .pack-rays,#pack .pack-hero,#pack .pack-openflag{animation:none !important}
+    #pack .pack-rays{opacity:1}
+    #pack .pack-hero{transform:rotate(-2deg)}
+  }
+  @media(max-width:1080px){
+    #pack .pack-picks{flex-wrap:wrap;--pcard:min(clamp(140px,22vw,220px),calc(40vh*5/7))}
+    #pack .pack-inner{flex-wrap:wrap;justify-content:center}
+  }
+  #shop .stallx{background:var(--cream,#fff6e3);border:3px solid var(--ink,#17211f);border-radius:14px;
+    box-shadow:5px 5px 0 var(--ink,#17211f);display:flex;flex-direction:column;min-height:0;overflow:hidden;
+    padding:15px 10px 10px;position:relative}
+  /* the awning: every stall is a street-market stand, not an admin panel */
+  #shop .stallx::before{content:"";position:absolute;top:0;left:0;right:0;height:9px;
+    background:repeating-linear-gradient(90deg,var(--punch,#ff5a2d) 0 20px,#fff6e3 20px 40px);
+    border-bottom:2.5px solid var(--ink,#17211f)}
+  #shop .stall-notice::before{
+    background:repeating-linear-gradient(90deg,var(--gold,#ffc93c) 0 20px,#fff6e3 20px 40px)}
+  #shop .stallx-head{font-family:Anton,Impact,sans-serif;font-style:italic;color:var(--punch,#ff5a2d);
+    letter-spacing:1px;font-size:clamp(13px,1.5vw,19px);text-transform:uppercase;
+    border-bottom:2.5px solid rgba(23,33,31,.15);padding-bottom:4px;margin-bottom:8px;flex:0 0 auto}
+  #shop .stallx-head span{font-family:"Work Sans",sans-serif;font-style:normal;font-weight:800;
+    font-size:9.5px;letter-spacing:.6px;color:#7a6a4a;text-transform:none;margin-left:7px}
+  #shop .stallx-goods{flex:1 1 auto;min-height:0;overflow:auto;display:flex;gap:10px;
+    align-items:center;justify-content:center;flex-wrap:wrap;align-content:center}
+  /* packs size by WIDTH with their natural aspect — no more flex-crush slivers.
+     min-width:0 everywhere: a nowrap label (JUMBO · 5 CARDS) must never be
+     allowed to inflate the tilt wrapper past the button. */
+  #shop .stall-packs .packx{width:clamp(126px,11.5vw,215px);flex:0 0 auto;height:auto;min-width:0}
+  #shop .stall-packs .packx-tilt{width:100%;min-width:0}
+  #shop .stall-packs .packx .pack-art{width:100%;height:auto;flex:none;min-height:0;min-width:0}
+  #shop .stall-packs .packx .pack-jumbo{white-space:normal;text-align:center}
+  #shop .stall-staff .stallx-goods{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,26px)}
+  #shop .stall-kit .stallx-goods{display:flex;align-items:center;justify-content:center;gap:clamp(8px,1vw,16px);overflow:hidden}
+  /* goods float bare on the stall — no boxes, no per-item buttons */
+  #shop .singlex{background:none;border:0;box-shadow:none;padding:0;width:auto;min-width:0;margin:0}
+  #shop .goodx{position:relative;cursor:pointer;transition:transform .14s ease,filter .14s ease}
+  #shop .goodx:hover{transform:translateY(-3px)}
+  #shop .goodx.sel,#shop .shop-loadout .coachcard.sel{transform:translateY(-5px) scale(1.05);
+    filter:drop-shadow(0 0 13px rgba(255,201,60,.9)) drop-shadow(0 4px 6px rgba(23,33,31,.3));z-index:5}
+  #shop .shop-loadout .coachcard{cursor:pointer;transition:transform .14s ease,filter .14s ease}
+  #shop .goodx.bought{opacity:.55;cursor:default;filter:grayscale(.4)}
+  #shop .goodx-price{position:absolute;top:-9px;right:-7px;z-index:4;display:flex;align-items:center;gap:4px;
+    background:var(--gold,#ffc93c);border:2.5px solid var(--ink,#17211f);border-radius:99px;
+    padding:2px 10px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:14px;color:#3a2a00;
+    box-shadow:0 2.5px 0 var(--ink,#17211f)}
+  #shop .goodx-price .coin{width:15px;height:15px}
+  #shop .goodx-price.sold{background:#d9d2c0;color:#6a604a;font-size:11px;letter-spacing:1px}
+  #shop .coachface svg{width:var(--mcw);height:auto;display:block}
+  /* market consumable = its IN-GAME form: the vertical 1/3-card kit strip */
+  #shop .goods-tool{width:calc(var(--mcw)/2.9);height:calc(var(--mcw)*7/5);display:flex;flex-direction:column;
+    border-radius:12px;overflow:hidden}
+  #shop .goods-tool .kit-plate{writing-mode:vertical-rl;transform:rotate(180deg);flex:1 1 auto;
+    display:flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:.5px}
+  #shop .goods-tool .kit-art{flex:0 0 32%;display:flex;align-items:center;justify-content:center}
+  #shop .goods-tool .kit-art svg{width:60%;height:auto}
+  /* training-camp reveal: a CAMP POSTER — sunburst, flag disc, gold ribbon */
+  .trainx{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;
+    background:
+      repeating-conic-gradient(from 8deg at 50% 30%,#fff6e3 0deg 11deg,#ffedc2 11deg 22deg);
+    border:3px solid var(--ink,#17211f);border-radius:14px;
+    box-shadow:4px 4px 0 rgba(23,33,31,.45);padding:18px 14px 14px;min-width:158px;overflow:hidden}
+  .trainx .trainx-flag{width:52px;height:52px;border-radius:50%;overflow:hidden;background:#fff;
+    border:3px solid var(--ink,#17211f);box-shadow:0 3px 0 rgba(23,33,31,.3),0 0 0 5px rgba(255,255,255,.65)}
+  .trainx b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:30px;letter-spacing:2px;
+    color:var(--ink,#17211f);text-shadow:2px 2px 0 rgba(255,201,60,.55);line-height:1}
+  .trainx .trainx-n{font-size:10.5px;font-weight:900;letter-spacing:.8px;color:#0b6a38;text-transform:uppercase;
+    background:#d9f6e4;border:2px solid #1f9b53;border-radius:99px;padding:2px 10px}
+  .trainx p{margin:3px 0 0;font-weight:900;font-size:11.5px;color:#3a2a00;line-height:1.3;max-width:175px;
+    background:var(--gold,#ffc93c);border:2.5px solid var(--ink,#17211f);border-radius:9px;padding:5px 9px;
+    box-shadow:0 3px 0 rgba(23,33,31,.35)}
+  .trainx p b{font-size:inherit;font-family:inherit;font-style:normal;text-shadow:none;letter-spacing:0}
+  .pack-art-training{--pack-top:#2fae66;--pack-bottom:#0b5236;--pack-accent:#ffe79a}
+  /* voucher = a golden TICKET with a perforated stub */
+  #shop .stall-vlist{flex-direction:column;flex-wrap:nowrap;justify-content:center;padding:2px 8px 0;overflow-x:hidden}
+  #shop .vticket{display:flex;align-items:stretch;gap:0;width:100%;max-width:min(100%,235px);box-sizing:border-box;
+    background:linear-gradient(135deg,#ffe9a8,#ffc93c 70%,#f0b400);
+    border:3px solid var(--ink,#17211f);border-radius:12px;overflow:visible;
+    box-shadow:4px 4px 0 rgba(23,33,31,.4)}
+  #shop .vticket .vt-band{writing-mode:vertical-rl;transform:rotate(180deg);flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:12px;letter-spacing:3px;color:#fff6e3;
+    background:var(--ink,#17211f);padding:8px 4px;border-radius:0 8px 8px 0;
+    border-right:2.5px dashed rgba(255,246,227,.55)}
+  #shop .vticket .vt-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px;
+    padding:10px 12px 11px;text-align:left}
+  #shop .vticket .vt-main b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:16px;
+    letter-spacing:.6px;color:#3a2a00;text-transform:uppercase;line-height:1.05}
+  #shop .vticket .vt-main small{font-weight:700;font-size:10.5px;color:#5a4200;line-height:1.35}
+  #shop .vticket.bought{filter:grayscale(.55);opacity:.6}
+  #shop .stall-vlist .vcard{width:100%;max-width:230px}
+  /* the tipbox TEAM SHEET (rich tip on MANAGE SQUAD + the match DECK) */
+  #tipbox.rich{max-width:310px}
+  #tipbox .tip-sheet{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:2px 2px 1px}
+  #tipbox .tsh-title{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;letter-spacing:2.5px;
+    color:var(--punch,#ff5a2d);line-height:1;margin:0}
+  #tipbox .tsh-line{font-family:"Work Sans",Inter,sans-serif;font-weight:800;font-size:11.5px;color:var(--ink,#17211f)}
+  #tipbox .tsh-line.dim{font-weight:700;font-size:10.5px;color:#7a6a4a}
+  #tipbox .tsh-nats{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:100%}
+  #tipbox .ts-nat{display:flex;align-items:center;gap:4px;background:#fffdf4;
+    border:2px solid var(--ink,#17211f);border-radius:99px;padding:1px 7px 1px 2px}
+  #tipbox .ts-nat svg{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(23,33,31,.5)}
+  #tipbox .ts-nat b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;color:var(--ink,#17211f)}
+  #tipbox .ts-nat.top{background:var(--gold,#ffc93c)}
+  #tipbox .tsh-teams{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+  #tipbox .ts-team{font-family:"Work Sans",sans-serif;font-weight:900;font-size:10px;letter-spacing:.4px;
+    color:#5a4a2a;background:#f3ecd9;border:1.5px solid rgba(23,33,31,.4);border-radius:99px;padding:1px 8px}
+  /* SCOUT NEXT RIVAL rides the top bar: the gold EXIT verb */
+  #shop .shopact-scout{background:var(--gold,#ffc93c) !important;color:#111 !important;
+    border:3px solid var(--ink,#17211f) !important;box-shadow:0 4px 0 var(--ink,#17211f) !important}
+  /* the TEAM SHEET fills the once-dead middle with the roster read */
+  /* the commerce verbs: loud, top bar, one home */
+  #shop .shop-actions{display:flex;gap:10px;align-items:center;flex:0 0 auto}
+  #shop .shopact{font-family:Anton,Impact,sans-serif !important;font-style:italic;letter-spacing:1.5px;
+    font-size:clamp(14px,1.5vw,19px) !important;padding:clamp(7px,1vh,11px) clamp(14px,1.8vw,26px) !important;
+    border-radius:12px !important;text-transform:uppercase}
+  #shop .shopact-buy:not([disabled]){background:radial-gradient(circle at 34% 28%,#ffe089,var(--gold,#ffc93c) 58%,#f0b400) !important;
+    color:#111 !important;border:3px solid var(--ink,#17211f) !important;
+    box-shadow:0 5px 0 var(--ink,#17211f),0 0 20px rgba(255,201,60,.45) !important;animation:playBreath 1.8s ease-in-out infinite}
+  #shop .shopact-sell:not([disabled]){background:#ffe3dc !important;color:#8a2a18 !important;
+    border:3px solid var(--ink,#17211f) !important;box-shadow:0 4px 0 var(--ink,#17211f) !important}
+  #shop .shopact[disabled]{opacity:.45}
+  /* ── the ONE tooltip: sticker box, orange name, ink effect ── */
+  #tipbox{position:fixed;z-index:99999;pointer-events:none;max-width:270px;
+    background:var(--cream,#fff6e3);border:2.5px solid var(--ink,#17211f);border-radius:11px;
+    box-shadow:4px 4px 0 rgba(23,33,31,.4);padding:9px 12px 10px;
+    opacity:0;transform:translateY(5px) scale(.97);transition:opacity .13s ease,transform .13s ease}
+  #tipbox.on{opacity:1;transform:none}
+  #tipbox b{display:block;font-family:Anton,Impact,sans-serif;font-style:italic;letter-spacing:.6px;
+    font-size:15px;color:var(--punch,#ff5a2d);line-height:1.15;margin-bottom:3px}
+  #tipbox span{display:block;font-family:"Work Sans",Inter,sans-serif;font-weight:700;
+    font-size:12px;color:var(--ink,#17211f);line-height:1.4}
+  .shop-hint{color:var(--punch,#ff5a2d);animation:hintPulse 1.6s ease-in-out infinite}
+  @keyframes hintPulse{0%,100%{opacity:.65}50%{opacity:1}}
+  /* hex honesty: the ACTUAL victims, named in red on the pact */
+  .hexx-stake{margin:6px 0 0;max-width:200px;font-weight:800;font-size:10.5px;line-height:1.35;
+    color:#ffb3bb;background:rgba(120,20,30,.35);border:2px solid rgba(255,90,110,.55);
+    border-radius:9px;padding:5px 9px}
+  .hexx-stake b{display:block;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:10px;
+    letter-spacing:2px;color:#ff4155;margin-bottom:2px}
+  /* narrow: stalls become a 2x2 grid and the page scrolls instead of cropping */
+  @media(max-width:1080px){
+    #shop .shopx-body.shopx-v4{overflow:auto}
+    #shop .stall-row{grid-template-columns:1fr 1fr;flex:none;grid-auto-rows:minmax(220px,auto)}
+    .bench-row{flex-wrap:wrap;overflow:visible}
   }
 </style>
 </head>
@@ -6111,13 +6374,13 @@
            boards docked beneath — overlap is now structurally impossible. -->
       <div class="stand-lane left" aria-hidden="false">
         <svg viewBox="8 140 148 310" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g class="crowd"><g class="stand-l"><rect x="14" y="146" width="134" height="296" rx="16" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.35)" stroke-width="2.5"/><rect x="21" y="198" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="242" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="286" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="330" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="374" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="21" y="418" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><g transform="translate(36 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(66 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(96 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(126 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(43 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(73 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(103 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(133 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(36 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(66 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(96 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(126 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(43 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(73 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(103 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(133 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(36 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(66 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(96 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(126 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(43 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(73 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(103 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(133 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g></g></g></svg>
-        <div class="field-panel field-purse" title="Your coins — earned ball by ball, spent in the Clubhouse">
+        <div class="field-panel field-purse" data-tip="The Purse — your coins, earned ball by ball. Boundaries, wickets and underdog wins pay; spend it in the Clubhouse.">
         <span class="coin"></span><b id="matchCoins">0</b>
       </div>
       </div>
       <div class="stand-lane right" aria-hidden="false">
         <svg viewBox="1046 140 148 310" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g class="crowd"><g class="stand-r"><rect x="1052" y="146" width="134" height="296" rx="16" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.35)" stroke-width="2.5"/><rect x="1059" y="198" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="242" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="286" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="330" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="374" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><rect x="1059" y="418" width="120" height="2.5" fill="rgba(255,255,255,.22)"/><g transform="translate(1074 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1104 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1134 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1164 180)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.26"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.32)"/></g></g><g transform="translate(1081 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1111 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1141 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1171 224)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.30"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.36)"/></g></g><g transform="translate(1074 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1104 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1134 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1164 268)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.34"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1081 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1111 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1141 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1171 312)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.38"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1074 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1104 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1134 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/><g class="prop prop-bat" transform="translate(7 -12) rotate(38)"><rect x="-2" y="-13" width="4.5" height="15" rx="2.2" fill="#e8b96b" stroke="#17211f" stroke-width="1.2"/><rect x="-1.4" y="-18" width="3" height="5.5" rx="1.4" fill="#17211f"/></g><g class="prop prop-ball" transform="translate(8 -11)"><circle r="4.6" fill="#ff4155" stroke="#17211f" stroke-width="1.2"/><path d="M-2.6 -1.8 q2.6 1.8 0 4.4 M2.6 -1.8 q-2.6 1.8 0 4.4" stroke="#fff6e3" stroke-width=".9" fill="none"/></g></g></g><g transform="translate(1164 356)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#1f9b53" opacity="0.42"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1081 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#c0303f" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1111 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#2f8fd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1141 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#f0a52b" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g><g transform="translate(1171 400)"><g class="fanb"><rect x="-7" y="2.5" width="14" height="12" rx="6" fill="#8a5cd0" opacity="0.46"/><circle cx="0" cy="-3" r="5.5" fill="rgba(23,33,31,0.38)"/></g></g></g></g></svg>
-        <div class="field-panel field-cond" title="Match conditions — coming soon">
+        <div class="field-panel field-cond" data-tip="Conditions — pitch &amp; weather effects, coming soon.">
         <svg viewBox="0 0 48 32" aria-hidden="true"><circle cx="15" cy="13" r="8" fill="#ffd34e" opacity=".8"/><path d="M14 24 a7 7 0 0 1 6.5 -9 a8 8 0 0 1 15 3 a5.5 5.5 0 0 1 -1 11 h-19 a5.5 5.5 0 0 1 -1.5 -5" fill="#fffdf4" opacity=".85" stroke="rgba(23,33,31,.3)" stroke-width="1.5"/></svg>
       </div>
       </div>
@@ -6146,21 +6409,29 @@
   <section id="shop" class="screen">
     <div class="top">
       <div><div class="match-title">The Clubhouse</div><div class="sub" id="shopSub"></div></div>
+      <!-- ONE commerce verb set: tap a good to pick it up, confirm here.
+           No per-item buttons anywhere in the stalls. -->
+      <div class="shop-actions">
+        <button class="btn shopact shopact-buy" id="buyBtn" disabled>BUY</button>
+        <button class="btn secondary shopact shopact-sell" id="sellBtn" disabled>SELL</button>
+        <button class="btn secondary shopact" id="rerollBtn">REROLL</button>
+        <button class="btn shopact shopact-scout" id="nextBtn">SCOUT NEXT RIVAL</button>
+      </div>
       <div class="coins-tag"><span class="coin"></span><span id="coins">0</span></div>
     </div>
 
     <div class="shopx-body" id="offers"></div>
+  </section>
 
-    <div class="shopx-foot">
-      <div class="shopx-foot-cell">
-        <button class="btn secondary sm" id="shopSquadBtn">Go to Squad</button>
-        <button class="btn secondary sm" id="rerollBtn">Reroll - 2</button>
-      </div>
-      <span class="shopx-roster">Roster <b id="deckCount">0</b> cards</span>
-      <button class="btn" id="nextBtn">Scout Next Rival</button>
+  <!-- PACK OPEN — a real screen, not an overlay. Pack (left) + its cards at
+       full scale; click a card to choose it. Your bench stays below so you
+       can sell a coach to make room. No buy/reroll/scout/swap chrome. -->
+  <section id="pack" class="screen">
+    <div class="pack-stage" id="packStage">
+      <div class="coins-tag pack-coins"><span class="coin"></span><span id="packCoins">0</span></div>
+      <button class="btn shopact shopact-sell pack-sell" id="packSellBtn" hidden>SELL &middot; +<span id="packSellVal">0</span></button>
     </div>
-
-    <div class="pack-overlay" id="packOverlay"></div>
+    <div class="bench-row pack-bench" id="packBench"></div>
   </section>
 
   <section id="squad" class="screen">
@@ -6795,6 +7066,39 @@ function destroyWeakest(n,exceptId=null){
   }
   return destroyed;
 }
+/* HEX STAKES: every hex names its ACTUAL current victims before you seal the
+   pact — no hidden information, ever. Mirrors destroyWeakest's selection. */
+function weakestVictims(n,exceptId=null){
+  const take=Math.min(n,Math.max(0,roster().length-12));
+  if(!take)return [];
+  const sorted=roster().slice().sort(sortStrong).filter(c=>c.id!==exceptId);
+  return sorted.slice(-take).reverse().map(c=>c.name);
+}
+function hexStake(hexId){
+  const cs=activeCoaches(),names=a=>a.join(", ");
+  const sorted=roster().slice().sort(sortStrong),best=sorted[0];
+  switch(hexId){
+    case "hex_aura":return cs.length?{lose:null}:{lose:"fizzles — you have no coach"};
+    case "hex_ectoplasm":{const v=weakestVictims(1);return {lose:v.length?v[0]:cs.length?"no card spare (roster at 12)":"fizzles — no coach"}}
+    case "hex_cryptid":return {lose:`ALL your coins (${run.coins})`};
+    case "hex_immolate":{const v=weakestVictims(3);return {lose:v.length?names(v):"nothing — roster at 12 (free +15)"}}
+    case "hex_ankh":return cs.length>1?{lose:`one of: ${names(cs.filter((c,i)=>i>=0).map(c=>c.name))}`}:cs.length?{lose:"none — copy may go Negative"}:{lose:"fizzles — no coach"};
+    case "hex_blood_pact":{const second=sorted[1];return {lose:second&&roster().length>12?second.name:"nothing (roster at 12)"}}
+    case "hex_void":return {lose:"6 coins"};
+    case "hex_phantom":return {lose:usedCoachSlots()>=coachSlotLimit()?`a random coach: ${names(cs.map(c=>c.name))}`:null};
+    case "hex_greed":return {lose:`packs +1 forever (coins ${run.coins} → ${run.coins*2})`};
+    case "hex_soul_trade":{const v=weakestVictims(5,best?.id);return {lose:v.length?names(v):"no spare souls (roster at 12)"}}
+    case "hex_poltergeist":{const ids=activeIds(),bench=roster().filter(c=>!ids.has(c.id));
+      return {lose:bench.length&&roster().length>12?`2 random of: ${names(bench.map(c=>c.name))}`:"no bench to take"}}
+    case "hex_seance":return {lose:"reroll sealed this shop"};
+    case "hex_blood_moon":return {lose:"EVERY card -8 Technique / -8 Accuracy"};
+    case "hex_echo":{const t=(run.consumables||[]).filter(c=>!c.kind);
+      return {lose:t.length?`your tools: ${names(t.map(x=>x.name))}`:cs.length?"nothing — kit already empty":"fizzles — no coach"}}
+    case "hex_chosen":{const v=weakestVictims(99);return {lose:v.length?names(v):"nothing — already the chosen few"}}
+    case "hex_pact_chaos":return {lose:"5 coins"};
+    default:return {lose:null};
+  }
+}
 const HEXES=[
   {id:"hex_aura",name:"Aura",desc:"A random active coach gains a random edition.",cost:"No cost.",
     use(){const cs=activeCoaches();if(!cs.length)return "No coach to enchant.";const t=pick(cs);t.edition=pick(["foil","holographic","polychrome"]);return `${t.name} is now ${EDITIONS[t.edition].label}!`}},
@@ -6921,7 +7225,19 @@ const VOUCHERS=[
   {id:"local_sponsor",title:"Local Sponsor",desc:"Earn +2 coins after each win for this run.",price:6,buy:()=>{run.scout=(run.scout||0)+2}},
   {id:"pack_coupon",title:"Pack Coupon",desc:"Next shop reroll is free.",price:4,buy:()=>{run.freeReroll=(run.freeReroll||0)+1}},
   {id:"refresh_deal",title:"Refresh Deal",desc:"Rerolls cost 1 less for this run.",price:5,buy:()=>{run.rerollDiscount=(run.rerollDiscount||0)+1}},
-  {id:"extra_pack",title:"Backroom Stock",desc:"Refresh the packs without changing voucher offers.",price:5,buy:()=>{const def=MATCHES[Math.min(run.match,MATCHES.length-1)];run.shop.packs=["coach","player","consumable"].map(type=>makePack(type,def))}}
+  {id:"extra_pack",title:"Backroom Stock",desc:"Refresh the packs without changing voucher offers.",price:5,buy:()=>{const def=MATCHES[Math.min(run.match,MATCHES.length-1)];run.shop.packs=["coach","player"].map(type=>makePack(type,def))}},
+  /* shop-warping vouchers (v3): permanent run upgrades that change what the
+     shop IS — the Balatro direction, cricket-flavoured. `flag` is re-derived
+     from voucherIds on load so saves keep their powers. */
+  {id:"talent_agency",title:"Talent Agency",flag:"talentAgency",price:6,
+   desc:"The market permanently stocks a face-up PLAYER — certainty over pack odds.",
+   buy:()=>{run.talentAgency=true;run.shop.singles=rollSingles()}},
+  {id:"premium_shelf",title:"Premium Shelf",flag:"premiumShelf",price:7,
+   desc:"Every pull can come one rarity higher (35% chance) for the rest of the run.",
+   buy:()=>{run.premiumShelf=true}},
+  {id:"overstock",title:"Overstock",flag:"overstock",price:5,
+   desc:"The market permanently stocks a 4th item.",
+   buy:()=>{run.overstock=true;run.shop.singles=rollSingles()}}
 ];
 const TEAMS=[
   {name:"Harbour Sharks",c1:"#0b2f6b",c2:"#1f8fd6",cl:"#7fd6f2",badge:"HS"},
@@ -6970,6 +7286,48 @@ function toggleFlip(id){
   });
   if(typeof TUT!=="undefined")TUT.notify("flip");
 }
+
+/* ── TIP: the ONE tooltip. Anything with data-tip="Name — effect" gets the
+   sticker tipbox (orange name, ink effect) in shop AND match — cards carry
+   art, the tipbox carries words. Browser titles are dead. ── */
+const TIP=(()=>{
+  let box=null,cur=null;
+  const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function ensure(){
+    if(box)return;
+    box=document.createElement("div");box.id="tipbox";box.setAttribute("aria-hidden","true");
+    document.body.appendChild(box);
+  }
+  function place(x,y){
+    const w=box.offsetWidth,h=box.offsetHeight,m=12;
+    let px=x+14,py=y+18;
+    if(px+w>innerWidth-m)px=x-w-14;              // flip left of the pointer
+    if(py+h>innerHeight-m)py=y-h-16;             // flip above
+    box.style.left=Math.max(m,px)+"px";box.style.top=Math.max(m,py)+"px";
+  }
+  function show(node,x,y){
+    ensure();
+    if(node.dataset.tipHtml){ // rich tips (team sheet etc.) — our own markup
+      box.innerHTML=node.dataset.tipHtml;
+      box.classList.add("on","rich");place(x,y);return;
+    }
+    box.classList.remove("rich");
+    const t=node.dataset.tip||"";
+    const i=t.indexOf(" — ");
+    box.innerHTML=i>0?`<b>${esc(t.slice(0,i))}</b><span>${esc(t.slice(i+3))}</span>`:`<span>${esc(t)}</span>`;
+    box.classList.add("on");place(x,y);
+  }
+  function hide(){cur=null;if(box)box.classList.remove("on","rich")}
+  document.addEventListener("pointerover",e=>{
+    const n=e.target.closest&&e.target.closest("[data-tip],[data-tip-html]");
+    if(n){if(n!==cur){cur=n;show(n,e.clientX,e.clientY)}}
+    else if(cur)hide();
+  });
+  document.addEventListener("pointermove",e=>{if(cur&&box)place(e.clientX,e.clientY)});
+  document.addEventListener("pointerdown",hide);
+  document.addEventListener("scroll",hide,true);
+  return {hide};
+})();
 
 function show(id){
   document.querySelectorAll(".screen").forEach(s=>{
@@ -7054,7 +7412,11 @@ function pickTrait(role){
   return pick(pool.length?pool:TRAITS);
 }
 function starter(){return ["bat","bat","bat","bowl","bowl","bowl","all","all","all","all","all","all"].map(role=>card("common",role,{anchor:5}))}
-function rarityFromPool(pool){return pick(pool&&pool.length?pool:["common"])}
+function rarityFromPool(pool){
+  const r=pick(pool&&pool.length?pool:["common"]);
+  // Premium Shelf voucher: 35% chance any pull climbs one rarity tier
+  return (typeof run!=="undefined"&&run?.premiumShelf&&Math.random()<.35)?bumpRarity(r):r;
+}
 const ARCHS=[
   {key:"bat",name:"an aggressive batting side",comp:{bat:5,bowl:2,all:5},tiltBat:5,read:"Stacked with batters — their bowling is thinner. Defend well, then cash in when you bowl."},
   {key:"bowl",name:"a bowling-heavy unit",comp:{bat:2,bowl:5,all:5},tiltBowl:5,read:"A deep bowling attack — runs are hard to find when you bat. Their batting is beatable."},
@@ -7376,6 +7738,8 @@ function continueRun(){
     consumables:d.consumables.map(sc=>{const def=CONSUMABLES.find(x=>x.id===sc.id);return def?{...def,ownedId:sc.ownedId}:null}).filter(Boolean),
     voucherIds:d.voucherIds,packTax:d.packTax,freePacks:d.freePacks,noReroll:d.noReroll,
     scout:d.scout,trainBoost:d.trainBoost,rerollDiscount:d.rerollDiscount,freeReroll:d.freeReroll};
+  // shop-warping voucher powers are flags, not serialized fields — re-derive
+  (run.voucherIds||[]).forEach(id=>{const v=VOUCHERS.find(x=>x.id===id);if(v&&v.flag)run[v.flag]=true});
   if(d.nextRival&&d.nextRival.defIndex>=0){
     run.nextRival={def:MATCHES[d.nextRival.defIndex],arch:ARCHS.find(a=>a.key===d.nextRival.archKey)||ARCHS[3],deck:d.nextRival.deck.map(rehydrateCard)};
   }
@@ -7772,7 +8136,7 @@ function setStance(st){
   // no preview means the wheel doesn't change — just move the highlight,
   // no rebuild (no flash) on the board
   document.querySelectorAll(".stance-chip").forEach(b=>b.classList.toggle("on",b.dataset.stance===st));
-  document.querySelectorAll(".stance-chip").forEach(b=>b.title=escSVG(stanceTip(b.dataset.stance)||STANCES[m.phase][b.dataset.stance].desc));
+  document.querySelectorAll(".stance-chip").forEach(b=>b.dataset.tip=STANCES[m.phase][b.dataset.stance].label+" — "+(stanceTip(b.dataset.stance)||STANCES[m.phase][b.dataset.stance].desc));
   const ex=document.getElementById("stanceExplain");if(ex)ex.textContent=STANCE_PLAIN[st]||"";
   requestAnimationFrame(syncSelectionRing); // the wheel morphs to the confirmed stance
   if(typeof TUT!=="undefined")TUT.notify("stance");
@@ -7986,32 +8350,47 @@ function scoutedMode(){
   return pick(["bat","bowl"]);
 }
 function rollSingles(){
+  /* THE MARKET (v3.1): 3 plain slots — coaches & consumables, no counter-pick
+     gimmicks (Scouted Deal retired). Vouchers grow it, Balatro-Overstock
+     style: Overstock = permanent 4th slot, Talent Agency = face-up player. */
   const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
-  const mode=scoutedMode();
-  const tools=CONSUMABLES.filter(c=>c.mode===mode);
-  const scoutedItem=pick(tools.length?tools:CONSUMABLES);
-  const scoutedPrice=Math.max(1,(scoutedItem.kind==="instant"?4:3)-1);
   const owned=new Set(activeCoaches().map(c=>c.id));
   let pool=COACHES.filter(c=>c.unlock<=run.match&&!owned.has(c.id));
   if(!pool.length)pool=COACHES.filter(c=>!owned.has(c.id));
-  const coach=weightedCoachPick(pool.length?pool:COACHES);
-  // face-up player card: certainty costs +2 over the pack gamble
-  const playerCard=card(rarityFromPool(def.shop||def.rarities||["common"]),pick(["bat","bowl","all"]));
-  return [
-    {kind:"player",item:playerCard,price:cardPrice(playerCard)+2,scouted:false,bought:false},
-    {kind:"consumable",item:scoutedItem,price:scoutedPrice,scouted:true,mode,bought:false},
-    {kind:"coach",item:coach,price:coach.price,scouted:false,bought:false}
-  ];
+  const usedCoach=new Set(),usedTool=new Set();
+  const coachSlot=()=>{
+    const p2=pool.filter(c=>!usedCoach.has(c.id));
+    const c=weightedCoachPick(p2.length?p2:pool.length?pool:COACHES);
+    usedCoach.add(c.id);
+    return {kind:"coach",item:c,price:c.price,bought:false};
+  };
+  const toolSlot=()=>{
+    const opts=CONSUMABLES.filter(c=>!usedTool.has(c));
+    const t=pick(opts.length?opts:CONSUMABLES);
+    usedTool.add(t);
+    return {kind:"consumable",item:t,price:t.kind==="instant"?4:3,mode:t.mode,bought:false};
+  };
+  /* five-box shop: the STAFF ROOM stocks 2 coaches, the KIT SHED 2 tools.
+     Overstock adds one more of each; Talent Agency adds a face-up player
+     to the staff room. One flat array — the boxes filter by kind. */
+  const slots=[coachSlot(),coachSlot(),toolSlot(),toolSlot()];
+  if(run.overstock){slots.push(coachSlot());slots.push(toolSlot());}
+  if(run.talentAgency){
+    // face-up player card: certainty costs +2 over the pack gamble
+    const playerCard=card(rarityFromPool(def.shop||def.rarities||["common"]),pick(["bat","bowl","all"]));
+    slots.push({kind:"player",item:playerCard,price:cardPrice(playerCard)+2,bought:false});
+  }
+  return slots;
 }
 function rollShop(keepVouchers=false){
   const def=MATCHES[Math.min(run.match,MATCHES.length-1)];
   const bought=new Set(run.voucherIds||[]);
   const vouchers=keepVouchers&&run.shop?.vouchers
     ?run.shop.vouchers
-    :shuffle(VOUCHERS.filter(v=>!bought.has(v.id)).slice()).slice(0,1);
+    :shuffle(VOUCHERS.filter(v=>!bought.has(v.id)).slice()).slice(0,1); // ONE per visit, never a repeat
   // Weighted pack lineup — the reroll chase. Hex is the rare slot.
   const hexW=activeCoaches().some(co=>co.hexDowser)?12:6;
-  const packCount=Math.random()<.65?3:2;
+  const packCount=2; // shop v3: the pack stall always offers exactly 2
   const packs=[];let hexSeen=false;
   for(let i=0;i<packCount;i++){
     let r=Math.random()*100;
@@ -8019,9 +8398,9 @@ function rollShop(keepVouchers=false){
     if(r<hexW&&!hexSeen&&run.match>=1){type="hex";hexSeen=true}
     else{
       r=Math.random()*100;
-      type=r<38?"player":r<70?"coach":"consumable";
+      type=r<34?"player":r<58?"coach":r<78?"consumable":"training";
     }
-    const jumbo=type!=="hex"&&Math.random()<.16;
+    const jumbo=type!=="hex"&&type!=="training"&&Math.random()<.16;
     packs.push(makePack(type,def,jumbo));
   }
   // never an all-consumable dud lineup
@@ -8029,7 +8408,7 @@ function rollShop(keepVouchers=false){
   run.shop={packs,vouchers,singles:rollSingles()};
 }
 function makePack(type,def,jumbo=false){
-  const base=type==="player"?6:type==="coach"?5:type==="hex"?5:3;
+  const base=type==="player"?6:type==="coach"?5:type==="hex"?5:type==="training"?5:3;
   return {type,jumbo,price:base+(jumbo?2:0),opened:false,picked:false,choices:[],defLevel:def.level};
 }
 function packPrice(pack){
@@ -8038,20 +8417,21 @@ function packPrice(pack){
   if(activeCoaches().some(co=>co.haggler))p-=1;
   return Math.max(1,p);
 }
-function packTitle(type){return type==="player"?"Player Pack":type==="coach"?"Coach Pack":type==="hex"?"Hex Pack":"Consumable Pack"}
+function packTitle(type){return type==="player"?"Player Pack":type==="coach"?"Coach Pack":type==="hex"?"Hex Pack":type==="training"?"Training Pack":"Consumable Pack"}
 function packDisplayName(pack){return (pack.jumbo?"Jumbo ":"")+packTitle(pack.type)}
 function packTagline(pack){
   const n=packRevealCount(pack);
   if(pack.type==="hex")return `Reveal ${n} hexes. Broken power - at a price.`;
+  if(pack.type==="training")return `Your squad's nations. Train ONE country's cards.`;
   return `Reveal ${n} ${pack.type==="player"?"players. Sign":pack.type==="coach"?"coaches. Hire or swap":"tools. Keep"} 1.`;
 }
-function packTeaser(type){return type==="player"?"Batters & bowlers":type==="coach"?"Perks & tactics":type==="hex"?"Forbidden deals":"One-shot boosts"}
+function packTeaser(type){return type==="player"?"Batters & bowlers":type==="coach"?"Perks & tactics":type==="hex"?"Forbidden deals":type==="training"?"National camps":"One-shot boosts"}
 function coachArt(coach){
   if(!coach)return COACH_ART_POOL[0];
   const h=Math.abs([...String(coach.id)].reduce((n,ch)=>n+ch.charCodeAt(0),0));
   return COACH_ART_POOL[h%COACH_ART_POOL.length];
 }
-function packSilhouette(type){return type==="player"?"assets/packs/player.png":type==="coach"?"assets/packs/coach.png":"assets/packs/boost.png"}
+function packSilhouette(type){return type==="player"?"assets/packs/player.png":type==="coach"||type==="training"?"assets/packs/coach.png":"assets/packs/boost.png"}
 function packArt(type,price,opts={}){
   const sparkle=opts.sparkle||type==="hex"?`<div class="pack-sparkles"><i></i><i></i><i></i><i></i></div>`:"";
   return `<div class="pack-art pack-art-${type}">
@@ -8068,6 +8448,7 @@ function packArt(type,price,opts={}){
 }
 function packRevealCount(pack){
   if(pack.type==="hex")return 2;
+  if(pack.type==="training")return 5;   // up to 5 nations from YOUR roster
   let n=3+(pack.jumbo?2:0);
   const cs=activeCoaches();
   if(pack.type==="player"&&cs.some(co=>co.packBonus))n++;
@@ -8084,6 +8465,14 @@ function packChoices(pack){
   const pool=def.shop||def.rarities||["common"];
   const n=packRevealCount(pack);
   const cs=activeCoaches();
+  if(pack.type==="training"){
+    /* TRAINING PACK: the options ARE your squad's nations — you learn who
+       you own, and chasing one flag becomes a build (symmetry pays). */
+    const counts={};
+    roster().forEach(c=>{const nat=nationFor(c);counts[nat]=(counts[nat]||0)+1});
+    return Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,5)
+      .map(nat=>({type:"training",nation:nat,count:counts[nat],gain:2}));
+  }
   if(pack.type==="player"){
     const roles=[];
     for(let i=0;i<n;i++)roles.push(i<3?["bat","bowl","all"][i]:pick(["bat","bowl","all"]));
@@ -8122,11 +8511,8 @@ function rerollCost(){
 let packRevealTimer=null;
 function openPack(i){
   const pack=run.shop?.packs?.[i];if(!pack||pack.picked)return;
-  if(pack.opened){
-    SFX.play("nav");
-    run.packOpen=i;
-    renderPackOverlay("reveal");
-    return;
+  if(pack.opened){         // already paid — resume the reveal
+    SFX.play("nav");run.packOpen=i;renderPackScreen();show("pack");return;
   }
   const cost=packPrice(pack);
   if(run.coins<cost){flashHint("Not enough coins.");return}
@@ -8136,16 +8522,13 @@ function openPack(i){
   pack.opened=true;
   pack.choices=packChoices(pack);
   run.packOpen=i;
-  renderShop();
-  renderPackOverlay("rip");
-  clearTimeout(packRevealTimer);
-  packRevealTimer=setTimeout(()=>{if(run.packOpen===i){SFX.play("swish");renderPackOverlay("reveal")}},1000);
+  renderPackScreen(true);   // true = play the rip-in reveal
+  show("pack");
 }
-function closePackOverlay(){
+function leavePackScreen(){
   clearTimeout(packRevealTimer);
-  run.packOpen=null;
-  const ov=$("#packOverlay");
-  if(ov){ov.classList.remove("show");ov.innerHTML=""}
+  run.packOpen=null;packSel=null;
+  renderShop();show("shop");
 }
 function coachSellValue(coach){
   let v=Math.max(2,Math.floor((coach?.price||5)*.45))+(coach?.edition?EDITIONS[coach.edition].sell:0);
@@ -8164,6 +8547,18 @@ function resolvePackChoice(pack,choice,replaceIndex=null){
   }else if(choice.type==="hex"){
     const report=choice.hex.use();
     flashHint(`${choice.hex.name}: ${report||"done."}`);
+  }else if(choice.type==="training"){
+    // camps train the SUB-STATS — the squares the player reads and duels
+    // with — so the gain is visible on every card face (never the boost
+    // layer: syncRatings floors low ratings at 10 and would hide it)
+    const squad=roster().filter(c=>nationFor(c)===choice.nation);
+    squad.forEach(c=>{
+      BAT_KEYS.forEach(k=>c.batting[k]=clamp(c.batting[k]+choice.gain,1,99));
+      BOWL_KEYS.forEach(k=>c.bowling[k]=clamp(c.bowling[k]+choice.gain,1,99));
+      syncRatings(c);
+    });
+    SFX.play("coach");
+    flashHint(`${choice.nation} camp: every stat +${choice.gain} on ${squad.length} card${squad.length===1?"":"s"}.`);
   }else if(choice.type==="coach"){
     const coaches=activeCoaches();
     if(coaches.some(c=>c.id===choice.coach.id)){flashHint("That coach is already active.");return false}
@@ -8179,21 +8574,39 @@ function resolvePackChoice(pack,choice,replaceIndex=null){
   }
   return true;
 }
-function choosePackCard(packIndex,choiceIndex,replaceIndex=null){
-  const pack=run.shop?.packs?.[packIndex],choice=pack?.choices?.[choiceIndex];
+/* CLICK A CARD = CHOOSE IT. Coaches need a free slot — if full, the bench
+   shakes and asks you to sell one first (no swap/replace chrome). */
+function pickPackChoice(i){
+  const pack=run.shop?.packs?.[run.packOpen],choice=pack?.choices?.[i];
   if(!pack||!choice||pack.picked)return;
-  if(!resolvePackChoice(pack,choice,replaceIndex))return;
-  SFX.play(choice.type==="coach"?"coach":"buy");
+  if(choice.type==="coach"){
+    const coaches=activeCoaches();
+    if(coaches.some(c=>c.id===choice.coach.id)){flashHint("Already on your staff.");return}
+    const negative=choice.edition==="negative";
+    if(!negative&&usedCoachSlots()>=coachSlotLimit()){shakeBenchNoSpace();return}
+    coaches.push({...choice.coach,edition:choice.edition||null,instId:uid()});
+    SFX.play("coach");
+  }else{
+    if(!resolvePackChoice(pack,choice))return;
+    SFX.play(choice.type==="hex"?"coach":"buy");
+  }
   pack.picked=true;
-  closePackOverlay();
-  renderShop();
+  leavePackScreen();
 }
-function skipPackReward(){
-  const pack=run.shop?.packs?.[run.packOpen];if(!pack)return;
-  SFX.play("nav");
-  pack.picked=true;
-  closePackOverlay();
-  renderShop();
+function shakeBenchNoSpace(){
+  SFX.play("tick");
+  const b=$("#packBench");if(b){b.classList.remove("no-space");void b.offsetWidth;b.classList.add("no-space")}
+  flashHint("Coach slots full — sell one first.");
+}
+function packSellSelected(){
+  if(packSel==null)return;
+  const c=activeCoaches()[packSel];if(!c)return;
+  packSel=null;
+  SFX.play("buy");
+  run.coins+=coachSellValue(c);
+  activeCoaches().splice(activeCoaches().indexOf(c),1);
+  renderPackBench();updatePackSell();
+  const pc=$("#packCoins");if(pc)pc.textContent=run.coins;
 }
 function sellCoach(i){
   const coaches=activeCoaches();
@@ -9509,13 +9922,13 @@ function renderKitbag(){
     const modeClass=c.mode==="bowl"?"mode-bowl":c.mode==="bat"?"mode-bat":"mode-any";
     const art=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
     return `<button class="kit-slot ${modeClass} ${armed?'armed':''} ${onMode?'':'offmode'}" data-tool="${c.ownedId}"
-      title="${esc(c.name)} — ${esc(c.desc)}${onMode?"":" · fires when you "+(c.mode==="bat"?"bat":"bowl")}">
+      data-tip="${esc(c.name)} — ${esc(dispDesc(c.desc))}${onMode?" · tap to arm for the next ball":" · fires when you "+(c.mode==="bat"?"bat":"bowl")}">
       ${armed?'<span class="kit-armflag">NEXT BALL</span>':''}
       <span class="kit-art">${art}</span>
       <span class="kit-plate">${c.name}</span>
     </button>`;
   });
-  const peg=`<span class="kit-slot empty" title="One-use tools from the Clubhouse arm here"><span class="kit-peg"><svg viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg></span></span>`;
+  const peg=`<span class="kit-slot empty" data-tip="Kit peg — one-use tools from the Clubhouse arm here"><span class="kit-peg"><svg viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg></span></span>`;
   while(slots.length<2)slots.push(peg);
   el.innerHTML=`<div class="kit-zone"><div class="kit-zone-head"><b>Kit</b>${tools.length?`<em>&times;${tools.length}</em>`:""}</div><div class="kit-zone-row">${slots.join("")}</div></div>`;
   el.querySelectorAll("[data-tool]").forEach(b=>b.onclick=()=>armTool(b.dataset.tool));
@@ -9535,7 +9948,7 @@ function stanceChipsHTML(){
   const set=STANCES[m.phase],cur=currentStance();
   const chips=Object.keys(set).map(k=>{
     const s=set[k],risk=STANCE_RISK[k]||"";
-    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" title="${escSVG(stanceTip(k)||s.desc)}">
+    return `<button class="stance-chip risk-${risk.toLowerCase()} ${cur===k?'on':''}" data-stance="${k}" data-tip="${escSVG(s.label+" — "+(stanceTip(k)||s.desc))}">
       <i>${s.icon}</i><b>${s.label}</b><small class="stance-risk">${risk}</small>
     </button>`;
   }).join("");
@@ -9582,7 +9995,7 @@ function renderHand(){
       <div class="fanhold" data-id="${c.id}" style="--z:${i+1};--d:${i*22}ms">
         ${cardHTML(c,{used:false,disabled:!!m.result,emph:disc,dealin:animate,mini:false,as:"div"})}
       </div>`).join("")||`<div class="hand-empty">No cards left</div>`;
-  const deck=`<button class="hand-deck" id="deckBtn" title="Open your full squad + bench — field or swap any card">
+  const deck=`<button class="hand-deck" id="deckBtn" data-tip-html="${escSVG(teamSheetTipHTML("match"))}">
       <span class="hd-cards"><i></i><i></i><i></i></span><b class="hd-n">${avail.length}</b><span class="hd-lbl">DECK</span>
     </button>`;
   $("#hand").innerHTML=`<div class="av-handrow">${cards}${deck}</div>`;
@@ -9836,13 +10249,15 @@ function closeRivalDeck(){SFX.play("click");$("#rivalDrawer").classList.remove("
    Slim horizontal strip: owned coaches (art + name, effect on hover) + empty
    pegs. In the shop it's sellable (tap a coach to sell). */
 function coachCardCell(coach,i,sell,mini){
-  return `<div class="coachcard${sell?' sellable':''}" data-coach="${coach.instId||coach.id}" ${sell?`data-sell-coach="${i}" role="button"`:""} title="${escSVG(coach.name+" — "+dispDesc(coach.desc))}${sell?" · tap to sell +"+coachSellValue(coach):""}">
-    ${mini?coachMiniSVG(coach):coachCardSVG(coach)}
+  // ONE TRUTH: the coach card is coachMiniSVG (art + name + badge) EVERYWHERE
+  // — the tipbox carries the description; text never rides the card face
+  return `<div class="coachcard${sell?' sellable':''}" data-coach="${coach.instId||coach.id}" ${sell?`data-sell-coach="${i}" role="button"`:""} data-tip="${escSVG(coach.name+" — "+dispDesc(coach.desc))}${sell?escSVG(" · tap to sell +"+coachSellValue(coach)):""}">
+    ${coachMiniSVG(coach)}
     ${sell?`<span class="coachcard-sell"><span class="coin"></span>${coachSellValue(coach)}</span>`:""}
   </div>`;
 }
 function coachEmptyCell(){
-  return `<div class="coachcard empty" title="Empty coaching slot — open a Coach Pack in the Clubhouse"><div class="coachcard-empty"><svg viewBox="0 0 60 72" aria-hidden="true"><circle cx="30" cy="26" r="13"/><path d="M4 68 Q30 42 56 68 Z"/></svg></div></div>`;
+  return `<div class="coachcard empty" data-tip="Empty coaching slot — open a Coach Pack in the Clubhouse"><div class="coachcard-empty"><svg viewBox="0 0 60 72" aria-hidden="true"><circle cx="30" cy="26" r="13"/><path d="M4 68 Q30 42 56 68 Z"/></svg></div></div>`;
 }
 function coachStripHTML(opts={}){
   const active=activeCoaches();
@@ -9898,81 +10313,195 @@ function toolCardHTML(it){
     <div class="itemx-effect">${it.desc}</div>
   </div>`;
 }
+/* THE TEAM SHEET, as a rich tooltip: hover MANAGE SQUAD (shop) or DECK
+   (match) — the roster read without a click. Nations = training-camp
+   currency, teams = insider-coach currency, roles = balance. */
+function teamSheetTipHTML(ctx){
+  const all=roster();
+  const natCounts={};all.forEach(c=>{const n=nationFor(c);natCounts[n]=(natCounts[n]||0)+1});
+  const nats=Object.keys(natCounts).sort((a,b)=>natCounts[b]-natCounts[a]);
+  const teamCounts={};all.forEach(c=>{if(c.team)teamCounts[c.team.badge]=(teamCounts[c.team.badge]||0)+1});
+  const teams=Object.keys(teamCounts).sort((a,b)=>teamCounts[b]-teamCounts[a]).slice(0,4);
+  const rc={bat:0,bowl:0,all:0};all.forEach(c=>rc[c.role]=(rc[c.role]||0)+1);
+  let line1,line2;
+  if(ctx==="match"&&typeof m!=="undefined"&&m){
+    const squad=activeSquad(),left=squad.filter(c=>!c.used);
+    const lr={bat:0,bowl:0,all:0};left.forEach(c=>lr[c.role]=(lr[c.role]||0)+1);
+    line1=`${left.length} left to play &middot; ${squad.length-left.length} used`;
+    line2=`Left: ${lr.bat} bat / ${lr.all} all / ${lr.bowl} bowl`;
+  }else{
+    line1=`${all.length} players &middot; ${rc.bat} bat / ${rc.all} all / ${rc.bowl} bowl`;
+    const kit=(run?.consumables||[]).filter(c=>!c.kind);
+    line2=kit.length?`Kit: ${kit.map(k=>k.name).join(" &middot; ")}`:"";
+  }
+  return `<div class="tip-sheet">
+    <b class="tsh-title">TEAM SHEET</b>
+    <span class="tsh-line">${line1}</span>
+    ${line2?`<span class="tsh-line dim">${line2}</span>`:""}
+    <div class="tsh-nats">${nats.map((n,i)=>`<span class="ts-nat ${i===0?'top':''}"><svg viewBox="0 0 24 24">${NATION_FLAG[n]||""}</svg><b>${natCounts[n]}</b></span>`).join("")}</div>
+    ${teams.length?`<div class="tsh-teams">${teams.map(t=>`<span class="ts-team">${t} &times;${teamCounts[t]}</span>`).join("")}</div>`:""}
+  </div>`;
+}
+/* ---- shop selection state: one good "in hand", confirmed at the top bar ---- */
+let shopSel=null;
+function shopSelPrice(){
+  if(!shopSel||!run?.shop)return null;
+  if(shopSel.type==="single"){const s=run.shop.singles[shopSel.i];return s&&!s.bought?s.price:null}
+  if(shopSel.type==="pack"){const p=run.shop.packs[shopSel.i];return p&&!p.opened&&!p.picked?packPrice(p):null}
+  if(shopSel.type==="voucher"){const v=run.shop.vouchers[shopSel.i];return v&&!v.bought?v.price:null}
+  return null;
+}
+function paintShopSel(){
+  document.querySelectorAll("#offers .sel").forEach(el=>el.classList.remove("sel"));
+  const buy=$("#buyBtn"),sell=$("#sellBtn");
+  let buyP=null,sellV=null,el=null;
+  if(shopSel){
+    if(shopSel.type==="single")el=document.querySelector(`[data-sel-single="${shopSel.i}"]`);
+    else if(shopSel.type==="pack")el=document.querySelector(`[data-sel-pack="${shopSel.i}"]`);
+    else if(shopSel.type==="voucher")el=document.querySelector(`[data-sel-voucher="${shopSel.i}"]`);
+    else if(shopSel.type==="coach"){
+      const c=activeCoaches()[shopSel.i];
+      if(c){el=document.querySelector(`#offers .bench-row .coachcard[data-coach="${c.instId||c.id}"]`);sellV=coachSellValue(c);}
+    }
+    if(el)el.classList.add("sel");
+    buyP=shopSelPrice();
+  }
+  if(buy){buy.disabled=!(buyP!=null&&run.coins>=buyP);buy.innerHTML=buyP!=null?`BUY &middot; ${buyP}`:"BUY";}
+  if(sell){sell.disabled=sellV==null;sell.innerHTML=sellV!=null?`SELL &middot; +${sellV}`:"SELL";}
+}
+function shopBuySelected(){
+  if(!shopSel)return;
+  localStorage.setItem("pp_shop_hint","1");   // they've learned the verb
+  const sel=shopSel;shopSel=null;
+  if(sel.type==="single")buySingle(sel.i);
+  else if(sel.type==="pack")openPack(sel.i);
+  else if(sel.type==="voucher")buyVoucher(sel.i);
+}
+function shopSellSelected(){
+  if(!shopSel||shopSel.type!=="coach")return;
+  const i=shopSel.i;shopSel=null;
+  sellCoach(i);
+}
 function renderShop(){
   run.refreshes=2+(run.refreshBonus||0);
   if(!run.shop||Array.isArray(run.shop))rollShop();
+  shopSel=null;   // fresh goods, empty hands
   const next=MATCHES[run.match];
   const coaches=activeCoaches();
   const packMarkup=(pack,i)=>{
     const state=pack.picked?"picked":pack.opened?"opened":"sealed";
     const cost=packPrice(pack);
-    const disabled=pack.picked||(!pack.opened&&run.coins<cost);
     const hint=pack.opened&&!pack.picked?`<span class="packx-hint">Continue &#9658;</span>`:"";
-    return `<button class="packx ${state} ${pack.type==='hex'?'is-hex':''}" data-open-pack="${i}" ${disabled?'disabled':''} aria-label="${packDisplayName(pack)} — ${disabled?'costs '+cost+' coins':'tap to open'}">
-      <div class="packx-tilt">${packArt(pack.type,pack.opened?null:cost,{sparkle:pack.type!=="consumable"&&!pack.picked,jumbo:pack.jumbo})}</div>
+    return `<button class="packx goodx ${state} ${pack.type==='hex'?'is-hex':''}" data-sel-pack="${i}"
+      data-tip="${escSVG(packDisplayName(pack)+" — "+packTagline(pack))}"
+      aria-label="${packDisplayName(pack)} — ${pack.picked?'claimed':pack.opened?'tap to continue':'costs '+cost+' coins'}">
+      <div class="packx-tilt">${packArt(pack.type,null,{sparkle:pack.type!=="consumable"&&!pack.picked,jumbo:pack.jumbo})}</div>
+      ${!pack.opened&&!pack.picked?`<span class="goodx-price"><span class="coin"></span>${cost}</span>`:""}
       ${hint}
       ${pack.picked?'<span class="packx-stamp">CLAIMED</span>':''}
     </button>`;
   };
-  const voucherMarkup=(v,i)=>`<div class="vcard ${v.bought?'bought':''}">
-    <div class="vcard-top"><b>${v.title}</b><span class="vcard-price"><span class="coin"></span>${v.price}</span></div>
-    <p>${v.desc}</p>
-    <button class="btn secondary sm" data-buy-voucher="${i}" ${v.bought||run.coins<v.price?'disabled':''}>${v.bought?'Sold Out':'Buy'}</button>
+  /* voucher = a golden TICKET, not a text box */
+  const voucherMarkup=(v,i)=>`<div class="vticket goodx ${v.bought?'bought':''}" data-sel-voucher="${i}"
+      data-tip="${escSVG(v.title+" — "+v.desc)}">
+    <span class="vt-band">VOUCHER</span>
+    <span class="vt-main"><b>${v.title}</b><small>${v.desc}</small></span>
+    <span class="goodx-price ${v.bought?'sold':''}">${v.bought?'SOLD':`<span class="coin"></span>${v.price}`}</span>
   </div>`;
   // Singles render as the real cards — always face-up, price tag on top.
   const singleMarkup=(s,i)=>{
     const it=s.item;
-    let face="";
-    if(s.kind==="player")face=`<div class="singlex-cardface">${cardHTML(it,{as:"div"})}</div>`;
-    else if(s.kind==="coach")face=`<div class="singlex-cardface">${coachCardHTML(it,true)}</div>`;
-    else face=`<div class="singlex-cardface">${toolCardHTML(it)}</div>`;
-    const note=s.scouted?`<small class="singlex-note">Scouted vs ${run.nextRival?.arch?.name||"the next rival"}</small>`:"";
-    const cta=s.bought?(s.kind==="coach"?"Hired":s.kind==="player"?"Signed":"Sold")
-      :(s.kind==="coach"?"Hire":s.kind==="player"?"Sign":"Buy");
-    return `<div class="singlex ${s.bought?'bought':''} ${s.scouted?'is-scouted':''}">
-      ${s.scouted?'<span class="singlex-scouted">Scouted</span>':''}
-      ${face}${note}
-      <button class="btn secondary sm" data-buy-single="${i}" ${s.bought||run.coins<s.price?'disabled':''}>${cta} &middot; ${s.price}</button>
+    let face="",tip="";
+    if(s.kind==="player"){
+      face=`<div class="singlex-cardface">${cardHTML(it,{as:"div"})}</div>`;
+      tip=`${it.name} — ${it.rarity} ${it.role==="bat"?"batter":it.role==="bowl"?"bowler":"all-rounder"}${it.trait?`. ${it.trait.name}: ${dispDesc(it.trait.desc||"")}`:""}`;
+    // coach singles wear the SAME full-art trump the match carries — one identity
+    }else if(s.kind==="coach"){
+      face=`<div class="singlex-cardface coachface">${coachMiniSVG(it)}</div>`;
+      tip=`${it.name} — ${dispDesc(it.desc)}`;
+    // consumables wear their IN-GAME form: the vertical 1/3-card kit strip
+    }else{
+      const ico=it.mode==="bowl"?ICON.ball:it.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
+      face=`<span class="kit-slot goods-tool mode-${it.mode||'any'}"><span class="kit-art">${ico}</span><span class="kit-plate">${it.name}</span></span>`;
+      tip=`${it.name} — ${dispDesc(it.desc)}${it.kind==="instant"?" (instant, one use)":it.mode==="bat"?" (arms your batting)":it.mode==="bowl"?" (arms your bowling)":" (any ball)"}`;
+    }
+    return `<div class="singlex goodx ${s.bought?'bought':''} ${s.kind==='consumable'?'toolg':''}"
+      data-sel-single="${i}" data-tip="${escSVG(tip)}">
+      ${face}
+      <span class="goodx-price ${s.bought?'sold':''}">${s.bought?'SOLD':`<span class="coin"></span>${s.price}`}</span>
     </div>`;
   };
-  const emptySlots=Math.max(0,coachSlotLimit()-usedCoachSlots());
-  const coachSlots=coaches.map((coach,i)=>
-    `<div class="staffx">${coachCardHTML(coach,true)}<button class="btn secondary sm" data-sell-coach="${i}">Sell +${coachSellValue(coach)}</button></div>`
-  ).concat(Array.from({length:emptySlots},()=>`<div class="staffx empty" title="Empty coaching slot — open a Coach Pack to fill it"><svg viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="16" r="8"/><path d="M6 40 Q22 24 38 40 Z"/></svg></div>`)).join("");
-  const consumables=(run.consumables||[]).map(c=>`<span class="chipx ${c.mode}"><b>${c.name}</b><small>${c.mode==="any"?"Any ball":c.mode==="bat"?"Batting":"Bowling"}</small></span>`).join("");
-  const firstShop=!localStorage.getItem("pp_seen_shop");
+  // teaching happens in the tutorial now — the sub line is pure situation
   const rewardChip=run.__reward>0?`<span class="earn-chip">MATCH WON &middot; +${run.__reward} coins</span> `:"";
-  const intro=firstShop
-    ?`This is the Clubhouse. You earn coins by winning — spend them on packs, coaches &amp; training to get stronger for the next rival.`
-    :`Next up: <b>${matchLabel(next)}</b> &middot; match ${run.match+1} of ${MATCHES.length}`;
-  $("#shopSub").innerHTML=rewardChip+intro;
-  localStorage.setItem("pp_seen_shop","1");
+  const firstHint=!localStorage.getItem("pp_shop_hint")?` &middot; <b class="shop-hint">tap any good, then BUY</b>`:"";
+  $("#shopSub").innerHTML=rewardChip+`Next up: <b>${matchLabel(next)}</b> &middot; match ${run.match+1} of ${MATCHES.length}`+firstHint;
   $("#nextBtn").textContent="Scout Next Rival";
   $("#nextBtn").disabled=false;
   syncCoins();
   run.__reward=0;   // consume the earn beat so it shows once
-  $("#deckCount").textContent=roster().length;
   $("#rerollBtn").textContent=run.noReroll?"Reroll Sealed":rerollCost()?`Reroll Packs - ${rerollCost()}`:"Reroll Packs - Free";
   $("#rerollBtn").disabled=run.noReroll||run.coins<rerollCost();
-  const marketItems=`${(run.shop.singles||[]).map(singleMarkup).join("")}${run.shop.vouchers.map(voucherMarkup).join("")}${consumables||""}`;
-  $("#offers").className="shopx-body shopx-v2";
+  /* SHOP v3 — three stalls + the loadout truth. The bottom tray is the SAME
+     band the match carries (coach cards + kit at --cardw, MANAGE SQUAD where
+     the hand lives) — one decision surface, one size, everywhere. */
+  const staffGoods=(run.shop.singles||[]).map((s,i)=>s.kind!=="consumable"?singleMarkup(s,i):"").join("");
+  const kitGoods=(run.shop.singles||[]).map((s,i)=>s.kind==="consumable"?singleMarkup(s,i):"").join("");
+  /* THE BENCH: no box, no chrome — your coaches at full size on the reclaimed
+     bottom, overlapping when they must, MANAGE SQUAD standing first with the
+     TEAM SHEET as its hover (all owned kit is one-use, so it lives in the
+     match tray + the sheet, not here). */
+  const benchCoaches=activeCoaches().map((c,i)=>coachCardCell(c,i,false,true)).join("")||coachEmptyCell();
+  $("#offers").className="shopx-body shopx-v4";
   $("#offers").innerHTML=`
-    ${coachStripHTML({sellable:true})}
-    <section class="shopx-shelf shopx-packs">
-      <div class="shopx-shelf-head">Rip a pack <span>keep one pull</span></div>
-      <div class="packx-row">${run.shop.packs.map(packMarkup).join("")}</div>
-    </section>
-    <section class="shopx-shelf shopx-market">
-      <div class="shopx-shelf-head">Market Stall</div>
-      <div class="shopx-itemrow shopx-marketgrid">${marketItems||'<div class="railx-empty">Sold out — reroll for more.</div>'}</div>
-    </section>`;
-  document.querySelectorAll("#offers [data-open-pack]").forEach(b=>b.onclick=()=>openPack(+b.dataset.openPack));
-  document.querySelectorAll("#offers [data-sell-coach]").forEach(b=>b.onclick=()=>sellCoach(+b.dataset.sellCoach));
-  document.querySelectorAll("#offers [data-buy-voucher]").forEach(b=>b.onclick=()=>buyVoucher(+b.dataset.buyVoucher));
-  document.querySelectorAll("#offers [data-buy-single]").forEach(b=>b.onclick=()=>buySingle(+b.dataset.buySingle));
-  document.querySelectorAll("#offers .singlex-cardface .card").forEach(el=>el.onclick=()=>toggleFlip(el.dataset.id));
+    <div class="stall-row">
+      <section class="stallx stall-staff">
+        <div class="stallx-head">Staff Room <span>coaches for hire</span></div>
+        <div class="stallx-goods">${staffGoods||'<div class="railx-empty">Sold out — reroll for more.</div>'}</div>
+      </section>
+      <section class="stallx stall-packs">
+        <div class="stallx-head">Packs <span>rip &middot; keep one</span></div>
+        <div class="stallx-goods packx-row">${run.shop.packs.map(packMarkup).join("")}</div>
+      </section>
+      <section class="stallx stall-kit">
+        <div class="stallx-head">Kit Shed <span>one-use tools</span></div>
+        <div class="stallx-goods">${kitGoods||'<div class="railx-empty">Sold out.</div>'}</div>
+      </section>
+    </div>
+    <div class="bench-row">
+      <button class="hand-deck squad-mega" id="squadMegaBtn" data-tip-html="${escSVG(teamSheetTipHTML("shop"))}">
+        <span class="hd-cards"></span><b class="hd-n">${roster().length}</b><span class="hd-lbl">MANAGE SQUAD</span>
+      </button>
+      <div class="coach-spine bench-spine" aria-hidden="true">COACH</div>
+      ${benchCoaches}
+      <section class="stallx stall-notice">
+        <div class="stallx-head">Notice Board <span>one per visit</span></div>
+        <div class="stallx-goods stall-vlist">${run.shop.vouchers.map(voucherMarkup).join("")||'<div class="railx-empty">Nothing pinned.</div>'}</div>
+      </section>
+    </div>`;
+  /* SELECT -> CONFIRM commerce: tap picks a good up (pop + gold ring), the
+     top-bar BUY/SELL buttons are the only way money moves. */
+  document.querySelectorAll("#offers [data-sel-single]").forEach(el=>el.onclick=()=>{
+    const i=+el.dataset.selSingle;if(run.shop.singles[i]?.bought)return;
+    SFX.play("tick");shopSel={type:"single",i};paintShopSel();
+  });
+  document.querySelectorAll("#offers [data-sel-pack]").forEach(el=>el.onclick=()=>{
+    const i=+el.dataset.selPack,p=run.shop.packs[i];
+    if(!p||p.picked)return;
+    if(p.opened){openPack(i);return}       // already paid — resume the reveal
+    SFX.play("tick");shopSel={type:"pack",i};paintShopSel();
+  });
+  document.querySelectorAll("#offers [data-sel-voucher]").forEach(el=>el.onclick=()=>{
+    const i=+el.dataset.selVoucher;if(run.shop.vouchers[i]?.bought)return;
+    SFX.play("tick");shopSel={type:"voucher",i};paintShopSel();
+  });
+  document.querySelectorAll("#offers .bench-row .coachcard[data-coach]").forEach(el=>el.onclick=()=>{
+    const idx=activeCoaches().findIndex(c=>(c.instId||c.id)===el.dataset.coach);
+    if(idx<0)return;
+    SFX.play("tick");shopSel={type:"coach",i:idx};paintShopSel();
+  });
   bindPackTilt($("#offers"));
-  const sq=$("#shopSquadBtn");if(sq){sq.disabled=false;sq.onclick=openSquadRoom}
+  const mega=$("#squadMegaBtn");if(mega)mega.onclick=openSquadRoom;
+  paintShopSel();
   persistRun();
 }
 function bindPackTilt(root){
@@ -9989,61 +10518,115 @@ function bindPackTilt(root){
   });
 }
 
-function renderPackOverlay(phase){
+let packSel=null;   // selected BENCH coach (for the sell-to-make-room flow)
+function roleWord(r){return r==="bat"?"batter":r==="bowl"?"bowler":"all-rounder"}
+/* THE PACK SCREEN: the opened pack (left) + its cards at full scale. Click a
+   card to CHOOSE it — no pick buttons anywhere. The bench sits below so a
+   coach can be sold to free a slot. Click the pack itself to walk away. */
+function renderPackScreen(ripIn){
   const pack=run.shop?.packs?.[run.packOpen];
-  const ov=$("#packOverlay");
-  if(!pack||!ov){closePackOverlay();return}
-  const choices=(pack.choices||[]).map((choice,i)=>packChoiceMarkup(choice,run.packOpen,i,pack)).join("");
-  ov.innerHTML=`<div class="pov ${phase} ${pack.type==='hex'?'pov-hex':''}">
-    <div class="pov-pack">
-      <div class="pov-pack-body">${packArt(pack.type,null,{sparkle:true,jumbo:pack.jumbo})}</div>
-      <div class="pov-tear">${packArt(pack.type,null)}</div>
+  const stage=$("#packStage");
+  if(!pack||!stage){leavePackScreen();return}
+  packSel=null;
+  const picks=(pack.choices||[]).map((choice,i)=>packPickMarkup(choice,i)).join("");
+  // pack hero (left) + the reveal — rebuild only the inner, keep the coins/sell chips
+  stage.querySelectorAll(".pack-inner").forEach(el=>el.remove());
+  const inner=document.createElement("div");
+  inner.className="pack-inner";
+  inner.innerHTML=`
+    <div class="pack-burstwrap" aria-hidden="true"><div class="pack-rays"></div></div>
+    <div class="pack-herocol">
+      <div class="pack-hero ${pack.type==='hex'?'is-hex':''}">
+        ${packArt(pack.type,null,{sparkle:true,jumbo:pack.jumbo})}
+        <span class="pack-openflag">OPENED!</span>
+      </div>
+      <button class="btn secondary sm pack-skip" id="packSkipBtn" data-tip="${escSVG("Take nothing from "+packDisplayName(pack))}">SKIP REWARD</button>
     </div>
-    <div class="pov-head"><b>${packDisplayName(pack)}</b><span>${packTagline(pack)}</span></div>
-    <div class="pov-row">${choices}</div>
-    <div class="pov-actions"><button class="btn secondary" id="skipPackBtn">Skip Reward</button></div>
-  </div>`;
-  ov.classList.add("show");
-  ov.querySelectorAll("[data-pack-choice]").forEach(b=>b.onclick=e=>{e.stopPropagation();choosePackCard(+b.dataset.pack,+b.dataset.choice,b.dataset.replace)});
-  ov.querySelectorAll(".pchoice-card .card").forEach(el=>el.onclick=e=>{e.stopPropagation();toggleFlip(el.dataset.id)});
-  const skip=$("#skipPackBtn");if(skip)skip.onclick=skipPackReward;
-}
-
-function packChoiceMarkup(choice,packIndex,choiceIndex,pack){
-  const pickBtn=(label,disabled=false)=>`<button class="btn sm pchoice-pick" data-pack-choice data-pack="${packIndex}" data-choice="${choiceIndex}" ${disabled||pack.picked?'disabled':''}>${label}</button>`;
-  let front="",cls="";
-  if(choice.type==="player"){
-    cls="player";
-    const c=choice.card;
-    front=`<div class="pchoice-card">${cardHTML(c,{emph:c.role==="bowl"?"bowl":"bat",as:"div"})}</div>${pickBtn("Sign")}`;
-  }else if(choice.type==="consumable"){
-    cls="tool";
-    const c=choice.consumable;
-    front=`${toolCardHTML(c)}${pickBtn("Keep")}`;
-  }else if(choice.type==="hex"){
-    cls="hexc";
-    const h=choice.hex;
-    front=`<div class="hexx">
-      <span class="hexx-tag">HEX</span>
-      <div class="hexx-sigil">&#10022;</div>
-      <b>${h.name}</b>
-      <p class="hexx-power">${h.desc}</p>
-      <p class="hexx-cost">${h.cost}</p>
-    </div>${pickBtn("Seal the Pact")}`;
-  }else{
-    cls="coach";
-    const coach=choice.coach,coaches=activeCoaches(),dup=coaches.some(c=>c.id===coach.id);
-    const coachView={...coach,edition:choice.edition||null};
-    const hasRoom=choice.edition==="negative"||usedCoachSlots()<coachSlotLimit();
-    const act=hasRoom
-      ?pickBtn(dup?"Already Hired":"Hire",dup)
-      :`<div class="swap-row"><span>Swap out:</span>${coaches.map((old,i)=>old.edition==="negative"?"":`<button class="btn secondary sm" data-pack-choice data-pack="${packIndex}" data-choice="${choiceIndex}" data-replace="${i}" ${pack.picked||dup?'disabled':''}>${old.name.split(" ")[0]}</button>`).join("")}</div>`;
-    front=`${coachCardHTML(coachView)}${act}`;
+    <div class="pack-picks ${ripIn?'':'reveal'}" id="packPicks">${picks}</div>`;
+  stage.appendChild(inner);
+  const pc=$("#packCoins");if(pc)pc.textContent=run.coins;
+  renderPackBench();
+  updatePackSell();
+  const picksEl=$("#packPicks");
+  if(ripIn){
+    SFX.play("swish");
+    stage.classList.remove("burst");void stage.offsetWidth;stage.classList.add("burst");
+    requestAnimationFrame(()=>requestAnimationFrame(()=>picksEl.classList.add("reveal")));
+    // confetti pop as the cards land
+    setTimeout(()=>{
+      const b=inner.querySelector(".pack-burstwrap");
+      if(b){const c=document.createElement("div");c.className="confetti-burst";c.innerHTML=confettiHTML();b.appendChild(c)}
+    },260);
   }
-  return `<div class="pchoice ${cls}" style="--d:${220+choiceIndex*160}ms">
+  picksEl.querySelectorAll("[data-pick]").forEach(el=>el.onclick=()=>pickPackChoice(+el.dataset.pick));
+  $("#packSkipBtn").onclick=leavePackScreen;
+}
+function renderPackBench(){
+  const b=$("#packBench");if(!b)return;
+  b.classList.remove("no-space");
+  const coaches=activeCoaches().map((c,i)=>coachCardCell(c,i,false,true)).join("")||coachEmptyCell();
+  b.innerHTML=`
+    <button class="hand-deck squad-mega" id="packMegaBtn" data-tip-html="${escSVG(teamSheetTipHTML("shop"))}">
+      <span class="hd-cards"></span><b class="hd-n">${roster().length}</b><span class="hd-lbl">MANAGE SQUAD</span>
+    </button>
+    <div class="coach-spine bench-spine" aria-hidden="true">COACH</div>
+    ${coaches}`;
+  b.querySelectorAll(".coachcard[data-coach]").forEach(el=>el.onclick=()=>{
+    const idx=activeCoaches().findIndex(c=>(c.instId||c.id)===el.dataset.coach);
+    if(idx<0)return;
+    SFX.play("tick");packSel=(packSel===idx?null:idx);updatePackSell();
+  });
+  const mega=$("#packMegaBtn");if(mega)mega.onclick=openSquadRoom;
+}
+function updatePackSell(){
+  const btn=$("#packSellBtn");if(!btn)return;
+  document.querySelectorAll("#packBench .coachcard.sel").forEach(el=>el.classList.remove("sel"));
+  const c=packSel!=null?activeCoaches()[packSel]:null;
+  if(c){
+    const el=document.querySelector(`#packBench .coachcard[data-coach="${c.instId||c.id}"]`);
+    if(el)el.classList.add("sel");
+    btn.hidden=false;btn.disabled=false;
+    const v=$("#packSellVal");if(v)v.textContent=coachSellValue(c);
+  }else{btn.hidden=true;btn.disabled=true}
+}
+/* full-scale, button-less: the card IS the choice. Same art everywhere. */
+function packPickMarkup(choice,i){
+  let inner="",cls="",tip="";
+  if(choice.type==="player"){
+    cls="p-player";const c=choice.card;
+    inner=cardHTML(c,{emph:c.role==="bowl"?"bowl":"bat",as:"div"});
+    tip=`${c.name} — ${c.rarity} ${roleWord(c.role)}${c.trait?`. ${c.trait.name}: ${dispDesc(c.trait.desc||"")}`:""}`;
+  }else if(choice.type==="coach"){
+    cls="p-coach";const coach={...choice.coach,edition:choice.edition||null};
+    inner=coachMiniSVG(coach);
+    tip=`${choice.coach.name} — ${dispDesc(choice.coach.desc)}${choice.edition?` (${EDITIONS[choice.edition].label})`:""}`;
+  }else if(choice.type==="consumable"){
+    cls="p-tool";const c=choice.consumable;
+    const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
+    inner=`<span class="kit-slot goods-tool reveal-tool mode-${c.mode||'any'}"><span class="kit-art">${ico}</span><span class="kit-plate">${c.name}</span></span>`;
+    tip=`${c.name} — ${dispDesc(c.desc)}${c.kind==="instant"?" (instant, one use)":c.mode==="bat"?" (arms your batting)":c.mode==="bowl"?" (arms your bowling)":" (any ball)"}`;
+  }else if(choice.type==="hex"){
+    cls="p-hex";const h=choice.hex;const stake=hexStake(h.id);
+    inner=`<div class="hexx">
+      <span class="hexx-tag">HEX</span><div class="hexx-sigil">&#10022;</div><b>${h.name}</b>
+      <p class="hexx-power">${h.desc}</p><p class="hexx-cost">${h.cost}</p>
+      ${stake.lose?`<p class="hexx-stake"><b>ON THE BLOCK</b>${escSVG(stake.lose)}</p>`:""}
+    </div>`;
+    tip=`${h.name} — ${h.desc} Price: ${h.cost}`;
+  }else if(choice.type==="training"){
+    cls="p-train";
+    inner=`<div class="trainx">
+      <svg viewBox="0 0 24 24" class="trainx-flag" aria-hidden="true">${NATION_FLAG[choice.nation]||""}</svg>
+      <b>${choice.nation}</b>
+      <span class="trainx-n">${choice.count} card${choice.count===1?"":"s"} in your squad</span>
+      <p>Every stat <b>+${choice.gain}</b> on every ${choice.nation} card</p>
+    </div>`;
+    tip=`${choice.nation} camp — every stat +${choice.gain} on your ${choice.count} ${choice.nation} card${choice.count===1?"":"s"}`;
+  }
+  return `<div class="pchoice ${cls}" data-pick="${i}" data-tip="${escSVG(tip)}" style="--d:${160+i*120}ms">
     <div class="pflip">
       <div class="pface back"><div class="pback-rays"></div><span>POWERPLAY</span></div>
-      <div class="pface front">${front}</div>
+      <div class="pface front">${inner}</div>
     </div>
   </div>`;
 }
@@ -10567,6 +11150,69 @@ $("#draftAutoBtn").onclick=autoSelectDraft;
 $("#draftConfirmBtn").onclick=confirmDraft;
 $("#tossRestartBtn").onclick=()=>startRun();
 $("#nextBtn").onclick=()=>{SFX.play("nav");goVs()};
+$("#buyBtn").onclick=()=>{SFX.play("buy");shopBuySelected()};
+$("#sellBtn").onclick=()=>{shopSellSelected()};
+$("#packSellBtn").onclick=packSellSelected;
+/* THE CLUBHOUSE gets a room — a warm dressing-room scene behind the shop and
+   pack panels so they sit IN a place, not on flat sky. One SVG, cloned into
+   both screens as a z-0 backdrop. */
+function clubSceneSVG(){
+  const bunt=Array.from({length:15},(_,i)=>{const x=i*100+8,c=["#ff5a2d","#ffc93c","#1f9b53","#2f8fd0","#7245c9"][i%5];
+    return `<path d="M${x} 40 L${x+46} 40 L${x+23} 82 Z" fill="${c}" opacity=".72" stroke="rgba(23,33,31,.25)" stroke-width="1.5"/>`}).join("");
+  // a wall of lockers — vertical panels with handles + jersey silhouettes
+  const jCol=["#c0303f","#2f8fd0","#1f9b53","#7245c9","#ff9430","#c0303f","#2f8fd0","#1f9b53","#7245c9"];
+  const lockers=Array.from({length:9},(_,i)=>{const x=40+i*156;const jc=jCol[i];
+    return `<g>
+      <rect x="${x}" y="150" width="140" height="500" rx="6" fill="${i%2?'#f0cd8b':'#e9c47f'}" stroke="rgba(140,92,38,.4)" stroke-width="2.5"/>
+      <rect x="${x+12}" y="176" width="116" height="150" rx="4" fill="rgba(140,92,38,.14)"/>
+      <circle cx="${x+120}" cy="410" r="5" fill="rgba(90,60,26,.55)"/>
+      <!-- a hung jersey inside -->
+      <g transform="translate(${x+70} 250)"><rect x="-3" y="-38" width="6" height="26" fill="rgba(90,60,26,.4)"/>
+        <path d="M-34 -14 l19 -10 l5 5 h20 l5 -5 l19 10 l-12 17 l-7 -4 v66 h-48 v-66 l-7 4 Z" fill="${jc}" opacity=".5" stroke="rgba(23,33,31,.35)" stroke-width="2"/>
+        <text y="34" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="26" fill="rgba(255,246,227,.55)" font-style="italic">${(i%9)+1}</text></g>
+    </g>`}).join("");
+  const trophy=(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M-16 -34 h32 v10 a16 16 0 0 1 -32 0 Z" fill="#ffce3d" stroke="#b6801a" stroke-width="2.5"/>
+    <path d="M-16 -30 a-12 12 0 0 1 -12 12 a12 12 0 0 0 12 8 Z" fill="#ffce3d" stroke="#b6801a" stroke-width="2.5"/>
+    <path d="M16 -30 a12 12 0 0 0 12 12 a12 12 0 0 1 -12 8 Z" fill="#ffce3d" stroke="#b6801a" stroke-width="2.5"/>
+    <rect x="-4" y="-2" width="8" height="12" fill="#e0a92c"/><rect x="-14" y="10" width="28" height="8" rx="2" fill="#c98a1e" stroke="#b6801a" stroke-width="1.5"/>
+  </g>`;
+  const ball=(x,y)=>`<g transform="translate(${x} ${y})"><circle r="16" fill="#c0303f" stroke="#7d1f28" stroke-width="2.5"/>
+    <path d="M-10 -8 Q-3 0 -10 8 M10 -8 Q3 0 10 8" stroke="#ffe4c4" stroke-width="1.8" fill="none"/></g>`;
+  const bat=(x,y,r)=>`<g transform="translate(${x} ${y}) rotate(${r})"><rect x="-9" y="-64" width="18" height="70" rx="7" fill="#e8c07a" stroke="#b6801a" stroke-width="2.5"/><rect x="-5" y="-92" width="10" height="30" rx="4" fill="#17211f"/></g>`;
+  const kitbag=(x,c)=>`<g transform="translate(${x} 690)"><rect x="-52" y="-30" width="104" height="52" rx="24" fill="${c}" stroke="rgba(23,33,31,.4)" stroke-width="2.5"/><rect x="-52" y="-14" width="104" height="6" fill="rgba(23,33,31,.16)"/><path d="M-22 -30 q22 -22 44 0" fill="none" stroke="rgba(23,33,31,.5)" stroke-width="4"/></g>`;
+  return `<div class="club-scene" aria-hidden="true">
+    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="clubWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe0a6"/><stop offset=".5" stop-color="#f4cb84"/><stop offset="1" stop-color="#e6b26a"/></linearGradient>
+        <linearGradient id="clubFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9884a"/><stop offset="1" stop-color="#a3641f"/></linearGradient>
+        <radialGradient id="clubGlow" cx="50%" cy="30%" r="70%"><stop offset="0" stop-color="#fff2cf" stop-opacity=".7"/><stop offset="1" stop-color="#fff2cf" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="1440" height="900" fill="url(#clubWall)"/>
+      <rect width="1440" height="620" fill="url(#clubGlow)"/>
+      <g class="club-bunt">${bunt}</g>
+      <!-- the locker wall -->
+      <g opacity=".9">${lockers}</g>
+      <!-- trophy shelf across the top of the lockers -->
+      <rect x="30" y="132" width="1380" height="14" rx="3" fill="#b0722f" stroke="rgba(23,33,31,.3)" stroke-width="2.5"/>
+      <rect x="30" y="146" width="1380" height="8" fill="rgba(23,33,31,.18)"/>
+      ${trophy(210,118,1.15)}${ball(360,110)}${bat(470,124,18)}${trophy(1230,118,1)}${ball(1090,110)}${trophy(720,116,.85)}
+      <!-- the kit bench + bags on the floor -->
+      <rect x="0" y="720" width="1440" height="180" fill="url(#clubFloor)"/>
+      <rect x="0" y="720" width="1440" height="6" fill="rgba(23,33,31,.22)"/>
+      <rect x="120" y="700" width="1200" height="26" rx="6" fill="#a86a34" stroke="rgba(23,33,31,.3)" stroke-width="2.5"/>
+      <g stroke="rgba(23,33,31,.35)" stroke-width="6">${[220,1220].map(x=>`<line x1="${x}" y1="726" x2="${x}" y2="792"/>`).join("")}</g>
+      ${kitbag(420,"#2f8fd0")}${kitbag(720,"#c0303f")}${kitbag(1020,"#1f9b53")}
+    </svg>
+  </div>`;
+}
+function installClubScene(){
+  ["shop","pack"].forEach(id=>{
+    const sec=document.getElementById(id);
+    if(sec&&!sec.querySelector(".club-scene"))sec.insertAdjacentHTML("afterbegin",clubSceneSVG());
+  });
+}
+installClubScene();
 $("#rerollBtn").onclick=()=>{
   if(run.noReroll){flashHint("The spirits sealed this shop.");return}
   const cost=rerollCost();
