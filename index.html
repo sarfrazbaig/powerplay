@@ -3199,8 +3199,10 @@
     font-family:"Work Sans",Inter,sans-serif;font-weight:800;font-size:12px;letter-spacing:.3px;
     color:#7a5a1a;background:rgba(255,201,60,.4);border-radius:999px;padding:3px 12px;
   }
-  .packx.picked .pack-art{filter:grayscale(.85) brightness(.8)}
-  .packx.picked .packx-tilt{animation:none}
+  .packx.picked .pack-art,.packx.skipped .pack-art{filter:grayscale(.85) brightness(.8)}
+  .packx.picked .packx-tilt,.packx.skipped .packx-tilt{animation:none}
+  .packx.skipped{opacity:.62;cursor:default}
+  .packx-stamp.skipped{background:#d9d2c0;color:#5a5142;border-color:#3a352b;box-shadow:3px 3px 0 #3a352b}
   .packx-stamp{
     position:absolute;
     top:38%;
@@ -5890,34 +5892,48 @@
   #shop .shopx-body.shopx-v4{display:flex;flex-direction:column;gap:10px;min-height:0;height:100%;overflow:hidden;
     grid-template-columns:none}
   /* row 1: three buying stalls — packs take the width the notice board freed */
-  #shop .stall-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.55fr) minmax(0,.5fr);
-    gap:10px;flex:1.3 1 0;min-height:0;--mcw:clamp(140px,12vw,190px)}
-  /* row 2: THE BENCH — no box, just your coaches at full size + MANAGE SQUAD.
-     Fixed card width, shrinking holders: cards OVERLAP, never shrink. */
-  .bench-row{--bcw:min(clamp(150px,13.5vw,235px),calc(34vh*5/7));
-    flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:flex-start;
-    padding:6px 10px 2px;overflow:visible}
-  .bench-row .squad-mega{flex:0 0 var(--bcw);width:var(--bcw);margin-right:16px;
-    cursor:pointer;border:0;transition:transform .14s ease}
+  /* TOP ROW: three buying stalls — staff room, packs, kit shed (narrow) */
+  #shop .stall-row{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1.55fr) minmax(0,.4fr);
+    gap:10px;flex:1.35 1 0;min-height:0;--mcw:clamp(140px,12vw,190px)}
+  /* BOTTOM ROW: two panels — Notice Board (left) + the Dugout (right, wide) */
+  #shop .dug-row{display:grid;grid-template-columns:clamp(238px,22vw,320px) minmax(0,1fr);
+    gap:10px;flex:1 1 0;min-height:0}
+  #shop .stall-dugout .bench-row.dug-tray{flex:1 1 auto;min-height:0}
+  /* THE OWNED TRAY — cards sized by PANEL HEIGHT so they grow to fill; the
+     coach + kit groups FLEX to fill the width; empty ghosts hold every slot
+     so 0 items and a full stack both read as intentional. */
+  .bench-row{flex:1 1 0;min-height:0;display:flex;align-items:stretch;
+    gap:clamp(6px,.9vw,16px);padding:8px 12px;overflow:hidden}
+  /* MANAGE SQUAD: a fixed card at full panel height */
+  .bench-row .squad-mega{flex:0 0 auto;height:100%;width:auto;aspect-ratio:5/7;max-width:26%;
+    cursor:pointer;border:0;transition:transform .14s ease;display:flex;flex-direction:column}
   .bench-row .squad-mega:hover{transform:translateY(-5px)}
-  .bench-row .squad-mega .hd-lbl{font-size:11px;letter-spacing:1.6px;line-height:1.3;text-align:center}
-  .bench-row .coachcard{flex:0 1 var(--bcw);min-width:calc(var(--bcw)*.42);position:relative;
-    cursor:pointer;transition:transform .14s ease,filter .14s ease}
-  .bench-row .coachcard svg{width:var(--bcw);height:auto;display:block}
-  .bench-row .coachcard:nth-of-type(1){z-index:9}.bench-row .coachcard:nth-of-type(2){z-index:8}
-  .bench-row .coachcard:nth-of-type(3){z-index:7}.bench-row .coachcard:nth-of-type(4){z-index:6}
-  .bench-row .coachcard:nth-of-type(5){z-index:5}.bench-row .coachcard:nth-of-type(6){z-index:4}
-  .bench-row .coachcard:nth-of-type(7){z-index:3}.bench-row .coachcard:nth-of-type(8){z-index:2}
-  .bench-row .coachcard:hover{z-index:50 !important;transform:translateY(-6px)}
-  .bench-row .coachcard.empty{flex:0 0 calc(var(--bcw)*.62);height:calc(var(--bcw)*7/5*.92);
-    align-self:center}
-  .bench-row .coachcard-sell{display:none}
-  /* the match's COACH spine, verbatim — the anchor that says "these are mine" */
+  .bench-row .squad-mega .hd-n{font-size:clamp(20px,3vh,34px)}
+  .bench-row .squad-mega .hd-lbl{font-size:clamp(9px,1.3vh,12px);letter-spacing:1.4px;line-height:1.3;text-align:center}
+  /* the vertical COACH / KIT spines label each group */
   .bench-row .coach-spine{flex:0 0 auto;align-self:stretch;display:flex;align-items:center;justify-content:center;
-    font-size:clamp(15px,1.6vw,24px);letter-spacing:3px;margin:6px 12px 6px 2px}
-  /* the notice board docks at the bench's right end */
-  .bench-row .stall-notice{margin-left:auto;flex:0 0 clamp(230px,21vw,300px);align-self:stretch;min-height:0;
-    display:flex;flex-direction:column}
+    font-size:clamp(13px,2.4vh,22px);letter-spacing:3px;margin:0 2px}
+  .bench-row .kit-spine{color:#c0303f}
+  /* COACHES — spread to fill their group; overlap only past the cap */
+  .dug-coaches{flex:2.4 1 0;min-width:0;display:flex;align-items:center;justify-content:space-evenly;
+    gap:clamp(2px,.6vw,12px)}
+  .dug-coaches .coachcard{flex:0 1 auto;height:100%;min-width:0;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:transform .14s ease,filter .14s ease}
+  .dug-coaches .coachcard svg{height:100%;max-height:100%;width:auto;display:block}
+  .dug-coaches .coachcard:nth-of-type(1){z-index:9}.dug-coaches .coachcard:nth-of-type(2){z-index:8}
+  .dug-coaches .coachcard:nth-of-type(3){z-index:7}.dug-coaches .coachcard:nth-of-type(4){z-index:6}
+  .dug-coaches .coachcard:nth-of-type(5){z-index:5}.dug-coaches .coachcard:nth-of-type(6){z-index:4}
+  .dug-coaches .coachcard:hover{z-index:50 !important;transform:translateY(-6px)}
+  .dug-coaches .coachcard.empty{opacity:.85}
+  .dug-coaches .coachcard.empty .coachcard-empty{width:auto;height:100%;aspect-ratio:5/7;
+    border:3px dashed rgba(23,33,31,.28);border-radius:16px;display:grid;place-items:center}
+  .dug-coaches .coachcard.empty svg{width:42%;height:auto}
+  .bench-row .coachcard-sell{display:none}
+  /* KIT — non-stacking fixed slots, each a full-height 1/3-card strip */
+  .dug-kit{flex:1.2 1 0;min-width:0;display:flex;align-items:center;justify-content:space-evenly;gap:clamp(4px,.6vw,10px)}
+  .bench-row .dug-kit .kit-slot{flex:0 1 auto;height:100%;width:auto;aspect-ratio:5/21;min-width:0}
+  .bench-row .dug-kit .kit-slot.empty{aspect-ratio:5/21}
   /* selected bench coach — gold ring (shop + pack) */
   .bench-row .coachcard.sel{filter:drop-shadow(0 0 12px rgba(255,201,60,.95)) drop-shadow(0 4px 6px rgba(23,33,31,.3));
     transform:translateY(-6px) scale(1.04);z-index:60 !important}
@@ -5994,11 +6010,13 @@
     border:3px solid var(--ink,#17211f);border-radius:16px;
     box-shadow:6px 6px 0 var(--ink,#17211f);padding:8px 16px;overflow:visible}
   /* NO SPACE: the whole bench shakes to say "sell one first" */
-  #pack .pack-bench.no-space .coachcard{animation:benchShake .5s cubic-bezier(.36,.07,.19,.97) both}
+  #pack .pack-bench.no-space .coachcard,
+  #shop .dug-tray.no-space .coachcard{animation:benchShake .5s cubic-bezier(.36,.07,.19,.97) both}
   @keyframes benchShake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
     30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
   @media (prefers-reduced-motion:reduce){
     #pack .pack-picks.reveal .pflip,#pack .pack-bench.no-space .coachcard,
+    #shop .dug-tray.no-space .coachcard,
     #pack .pack-stage.burst .pack-rays,#pack .pack-hero,#pack .pack-openflag{animation:none !important}
     #pack .pack-rays{opacity:1}
     #pack .pack-hero{transform:rotate(-2deg)}
@@ -6026,29 +6044,81 @@
   /* packs size by WIDTH with their natural aspect — no more flex-crush slivers.
      min-width:0 everywhere: a nowrap label (JUMBO · 5 CARDS) must never be
      allowed to inflate the tilt wrapper past the button. */
-  #shop .stall-packs .packx{width:clamp(126px,11.5vw,215px);flex:0 0 auto;height:auto;min-width:0}
-  #shop .stall-packs .packx-tilt{width:100%;min-width:0}
-  #shop .stall-packs .packx .pack-art{width:100%;height:auto;flex:none;min-height:0;min-width:0}
+  /* SALE STALLS — items ASPECT-FIT their cell: as big as fits in BOTH the
+     panel height and the cell's width share, so nothing overflows or shrinks
+     to a sliver. Each single takes an equal flex cell; the card sizes to it. */
+  /* GRID of 2 equal columns → both packs get identical space by construction
+     (flex was shrinking one based on its art's content). The ROW is bounded to
+     the panel height (minmax(0,1fr)) so packs never overflow / scroll. */
+  #shop .stall-packs .stallx-goods{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr);
+    height:100%;overflow:hidden;align-items:center;justify-items:center;gap:clamp(14px,2.4vw,48px)}
+  #shop .stall-packs .packx{min-width:0;max-width:100%;height:100%;max-height:100%;min-height:0;background:none;border:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative}
+  #shop .stall-packs .good-fit.gf-pack{flex:1 1 auto;min-height:0;min-width:0;
+    display:flex;align-items:center;justify-content:center;position:relative}
+  /* the tilt is height-driven with the pack aspect, but CAPPED so packs stay
+     their sleek designed size (not chunky panel-filling squares) */
+  #shop .stall-packs .packx-tilt{height:100%;max-height:min(100%,300px);width:auto;max-width:100%;aspect-ratio:230/340;min-width:0}
+  #shop .stall-packs .packx .pack-art{width:100% !important;height:100% !important;max-width:none !important;
+    aspect-ratio:auto !important;flex:none;min-height:0;min-width:0}
   #shop .stall-packs .packx .pack-jumbo{white-space:normal;text-align:center}
-  #shop .stall-staff .stallx-goods{display:flex;align-items:center;justify-content:center;gap:clamp(12px,1.6vw,26px)}
-  #shop .stall-kit .stallx-goods{display:flex;align-items:center;justify-content:center;gap:clamp(8px,1vw,16px);overflow:hidden}
+  #shop .stall-staff .stallx-goods,#shop .stall-kit .stallx-goods{display:flex;flex-wrap:nowrap;align-items:stretch;justify-content:space-evenly;
+    gap:clamp(8px,1.4vw,24px);overflow:visible}
+  /* each single is a COLUMN: card (max-fit) on top, price chip docked below.
+     The card sizes to fit BOTH its cell width and the row height, centered —
+     never letterboxed, and the price sits under it so it can't float. */
+  #shop .stall-staff .singlex,#shop .stall-kit .singlex{flex:1 1 0;min-width:0;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;position:relative}
+  /* the card BOTTOM-aligns in its fit box, so the price docked below always
+     hugs the card — never floats far when the card is narrow (e.g. 3 coaches) */
+  #shop .good-fit{flex:1 1 auto;min-height:0;min-width:0;max-width:100%;width:100%;
+    display:flex;align-items:flex-end;justify-content:center;overflow:visible}
+  /* CARD singles: the card + its price chip are ONE vertically-centred unit, so
+     a shelf of 3-4 short (width-constrained) cards sits in the MIDDLE of the
+     panel with the price hugging — never sunk to the floor. (Packs centre via
+     .gf-pack; kit strips fill the height so they need no help.) */
+  #shop .good-fit.gf-card{flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  #shop .good-fit.gf-card>svg,#shop .good-fit.gf-card>.card{flex:0 1 auto;min-height:0;min-width:0}
+  /* a player .card is a DIV (its .tc svg is width:100%), so unlike the coach's
+     direct <svg> it has NO intrinsic size to fit from in the column and collapses
+     to 0. Give it the card's intrinsic px box (250x350) + aspect so max-width/
+     max-height scale it down to fit its cell exactly like the coach svg does. */
+  #shop .good-fit.gf-card>.card{align-self:stretch;width:auto;height:auto;aspect-ratio:250/350;max-height:100%;min-height:0}
+  #shop .good-fit svg,#shop .good-fit .card,#shop .good-fit .card .tc,#shop .good-fit .card svg{
+    max-width:100%;max-height:100%;width:auto;height:auto;display:block}
+  #shop .good-fit .card{background:none;border:0;box-shadow:0;padding:0;cursor:pointer}
+  #shop .good-fit.gf-tool .goods-tool{height:100%;max-height:100%;aspect-ratio:5/21;width:auto;max-width:100%}
   /* goods float bare on the stall — no boxes, no per-item buttons */
   #shop .singlex{background:none;border:0;box-shadow:none;padding:0;width:auto;min-width:0;margin:0}
   #shop .goodx{position:relative;cursor:pointer;transition:transform .14s ease,filter .14s ease}
   #shop .goodx:hover{transform:translateY(-3px)}
-  #shop .goodx.sel,#shop .shop-loadout .coachcard.sel{transform:translateY(-5px) scale(1.05);
-    filter:drop-shadow(0 0 13px rgba(255,201,60,.9)) drop-shadow(0 4px 6px rgba(23,33,31,.3));z-index:5}
+  /* SALE CELLS are transparent — the CARD is the only visible thing (kill the
+     theme's cream !important bg, or the whole box looks bordered when it pops) */
+  #shop .stall-staff .singlex,#shop .stall-kit .singlex,#shop .stall-packs .packx,#shop .stall-notice .vsingle{
+    background:none !important;border:0 !important;box-shadow:none !important}
+  /* SELECTION = only the CARD pops (lift + scale + depth shadow), no box/border.
+     Stays until another good is picked or this one is bought. */
+  #shop .good-fit{transition:transform .16s cubic-bezier(.2,.9,.3,1),filter .16s ease}
+  #shop .goodx.sel{z-index:8}
+  #shop .goodx.sel .good-fit{transform:translateY(-10px) scale(1.05);filter:drop-shadow(0 10px 12px rgba(23,33,31,.42))}
+  #shop .shop-loadout .coachcard.sel,#shop .dug-tray .coachcard.sel{transform:translateY(-9px) scale(1.06);
+    filter:drop-shadow(0 9px 11px rgba(23,33,31,.4));z-index:8}
+  #shop .goodx:focus,#shop .goodx:focus-visible,#shop .packx:focus{outline:none}
   #shop .shop-loadout .coachcard{cursor:pointer;transition:transform .14s ease,filter .14s ease}
   #shop .goodx.bought{opacity:.55;cursor:default;filter:grayscale(.4)}
-  #shop .goodx-price{position:absolute;top:-9px;right:-7px;z-index:4;display:flex;align-items:center;gap:4px;
+  /* price = a badge INSIDE the card's top-right corner (never sticks out, so
+     the panels' overflow:hidden can't clip it) */
+  #shop .goodx-price{position:absolute;top:6px;right:6px;z-index:6;display:flex;align-items:center;gap:4px;
     background:var(--gold,#ffc93c);border:2.5px solid var(--ink,#17211f);border-radius:99px;
-    padding:2px 10px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:14px;color:#3a2a00;
-    box-shadow:0 2.5px 0 var(--ink,#17211f)}
+    padding:2px 9px;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;color:#3a2a00;
+    box-shadow:0 2px 0 var(--ink,#17211f)}
+  /* price docked BELOW the card (singles) — static, centered, never clips/floats */
+  #shop .goodx-price.below{position:static;flex:0 0 auto;align-self:center}
   #shop .goodx-price .coin{width:15px;height:15px}
   #shop .goodx-price.sold{background:#d9d2c0;color:#6a604a;font-size:11px;letter-spacing:1px}
-  #shop .coachface svg{width:var(--mcw);height:auto;display:block}
+  #shop .coachface svg{height:100%;max-height:100%;width:auto;display:block}
   /* market consumable = its IN-GAME form: the vertical 1/3-card kit strip */
-  #shop .goods-tool{width:calc(var(--mcw)/2.9);height:calc(var(--mcw)*7/5);display:flex;flex-direction:column;
+  #shop .goods-tool{height:100%;max-height:100%;width:auto;aspect-ratio:5/21;display:flex;flex-direction:column;
     border-radius:12px;overflow:hidden}
   #shop .goods-tool .kit-plate{writing-mode:vertical-rl;transform:rotate(180deg);flex:1 1 auto;
     display:flex;align-items:center;justify-content:center;font-weight:900;letter-spacing:.5px}
@@ -6071,24 +6141,34 @@
     box-shadow:0 3px 0 rgba(23,33,31,.35)}
   .trainx p b{font-size:inherit;font-family:inherit;font-style:normal;text-shadow:none;letter-spacing:0}
   .pack-art-training{--pack-top:#2fae66;--pack-bottom:#0b5236;--pack-accent:#ffe79a}
-  /* voucher = a golden TICKET with a perforated stub */
-  #shop .stall-vlist{flex-direction:column;flex-wrap:nowrap;justify-content:center;padding:2px 8px 0;overflow-x:hidden}
-  #shop .vticket{display:flex;align-items:stretch;gap:0;width:100%;max-width:min(100%,235px);box-sizing:border-box;
-    background:linear-gradient(135deg,#ffe9a8,#ffc93c 70%,#f0b400);
-    border:3px solid var(--ink,#17211f);border-radius:12px;overflow:visible;
-    box-shadow:4px 4px 0 rgba(23,33,31,.4)}
-  #shop .vticket .vt-band{writing-mode:vertical-rl;transform:rotate(180deg);flex:0 0 auto;
+  /* voucher = a golden PORTRAIT TICKET (the card) + price chip BELOW it,
+     exactly like the singles — price outside the card, not inside */
+  /* overflow:visible + generous padding = the selection POP has room to lift &
+     scale INSIDE the panel's clip box (no scrollbar, no clipped voucher top) */
+  #shop .stall-vlist{display:flex;flex-direction:column;flex-wrap:nowrap;justify-content:center;align-items:center;
+    height:100%;padding:14px 12px 10px;overflow:visible}
+  #shop .vsingle{flex:1 1 auto;min-height:0;width:100%;max-width:min(94%,290px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+  /* the voucher is the biggest good on the board — a gentler pop keeps it whole
+     inside the notice panel while still clearly lifting on select */
+  #shop .goodx.sel .good-fit.gf-voucher{transform:translateY(-6px) scale(1.03)}
+  #shop .vsingle .good-fit.gf-voucher{flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:stretch;justify-content:center}
+  #shop .vticket{position:relative;display:flex;flex-direction:column;width:100%;
+    height:100%;max-height:100%;box-sizing:border-box;
+    background:linear-gradient(150deg,#ffe9a8,#ffc93c 65%,#f0b400);
+    border:3px solid var(--ink,#17211f);border-radius:16px;overflow:hidden;
+    box-shadow:5px 5px 0 rgba(23,33,31,.4)}
+  #shop .vticket .vt-band{writing-mode:horizontal-tb;transform:none;flex:0 0 auto;width:100%;
     display:flex;align-items:center;justify-content:center;
-    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:12px;letter-spacing:3px;color:#fff6e3;
-    background:var(--ink,#17211f);padding:8px 4px;border-radius:0 8px 8px 0;
-    border-right:2.5px dashed rgba(255,246,227,.55)}
-  #shop .vticket .vt-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px;
-    padding:10px 12px 11px;text-align:left}
-  #shop .vticket .vt-main b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:16px;
-    letter-spacing:.6px;color:#3a2a00;text-transform:uppercase;line-height:1.05}
-  #shop .vticket .vt-main small{font-weight:700;font-size:10.5px;color:#5a4200;line-height:1.35}
+    font-family:Anton,Impact,sans-serif;font-style:italic;font-size:13px;letter-spacing:4px;color:#fff6e3;
+    background:var(--ink,#17211f);padding:7px 4px 6px;border-radius:0;
+    border-bottom:2.5px dashed rgba(255,246,227,.5)}
+  #shop .vticket .vt-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    padding:12px 14px;text-align:center}
+  #shop .vticket .vt-main b{font-family:Anton,Impact,sans-serif;font-style:italic;font-size:clamp(18px,2.6vh,26px);
+    letter-spacing:.6px;color:#3a2a00;text-transform:uppercase;line-height:1.1}
+  #shop .vticket .vt-main small{font-weight:800;font-size:clamp(11px,1.6vh,14px);color:#5a4200;line-height:1.4}
   #shop .vticket.bought{filter:grayscale(.55);opacity:.6}
-  #shop .stall-vlist .vcard{width:100%;max-width:230px}
   /* the tipbox TEAM SHEET (rich tip on MANAGE SQUAD + the match DECK) */
   #tipbox.rich{max-width:310px}
   #tipbox .tip-sheet{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:2px 2px 1px}
@@ -6138,11 +6218,17 @@
     border-radius:9px;padding:5px 9px}
   .hexx-stake b{display:block;font-family:Anton,Impact,sans-serif;font-style:italic;font-size:10px;
     letter-spacing:2px;color:#ff4155;margin-bottom:2px}
-  /* narrow: stalls become a 2x2 grid and the page scrolls instead of cropping */
+  /* narrow: the page scrolls; rows get a FIXED height so the height:100% cards
+     resolve cleanly (auto rows made them blow up). One column keeps it simple. */
   @media(max-width:1080px){
-    #shop .shopx-body.shopx-v4{overflow:auto}
-    #shop .stall-row{grid-template-columns:1fr 1fr;flex:none;grid-auto-rows:minmax(220px,auto)}
-    .bench-row{flex-wrap:wrap;overflow:visible}
+    #shop .shopx-body.shopx-v4{overflow:auto;display:block;height:auto}
+    #shop .stall-row,#shop .dug-row{display:grid;grid-template-columns:1fr;flex:none;
+      grid-auto-rows:clamp(210px,30vw,300px);gap:12px;margin-bottom:12px}
+    #shop .stall-dugout .bench-row.dug-tray{overflow:hidden}
+  }
+  @media(max-width:1080px) and (min-width:620px){
+    #shop .stall-row{grid-template-columns:1fr 1fr}
+    #shop .dug-row{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -8510,7 +8596,7 @@ function rerollCost(){
 }
 let packRevealTimer=null;
 function openPack(i){
-  const pack=run.shop?.packs?.[i];if(!pack||pack.picked)return;
+  const pack=run.shop?.packs?.[i];if(!pack||pack.picked||pack.skipped)return;
   if(pack.opened){         // already paid — resume the reveal
     SFX.play("nav");run.packOpen=i;renderPackScreen();show("pack");return;
   }
@@ -8529,6 +8615,15 @@ function leavePackScreen(){
   clearTimeout(packRevealTimer);
   run.packOpen=null;packSel=null;
   renderShop();show("shop");
+}
+/* SKIP REWARD = take nothing and CLOSE the pack for good. It's already paid,
+   so mark it spent — the shop must NOT keep nagging "Continue" on a pack the
+   player deliberately walked away from. */
+function skipPackReward(){
+  const pack=run.shop?.packs?.[run.packOpen];
+  if(pack&&!pack.picked)pack.skipped=true;
+  SFX.play("nav");
+  leavePackScreen();
 }
 function coachSellValue(coach){
   let v=Math.max(2,Math.floor((coach?.price||5)*.45))+(coach?.edition?EDITIONS[coach.edition].sell:0);
@@ -8595,7 +8690,11 @@ function pickPackChoice(i){
 }
 function shakeBenchNoSpace(){
   SFX.play("tick");
-  const b=$("#packBench");if(b){b.classList.remove("no-space");void b.offsetWidth;b.classList.add("no-space")}
+  // shake whichever owned-coach bench is on screen — the pack bench OR the
+  // shop dugout — so "slots full" reads the same everywhere
+  [$("#packBench"),document.querySelector("#offers .dug-tray")].forEach(b=>{
+    if(b){b.classList.remove("no-space");void b.offsetWidth;b.classList.add("no-space")}
+  });
   flashHint("Coach slots full — sell one first.");
 }
 function packSellSelected(){
@@ -8629,14 +8728,17 @@ function buyVoucher(i){
 }
 function buySingle(i){
   const single=run.shop?.singles?.[i];if(!single||single.bought)return;
+  // coach full-slots guard runs BEFORE spending / sound — shake the dugout
+  if(single.kind==="coach"){
+    if(activeCoaches().some(c=>c.id===single.item.id)){flashHint("That coach is already active.");return}
+    if(usedCoachSlots()>=coachSlotLimit()){shakeBenchNoSpace();return}
+  }
   if(run.coins<single.price){flashHint("Not enough coins.");return}
   SFX.play(single.kind==="coach"?"coach":"buy");
   if(single.kind==="player"){
     run.coins-=single.price;
     roster().push(single.item);
   }else if(single.kind==="coach"){
-    if(activeCoaches().some(c=>c.id===single.item.id)){flashHint("That coach is already active.");return}
-    if(usedCoachSlots()>=coachSlotLimit()){flashHint("Coach slots full — sell one first.");return}
     run.coins-=single.price;
     activeCoaches().push({...single.item,edition:null,instId:uid()});
   }else{
@@ -10382,6 +10484,33 @@ function shopSellSelected(){
   const i=shopSel.i;shopSel=null;
   sellCoach(i);
 }
+/* THE OWNED TRAY (shop + pack, shared): MANAGE SQUAD + your coaches (which
+   STACK/overlap past the 3-slot cap) + your consumables (which do NOT stack —
+   one fixed slot each). FIXED SLOTS: empty ghosts hold the space so 0 items
+   and a full stack both look intentional; cards fill the panel height. */
+function benchKitCells(){
+  const tools=(run.consumables||[]).filter(c=>!c.kind);
+  const slot=c=>{const ico=c.mode==="bowl"?ICON.ball:c.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
+    return `<span class="kit-slot mode-${c.mode}" data-tip="${escSVG(c.name+" — "+dispDesc(c.desc)+" (one-use, arm it in a match)")}"><span class="kit-art">${ico}</span><span class="kit-plate">${c.name}</span></span>`;};
+  const peg=`<span class="kit-slot empty" data-tip="Kit slot — one-use tools you buy wait here, then arm from the match tray."><span class="kit-peg"><svg viewBox="0 0 80 60"><rect x="6" y="18" width="68" height="36" rx="9" fill="currentColor"/><path d="M26 18 Q40 2 54 18" fill="none" stroke="currentColor" stroke-width="5"/></svg></span></span>`;
+  const cells=tools.map(slot);
+  while(cells.length<KIT_SLOTS)cells.push(peg);
+  return cells;
+}
+const KIT_SLOTS=3;
+function ownedTrayHTML(megaId){
+  const cs=activeCoaches();
+  const slots=Math.max(coachSlotLimit(),cs.length);   // always show the cap; more if overstacked
+  const coachCells=[];
+  for(let i=0;i<slots;i++)coachCells.push(cs[i]?coachCardCell(cs[i],i,false,true):coachEmptyCell());
+  return `<button class="hand-deck squad-mega" id="${megaId}" data-tip-html="${escSVG(teamSheetTipHTML("shop"))}">
+      <span class="hd-cards"></span><b class="hd-n">${roster().length}</b><span class="hd-lbl">MANAGE SQUAD</span>
+    </button>
+    <div class="coach-spine bench-spine" aria-hidden="true">COACH</div>
+    <div class="dug-coaches">${coachCells.join("")}</div>
+    <div class="coach-spine bench-spine kit-spine" aria-hidden="true">KIT</div>
+    <div class="dug-kit">${benchKitCells().join("")}</div>`;
+}
 function renderShop(){
   run.refreshes=2+(run.refreshBonus||0);
   if(!run.shop||Array.isArray(run.shop))rollShop();
@@ -10389,46 +10518,58 @@ function renderShop(){
   const next=MATCHES[run.match];
   const coaches=activeCoaches();
   const packMarkup=(pack,i)=>{
-    const state=pack.picked?"picked":pack.opened?"opened":"sealed";
+    const done=pack.picked||pack.skipped;
+    const state=pack.picked?"picked":pack.skipped?"skipped":pack.opened?"opened":"sealed";
     const cost=packPrice(pack);
-    const hint=pack.opened&&!pack.picked?`<span class="packx-hint">Continue &#9658;</span>`:"";
+    const hint=pack.opened&&!done?`<span class="packx-hint">Continue &#9658;</span>`:"";
+    const stamp=pack.picked?'<span class="packx-stamp">CLAIMED</span>'
+      :pack.skipped?'<span class="packx-stamp skipped">SKIPPED</span>':'';
     return `<button class="packx goodx ${state} ${pack.type==='hex'?'is-hex':''}" data-sel-pack="${i}"
       data-tip="${escSVG(packDisplayName(pack)+" — "+packTagline(pack))}"
-      aria-label="${packDisplayName(pack)} — ${pack.picked?'claimed':pack.opened?'tap to continue':'costs '+cost+' coins'}">
-      <div class="packx-tilt">${packArt(pack.type,null,{sparkle:pack.type!=="consumable"&&!pack.picked,jumbo:pack.jumbo})}</div>
-      ${!pack.opened&&!pack.picked?`<span class="goodx-price"><span class="coin"></span>${cost}</span>`:""}
-      ${hint}
-      ${pack.picked?'<span class="packx-stamp">CLAIMED</span>':''}
+      aria-label="${packDisplayName(pack)} — ${pack.picked?'claimed':pack.skipped?'skipped':pack.opened?'tap to continue':'costs '+cost+' coins'}">
+      <div class="good-fit gf-pack">
+        <div class="packx-tilt">${packArt(pack.type,null,{sparkle:pack.type!=="consumable"&&!done,jumbo:pack.jumbo})}</div>
+        ${hint}
+        ${stamp}
+      </div>
+      ${!pack.opened&&!done?`<span class="goodx-price below"><span class="coin"></span>${cost}</span>`:""}
     </button>`;
   };
   /* voucher = a golden TICKET, not a text box */
-  const voucherMarkup=(v,i)=>`<div class="vticket goodx ${v.bought?'bought':''}" data-sel-voucher="${i}"
+  const voucherMarkup=(v,i)=>`<div class="vsingle goodx ${v.bought?'bought':''}" data-sel-voucher="${i}"
       data-tip="${escSVG(v.title+" — "+v.desc)}">
-    <span class="vt-band">VOUCHER</span>
-    <span class="vt-main"><b>${v.title}</b><small>${v.desc}</small></span>
-    <span class="goodx-price ${v.bought?'sold':''}">${v.bought?'SOLD':`<span class="coin"></span>${v.price}`}</span>
+    <div class="good-fit gf-voucher"><div class="vticket">
+      <span class="vt-band">VOUCHER</span>
+      <span class="vt-main"><b>${v.title}</b><small>${v.desc}</small></span>
+    </div></div>
+    <span class="goodx-price below ${v.bought?'sold':''}">${v.bought?'SOLD':`<span class="coin"></span>${v.price}`}</span>
   </div>`;
-  // Singles render as the real cards — always face-up, price tag on top.
+  // Singles: the real card (max-fit, never letterboxed) with a price chip
+  // docked BELOW it — clean and consistent whether 1 or 3 are on the shelf.
   const singleMarkup=(s,i)=>{
     const it=s.item;
-    let face="",tip="";
+    let media="",tip="",gf="gf-card";
     if(s.kind==="player"){
-      face=`<div class="singlex-cardface">${cardHTML(it,{as:"div"})}</div>`;
+      media=cardHTML(it,{as:"div"});
       tip=`${it.name} — ${it.rarity} ${it.role==="bat"?"batter":it.role==="bowl"?"bowler":"all-rounder"}${it.trait?`. ${it.trait.name}: ${dispDesc(it.trait.desc||"")}`:""}`;
-    // coach singles wear the SAME full-art trump the match carries — one identity
     }else if(s.kind==="coach"){
-      face=`<div class="singlex-cardface coachface">${coachMiniSVG(it)}</div>`;
+      media=coachMiniSVG(it);
       tip=`${it.name} — ${dispDesc(it.desc)}`;
-    // consumables wear their IN-GAME form: the vertical 1/3-card kit strip
     }else{
       const ico=it.mode==="bowl"?ICON.ball:it.mode==="bat"?ICON.bat:`<span class="kit-glyph">&#9889;</span>`;
-      face=`<span class="kit-slot goods-tool mode-${it.mode||'any'}"><span class="kit-art">${ico}</span><span class="kit-plate">${it.name}</span></span>`;
+      media=`<span class="kit-slot goods-tool mode-${it.mode||'any'}"><span class="kit-art">${ico}</span><span class="kit-plate">${it.name}</span></span>`;
+      gf="gf-tool";
       tip=`${it.name} — ${dispDesc(it.desc)}${it.kind==="instant"?" (instant, one use)":it.mode==="bat"?" (arms your batting)":it.mode==="bowl"?" (arms your bowling)":" (any ball)"}`;
     }
+    const priceHTML=`<span class="goodx-price below ${s.bought?'sold':''}">${s.bought?'SOLD':`<span class="coin"></span>${s.price}`}</span>`;
+    // CARD singles keep the price INSIDE the fit box so [card+price] centre as
+    // ONE unit — a shelf of 3-4 short cards then sits mid-panel, price hugging,
+    // instead of the card sinking to the floor. Kit strips fill height, so they
+    // keep the price docked below as a sibling.
     return `<div class="singlex goodx ${s.bought?'bought':''} ${s.kind==='consumable'?'toolg':''}"
       data-sel-single="${i}" data-tip="${escSVG(tip)}">
-      ${face}
-      <span class="goodx-price ${s.bought?'sold':''}">${s.bought?'SOLD':`<span class="coin"></span>${s.price}`}</span>
+      <div class="good-fit ${gf}">${media}${gf==="gf-card"?priceHTML:""}</div>
+      ${gf==="gf-card"?"":priceHTML}
     </div>`;
   };
   // teaching happens in the tutorial now — the sub line is pure situation
@@ -10450,7 +10591,6 @@ function renderShop(){
      bottom, overlapping when they must, MANAGE SQUAD standing first with the
      TEAM SHEET as its hover (all owned kit is one-use, so it lives in the
      match tray + the sheet, not here). */
-  const benchCoaches=activeCoaches().map((c,i)=>coachCardCell(c,i,false,true)).join("")||coachEmptyCell();
   $("#offers").className="shopx-body shopx-v4";
   $("#offers").innerHTML=`
     <div class="stall-row">
@@ -10467,15 +10607,14 @@ function renderShop(){
         <div class="stallx-goods">${kitGoods||'<div class="railx-empty">Sold out.</div>'}</div>
       </section>
     </div>
-    <div class="bench-row">
-      <button class="hand-deck squad-mega" id="squadMegaBtn" data-tip-html="${escSVG(teamSheetTipHTML("shop"))}">
-        <span class="hd-cards"></span><b class="hd-n">${roster().length}</b><span class="hd-lbl">MANAGE SQUAD</span>
-      </button>
-      <div class="coach-spine bench-spine" aria-hidden="true">COACH</div>
-      ${benchCoaches}
+    <div class="dug-row">
       <section class="stallx stall-notice">
         <div class="stallx-head">Notice Board <span>one per visit</span></div>
         <div class="stallx-goods stall-vlist">${run.shop.vouchers.map(voucherMarkup).join("")||'<div class="railx-empty">Nothing pinned.</div>'}</div>
+      </section>
+      <section class="stallx stall-dugout">
+        <div class="stallx-head">Dugout <span>your squad &amp; staff</span></div>
+        <div class="bench-row dug-tray">${ownedTrayHTML("squadMegaBtn")}</div>
       </section>
     </div>`;
   /* SELECT -> CONFIRM commerce: tap picks a good up (pop + gold ring), the
@@ -10486,7 +10625,7 @@ function renderShop(){
   });
   document.querySelectorAll("#offers [data-sel-pack]").forEach(el=>el.onclick=()=>{
     const i=+el.dataset.selPack,p=run.shop.packs[i];
-    if(!p||p.picked)return;
+    if(!p||p.picked||p.skipped)return;
     if(p.opened){openPack(i);return}       // already paid — resume the reveal
     SFX.play("tick");shopSel={type:"pack",i};paintShopSel();
   });
@@ -10559,18 +10698,12 @@ function renderPackScreen(ripIn){
     },260);
   }
   picksEl.querySelectorAll("[data-pick]").forEach(el=>el.onclick=()=>pickPackChoice(+el.dataset.pick));
-  $("#packSkipBtn").onclick=leavePackScreen;
+  $("#packSkipBtn").onclick=skipPackReward;
 }
 function renderPackBench(){
   const b=$("#packBench");if(!b)return;
   b.classList.remove("no-space");
-  const coaches=activeCoaches().map((c,i)=>coachCardCell(c,i,false,true)).join("")||coachEmptyCell();
-  b.innerHTML=`
-    <button class="hand-deck squad-mega" id="packMegaBtn" data-tip-html="${escSVG(teamSheetTipHTML("shop"))}">
-      <span class="hd-cards"></span><b class="hd-n">${roster().length}</b><span class="hd-lbl">MANAGE SQUAD</span>
-    </button>
-    <div class="coach-spine bench-spine" aria-hidden="true">COACH</div>
-    ${coaches}`;
+  b.innerHTML=ownedTrayHTML("packMegaBtn");
   b.querySelectorAll(".coachcard[data-coach]").forEach(el=>el.onclick=()=>{
     const idx=activeCoaches().findIndex(c=>(c.instId||c.id)===el.dataset.coach);
     if(idx<0)return;
